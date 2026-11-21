@@ -17,7 +17,7 @@ with no human in the loop, and watched with [gh-cao](https://github.com/githubne
 ```mermaid
 flowchart LR
   RCB[gov.pl/web/rcb/komunikaty] -->|every 10 min| U[Update data<br/>scripts/rcb.py]
-  U -->|alerts.json| P[GitHub Pages<br/>map + list]
+  U -->|alerts.json, archive.json| P[GitHub Pages<br/>map, history, analytics]
   U -- fails --> PD[parser-doctor 🤖]
   U -- unmatched.json --> RK[region-keeper 🤖]
   CI[CI / Update / Gate fail] --> CD[ci-doctor 🤖] -->|issue| PD
@@ -69,6 +69,7 @@ schedule); the gate merges only when unit tests and a live parse of gov.pl pass.
 ```sh
 python3 -I -m unittest discover -s tests
 python3 -I scripts/rcb.py update --pages 3      # writes docs/data/
+python3 -I scripts/rcb.py update --pages 120 --keep-going   # backfill the archive since 2021
 python3 -m http.server -d docs 8000
 ```
 

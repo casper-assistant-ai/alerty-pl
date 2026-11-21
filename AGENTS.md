@@ -3,10 +3,10 @@
 alerty-pl is a static site: a map of Poland that shows active RCB alerts, like alerts.in.ua does for Ukraine.
 
 - `scripts/rcb.py` (Python 3, stdlib only) reads https://www.gov.pl/web/rcb/komunikaty and the
-  detail page of each alert. It writes `docs/data/alerts.json`, `unmatched.json` and `meta.json`.
+  detail page of each alert. It writes `docs/data/alerts.json` (the last 60 days and everything active), `archive.json` (every alert since 2021, merged on each run; backfill with `update --pages 120 --keep-going`), `unmatched.json` and `meta.json`.
 - `scripts/build_geo.py` builds `docs/geo/poland.json` (SVG paths of 16 voivodeships and 380 powiaty)
   from ppatrzyk/polska-geojson. You do not need to run it.
-- `docs/` is the site (GitHub Pages): `index.html`, `app.js`, `style.css`. No build step, no npm.
+- `docs/` is the site (GitHub Pages): `index.html` + `app.js` (map), `historia.html` + `history.js` (archive), `analityka.html` + `analytics.js` (charts), shared `common.js` and `style.css`, self-hosted IBM Plex in `docs/fonts/` (OFL). No build step, no npm.
 - Tests: `python3 -I -m unittest discover -s tests`. Fixtures are saved gov.pl pages in `tests/fixtures/`.
 - Live check: `python3 -I scripts/rcb.py update --pages 1 --out /tmp/gh-aw/agent/live`.
 

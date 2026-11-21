@@ -77,6 +77,25 @@ class WaterAlert(unittest.TestCase):
         self.assertEqual(a["regions"]["whole"], [])
 
 
+class Archive(unittest.TestCase):
+    def test_archive_keeps_old_and_adds_new(self):
+        import tempfile
+        now = dt.datetime(2026, 11, 21, 12, 0, tzinfo=rcb.TZ)
+        a = rcb.parse_detail(page("alert-rcb---atak-z-powietrza-2011.html"), GAZ,
+                             title="Alert RCB - atak z powietrza (20.11)", date="2026-11-20")
+        a.update({"id": "new", "url": "https://www.gov.pl/web/rcb/new", "intro": ""})
+        a["status"], a["started_at"], a["last_at"] = rcb.status(a, now)
+        with tempfile.TemporaryDirectory() as d:
+            old = dict(rcb.compact(a), id="old", date="2024-05-01", started_at="2024-05-01T10:00:00+02:00")
+            json.dump({"alerts": [old]}, open(os.path.join(d, "archive.json"), "w"))
+            self.assertEqual(rcb.update_archive(d, [a]), 2)
+            rows = json.load(open(os.path.join(d, "archive.json")))["alerts"]
+        self.assertEqual([r["id"] for r in rows], ["new", "old"])
+        self.assertEqual(rows[0]["category"], "air")
+        self.assertIn("podkarpackie", rows[0]["voivodeships"])
+        self.assertLessEqual(len(rows[0]["message"]), 400)
+
+
 class Gazetteer(unittest.TestCase):
     def test_counts(self):
         self.assertEqual(len(GEO["voivodeships"]), 16)

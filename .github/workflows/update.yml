@@ -38,7 +38,7 @@ jobs:
         run: |
           git config user.name "alerty-pl bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/alerts.json docs/data/unmatched.json
+          git add docs/data/alerts.json docs/data/archive.json docs/data/unmatched.json
           if ! git diff --cached --quiet; then
             msg=$(python3 -I -c 'import json;m=json.load(open("docs/data/meta.json"));print("data:",m["active"],"active,",m["count"],"alerts")')
             git commit -m "$msg"

@@ -6,6 +6,8 @@ run on saved HTML in tests/fixtures without the network.
 
 Usage:
   rcb.py update [--pages N] [--out docs/data]   fetch, parse, write alerts.json + unmatched.json
+                                                and add every alert to archive.json (the history)
+  rcb.py update --pages 120 --keep-going        one-off backfill of the whole komunikaty archive
   rcb.py parse FILE.html                        print the parsed detail page (debugging)
 """
 import argparse
@@ -250,7 +252,32 @@ def build_alert(item, detail, gaz, now):
     return a
 
 
-def update(pages, out_dir):
+def compact(a):
+    """The archive record of an alert: what the history and analytics pages need."""
+    first = a["updates"][-1]["message"] if a["updates"] else a.get("intro", "")
+    return {"id": a["id"], "url": a["url"], "title": a["title"], "date": a["date"],
+            "category": a["category"], "status": a["status"],
+            "started_at": a["started_at"], "last_at": a["last_at"],
+            "voivodeships": a["regions"]["voivodeships"], "powiaty": a["regions"]["powiaty"],
+            "whole": a["regions"]["whole"], "updates": len(a["updates"]),
+            "message": (first or "")[:400]}
+
+
+def update_archive(out_dir, alerts):
+    """archive.json keeps every alert ever seen, newest first; it is never trimmed."""
+    path = os.path.join(out_dir, "archive.json")
+    arch = {}
+    if os.path.exists(path):
+        arch = {a["id"]: a for a in json.load(open(path, encoding="utf-8")).get("alerts", [])}
+    for a in alerts:
+        arch[a["id"]] = compact(a)
+    rows = sorted(arch.values(), key=lambda a: (a["date"], a["started_at"]), reverse=True)
+    write_if_changed(path, {"source": BASE + "/web/rcb/komunikaty", "parser": PARSER_VERSION,
+                            "count": len(rows), "alerts": rows}, indent=None)
+    return len(rows)
+
+
+def update(pages, out_dir, keep_going=False):
     geo = json.load(open(os.path.join(ROOT, "docs/geo/poland.json"), encoding="utf-8"))
     gaz = Gazetteer(geo)
     path = os.path.join(out_dir, "alerts.json")
@@ -276,7 +303,13 @@ def update(pages, out_dir):
             a = prev
             a["status"], a["started_at"], a["last_at"] = status(a, now)
         else:
-            a = build_alert(it, fetch(it["url"]), gaz, now)
+            try:
+                a = build_alert(it, fetch(it["url"]), gaz, now)
+            except Exception as e:  # a backfill skips a broken old page; a normal run fails loudly
+                if not keep_going:
+                    raise
+                print(f"skip {it['url']}: {e}", file=sys.stderr)
+                continue
             a["parser"] = PARSER_VERSION
         alerts.append(a)
         if a["category"] != "other" and not a["regions"]["voivodeships"] and "cała polska" not in json.dumps(a, ensure_ascii=False).lower():
@@ -289,20 +322,24 @@ def update(pages, out_dir):
             a["status"], a["started_at"], a["last_at"] = status(a, now)
             alerts.append(a)
     alerts.sort(key=lambda a: (a["date"], a["last_at"]), reverse=True)
-    alerts = alerts[:400]
+    os.makedirs(out_dir, exist_ok=True)
+    total = update_archive(out_dir, alerts)
+    # the live map needs only recent alerts; the history lives in archive.json
+    cutoff = (now.date() - dt.timedelta(days=RECENT_DAYS)).isoformat()
+    alerts = [a for a in alerts if a["date"] >= cutoff or a["status"] in ("active", "planned")][:400]
     os.makedirs(out_dir, exist_ok=True)
     data = {"source": BASE + "/web/rcb/komunikaty", "parser": PARSER_VERSION, "alerts": alerts}
     write_if_changed(path, data)
     write_if_changed(os.path.join(out_dir, "unmatched.json"), {"items": unmatched})
     meta = {"checked_at": now.isoformat(timespec="seconds"), "count": len(alerts),
-            "active": sum(a["status"] == "active" for a in alerts)}
+            "active": sum(a["status"] == "active" for a in alerts), "archive": total}
     with open(os.path.join(out_dir, "meta.json"), "w", encoding="utf-8") as fh:
         json.dump(meta, fh, ensure_ascii=False, indent=1)
     print(json.dumps(meta, ensure_ascii=False))
 
 
-def write_if_changed(path, data):
-    new = json.dumps(data, ensure_ascii=False, indent=1) + "\n"
+def write_if_changed(path, data, indent=1):
+    new = json.dumps(data, ensure_ascii=False, indent=indent) + "\n"
     if os.path.exists(path) and open(path, encoding="utf-8").read() == new:
         return False
     with open(path, "w", encoding="utf-8") as fh:
@@ -311,6 +348,7 @@ def write_if_changed(path, data):
 
 
 PARSER_VERSION = 1
+RECENT_DAYS = 60  # alerts.json keeps this many days; archive.json keeps everything
 
 
 def main():
@@ -319,11 +357,12 @@ def main():
     u = sub.add_parser("update")
     u.add_argument("--pages", type=int, default=3)
     u.add_argument("--out", default=os.path.join(ROOT, "docs/data"))
+    u.add_argument("--keep-going", action="store_true", help="skip detail pages that fail (backfill)")
     p = sub.add_parser("parse")
     p.add_argument("file")
     a = ap.parse_args()
     if a.cmd == "update":
-        update(a.pages, a.out)
+        update(a.pages, a.out, a.keep_going)
     else:
         geo = json.load(open(os.path.join(ROOT, "docs/geo/poland.json"), encoding="utf-8"))
         r = parse_detail(open(a.file, encoding="utf-8").read(), Gazetteer(geo))
