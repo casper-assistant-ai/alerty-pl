@@ -15,6 +15,29 @@
  },
  "releases": [
   {
+   "version": "1.6.0",
+   "date": "2026-11-21",
+   "sha": "ffe1c84",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "site-check",
+     "breaking": false,
+     "text": "hourly headless check of the live site and a site-fixer agent",
+     "sha": "ffe1c84",
+     "date": "2026-11-21"
+    },
+    {
+     "type": "feat",
+     "scope": "changelog",
+     "breaking": false,
+     "text": "Zmiany page with semver releases built from Conventional Commits",
+     "sha": "c39f61e",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
    "version": "1.5.1",
    "date": "2026-11-21",
    "sha": "480d5db",
