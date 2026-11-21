@@ -1,13 +1,21 @@
 ---
 description: |
-  Investigates failed runs of CI, Update data and Agent PR gate on main and files one
-  issue per distinct cause with the evidence and the fix it suggests.
+  Investigates failed runs of CI, Update data and Agent PR gate, on main and on pull requests,
+  files one issue per distinct cause with the evidence and the fix it suggests, and dispatches
+  the issue-worker, which brings it to a fix PR or closes it with the reason.
 on:
   workflow_run:
     workflows: ["CI", "Update data", "Agent PR gate"]
     types: [completed]
     branches: [main]
-if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+  # CI on a pull request of this repository starts this run itself when it fails (ci.yml);
+  # fork PRs cannot, so outsiders cannot spend the agent budget
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "Id of the failed run"
+        required: true
+if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
 permissions:
   actions: read
   contents: read
@@ -26,9 +34,13 @@ safe-outputs:
     deduplicate-by-title: true
     expires: 7d
   add-comment:
-    max: 1
+    max: 2
     target: "*"
+  dispatch-workflow:
+    workflows: [issue-worker]
+    max: 1
   noop:
+    report-as-issue: false
 timeout-minutes: 10
 ---
 
@@ -36,14 +48,20 @@ timeout-minutes: 10
 
 Read the Process block in `AGENTS.md` first: it says what the team needs from you this week.
 
-Run: ${{ github.event.workflow_run.html_url }} (run id ${{ github.event.workflow_run.id }},
-head ${{ github.event.workflow_run.head_sha }}).
+Run: ${{ github.event.workflow_run.html_url }} (run id ${{ github.event.workflow_run.id }}${{ github.event.inputs.run_id }},
+head ${{ github.event.workflow_run.head_sha }}). Read the run (GitHub tools) for its event and
+head branch: a `pull_request` run belongs to the PR with that head branch.
 
-1. Read the failed jobs' logs and find the first real error.
+0. A run with no jobs (it waited for an approval that expired, or the pull request was merged
+   or closed first) is not a failure of the code: call `noop`.
+1. Read the failed jobs' logs and find the first real error. For a pull request run, find the PR
+   by its head branch and add one comment there with the cause and the fix.
 2. Classify it: parser broke on new gov.pl HTML, gov.pl unreachable (transient), test failure,
    workflow or permission problem, or Pages deployment problem.
 3. Search open issues titled "[ci-doctor]". If one has the same cause, add one comment with this
    run's link and stop.
 4. A single transient network error with the next run green: call `noop`.
-5. Otherwise create one issue: the error line, the cause with a confidence level, and the fix.
-   When the parser broke, say that the parser doctor was dispatched and should fix it.
+5. Otherwise create one issue: the error line, the cause with a confidence level, the fix, and
+   the PR number for a pull request run. When the parser broke, say that the parser doctor was
+   dispatched and should fix it. Then dispatch the `issue-worker`: it brings the issue to a fix PR
+   (an agent PR that fails is replaced by a fixed one) or closes it with the reason.

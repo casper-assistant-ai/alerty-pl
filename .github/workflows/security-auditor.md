@@ -32,6 +32,7 @@ safe-outputs:
     close-older-issues: true
     expires: 14d
   noop:
+    report-as-issue: false
 timeout-minutes: 30
 ---
 

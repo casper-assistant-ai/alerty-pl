@@ -27,6 +27,7 @@ safe-outputs:
     max: 5
     target: "*"
   noop:
+    report-as-issue: false
 timeout-minutes: 10
 ---
 

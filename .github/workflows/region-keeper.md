@@ -32,6 +32,7 @@ safe-outputs:
     protected-files: blocked
     expires: 3d
   noop:
+    report-as-issue: false
 timeout-minutes: 20
 ---
 
