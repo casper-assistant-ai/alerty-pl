@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests on saved RCB pages
+        run: python3 -I -m unittest discover -s tests -v
+      - name: Live smoke test (gov.pl list page parses)
+        run: python3 -I scripts/rcb.py update --pages 1 --out /tmp/smoke && python3 -I -c "import json;d=json.load(open('/tmp/smoke/alerts.json'));assert d['alerts'],'no alerts';print(len(d['alerts']),'alerts')"
+      - name: JavaScript syntax
+        run: node --check docs/app.js

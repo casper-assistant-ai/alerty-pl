@@ -1,0 +1,59 @@
+name: Agent PR gate
+
+# No humans in the loop: agent PRs are merged by this deterministic gate, not by a person.
+# A PR is merged only when (1) a gh-aw agent opened it, (2) it touches allowed paths only,
+# (3) unit tests and a live parse of gov.pl pass on its head. Anything else gets a comment.
+on:
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: agent-pr-gate
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ALLOWED: '^(scripts/|tests/|docs/(index\.html|app\.js|style\.css)$|README\.md$|AGENTS\.md$)'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check and merge agent PRs
+        run: |
+          set -u
+          git config user.name "alerty-pl bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          prs=$(gh pr list --state open --label agent --json number,author,isDraft \
+                --jq '.[] | select(.author.login=="app/github-actions" or .author.login=="github-actions") | .number')
+          for n in $prs; do
+            echo "::group::PR #$n"
+            gh pr ready "$n" 2>/dev/null || true
+            files=$(gh pr diff "$n" --name-only)
+            bad=$(echo "$files" | grep -Ev "$ALLOWED" || true)
+            if [ -n "$bad" ]; then
+              gh pr comment "$n" --body "Agent PR gate: files outside the allowed paths, not merged: $(echo $bad)"
+              gh pr edit "$n" --remove-label agent --add-label needs-attention
+              echo "::endgroup::"; continue
+            fi
+            git checkout -q --detach
+            gh pr checkout "$n" --force
+            ok=1
+            python3 -I -m unittest discover -s tests || ok=0
+            python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n || ok=0
+            node --check docs/app.js || ok=0
+            git checkout -q main
+            if [ "$ok" = 1 ]; then
+              gh pr merge "$n" --squash --delete-branch && echo "merged #$n"
+            else
+              gh pr comment "$n" --body "Agent PR gate: tests or the live parse failed on this branch. The authoring agent should push a fix."
+            fi
+            echo "::endgroup::"
+          done

@@ -1,0 +1,61 @@
+name: Update data
+
+# Every 10 minutes: read gov.pl/web/rcb/komunikaty, rebuild docs/data, deploy the site.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["docs/**", "scripts/**", "tests/**", ".github/workflows/update.yml"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  actions: write
+  issues: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: python3 -I -m unittest discover -s tests -v
+      - name: Scrape RCB
+        id: scrape
+        run: python3 -I scripts/rcb.py update --pages 3
+      - name: Commit data when alerts changed
+        run: |
+          git config user.name "alerty-pl bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/alerts.json docs/data/unmatched.json
+          if ! git diff --cached --quiet; then
+            msg=$(python3 -I -c 'import json;m=json.load(open("docs/data/meta.json"));print("data:",m["active"],"active,",m["count"],"alerts")')
+            git commit -m "$msg"
+            git pull --rebase -X theirs origin main
+            git push
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deploy
+        uses: actions/deploy-pages@v4
+      - name: Call the parser doctor on failure
+        if: failure() && steps.scrape.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # One doctor run per day at most: skip when an open parser issue or PR exists.
+          open=$(gh pr list --search 'in:title "[parser-doctor]"' --json number --jq length)
+          if [ "$open" = "0" ]; then gh workflow run parser-doctor.lock.yml || true; fi
