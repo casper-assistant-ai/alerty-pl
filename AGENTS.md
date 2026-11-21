@@ -41,11 +41,15 @@ number in `process/retro-log.md`). Every agent follows it.
 <!-- process:start -->
 - Target: at least half of the agent output is product work (feat, fix, perf, refactor, test):
   merged PRs that change the map, history, analytics, parser, tests or site check. Data commits,
-  reports and docs touch-ups are bookkeeping and do not count.
+  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-21: 60% (3 product
+  PRs, 2 reports); hold it by merging at least 4 product PRs next week.
 - Builders (site-designer, site-fixer, parser-doctor, region-keeper, test-improver, docs-keeper):
   before your own plan, look for open issues labelled `dev-task` that name you or fit your paths.
   Take the oldest one, and say `Closes #<n>` in the PR body. Call `noop` only when no dev-task fits
   and your own checklist finds nothing worth a PR.
+- Dev-tasks opened 2026-11-21: test-improver takes the status-rules tests (TTL, drill windows,
+  untested categories); site-designer takes the analytics → history cross-links with a powiat
+  filter. Both agents run before the 2026-11-23 retro.
 - Reporters (daily-status, ci-doctor, security-auditor): when a report finds something to build or
   fix, name the builder that should take it, so the next retro can turn it into a dev-task.
 <!-- process:end -->
