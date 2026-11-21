@@ -1,19 +1,7 @@
-// Alerty RCB — draws the map from geo/poland.json and colours it from data/alerts.json.
-const CAT = {
-  air: "Zagrożenie z powietrza", drill: "Ćwiczenia / test syren", water: "Woda niezdatna do picia",
-  weather: "Pogoda / powietrze", ordnance: "Niewybuch / ewakuacja", fire: "Pożar",
-  chemical: "Skażenie", other: "Inne komunikaty",
-};
-const PRIORITY = ["air", "chemical", "fire", "ordnance", "weather", "water", "drill", "other"];
+// Alerty RCB — the map page: draws geo/poland.json and colours powiaty from data/alerts.json.
+"use strict";
+const { CAT, PRIORITY, $, h, color, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText } = RCB;
 const NS = "http://www.w3.org/2000/svg";
-const $ = (s) => document.querySelector(s);
-const color = (c) => getComputedStyle(document.documentElement).getPropertyValue("--" + c).trim();
-
-async function getJSON(url) {
-  const r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store" });
-  if (!r.ok) throw new Error(url + ": " + r.status);
-  return r.json();
-}
 
 function el(tag, attrs = {}, parent) {
   const e = document.createElementNS(NS, tag);
@@ -31,47 +19,15 @@ function drawMap(geo) {
     path.dataset.name = (p.city ? "" : "powiat ") + p.name;
   }
   for (const v of geo.voivodeships) {
-    el("path", { d: v.d, class: "woj", "data-id": v.id }, gw);
-    const t = el("text", { x: v.cx, y: v.cy }, gt);
-    t.textContent = v.name;
+    el("path", { d: v.d, class: "woj" }, gw);
+    el("text", { x: v.cx, y: v.cy }, gt).textContent = v.name;
   }
 }
 
-function fmtTime(iso) {
-  const d = new Date(iso);
-  return d.toLocaleString("pl-PL", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" });
-}
-
-function duration(iso) {
-  const min = Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000));
-  return min < 60 ? `${min} min` : `${Math.floor(min / 60)} h ${min % 60} min`;
-}
-
-function regionLine(a, geo) {
-  const vn = Object.fromEntries(geo.voivodeships.map((v) => [v.id, v.name]));
-  const vs = a.regions.voivodeships.map((v) => "woj. " + (vn[v] || v));
-  const n = a.regions.powiaty.length;
-  return vs.join(", ") + (n ? ` · ${n} pow.` : "");
-}
-
-function item(a, geo, live) {
-  const li = document.createElement("li");
-  li.style.setProperty("--c", color(a.category));
-  const msg = (a.updates[0] && a.updates[0].message) || a.intro;
-  li.innerHTML = `<div class="t"></div><div class="m"></div><div class="r"></div><div class="when"></div>`;
-  li.querySelector(".t").textContent = CAT[a.category] + (a.status === "planned" ? " (planowane)" : "");
-  li.querySelector(".m").textContent = msg;
-  li.querySelector(".r").textContent = regionLine(a, geo);
-  const w = li.querySelector(".when");
-  w.innerHTML = live ? `trwa ${duration(a.started_at)} · ` : `${fmtTime(a.last_at > a.started_at ? a.last_at : a.started_at)} · `;
-  const link = document.createElement("a");
-  link.href = a.url; link.textContent = "komunikat RCB";
-  w.appendChild(link);
-  return li;
-}
+const covers = (a, p) => a.regions.powiaty.includes(p.dataset.id) || a.regions.whole.includes(p.dataset.v);
 
 function paint(geo, alerts) {
-  const fill = {}; // powiat id -> category (highest priority)
+  const fill = {};
   const put = (id, cat) => {
     if (!fill[id] || PRIORITY.indexOf(cat) < PRIORITY.indexOf(fill[id])) fill[id] = cat;
   };
@@ -84,69 +40,66 @@ function paint(geo, alerts) {
     p.style.fill = cat ? color(cat) : "";
     p.classList.toggle("hit", !!cat);
     p.classList.toggle("blink", cat === "air");
-    p.dataset.cat = cat || "";
   });
+  const used = new Set(Object.values(fill));
+  // the legend shows what is on the map now; with nothing active it explains the colours anyway
+  const cats = used.size ? PRIORITY.filter((c) => used.has(c)) : ["air", "water", "weather", "drill"];
+  $("#legend").replaceChildren(...cats.map((c) => h("li", {}, swatch(c), CAT[c])));
 }
 
-function tooltips(alerts) {
+function tooltips(state) {
   const tip = $("#tip"), wrap = $(".map-wrap");
-  $("#map").addEventListener("mousemove", (e) => {
+  $("#map").addEventListener("pointermove", (e) => {
     const p = e.target.closest("path.pow");
     if (!p) { tip.hidden = true; return; }
-    const hits = alerts.filter((a) => a.regions.powiaty.includes(p.dataset.id) || a.regions.whole.includes(p.dataset.v));
-    tip.innerHTML = "";
-    const b = document.createElement("b"); b.textContent = p.dataset.name; tip.appendChild(b);
-    const s = document.createElement("div");
-    s.textContent = hits.length ? hits.map((a) => CAT[a.category]).join(", ") : "brak alertów";
-    tip.appendChild(s);
+    const hits = state.active.filter((a) => covers(a, p));
+    tip.replaceChildren(h("b", { text: p.dataset.name }),
+      h("div", { text: hits.length ? hits.map((a) => CAT[a.category]).join(", ") : "brak alertów" }));
     const r = wrap.getBoundingClientRect();
-    tip.style.left = e.clientX - r.left + 14 + "px";
-    tip.style.top = e.clientY - r.top + 14 + "px";
+    const x = Math.min(e.clientX - r.left + 12, r.width - 200);
+    tip.style.left = x + "px";
+    tip.style.top = e.clientY - r.top + 12 + "px";
     tip.hidden = false;
   });
-  $("#map").addEventListener("mouseleave", () => (tip.hidden = true));
+  $("#map").addEventListener("pointerleave", () => (tip.hidden = true));
 }
 
-function legend() {
-  $("#legend").innerHTML = PRIORITY.filter((c) => c !== "other")
-    .map((c) => `<span><i style="background:${color(c)}"></i>${CAT[c]}</span>`).join("");
+function activeRow(a) {
+  const msg = (a.updates[0] && a.updates[0].message) || a.intro;
+  const link = h("a", { href: a.url, text: "komunikat" });
+  const since = a.status === "planned" ? "planowany od " + fmtShort(new Date(a.started_at)) : "trwa " + duration(a.started_at);
+  return h("li", {},
+    h("div", { class: "row-head" }, swatch(a.category), CAT[a.category]),
+    h("p", { class: "row-msg", text: msg.replace(/^"|"$/g, "") }),
+    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.regions.voivodeships, a.regions.powiaty) }), h("span", { text: since }), link));
+}
+
+function recentRow(a) {
+  const d = new Date(a.started_at);
+  return h("li", {},
+    h("span", { class: "when mono", text: hasTime(a.started_at) ? fmtShort(d) : fmtDay(d).slice(0, 5) }),
+    h("a", { class: "what", href: a.url }, swatch(a.category), h("span", { text: `${CAT[a.category]} · ${regionText(a.regions.voivodeships, [])}` })));
 }
 
 async function main() {
   const geo = await getJSON("geo/poland.json");
   drawMap(geo);
-  legend();
-  let bound = false;
+  const state = { active: [] };
+  tooltips(state);
   async function refresh() {
-    try {
-      const [data, meta] = await Promise.all([getJSON("data/alerts.json"), getJSON("data/meta.json")]);
-      const active = data.alerts.filter((a) => a.status === "active" || a.status === "planned");
-      const cutoff = Date.now() - 14 * 86400000;
-      const recent = data.alerts.filter((a) => !active.includes(a) && new Date(a.last_at) > cutoff && a.category !== "other");
-      paint(geo, active);
-      if (!bound) { tooltips(active); bound = true; }
-      const ul = $("#active"); ul.innerHTML = "";
-      if (!active.length) {
-        const li = document.createElement("li"); li.className = "empty"; li.textContent = "Brak aktywnych alertów RCB."; ul.appendChild(li);
-      }
-      active.forEach((a) => ul.appendChild(item(a, geo, true)));
-      const ur = $("#recent"); ur.innerHTML = "";
-      recent.slice(0, 30).forEach((a) => ur.appendChild(item(a, geo, false)));
-      const n = active.length, air = active.some((a) => a.category === "air");
-      $("#active-count").textContent = n;
-      $("#active-count").classList.toggle("zero", !n);
-      $("#active-count").classList.toggle("alarm", air);
-      const dot = $("#dot");
-      dot.classList.toggle("ok", !air);
-      dot.classList.toggle("alarm", air);
-      const alarmEl = $("#alarm");
-      const alarmTxt = air ? "Zagrożenie z powietrza" : "";
-      if (alarmEl.textContent !== alarmTxt) alarmEl.textContent = alarmTxt; // role=status: announced only on a real change
-      $("#checked").textContent = "sprawdzono " + fmtTime(meta.checked_at);
-      document.title = (air ? "Zagrożenie z powietrza — " : "") + "Alerty RCB — mapa alertów w Polsce";
-    } catch (e) {
-      $("#checked").textContent = "Nie udało się pobrać danych: " + e.message;
-    }
+    const res = await RCB.strip();
+    if (!res) return;
+    const { data, active } = res;
+    state.active = active;
+    paint(geo, active);
+    const cutoff = Date.now() - 7 * 86400000;
+    const recent = data.alerts.filter((a) => !active.includes(a) && new Date(a.last_at) > cutoff && a.category !== "other");
+    $("#active-count").textContent = active.length;
+    $("#active").replaceChildren(...(active.length ? active.map(activeRow)
+      : [h("li", { class: "empty", text: "Żaden alert RCB nie jest teraz aktywny." })]));
+    $("#week-count").textContent = recent.length;
+    $("#recent").replaceChildren(...(recent.length ? recent.slice(0, 12).map(recentRow)
+      : [h("li", { class: "empty", text: "W tym tygodniu nie było alertów." })]));
   }
   await refresh();
   setInterval(refresh, 60000);
