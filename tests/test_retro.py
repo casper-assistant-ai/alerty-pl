@@ -59,6 +59,15 @@ class Summarize(unittest.TestCase):
         self.assertIn("development share **50%**", retro.markdown(m))
 
 
+class Roles(unittest.TestCase):
+    def test_roles_from_sources(self):
+        r = retro.roles()
+        self.assertEqual(r["process-retro"], "process")
+        self.assertEqual(r["agent-coach"], "process")
+        self.assertEqual(r["site-designer"], "builder")
+        self.assertEqual(r["daily-status"], "reporter")
+
+
 class Schedule(unittest.TestCase):
     def test_caps_and_unknown(self):
         import json, tempfile
