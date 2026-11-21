@@ -1,5 +1,10 @@
 {
   "entries": {
+    "cloudflare/security-audit-skill/skills/security-audit@main": {
+      "repo": "cloudflare/security-audit-skill/skills/security-audit",
+      "version": "main",
+      "sha": "c1c8a8c1471069fb0e188eeaff69b8e8db6564a8"
+    },
     "github/gh-aw-actions/setup-cli@v1.2.2": {
       "repo": "github/gh-aw-actions/setup-cli",
       "version": "v1.2.2",
@@ -9,6 +14,26 @@
       "repo": "github/gh-aw-actions/setup",
       "version": "v1.2.2",
       "sha": "53d0749e19424a918acd82b4d140264ce48f2f14"
+    },
+    "googlechrome/modern-web-guidance/skills/modern-web-guidance@main": {
+      "repo": "googlechrome/modern-web-guidance/skills/modern-web-guidance",
+      "version": "main",
+      "sha": "64a6d708f5a43f2cd3fde5d4d7db3905ba1bdf65"
+    },
+    "heydamir/unslop/skills/unslop@main": {
+      "repo": "heydamir/unslop/skills/unslop",
+      "version": "main",
+      "sha": "620163eedb3529d9cd23a3994ed8d287d06f760d"
+    },
+    "microsoft/TokenEconomizer/plugin@main": {
+      "repo": "microsoft/TokenEconomizer/plugin",
+      "version": "main",
+      "sha": "1bfeccdcecf48333b22762ad1dd9e36c6dc065df"
+    },
+    "microsoft/skillopt/plugins/claude-code/skills/skillopt-sleep@main": {
+      "repo": "microsoft/skillopt/plugins/claude-code/skills/skillopt-sleep",
+      "version": "main",
+      "sha": "4fa83964c71a62dc7b815b344f6272d3383b6eb1"
     }
   }
 }

@@ -25,23 +25,40 @@ flowchart LR
   G -->|squash merge| main[(main)]
   IT[issue-triage 🤖] -->|labels| RK & PD
   DS[daily-status 🤖] -->|daily report issue| main
-  CAO[gh-cao] -.monitors.-> PD & RK & CD & DS & IT & TI & DK
+  SD[site-designer 🤖] -->|PR| G
+  SA[security-auditor 🤖] -->|issue| PD
+  AC[agent-coach 🤖] -->|learned rules PR| G
+  CAO[gh-cao] -.monitors.-> PD & RK & CD & DS & IT & TI & DK & SD & SA & AC
 ```
 
 ## The team
 
-| Workflow | Kind | Trigger | May change |
-|---|---|---|---|
-| `update.yml` | plain Actions | every 10 min | `docs/data/`, Pages |
-| `ci.yml` | plain Actions | push, PR | nothing |
-| `agent-pr-gate.yml` | plain Actions | twice an hour | merges agent PRs that pass |
-| `parser-doctor` | agent | daily + when Update fails | PR: `scripts/`, `tests/` |
-| `region-keeper` | agent | daily | PR: `scripts/`, `tests/` |
-| `ci-doctor` | agent | a failed run on main | issue |
-| `issue-triage` | agent | every 12 h | labels, comments |
-| `test-improver` | agent | weekly | PR: `tests/` |
-| `docs-keeper` | agent | weekly | PR: `README.md`, `AGENTS.md` |
-| `daily-status` | agent | daily | report issue |
+| Workflow | Kind | Model | Trigger | May change |
+|---|---|---|---|---|
+| `update.yml` | plain Actions | — | every 10 min | `docs/data/`, Pages |
+| `ci.yml` | plain Actions | — | push, PR | nothing |
+| `agent-pr-gate.yml` | plain Actions | — | twice an hour | merges agent PRs that pass |
+| `parser-doctor` | agent | GLM-5.3 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
+| `region-keeper` | agent | GLM-5.3 (z.ai) | daily | PR: `scripts/`, `tests/` |
+| `test-improver` | agent | GLM-5.3 (z.ai) | weekly | PR: `tests/` |
+| `docs-keeper` | agent | GLM-5.3 (z.ai) | weekly | PR: `README.md`, `AGENTS.md` |
+| `site-designer` | agent + skills unslop, modern-web-guidance | GLM-5.3 (z.ai) | weekly | PR: `docs/*.html\|js\|css` |
+| `security-auditor` | agent + skill security-audit | GLM-5.3 (z.ai) | weekly | issue |
+| `agent-coach` | agent + skill skillopt-sleep | GLM-5.3 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
+| `ci-doctor` | agent | Copilot | a failed run on main | issue |
+| `issue-triage` | agent | Copilot | every 12 h | labels, comments |
+| `daily-status` | agent | Copilot | daily | report issue |
+
+The developer agents run Claude Code against z.ai's Anthropic-compatible API
+(`engine: claude`, `model: glm-5.3`, `ANTHROPIC_BASE_URL`, secret `ANTHROPIC_API_KEY`; shared
+settings in `.github/workflows/shared/zai.md`). They load the
+[TokenEconomizer](https://github.com/microsoft/TokenEconomizer) plugin for cost control. Skills come
+pinned by commit through gh-aw `skills:`:
+[unslop](https://github.com/heydamir/unslop),
+[modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance),
+[security-audit](https://github.com/cloudflare/security-audit-skill) and
+[skillopt-sleep](https://github.com/microsoft/skillopt).
+Watchers and reporters stay on GitHub Copilot.
 
 Guard rails: agents run read-only and write only through gh-aw safe outputs; each PR is limited to
 its `allowed-files`; `.github/` is protected; public issues never start an agent (triage runs on a
