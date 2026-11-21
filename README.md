@@ -26,6 +26,8 @@ flowchart LR
   IT[issue-triage 🤖] -->|labels| RK & PD
   DS[daily-status 🤖] -->|daily report issue| main
   SD[site-designer 🤖] -->|PR| G
+  SC[site check<br/>headless Chrome] -->|issue site-error| SF[site-fixer 🤖]
+  SF -->|PR| G
   SA[security-auditor 🤖] -->|issue| PD
   AC[agent-coach 🤖] -->|learned rules PR| G
   CAO[gh-cao] -.monitors.-> PD & RK & CD & DS & IT & TI & DK & SD & SA & AC
@@ -35,13 +37,15 @@ flowchart LR
 
 | Workflow | Kind | Model | Trigger | May change |
 |---|---|---|---|---|
-| `update.yml` | plain Actions | — | every 10 min | `docs/data/`, Pages |
+| `update.yml` | plain Actions | — | every 10 min | `docs/data/`, release tag, `CHANGELOG.md`, Pages |
+| `site-check.yml` | plain Actions, headless Chrome | — | hourly and after each deploy | issue `site-error`, dispatches `site-fixer` |
 | `ci.yml` | plain Actions | — | push, PR | nothing |
 | `agent-pr-gate.yml` | plain Actions | — | twice an hour | merges agent PRs that pass |
 | `parser-doctor` | agent | GLM-5.3 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
 | `region-keeper` | agent | GLM-5.3 (z.ai) | daily | PR: `scripts/`, `tests/` |
 | `test-improver` | agent | GLM-5.3 (z.ai) | weekly | PR: `tests/` |
 | `docs-keeper` | agent | GLM-5.3 (z.ai) | weekly | PR: `README.md`, `AGENTS.md` |
+| `site-fixer` | agent | GLM-5.3 (z.ai) | on a site-check issue, daily | PR: `docs/*.html\|js\|css`, `scripts/`, `tests/` |
 | `site-designer` | agent + skills unslop, modern-web-guidance | GLM-5.3 (z.ai) | weekly | PR: `docs/*.html\|js\|css` |
 | `security-auditor` | agent + skill security-audit | GLM-5.3 (z.ai) | weekly | issue |
 | `agent-coach` | agent + skill skillopt-sleep | GLM-5.3 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
@@ -82,3 +86,10 @@ gh aw status && gh aw logs --start-date -1d
 ```
 
 Map data: [ppatrzyk/polska-geojson](https://github.com/ppatrzyk/polska-geojson) (MIT). Code: MIT.
+
+## Versions and changelog
+
+Commits follow [Conventional Commits](https://www.conventionalcommits.org); CI checks them.
+Each Update data run tags a new [semver](https://semver.org) version when main has releasable
+commits (`feat` → minor, `fix`/`perf` → patch, `!` → major) and rebuilds `CHANGELOG.md` and the
+[Zmiany](https://casper-assistant-ai.github.io/alerty-pl/zmiany.html) page from them.
