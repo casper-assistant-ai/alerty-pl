@@ -3,6 +3,7 @@
 
     retro.py metrics [--days 7] [--repo OWNER/NAME] [--out FILE.json] [--md FILE.md]
     retro.py dispatch [--schedule process/schedule.json] [--dry-run]
+    retro.py queue [--repo OWNER/NAME] [--out FILE.json] [--md FILE.md]
 
 `metrics` reads the last N days from the GitHub REST API (GH_TOKEN or GITHUB_TOKEN) and the
 workflow sources in .github/workflows, and counts for every agent: runs, failures, PRs opened,
@@ -14,6 +15,10 @@ Data commits of the Update data workflow are counted apart and never count as ei
 `dispatch` reads process/schedule.json (kept by the process-retro agent through the Agent PR
 gate) and starts the extra agent runs planned for today. It only starts agentic workflows that
 exist in this repository, at most `max_extra_runs_per_week` (capped at 3) per agent.
+
+`queue` lists the work waiting for the issue-worker agent: every open issue with its kind and the
+open PRs that already name it, the agent PRs the gate refused, and whether today's improvement PR
+(tests, reliability, simplicity) is still due because the queue is empty.
 Python 3 stdlib only.
 """
 import argparse
@@ -35,7 +40,8 @@ PREFIX = re.compile(r"^\[(?P<agent>[a-z0-9-]+)\] ")
 # the type the Agent PR gate gives a PR whose title is not a Conventional Commit
 GATE_TYPE = {"site-fixer": "fix", "site-designer": "feat", "parser-doctor": "fix",
              "region-keeper": "fix", "security-auditor": "fix", "test-improver": "test",
-             "docs-keeper": "docs", "agent-coach": "chore", "process-retro": "chore"}
+             "docs-keeper": "docs", "agent-coach": "chore", "process-retro": "chore",
+             "issue-worker": "fix"}
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 HARD_CAP = 3
 # agents that change the process itself; their PRs count as process, not as output
@@ -95,6 +101,7 @@ def summarize(commits, prs, issues, runs, role, since):
             if r.get("conclusion") in ("failure", "timed_out", "startup_failure"):
                 agents[a]["failed"] += 1
     linked = set()
+    dev_days = set()
     out = {"dev": 0, "book": 0, "process": 0, "other": 0}
     for p in prs:
         for n in re.findall(r"#(\d+)", (p.get("title") or "") + " " + (p.get("body") or "")):
@@ -111,6 +118,7 @@ def summarize(commits, prs, issues, runs, role, since):
             out[k if k in out else "other"] += 1
             if k == "dev":
                 g["dev_merged"] += 1
+                dev_days.add(p["merged_at"][:10])
         elif p.get("state") == "closed" or "needs-attention" in labels:
             g["rejected"] += 1
         else:
@@ -141,6 +149,7 @@ def summarize(commits, prs, issues, runs, role, since):
         "since": since,
         "dev_share": round(out["dev"] / total, 2) if total else None,
         "agent_output": out,
+        "dev_days": sorted(dev_days),
         "main_commits": kinds,
         "issues_without_pr": sorted(unlinked),
         "tooling_notices": tooling,
@@ -159,6 +168,8 @@ def markdown(m):
         "",
         f"- Commits on main: {c['dev']} product, {c['book']} docs/chore, {c['process']} process, "
         f"{c['data']} data, {c['other']} other.",
+        f"- Days with product work merged: {len(m.get('dev_days', []))} "
+        f"({', '.join(m.get('dev_days', [])) or 'none'}); a day without it is a failed day.",
         f"- Builders with nothing merged: {', '.join(m['builders_without_merge']) or 'none'}.",
         f"- Agents that only report: {', '.join(m['reporters_only']) or 'none'}.",
         f"- Open issues with no PR: {', '.join('#' + str(n) for n in m['issues_without_pr']) or 'none'}.",
@@ -233,6 +244,74 @@ def repo_name(arg):
     return arg or os.environ.get("GITHUB_REPOSITORY") or "casper-assistant-ai/alerty-pl"
 
 
+# gh-aw keeps these issues itself (no-op tracker); they are closed by fixing the cause
+MANAGED = re.compile(r"^\[aw\] No-Op Runs")
+WORKER = "issue-worker"
+IMPROVEMENT = "<!-- improvement -->"  # the issue-worker puts this line in an improvement PR body
+
+
+def issue_kind(title, labels):
+    """What an open issue asks for: managed, report, dev-task, ci, site-error, aw-notice or request."""
+    labels = set(labels or [])
+    a = agent_of(title)
+    if MANAGED.match(title or ""):
+        return "managed"
+    if "dev-task" in labels:
+        return "dev-task"
+    if "site-error" in labels:
+        return "site-error"
+    if a == "ci-doctor" or "ci" in labels:
+        return "ci"
+    if "agentic-workflows" in labels:
+        return "aw-notice"
+    if "report" in labels or a in ("daily-status", "security-audit"):
+        return "report"
+    return "request"
+
+
+ORDER = ["ci", "site-error", "aw-notice", "request", "dev-task", "report", "managed"]
+
+
+def queue(issues, prs, today):
+    """Pure: the issue-worker's queue from open issues and all recent PRs (plain dicts)."""
+    refs = {}
+    for p in prs:
+        if p.get("state") != "open":
+            continue
+        for n in set(re.findall(r"#(\d+)", (p.get("title") or "") + " " + (p.get("body") or ""))):
+            refs.setdefault(int(n), []).append(p["number"])
+    items = []
+    for i in issues:
+        if i.get("state") != "open":
+            continue
+        k = issue_kind(i.get("title"), i.get("labels"))
+        items.append({"number": i["number"], "title": i["title"], "kind": k,
+                      "labels": i.get("labels") or [], "created_at": i.get("created_at"),
+                      "open_prs": sorted(refs.get(i["number"], []))})
+    items.sort(key=lambda x: (ORDER.index(x["kind"]), x["created_at"] or ""))
+    refused = [{"number": p["number"], "title": p["title"]} for p in prs
+               if p.get("state") == "open" and "needs-attention" in (p.get("labels") or [])]
+    actionable = [x for x in items if not x["open_prs"] and x["kind"] != "managed"]
+    improved_today = any(agent_of(p.get("title")) == WORKER and IMPROVEMENT in (p.get("body") or "")
+                         and (p.get("created_at") or "").startswith(today) for p in prs)
+    return {"today": today, "issues": items, "actionable": [x["number"] for x in actionable],
+            "refused_prs": refused,
+            "improvement_due": not actionable and not refused and not improved_today}
+
+
+def queue_md(q):
+    lines = [f"Issue-worker queue on {q['today']}: {len(q['actionable'])} issue(s) to handle, "
+             f"{len(q['refused_prs'])} refused agent PR(s); improvement due: "
+             f"{'yes' if q['improvement_due'] else 'no'}.", "",
+             "| issue | kind | open PRs | title |", "|---|---|---|---|"]
+    for x in q["issues"]:
+        prs = ", ".join(f"#{n}" for n in x["open_prs"]) or "none"
+        lines.append(f"| #{x['number']} | {x['kind']} | {prs} | {x['title']} |")
+    for p in q["refused_prs"]:
+        lines.append(f"| PR #{p['number']} | refused by gate | | {p['title']} |")
+    return "\n".join(lines) + "\n"
+
+
 def load_schedule(path, known):
     """Validated plan: agent -> list of weekdays. Unknown agents and extra days are dropped."""
     data = json.loads(Path(path).read_text(encoding="utf-8"))
@@ -258,8 +337,23 @@ def main(argv=None):
     d.add_argument("--repo")
     d.add_argument("--day", help="mon..sun (default: today, UTC)")
     d.add_argument("--dry-run", action="store_true")
+    q = sub.add_parser("queue")
+    q.add_argument("--repo")
+    q.add_argument("--out")
+    q.add_argument("--md")
     a = ap.parse_args(argv)
-    if a.cmd == "metrics":
+    if a.cmd == "queue":
+        now = dt.datetime.now(dt.timezone.utc)
+        since = (now - dt.timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        _, prs, issues, _ = fetch(repo_name(a.repo), token(), since)
+        res = queue(issues, prs, now.strftime("%Y-%m-%d"))
+        if a.out:
+            Path(a.out).write_text(json.dumps(res, indent=1), encoding="utf-8")
+        md = queue_md(res)
+        if a.md:
+            Path(a.md).write_text(md, encoding="utf-8")
+        print(md)
+    elif a.cmd == "metrics":
         since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
         res = summarize(*fetch(repo_name(a.repo), token(), since), roles(), since)
         if a.out:

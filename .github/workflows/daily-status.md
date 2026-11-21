@@ -24,6 +24,8 @@ safe-outputs:
     max: 1
     close-older-issues: true
     expires: 3d
+  noop:
+    report-as-issue: false
 timeout-minutes: 10
 ---
 

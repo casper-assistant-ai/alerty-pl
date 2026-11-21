@@ -34,3 +34,18 @@ jobs:
         run: python3 -I scripts/rcb.py update --pages 1 --out /tmp/smoke && python3 -I -c "import json;d=json.load(open('/tmp/smoke/alerts.json'));assert d['alerts'],'no alerts';print(len(d['alerts']),'alerts')"
       - name: JavaScript syntax
         run: for f in docs/*.js; do node --check "$f"; done
+
+  doctor:
+    # a failed pull request run of this repository starts the CI doctor (fork PRs have a
+    # read-only token and cannot; main is watched by the doctor's own workflow_run trigger)
+    needs: test
+    if: failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Dispatch the CI doctor
+        run: gh workflow run ci-doctor.lock.yml -R "$GITHUB_REPOSITORY" -f run_id="$GITHUB_RUN_ID"

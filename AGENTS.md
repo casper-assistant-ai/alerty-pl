@@ -16,6 +16,11 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   builders with nothing merged, agents that only report, issues with no PR); the daily
   `process-retro` agent keeps the Process block below, `process/schedule.json` (extra agent runs,
   started by the Agent dispatch workflow) and `process/retro-log.md`.
+- Issue worker: the `issue-worker` agent takes every open issue to an end with no human: a fix PR
+  for the gate (`Closes #N`) or closing it with the reason. It runs on each new issue, every two
+  hours and when the CI doctor (which also watches pull request runs) dispatches it, replaces agent
+  PRs the gate refused, and when nothing waits makes one improvement PR a day (tests, reliability,
+  simpler upkeep) from `process/improvements.md`, which the process-retro keeps filled.
 - Releases: `scripts/changelog.py` tags `vMAJOR.MINOR.PATCH` from the commits since the last tag
   and builds `CHANGELOG.md` and `docs/data/changelog.json` (the Zmiany page). Both are generated.
 

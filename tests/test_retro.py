@@ -83,5 +83,51 @@ class Schedule(unittest.TestCase):
         self.assertIsInstance(plan, dict)
 
 
+class Queue(unittest.TestCase):
+    def issues(self):
+        return [
+            {"number": 2, "title": "[daily-status] 2026-11-21", "state": "open",
+             "created_at": "2026-11-21T14:00:00Z", "labels": ["agent", "report"]},
+            {"number": 6, "title": "[aw] Security auditor: hit engine rate limit (HTTP 429)",
+             "state": "open", "created_at": "2026-11-21T15:00:00Z", "labels": ["agentic-workflows"]},
+            {"number": 8, "title": "[aw] No-Op Runs", "state": "open",
+             "created_at": "2026-11-21T19:00:00Z", "labels": ["agentic-workflows"]},
+            {"number": 9, "title": "[dev-task] Cover rcb.status()", "state": "open",
+             "created_at": "2026-11-21T22:00:00Z", "labels": ["tests", "dev-task"]},
+            {"number": 11, "title": "[ci-doctor] Update data failed", "state": "open",
+             "created_at": "2026-11-22T01:00:00Z", "labels": ["agent", "ci"]},
+            {"number": 1, "title": "old", "state": "closed", "created_at": "2026-11-20T00:00:00Z",
+             "labels": []},
+        ]
+
+    def test_order_kinds_and_links(self):
+        prs = [{"number": 20, "title": "[test-improver] test: status", "body": "Closes #9",
+                "state": "open", "created_at": "2026-11-22T02:00:00Z", "labels": ["agent"]},
+               {"number": 21, "title": "[site-designer] feat: x", "body": "Closes #2",
+                "state": "closed", "created_at": "2026-11-22T02:00:00Z", "labels": ["agent"]}]
+        q = retro.queue(self.issues(), prs, "2026-11-22")
+        self.assertEqual([x["kind"] for x in q["issues"]],
+                         ["ci", "aw-notice", "dev-task", "report", "managed"])
+        self.assertEqual(q["actionable"], [11, 6, 2])
+        self.assertFalse(q["improvement_due"])
+        self.assertIn("| #9 | dev-task | #20 |", retro.queue_md(q))
+
+    def test_improvement_due_once_a_day(self):
+        q = retro.queue([], [], "2026-11-22")
+        self.assertTrue(q["improvement_due"])
+        done = [{"number": 30, "title": "[issue-worker] test: more cases",
+                 "body": "x\n<!-- improvement -->", "state": "open",
+                 "created_at": "2026-11-22T08:00:00Z", "labels": ["agent"]}]
+        self.assertFalse(retro.queue([], done, "2026-11-22")["improvement_due"])
+        self.assertTrue(retro.queue([], done, "2026-11-23")["improvement_due"])
+
+    def test_refused_pr_blocks_improvement(self):
+        prs = [{"number": 31, "title": "[site-designer] feat: y", "body": "", "state": "open",
+                "created_at": "2026-11-22T08:00:00Z", "labels": ["needs-attention"]}]
+        q = retro.queue([], prs, "2026-11-22")
+        self.assertEqual(q["refused_prs"], [{"number": 31, "title": "[site-designer] feat: y"}])
+        self.assertFalse(q["improvement_due"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -60,13 +60,14 @@ jobs:
                   site-fixer) type="fix(site)";; site-designer) type="feat(site)";;
                   parser-doctor) type="fix(parser)";; region-keeper) type="fix(regions)";;
                   security-auditor) type="fix(security)";; test-improver) type="test";;
-                  docs-keeper) type="docs";; process-retro) type="chore(process)";; *) type="chore";;
+                  docs-keeper) type="docs";; process-retro) type="chore(process)";; issue-worker) type="fix";; *) type="chore";;
                 esac
                 subject="$type: $subject"
               fi
               gh pr merge "$n" --squash --delete-branch --subject "$subject (#$n)" && echo "merged #$n: $subject"
             else
-              gh pr comment "$n" --body "Agent PR gate: tests or the live parse failed on this branch. The authoring agent should push a fix."
+              gh pr comment "$n" --body "Agent PR gate: tests or the live parse failed on this branch. The issue-worker replaces it with a fixed PR."
+              gh pr edit "$n" --add-label needs-attention
             fi
             echo "::endgroup::"
           done

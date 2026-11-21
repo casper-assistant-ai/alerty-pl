@@ -37,6 +37,7 @@ safe-outputs:
     protected-files: allowed
     expires: 7d
   noop:
+    report-as-issue: false
 timeout-minutes: 25
 ---
 
