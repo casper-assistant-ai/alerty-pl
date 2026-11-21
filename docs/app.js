@@ -63,7 +63,7 @@ function item(a, geo, live) {
   li.querySelector(".m").textContent = msg;
   li.querySelector(".r").textContent = regionLine(a, geo);
   const w = li.querySelector(".when");
-  w.innerHTML = live ? `trwa ${duration(a.started_at)} · ` : `${fmtTime(a.last_at)} · `;
+  w.innerHTML = live ? `trwa ${duration(a.started_at)} · ` : `${fmtTime(a.last_at > a.started_at ? a.last_at : a.started_at)} · `;
   const link = document.createElement("a");
   link.href = a.url; link.textContent = "komunikat RCB";
   w.appendChild(link);
