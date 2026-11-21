@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
-      ALLOWED: '^(scripts/|tests/|docs/(index\.html|app\.js|style\.css)$|README\.md$|AGENTS\.md$)'
+      ALLOWED: '^(scripts/|tests/|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$)'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,7 +48,7 @@ jobs:
             ok=1
             python3 -I -m unittest discover -s tests || ok=0
             python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n || ok=0
-            node --check docs/app.js || ok=0
+            for js in docs/*.js; do node --check "$js" || ok=0; done
             git checkout -q main
             if [ "$ok" = 1 ]; then
               gh pr merge "$n" --squash --delete-branch && echo "merged #$n"

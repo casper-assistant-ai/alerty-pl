@@ -11,10 +11,17 @@ permissions:
   issues: read
   pull-requests: read
 strict: true
+engine:
+  id: claude
+  model: glm-5.3
+  env:
+    ANTHROPIC_BASE_URL: https://api.z.ai/api/anthropic
+imports:
+  - shared/zai.md
 network:
   allowed: [defaults, python, "www.gov.pl"]
 tools:
-  bash: ["python3", "curl", "cat", "ls", "grep", "head", "tail", "wc", "jq"]
+  bash: ["python3:*", "curl:*", "cat:*", "ls:*", "grep:*", "head:*", "tail:*", "wc:*", "jq:*"]
   edit:
 safe-outputs:
   create-pull-request:

@@ -18,3 +18,10 @@ Rules:
   parse pass. Touch only the paths your workflow allows.
 - Alert categories: air, drill, water, weather, ordnance, fire, chemical, other.
   An alert is `active` until an update says it ended or its category TTL passes.
+
+## Learned rules
+
+The agent-coach workflow keeps this block (bounded edits, each with its evidence).
+
+<!-- learned:start -->
+<!-- learned:end -->
