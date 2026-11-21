@@ -1,0 +1,68 @@
+name: Site check
+
+# Every hour and after each deploy: open the live site in headless Chrome like a visitor
+# (desktop and phone), collect JavaScript errors, failed requests, empty pages and stale data.
+# A problem opens (or updates) one issue labelled site-error and calls the site-fixer agent,
+# which opens a PR for the Agent PR gate. When the site is clean again, the issue closes.
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  actions: write
+  pull-requests: read
+
+concurrency:
+  group: site-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Visit the live site
+        id: visit
+        run: |
+          set +e
+          CHROME=$(command -v google-chrome || command -v chromium) node scripts/site_check.mjs --out /tmp/site-check.json --md /tmp/site-check.md
+          echo "rc=$?" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: site-check
+          path: /tmp/site-check.*
+      - name: Report to an issue and call the fixer
+        if: steps.visit.outputs.rc == '1'
+        run: |
+          gh label create site-error --color B60205 --description "Site check found a problem on the live site" 2>/dev/null || true
+          hash=$(python3 -I -c 'import json,hashlib;r=json.load(open("/tmp/site-check.json"));print(hashlib.sha1(json.dumps(sorted({(p["kind"],p["detail"].split("?")[0]) for x in r["results"] for p in x["problems"]})).encode()).hexdigest()[:12])')
+          { cat /tmp/site-check.md; echo; echo "<!-- site-check:$hash -->"; echo "Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"; } > /tmp/body.md
+          n=$(gh issue list --label site-error --state open --json number --jq '.[0].number // empty')
+          if [ -z "$n" ]; then
+            gh issue create --title "Site check: problems on the live site" --label site-error --body-file /tmp/body.md
+          elif ! gh issue view "$n" --comments --json body,comments --jq '[.body] + [.comments[].body] | join("\n")' | grep -q "site-check:$hash"; then
+            gh issue comment "$n" --body-file /tmp/body.md
+          else
+            echo "same problems as already reported in #$n"
+          fi
+          # one fixer at a time: skip when a fixer PR is open
+          open=$(gh pr list --state open --search 'in:title "[site-fixer]"' --json number --jq length)
+          if [ "$open" = "0" ]; then gh workflow run site-fixer.lock.yml || true; fi
+      - name: Close the issue when the site is clean
+        if: steps.visit.outputs.rc == '0'
+        run: |
+          for n in $(gh issue list --label site-error --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "Site check passes again: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          done
+      - name: Fail when the check itself broke
+        if: steps.visit.outputs.rc != '0' && steps.visit.outputs.rc != '1'
+        run: exit 1

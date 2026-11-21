@@ -29,18 +29,27 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the changelog reads the whole history and the version tags
       - name: Tests
         run: python3 -I -m unittest discover -s tests -v
       - name: Scrape RCB
         id: scrape
         run: python3 -I scripts/rcb.py update --pages 3
+      - name: Release and changelog (semver from Conventional Commits)
+        run: |
+          git config user.name "alerty-pl bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          tag=$(python3 -I scripts/changelog.py release | grep '^v' || true)
+          if [ -n "$tag" ]; then git push origin "$tag"; echo "released $tag"; fi
+          python3 -I scripts/changelog.py build
       - name: Commit data when alerts changed
         run: |
           git config user.name "alerty-pl bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add docs/data/alerts.json docs/data/archive.json docs/data/unmatched.json
+          git add docs/data/alerts.json docs/data/archive.json docs/data/unmatched.json docs/data/changelog.json CHANGELOG.md
           if ! git diff --cached --quiet; then
-            msg=$(python3 -I -c 'import json;m=json.load(open("docs/data/meta.json"));print("data:",m["active"],"active,",m["count"],"alerts")')
+            msg=$(python3 -I -c 'import json;m=json.load(open("docs/data/meta.json"));print("chore(data):",m["active"],"active,",m["count"],"alerts")')
             git commit -m "$msg"
             git pull --rebase --autostash -X theirs origin main
             git push
@@ -58,6 +67,11 @@ jobs:
       - id: deploy2
         if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v4
+      - name: Check the live site after a deploy of new code
+        if: github.event_name != 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run site-check.yml || true
       - name: Call the parser doctor on failure
         if: failure() && steps.scrape.outcome == 'failure'
         env:
