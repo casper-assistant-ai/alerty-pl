@@ -1,0 +1,2381 @@
+{
+ "source": "https://www.gov.pl/web/rcb/komunikaty",
+ "parser": 1,
+ "alerts": [
+  {
+   "title": "Alert RCB - trening systemów alarmowania (21.11)",
+   "date": "2026-11-21",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (21.11) w godz. 08:00-12:00 na terenie gminy Gostyń odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "wielkopolskie"
+      ],
+      "powiaty": [
+       "wielkopolskie/gostynski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu gostyńskiego (woj. wielkopolskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "wielkopolskie"
+    ],
+    "powiaty": [
+     "wielkopolskie/gostynski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemow-alarmowania-2111",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-2111",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-21T08:00:00+01:00",
+   "last_at": "2026-11-21T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - atak z powietrza (20.11)",
+   "date": "2026-11-20",
+   "category": "air",
+   "updates": [
+    {
+     "time": "09:48",
+     "message": "UWAGA! Zakończył się atak powietrzny na Ukrainę. Brak zagrożenia na terenie Polski .",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
+    },
+    {
+     "time": "08:58",
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie województwa lubelskiego i podkarpackiego."
+    },
+    {
+     "time": "07:30",
+     "message": "UWAGA! Odwołano zagrożenie atakiem z powietrza. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [
+       "lubelskie/bilgorajski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/hrubieszowski",
+       "lubelskie/janowski",
+       "lubelskie/krasnicki",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubelski",
+       "lubelskie/lublin",
+       "lubelskie/opolski",
+       "lubelskie/pulawski",
+       "lubelskie/swidnicki",
+       "lubelskie/tomaszowski",
+       "lubelskie/wlodawski",
+       "lubelskie/zamojski",
+       "lubelskie/zamosc",
+       "podkarpackie/bieszczadzki",
+       "podkarpackie/brzozowski",
+       "podkarpackie/debicki",
+       "podkarpackie/jaroslawski",
+       "podkarpackie/jasielski",
+       "podkarpackie/kolbuszowski",
+       "podkarpackie/krosnienski",
+       "podkarpackie/krosno",
+       "podkarpackie/lancucki",
+       "podkarpackie/leski",
+       "podkarpackie/lezajski",
+       "podkarpackie/lubaczowski",
+       "podkarpackie/mielecki",
+       "podkarpackie/nizanski",
+       "podkarpackie/przemyski",
+       "podkarpackie/przemysl",
+       "podkarpackie/przeworski",
+       "podkarpackie/ropczycko-sedziszowski",
+       "podkarpackie/rzeszow",
+       "podkarpackie/rzeszowski",
+       "podkarpackie/sanocki",
+       "podkarpackie/stalowowolski",
+       "podkarpackie/strzyzowski",
+       "podkarpackie/tarnobrzeg",
+       "podkarpackie/tarnobrzeski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski;\n- podkarpackiego - powiaty: Tarnobrzeg, tarnobrzeski, stalowowolski, niżański, leżajski, kolbuszowski, mielecki, dębicki, ropczycko-sędziszowski, Rzeszów, rzeszowski, łańcucki, przeworski, jarosławski, lubaczowski, jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki."
+    },
+    {
+     "time": "06:34",
+     "message": "UWAGA! UWAGA! UWAGA! Zagrożenie atakiem z powietrza. Znajdź bezpieczne miejsce. Stosuj się do poleceń służb. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [
+       "lubelskie/bilgorajski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/hrubieszowski",
+       "lubelskie/janowski",
+       "lubelskie/krasnicki",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubelski",
+       "lubelskie/lublin",
+       "lubelskie/opolski",
+       "lubelskie/pulawski",
+       "lubelskie/swidnicki",
+       "lubelskie/tomaszowski",
+       "lubelskie/wlodawski",
+       "lubelskie/zamojski",
+       "lubelskie/zamosc",
+       "podkarpackie/debicki",
+       "podkarpackie/jaroslawski",
+       "podkarpackie/kolbuszowski",
+       "podkarpackie/lancucki",
+       "podkarpackie/lezajski",
+       "podkarpackie/lubaczowski",
+       "podkarpackie/mielecki",
+       "podkarpackie/nizanski",
+       "podkarpackie/przeworski",
+       "podkarpackie/ropczycko-sedziszowski",
+       "podkarpackie/rzeszow",
+       "podkarpackie/rzeszowski",
+       "podkarpackie/stalowowolski",
+       "podkarpackie/tarnobrzeg",
+       "podkarpackie/tarnobrzeski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski\n- podkarpackiego - powiaty: Tarnobrzeg, tarnobrzeski, stalowowolski, niżański, leżajski, kolbuszowski, mielecki, dębicki, ropczycko-sędziszowski, Rzeszów, rzeszowski, łańcucki, przeworski, jarosławski, lubaczowski."
+    },
+    {
+     "time": "06:30",
+     "message": "UWAGA! UWAGA! UWAGA! Zagrożenie atakiem z powietrza. Znajdź bezpieczne miejsce. Stosuj się do poleceń służb. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [
+       "lubelskie/bilgorajski",
+       "lubelskie/hrubieszowski",
+       "lubelskie/lubelski",
+       "lubelskie/tomaszowski",
+       "lubelskie/zamojski",
+       "lubelskie/zamosc",
+       "podkarpackie/bieszczadzki",
+       "podkarpackie/brzozowski",
+       "podkarpackie/debicki",
+       "podkarpackie/jaroslawski",
+       "podkarpackie/jasielski",
+       "podkarpackie/krosnienski",
+       "podkarpackie/krosno",
+       "podkarpackie/lancucki",
+       "podkarpackie/leski",
+       "podkarpackie/lubaczowski",
+       "podkarpackie/przemyski",
+       "podkarpackie/przemysl",
+       "podkarpackie/przeworski",
+       "podkarpackie/ropczycko-sedziszowski",
+       "podkarpackie/rzeszow",
+       "podkarpackie/rzeszowski",
+       "podkarpackie/sanocki",
+       "podkarpackie/strzyzowski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie pow. hrubieszowskiego, m. Zamość, zamojskiego, tomaszowskiego, biłgorajskiego (woj. lubelskie). został wysłany do odbiorców na terenie województw:\n- lubelskiego - powiaty: hrubieszowski, m. Zamość, zamojski, tomaszowski, biłgorajski\n- podkarpackiego - powiaty: dębicki, ropczycko-sędziszowski, Rzeszów, rzeszowski, łańcucki, przeworski, jarosławski, lubaczowski, jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki."
+    },
+    {
+     "time": null,
+     "message": "UWAGA! UWAGA! UWAGA! Zagrożenie atakiem z powietrza. Znajdź bezpieczne miejsce. Stosuj się do poleceń służb. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [],
+      "powiaty": [],
+      "whole": []
+     },
+     "region_text": "„UWAGA! UWAGA! UWAGA! Zagrożenie atakiem z powietrza. Znajdź bezpieczne miejsce. Stosuj się do poleceń służb. Oczekuj dalszych komunikatów.”"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [
+     "lubelskie/bilgorajski",
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/hrubieszowski",
+     "lubelskie/janowski",
+     "lubelskie/krasnicki",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/lubelski",
+     "lubelskie/lublin",
+     "lubelskie/opolski",
+     "lubelskie/pulawski",
+     "lubelskie/swidnicki",
+     "lubelskie/tomaszowski",
+     "lubelskie/wlodawski",
+     "lubelskie/zamojski",
+     "lubelskie/zamosc",
+     "podkarpackie/bieszczadzki",
+     "podkarpackie/brzozowski",
+     "podkarpackie/debicki",
+     "podkarpackie/jaroslawski",
+     "podkarpackie/jasielski",
+     "podkarpackie/kolbuszowski",
+     "podkarpackie/krosnienski",
+     "podkarpackie/krosno",
+     "podkarpackie/lancucki",
+     "podkarpackie/leski",
+     "podkarpackie/lezajski",
+     "podkarpackie/lubaczowski",
+     "podkarpackie/mielecki",
+     "podkarpackie/nizanski",
+     "podkarpackie/przemyski",
+     "podkarpackie/przemysl",
+     "podkarpackie/przeworski",
+     "podkarpackie/ropczycko-sedziszowski",
+     "podkarpackie/rzeszow",
+     "podkarpackie/rzeszowski",
+     "podkarpackie/sanocki",
+     "podkarpackie/stalowowolski",
+     "podkarpackie/strzyzowski",
+     "podkarpackie/tarnobrzeg",
+     "podkarpackie/tarnobrzeski"
+    ],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---atak-z-powietrza-2011",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-z-powietrza-2011",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-20T06:30:00+01:00",
+   "last_at": "2026-11-20T09:48:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemów alarmowania (20.11)",
+   "date": "2026-11-20",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (20.11) w godz. 10:00-12:00 na terenie gminy Sułoszowa odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "malopolskie"
+      ],
+      "powiaty": [
+       "malopolskie/krakowski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "malopolskie"
+    ],
+    "powiaty": [
+     "malopolskie/krakowski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemow-alarmowania-2011",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-2011",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-20T10:00:00+01:00",
+   "last_at": "2026-11-20T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemów alarmowania (19.11)",
+   "date": "2026-11-19",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (19.11) w godz. 9:00-11:00 na terenie powiatu radzyńskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/radzynski"
+      ],
+      "whole": []
+     },
+     "region_text": "na terenie powiatu radzyńskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.“\nAlert RCB został wysłany do odbiorców na terenie powiatu radzyńskiego (woj. lubelskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/radzynski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemow-alarmowania-1912",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-1912",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-19T09:00:00+01:00",
+   "last_at": "2026-11-19T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - woda niezdatna do spożycia, pow. zgorzelecki (19.11)",
+   "date": "2026-11-19",
+   "category": "water",
+   "updates": [
+    {
+     "time": null,
+     "message": "KOMUNIKAT: woda niezdatna do spożycia w miejscowościach na terenie gm. Pieńsk oraz w Żarskiej Wsi i Osiedle Nowa Żarska Wieś (pow. zgorzelecki). Śledź komunikaty.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/zgorzelecki"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu zgorzeleckiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/zgorzelecki"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---woda-niezdatna-do-picia-pow-zgorzelecki-1911",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---woda-niezdatna-do-picia-pow-zgorzelecki-1911",
+   "intro": "",
+   "status": "active",
+   "started_at": "2026-11-19T00:00:00+01:00",
+   "last_at": "2026-11-19T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - woda niezdatna do spożycia, pow. ząbkowicki (19.11)",
+   "date": "2026-11-19",
+   "category": "water",
+   "updates": [
+    {
+     "time": null,
+     "message": "KOMUNIKAT: Woda z wodociągu Złoty Stok nie nadaje się do celów spożywczych w miejscowościach: Złoty Stok, Płonica i Błotnica (pow. ząbkowicki). Śledź komunikaty.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/zabkowicki"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu ząbkowickiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/zabkowicki"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
+   "intro": "",
+   "status": "active",
+   "started_at": "2026-11-19T00:00:00+01:00",
+   "last_at": "2026-11-19T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Komunikat (18.11)",
+   "date": "2026-11-18",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [],
+      "powiaty": [],
+      "whole": []
+     },
+     "region_text": "Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.\nDziś w godz. 16.00–18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.\nPociski powoli opadają na spadochronach i długo świecą.\nKilka takich świateł na niebie może przypominać wolno lecący samolot lub duży dron."
+    }
+   ],
+   "regions": {
+    "voivodeships": [],
+    "powiaty": [],
+    "whole": []
+   },
+   "id": "komunikat-1811",
+   "url": "https://www.gov.pl/web/rcb/komunikat-1811",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-11-18T00:00:00+01:00",
+   "last_at": "2026-11-18T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (10.11)",
+   "date": "2026-11-10",
+   "category": "air",
+   "updates": [
+    {
+     "time": "10:55",
+     "message": "UWAGA! Zakończył się atak powietrzny na Ukrainę. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/biala-podlaska",
+       "lubelskie/bialski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubartowski",
+       "lubelskie/lukowski",
+       "lubelskie/parczewski",
+       "lubelskie/radzynski",
+       "lubelskie/rycki",
+       "lubelskie/swidnicki",
+       "lubelskie/wlodawski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski."
+    },
+    {
+     "time": "10:20",
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/biala-podlaska",
+       "lubelskie/bialski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubartowski",
+       "lubelskie/lukowski",
+       "lubelskie/parczewski",
+       "lubelskie/radzynski",
+       "lubelskie/rycki",
+       "lubelskie/swidnicki",
+       "lubelskie/wlodawski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski."
+    },
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [],
+      "powiaty": [],
+      "whole": []
+     },
+     "region_text": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/biala-podlaska",
+     "lubelskie/bialski",
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/lubartowski",
+     "lubelskie/lukowski",
+     "lubelskie/parczewski",
+     "lubelskie/radzynski",
+     "lubelskie/rycki",
+     "lubelskie/swidnicki",
+     "lubelskie/wlodawski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-1011",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-1011",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-10T10:20:00+01:00",
+   "last_at": "2026-11-10T10:55:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (09.11)",
+   "date": "2026-11-09",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/biala-podlaska",
+       "lubelskie/bialski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubartowski",
+       "lubelskie/lukowski",
+       "lubelskie/parczewski",
+       "lubelskie/radzynski",
+       "lubelskie/rycki",
+       "lubelskie/swidnicki",
+       "lubelskie/wlodawski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski\n- podlaskiego- powiaty: Suwałki, suwalski, augustowski, sejneński, sokólski, Białystok, białostocki, zambrowski, wysokomazowiecki, bielski, hajnowski, siemiatycki"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/biala-podlaska",
+     "lubelskie/bialski",
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/lubartowski",
+     "lubelskie/lukowski",
+     "lubelskie/parczewski",
+     "lubelskie/radzynski",
+     "lubelskie/rycki",
+     "lubelskie/swidnicki",
+     "lubelskie/wlodawski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-0911",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0911",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-09T00:00:00+01:00",
+   "last_at": "2026-11-09T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zła jakość powietrza (07.11)",
+   "date": "2026-11-07",
+   "category": "weather",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Dziś (07.11) prognozowana zła jakość powietrza - SMOG (pył zawieszony - PM10). Jeśli możesz, unikaj aktywności na zewnątrz i nie wietrz pomieszczeń.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "slaskie"
+      ],
+      "powiaty": [
+       "slaskie/myszkowski",
+       "slaskie/zawiercianski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatów zawierciańskiego i myszkowskiego (woj. śląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "slaskie"
+    ],
+    "powiaty": [
+     "slaskie/myszkowski",
+     "slaskie/zawiercianski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---zla-jakosc-powietrza",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zla-jakosc-powietrza",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-11-07T00:00:00+01:00",
+   "last_at": "2026-11-07T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - neutralizacja niewybuchu (07.11)",
+   "date": "2026-11-07",
+   "category": "ordnance",
+   "updates": [
+    {
+     "time": null,
+     "message": "KOMUNIKAT: 8.11 od godz. 7:00 neutralizacja niewybuchu na ul. Bałuki w Szczecinie. Zachowaj bezpieczną odległość i stosuj się do poleceń służb. Śledź komunikaty.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "zachodniopomorskie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "zachodniopomorskie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie Szczecina (woj. zachodniopomorskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "zachodniopomorskie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "zachodniopomorskie"
+    ]
+   },
+   "id": "alert-rcb---neutralizacja-niewybuchu-0711",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---neutralizacja-niewybuchu-0711",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-11-07T00:00:00+01:00",
+   "last_at": "2026-11-07T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania (06.11)",
+   "date": "2026-11-06",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (06.11) w godz. 10:00-12:00 na terenie Gminy Mogilany odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "malopolskie"
+      ],
+      "powiaty": [
+       "malopolskie/krakowski",
+       "malopolskie/olkuski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie). został wysłany do odbiorców na terenie powiatu olkuskiego (woj. małopolskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "malopolskie"
+    ],
+    "powiaty": [
+     "malopolskie/krakowski",
+     "malopolskie/olkuski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-0611",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0611",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-06T10:00:00+01:00",
+   "last_at": "2026-11-06T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania (05.11)",
+   "date": "2026-11-05",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Jutro (06.11) w godz. 09:00-13:00 na terenie Gminy Bogatynia odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/zgorzelecki"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu zgorzeleckiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/zgorzelecki"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-0511",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0511",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-05T09:00:00+01:00",
+   "last_at": "2026-11-05T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania (04.11)",
+   "date": "2026-11-04",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (04.11) w godz. 10:00-18:00 na terenie powiatu sępoleńskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "kujawsko-pomorskie"
+      ],
+      "powiaty": [
+       "kujawsko-pomorskie/sepolenski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu sępoleńskiego (woj. kujawsko-pomorskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "kujawsko-pomorskie"
+    ],
+    "powiaty": [
+     "kujawsko-pomorskie/sepolenski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-0411",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0411",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-04T10:00:00+01:00",
+   "last_at": "2026-11-04T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (03.11)",
+   "date": "2026-11-03",
+   "category": "air",
+   "updates": [
+    {
+     "time": "06:49",
+     "message": "UWAGA! Zakończył się atak powietrzny na Ukrainę. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego i podkarpackiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
+    },
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [],
+      "powiaty": [],
+      "whole": []
+     },
+     "region_text": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-0311",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0311",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-03T06:49:00+01:00",
+   "last_at": "2026-11-03T06:49:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania (03.11)",
+   "date": "2026-11-03",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIE: Dziś (03.11) w godz. 10:00-12:00 na terenie pow. radomszczańskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lodzkie"
+      ],
+      "powiaty": [
+       "lodzkie/radomszczanski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu radomszczańskiego (woj. łódzkie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lodzkie"
+    ],
+    "powiaty": [
+     "lodzkie/radomszczanski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-0311",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0311",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-03T10:00:00+01:00",
+   "last_at": "2026-11-03T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (03.11)",
+   "date": "2026-11-03",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/bilgorajski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/hrubieszowski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubelski",
+       "lubelskie/swidnicki",
+       "lubelskie/tomaszowski",
+       "lubelskie/wlodawski",
+       "lubelskie/zamojski",
+       "lubelskie/zamosc"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa: - lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszow"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/bilgorajski",
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/hrubieszowski",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/lubelski",
+     "lubelskie/swidnicki",
+     "lubelskie/tomaszowski",
+     "lubelskie/wlodawski",
+     "lubelskie/zamojski",
+     "lubelskie/zamosc"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-0312",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0312",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-11-03T00:00:00+01:00",
+   "last_at": "2026-11-03T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania (29.10)",
+   "date": "2026-10-29",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (29.10) w godz. 10.00-12.00 na terenie powiatu leskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "podkarpackie"
+      ],
+      "powiaty": [
+       "podkarpackie/leski"
+      ],
+      "whole": []
+     },
+     "region_text": "na terenie powiatu leskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój“.\nAlert RCB został wysłany do odbiorców na terenie powiatu leskiego (woj. podkarpackie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "podkarpackie"
+    ],
+    "powiaty": [
+     "podkarpackie/leski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-2910",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-2910",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-29T10:00:00+01:00",
+   "last_at": "2026-10-29T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (28.10)",
+   "date": "2026-10-28",
+   "category": "air",
+   "updates": [
+    {
+     "time": "10:49",
+     "message": "UWAGA! Zakończył się atak powietrzny na Ukrainę. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/bilgorajski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/hrubieszowski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubelski",
+       "lubelskie/swidnicki",
+       "lubelskie/tomaszowski",
+       "lubelskie/wlodawski",
+       "lubelskie/zamojski",
+       "lubelskie/zamosc"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski."
+    },
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [],
+      "powiaty": [],
+      "whole": []
+     },
+     "region_text": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/bilgorajski",
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/hrubieszowski",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/lubelski",
+     "lubelskie/swidnicki",
+     "lubelskie/tomaszowski",
+     "lubelskie/wlodawski",
+     "lubelskie/zamojski",
+     "lubelskie/zamosc"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-2810",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2810",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-28T10:49:00+01:00",
+   "last_at": "2026-10-28T10:49:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania",
+   "date": "2026-10-27",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (27.10) na terenie powiatu jaworskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie",
+       "malopolskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/jaworski",
+       "malopolskie/krakowski"
+      ],
+      "whole": []
+     },
+     "region_text": "na terenie gminy Czernichów odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój“.\nAlert RCB został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie). na terenie powiatu jaworskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój“.\nAlert RCB został wysłany do odbiorców na terenie powiatu jaworskiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie",
+     "malopolskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/jaworski",
+     "malopolskie/krakowski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania3",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania3",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-10-27T00:00:00+01:00",
+   "last_at": "2026-10-27T00:00:00+01:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - ostrzeżenie przed silnym wiatrem (24.10)",
+   "date": "2026-10-25",
+   "category": "weather",
+   "updates": [
+    {
+     "time": null,
+     "message": "Pogoda: jutro (25.10) prognozowany silny wiatr. Zachowaj ostrożność podczas aktywności na zewnątrz. Zabezpiecz rzeczy, które może porwać wiatr.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/kamiennogorski",
+       "dolnoslaskie/lwowecki",
+       "dolnoslaskie/walbrzyski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do mieszkańców Jeleniej Góry, Wałbrzycha oraz pow. kamiennogórskiego, karkonoskiego, lwóweckiego i wałbrzyskiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/kamiennogorski",
+     "dolnoslaskie/lwowecki",
+     "dolnoslaskie/walbrzyski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---ostrzezenie-przed-silnym-wiatrem-2510",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---ostrzezenie-przed-silnym-wiatrem-2510",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-10-25T00:00:00+02:00",
+   "last_at": "2026-10-25T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - ostrzeżenie przed silnym wiatrem (25.10)",
+   "date": "2026-10-25",
+   "category": "weather",
+   "updates": [
+    {
+     "time": null,
+     "message": "Pogoda: dziś (25.10) prognozowany silny wiatr. Zachowaj ostrożność podczas aktywności na zewnątrz. Zabezpiecz rzeczy, które może porwać wiatr.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "slaskie"
+      ],
+      "powiaty": [
+       "slaskie/bielski",
+       "slaskie/cieszynski",
+       "slaskie/zywiecki"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do mieszkańców Bielska Białej oraz pow. bielskiego, cieszyńskiego oraz żywieckiego (woj. śląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "slaskie"
+    ],
+    "powiaty": [
+     "slaskie/bielski",
+     "slaskie/cieszynski",
+     "slaskie/zywiecki"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---ostrzezenie-przed-silnym-wiatrem-2511",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---ostrzezenie-przed-silnym-wiatrem-2511",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-10-25T00:00:00+02:00",
+   "last_at": "2026-10-25T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania (23.10)",
+   "date": "2026-10-23",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (23.10) w godz. 10:00-12:00 na terenie gminy Skała odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "malopolskie"
+      ],
+      "powiaty": [
+       "malopolskie/krakowski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "malopolskie"
+    ],
+    "powiaty": [
+     "malopolskie/krakowski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-2310",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-2310",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-23T10:00:00+02:00",
+   "last_at": "2026-10-23T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (23.10)",
+   "date": "2026-10-23",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [
+       "lubelskie/biala-podlaska",
+       "lubelskie/bialski",
+       "lubelskie/bilgorajski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/hrubieszowski",
+       "lubelskie/janowski",
+       "lubelskie/krasnicki",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubartowski",
+       "lubelskie/lubelski",
+       "lubelskie/lublin",
+       "lubelskie/lukowski",
+       "lubelskie/opolski",
+       "lubelskie/parczewski",
+       "lubelskie/pulawski",
+       "lubelskie/radzynski",
+       "lubelskie/rycki",
+       "lubelskie/swidnicki",
+       "lubelskie/tomaszowski",
+       "lubelskie/wlodawski",
+       "lubelskie/zamojski",
+       "lubelskie/zamosc",
+       "podkarpackie/bieszczadzki",
+       "podkarpackie/brzozowski",
+       "podkarpackie/debicki",
+       "podkarpackie/jaroslawski",
+       "podkarpackie/jasielski",
+       "podkarpackie/krosnienski",
+       "podkarpackie/krosno",
+       "podkarpackie/lancucki",
+       "podkarpackie/leski",
+       "podkarpackie/lubaczowski",
+       "podkarpackie/przemyski",
+       "podkarpackie/przemysl",
+       "podkarpackie/przeworski",
+       "podkarpackie/ropczycko-sedziszowski",
+       "podkarpackie/rzeszow",
+       "podkarpackie/rzeszowski",
+       "podkarpackie/sanocki",
+       "podkarpackie/strzyzowski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa- lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski.\n został wysłany do odbiorców na terenie części województwa: - lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłg"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [
+     "lubelskie/biala-podlaska",
+     "lubelskie/bialski",
+     "lubelskie/bilgorajski",
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/hrubieszowski",
+     "lubelskie/janowski",
+     "lubelskie/krasnicki",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/lubartowski",
+     "lubelskie/lubelski",
+     "lubelskie/lublin",
+     "lubelskie/lukowski",
+     "lubelskie/opolski",
+     "lubelskie/parczewski",
+     "lubelskie/pulawski",
+     "lubelskie/radzynski",
+     "lubelskie/rycki",
+     "lubelskie/swidnicki",
+     "lubelskie/tomaszowski",
+     "lubelskie/wlodawski",
+     "lubelskie/zamojski",
+     "lubelskie/zamosc",
+     "podkarpackie/bieszczadzki",
+     "podkarpackie/brzozowski",
+     "podkarpackie/debicki",
+     "podkarpackie/jaroslawski",
+     "podkarpackie/jasielski",
+     "podkarpackie/krosnienski",
+     "podkarpackie/krosno",
+     "podkarpackie/lancucki",
+     "podkarpackie/leski",
+     "podkarpackie/lubaczowski",
+     "podkarpackie/przemyski",
+     "podkarpackie/przemysl",
+     "podkarpackie/przeworski",
+     "podkarpackie/ropczycko-sedziszowski",
+     "podkarpackie/rzeszow",
+     "podkarpackie/rzeszowski",
+     "podkarpackie/sanocki",
+     "podkarpackie/strzyzowski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-2310",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2310",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-23T00:00:00+02:00",
+   "last_at": "2026-10-23T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania",
+   "date": "2026-10-22",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (22.10) w godz. 10:00-12:00 na terenie gminy Radgoszcz odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "malopolskie"
+      ],
+      "powiaty": [
+       "malopolskie/dabrowski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu dąbrowskiego (woj. małopolskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "malopolskie"
+    ],
+    "powiaty": [
+     "malopolskie/dabrowski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania2",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania2",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-22T10:00:00+02:00",
+   "last_at": "2026-10-22T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (21.10)",
+   "date": "2026-10-21",
+   "category": "air",
+   "updates": [
+    {
+     "time": "23:03",
+     "message": "UWAGA! Zakończył się atak powietrzny na Ukrainę. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego."
+    },
+    {
+     "time": "21:08",
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego."
+    },
+    {
+     "time": "19:45",
+     "message": "UWAGA! Zakończył się atak powietrzny na Ukrainę. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego. został wysłany do odbiorców na terenie woj. podkarpackiego."
+    },
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [],
+      "powiaty": [],
+      "whole": []
+     },
+     "region_text": "„UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.”"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-2111",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2111",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-21T19:45:00+02:00",
+   "last_at": "2026-10-21T23:03:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - niezdatna woda (21.10)",
+   "date": "2026-10-21",
+   "category": "water",
+   "updates": [
+    {
+     "time": null,
+     "message": "KOMUNIKAT: woda z wodociągu Wrzos w części miejscowości Świeradów-Zdrój (pow. lubański) nie nadaje się do celów spożywczych. Śledź komunikaty.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/lubanski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu lubańskiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/lubanski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---niezdatna-woda-2110",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---niezdatna-woda-2110",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-10-21T00:00:00+02:00",
+   "last_at": "2026-10-21T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (21.10)",
+   "date": "2026-10-21",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Zakończył się atak powietrzny na Ukrainę. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-2110",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2110",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-21T00:00:00+02:00",
+   "last_at": "2026-10-21T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - ćwiczenia w powiecie kamiennogórskim (20.10)",
+   "date": "2026-10-20",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: W dniach 21-22.10 w godz. 09:00-15:00 na terenie gm. Kamienna Góra odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/kamiennogorski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu kamiennogórskiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/kamiennogorski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---cwiczenia-w-powiecie-kamiennogorskim-2010",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-w-powiecie-kamiennogorskim-2010",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-20T09:00:00+02:00",
+   "last_at": "2026-10-20T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (20.10)",
+   "date": "2026-10-20",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [
+       "lubelskie/lubelski",
+       "podkarpackie/bieszczadzki",
+       "podkarpackie/brzozowski",
+       "podkarpackie/jasielski",
+       "podkarpackie/krosnienski",
+       "podkarpackie/krosno",
+       "podkarpackie/leski",
+       "podkarpackie/przemyski",
+       "podkarpackie/przemysl",
+       "podkarpackie/sanocki",
+       "podkarpackie/strzyzowski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie powiatów: jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki, woj. podkarpackie.\n został wysłany do odbiorców na terenie powiatów: : jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki, woj. podkarpackie.\n został wysłany do odbi"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [
+     "lubelskie/lubelski",
+     "podkarpackie/bieszczadzki",
+     "podkarpackie/brzozowski",
+     "podkarpackie/jasielski",
+     "podkarpackie/krosnienski",
+     "podkarpackie/krosno",
+     "podkarpackie/leski",
+     "podkarpackie/przemyski",
+     "podkarpackie/przemysl",
+     "podkarpackie/sanocki",
+     "podkarpackie/strzyzowski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-2010",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2010",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-20T00:00:00+02:00",
+   "last_at": "2026-10-20T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - ćwiczenia służb (19.10)",
+   "date": "2026-10-19",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: 20-21.10 na ul. Czerniakowskiej, Sytej i Jagiellońskiej w Warszawie odbędą się ćwiczenia służb. Zachowaj spokój. Stosuj się do poleceń służb.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "mazowieckie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "mazowieckie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie Warszawy (woj. mazowieckie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "mazowieckie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "mazowieckie"
+    ]
+   },
+   "id": "alert-rcb---cwiczenia-sluzb-1910",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-sluzb-1910",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-10-19T00:00:00+02:00",
+   "last_at": "2026-10-19T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (19.10)",
+   "date": "2026-10-19",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego i podkarpackiego.\n został wysłany do odbiorców na terenie woj. podkarpackiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. podkarpackiego."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza2",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza2",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-19T00:00:00+02:00",
+   "last_at": "2026-10-19T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie z powietrza (18.10)",
+   "date": "2026-10-18",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego. został wysłany do odbiorców na terenie woj. podkarpackiego. został wysłany do odbiorców na terenie woj. lubelskiego. na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.\nAlert RCB został wysłany do odbiorców na terenie woj. lubelskiego."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---zagrozenie-z-powietrza-1810",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-1810",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-18T00:00:00+02:00",
+   "last_at": "2026-10-18T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - niezdatna woda (17.10)",
+   "date": "2026-10-17",
+   "category": "water",
+   "updates": [
+    {
+     "time": null,
+     "message": "KOMUNIKAT: woda w Gaworzycach, Kłobuczynie, Koźlicach, Dzikowie, Mieszkowie (pow. polkowicki) nie nadaje się do spożycia. Śledź komunikaty",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/polkowicki"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu polkowickiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/polkowicki"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---niezdatna-woda-1710",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---niezdatna-woda-1710",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-17T00:00:00+02:00",
+   "last_at": "2026-10-17T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - ćwiczenia systemu alarmowania (17.10)",
+   "date": "2026-10-17",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIE: Dziś (17.10) w godz. 10:00-14:00 na terenie gminy Ciepłowody odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie",
+       "malopolskie",
+       "warminsko-mazurskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/zabkowicki",
+       "malopolskie/krakowski",
+       "warminsko-mazurskie/lidzbarski"
+      ],
+      "whole": []
+     },
+     "region_text": "W związku z zaplanowanymi ćwiczeniami, do odbiorców na terenie powiatu ząbkowickiego, krakowskiego oraz lidzbarskiego przesłano Alert RCB.\nW związku z zaplanowanymi ćwiczeniami przesłano Alert RCB na teren 3 powiatów:\nząbkowickiego (woj. dolnośląskie) - o treści: \"ĆWICZENIE: Dziś (17.10) w godz. 10:00-14:00 na terenie gminy Ciepłowody odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"\nkrakowskiego (woj. małopolskie) - o treści: \"ĆWICZENIA: Dziś (17.10) w godz. 13:00-15:00 na terenie gminy Słomniki odbędzie się trening systemu alarmowania z wykorzystaniem syren. "
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie",
+     "malopolskie",
+     "warminsko-mazurskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/zabkowicki",
+     "malopolskie/krakowski",
+     "warminsko-mazurskie/lidzbarski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---cwiczenia-systemu-alarmowania-w-powiecie-zabkowickim-1710",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-systemu-alarmowania-w-powiecie-zabkowickim-1710",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-17T10:00:00+02:00",
+   "last_at": "2026-10-17T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie atakiem z powietrza (16.10)",
+   "date": "2026-10-16",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/lubelski",
+       "lubelskie/swidnicki",
+       "lubelskie/wlodawski"
+      ],
+      "whole": [
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego i podkarpackiego.\n został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie powiatów:\nwłodawskiego,\nłęczyńskiego,\nświdnickiego,\nChełm, chełmskiego,\nkrasnostawskiego,\nWoj. lubelskie.\n został wysłany do odbiorców na terenie powiatów:\nwłodawskiego, łęczyńskieg"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/lubelski",
+     "lubelskie/swidnicki",
+     "lubelskie/wlodawski"
+    ],
+    "whole": [
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---zagrozenie-atakiem-z-powietrza-1611",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-atakiem-z-powietrza-1611",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-16T00:00:00+02:00",
+   "last_at": "2026-10-16T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania z wykorzystaniem syren (16.10)",
+   "date": "2026-10-16",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIE: Dziś (16.10) w godz. 12:00-13:00 na terenie gminy Oława odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/olawski"
+      ],
+      "whole": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie pow. oławskiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/olawski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-z-wykorzystaniem-syren-1610",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-z-wykorzystaniem-syren-1610",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-16T12:00:00+02:00",
+   "last_at": "2026-10-16T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - zagrożenie atakiem z powietrza (15.10)",
+   "date": "2026-10-15",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie"
+    ]
+   },
+   "id": "alert-rcb---zagrozenie-atakiem-z-powietrza-1511",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-atakiem-z-powietrza-1511",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-15T00:00:00+02:00",
+   "last_at": "2026-10-15T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemów alarmowania pow. tomaszowski (15.10)",
+   "date": "2026-10-15",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIE: Dziś (15.10) w godz. 09:00-12:00 na terenie powiatu tomaszowskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/tomaszowski"
+      ],
+      "whole": []
+     },
+     "region_text": "wysłano do odbiorców na terenie powiatu tomaszowskiego (woj. lubelskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/tomaszowski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemow-alarmowania-pow-tomaszowski-1510",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-pow-tomaszowski-1510",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-15T09:00:00+02:00",
+   "last_at": "2026-10-15T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - trening systemu alarmowania pow. wąbrzeski (15.10)",
+   "date": "2026-10-15",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIE: Dziś (15.10) w godz. 08:30-13:00 na terenie powiatu wąbrzeskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "kujawsko-pomorskie"
+      ],
+      "powiaty": [
+       "kujawsko-pomorskie/wabrzeski"
+      ],
+      "whole": []
+     },
+     "region_text": "wysłano do odbiorców na terenie powiatu wąbrzeskiego (woj. kujawsko-pomorskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "kujawsko-pomorskie"
+    ],
+    "powiaty": [
+     "kujawsko-pomorskie/wabrzeski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---trening-systemu-alarmowania-pow-wabrzeski-1511",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-pow-wabrzeski-1511",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-15T08:30:00+02:00",
+   "last_at": "2026-10-15T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - rosyjski atak powietrzny na terenie Ukrainy (15.10)",
+   "date": "2026-10-15",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie"
+    ]
+   },
+   "id": "alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1510",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1510",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-15T00:00:00+02:00",
+   "last_at": "2026-10-15T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - ćwiczenia (powiat łaski)",
+   "date": "2026-10-14",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIE: Dziś (14.10) w godz. 10:00-13:00 na terenie powiatu łaskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lodzkie"
+      ],
+      "powiaty": [
+       "lodzkie/laski"
+      ],
+      "whole": []
+     },
+     "region_text": "wysłano do odbiorców na terenie powiatu łaskiego (woj.łódzkie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lodzkie"
+    ],
+    "powiaty": [
+     "lodzkie/laski"
+    ],
+    "whole": []
+   },
+   "id": "alert-rcb---cwiczenia-powiat-laski",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-powiat-laski",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-14T10:00:00+02:00",
+   "last_at": "2026-10-14T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - atak powietrzny na terenie Ukrainy (13.10)",
+   "date": "2026-10-13",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---atak-powietrzny-na-terenie-ukrainy",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-powietrzny-na-terenie-ukrainy",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-13T00:00:00+02:00",
+   "last_at": "2026-10-13T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - atak powietrzny na terenie Ukrainy (13.10)",
+   "date": "2026-10-13",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie"
+    ]
+   },
+   "id": "alert-rcb---atak-powietrzny-na-terenie-ukrainy-1310",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-powietrzny-na-terenie-ukrainy-1310",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-13T00:00:00+02:00",
+   "last_at": "2026-10-13T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - ćwiczenia z wykorzystaniem syren (11.10)",
+   "date": "2026-10-11",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: 12-16 października na terenie woj. mazowieckiego odbędzie się ćwiczenie Syrena-26 z wykorzystaniem syren alarmowych. Zachowaj spokój",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie",
+       "mazowieckie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/walbrzych",
+       "dolnoslaskie/walbrzyski"
+      ],
+      "whole": [
+       "mazowieckie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie województwa mazowieckiego. został wysłany do odbiorców na terenie powiatu wałbrzyskiego i miasta Wałbrzych (woj. dolnośląskie)"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie",
+     "mazowieckie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/walbrzych",
+     "dolnoslaskie/walbrzyski"
+    ],
+    "whole": [
+     "mazowieckie"
+    ]
+   },
+   "id": "alert-rcb---cwiczenia-z-wykorzystaniem-syren-1110",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-z-wykorzystaniem-syren-1110",
+   "intro": "",
+   "status": "expired",
+   "started_at": "2026-10-11T00:00:00+02:00",
+   "last_at": "2026-10-11T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - Rosyjski atak powietrzny na terenie Ukrainy (11.10)",
+   "date": "2026-10-11",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1110",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1110",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-11T00:00:00+02:00",
+   "last_at": "2026-10-11T00:00:00+02:00",
+   "parser": 1
+  },
+  {
+   "title": "Alert RCB - Rosyjski atak powietrzny na terenie Ukrainy (10.10)",
+   "date": "2026-10-10",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie",
+       "podkarpackie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "lubelskie",
+       "podkarpackie"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie",
+     "podkarpackie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "lubelskie",
+     "podkarpackie"
+    ]
+   },
+   "id": "alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1011",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1011",
+   "intro": "",
+   "status": "ended",
+   "started_at": "2026-10-10T00:00:00+02:00",
+   "last_at": "2026-10-10T00:00:00+02:00",
+   "parser": 1
+  }
+ ]
+}

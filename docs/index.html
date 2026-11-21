@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Alerty RCB — mapa alertów w Polsce</title>
+<meta name="description" content="Mapa aktualnych Alertów RCB w Polsce: zagrożenia z powietrza, woda, pogoda, ćwiczenia. Dane z gov.pl/web/rcb/komunikaty, odświeżane automatycznie.">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23e5484d'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3E!%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<header>
+  <div class="brand"><span class="dot"></span><h1>Alerty RCB</h1><span class="sub">mapa alertów w Polsce</span></div>
+  <div class="status" id="status">Ładowanie…</div>
+</header>
+<main>
+  <section class="map-wrap">
+    <svg id="map" role="img" aria-label="Mapa Polski z województwami i powiatami"></svg>
+    <div class="legend" id="legend"></div>
+    <div class="tip" id="tip" hidden></div>
+  </section>
+  <aside>
+    <h2>Teraz <span id="active-count" class="pill">0</span></h2>
+    <ul id="active" class="alerts"></ul>
+    <h2>Ostatnie 14 dni</h2>
+    <ul id="recent" class="alerts recent"></ul>
+  </aside>
+</main>
+<footer>
+  <p>Dane: <a href="https://www.gov.pl/web/rcb/komunikaty">Rządowe Centrum Bezpieczeństwa — komunikaty</a>.
+  Strona nieoficjalna, odświeżana co kilka minut przez GitHub Actions; w razie zagrożenia słuchaj
+  oficjalnych komunikatów i służb. Mapa: <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a> (MIT).</p>
+  <p>Ten serwis rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a> —
+  <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia pracy agentów</a>.</p>
+</footer>
+<script src="app.js"></script>
+</body>
+</html>
