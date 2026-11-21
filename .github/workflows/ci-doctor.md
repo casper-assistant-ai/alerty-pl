@@ -34,6 +34,8 @@ timeout-minutes: 10
 
 # CI doctor
 
+Read the Process block in `AGENTS.md` first: it says what the team needs from you this week.
+
 Run: ${{ github.event.workflow_run.html_url }} (run id ${{ github.event.workflow_run.id }},
 head ${{ github.event.workflow_run.head_sha }}).
 

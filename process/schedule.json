@@ -1,0 +1,5 @@
+{
+  "note": "Extra runs of agentic workflows on top of their own schedules, by UTC weekday (mon..sun). Kept by the process-retro agent; started daily by the Agent dispatch workflow. At most 3 extra runs per agent per week.",
+  "max_extra_runs_per_week": 3,
+  "extra_runs": {}
+}
