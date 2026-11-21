@@ -2,6 +2,17 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.9.0 (2026-11-22)
+
+### feat
+
+- **agents:** issue-worker takes every issue to a PR or a reasoned close ([7eb6301](https://github.com/casper-assistant-ai/alerty-pl/commit/7eb6301))
+- **process:** run process-retro daily over a rolling 7-day window ([3d7397b](https://github.com/casper-assistant-ai/alerty-pl/commit/3d7397b))
+
+### chore
+
+- **process:** retro 2026-11-21, dev share 60% (#12) ([42eaad0](https://github.com/casper-assistant-ai/alerty-pl/commit/42eaad0))
+
 ## 1.8.1 (2026-11-21)
 
 ### fix

@@ -15,6 +15,37 @@
  },
  "releases": [
   {
+   "version": "1.9.0",
+   "date": "2026-11-22",
+   "sha": "7eb6301",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "agents",
+     "breaking": false,
+     "text": "issue-worker takes every issue to a PR or a reasoned close",
+     "sha": "7eb6301",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "retro 2026-11-21, dev share 60% (#12)",
+     "sha": "42eaad0",
+     "date": "2026-11-21"
+    },
+    {
+     "type": "feat",
+     "scope": "process",
+     "breaking": false,
+     "text": "run process-retro daily over a rolling 7-day window",
+     "sha": "3d7397b",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.8.1",
    "date": "2026-11-21",
    "sha": "921dddd",
