@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.7.0 (2026-11-21)
+
+### feat
+
+- **map:** day slider, Esri Wayback and NASA imagery, NASA FIRMS fires ([49e5f4a](https://github.com/casper-assistant-ai/alerty-pl/commit/49e5f4a))
+
 ## 1.6.0 (2026-11-21)
 
 ### feat
