@@ -89,6 +89,85 @@ class WaterAlert(unittest.TestCase):
         self.assertEqual(a["regions"]["whole"], [])
 
 
+class WeatherAlert(unittest.TestCase):
+    """Meteo alert with no timed update: active for the 24 h weather TTL, then expired."""
+    def setUp(self):
+        self.a = rcb.parse_detail(page("alert-rcb---ostrzezenie-przed-silnym-wiatrem-2511.html"), GAZ,
+                                  title="Alert RCB - ostrzeżenie przed silnym wiatrem (25.10)",
+                                  date="2026-10-25")
+
+    def test_category_and_regions(self):
+        self.assertEqual(self.a["category"], "weather")
+        self.assertEqual(self.a["regions"]["voivodeships"], ["slaskie"])
+        self.assertEqual(self.a["regions"]["powiaty"],
+                         ["slaskie/bielski", "slaskie/cieszynski", "slaskie/zywiecki"])
+        self.assertEqual(self.a["regions"]["whole"], [])
+
+    def test_updates(self):
+        self.assertEqual(len(self.a["updates"]), 1)
+        self.assertIsNone(self.a["updates"][0]["time"])
+        self.assertFalse(self.a["updates"][0]["ended"])
+
+    def test_status_ttl(self):
+        self.a.update(id="x", url="u", intro="")
+        start = dt.datetime(2026, 10, 25, 0, 0, tzinfo=rcb.TZ)
+        self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=23))[0], "active")
+        self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=25))[0], "expired")
+
+
+class OrdnanceAlert(unittest.TestCase):
+    """Niewybuch named by city and street only: the whole voivodeship is alerted, no powiat."""
+    def setUp(self):
+        self.a = rcb.parse_detail(page("alert-rcb---neutralizacja-niewybuchu-0711.html"), GAZ,
+                                  title="Alert RCB - neutralizacja niewybuchu (07.11)", date="2026-11-07")
+
+    def test_category_and_regions(self):
+        self.assertEqual(self.a["category"], "ordnance")
+        self.assertEqual(self.a["regions"]["voivodeships"], ["zachodniopomorskie"])
+        self.assertEqual(self.a["regions"]["powiaty"], [])
+        self.assertEqual(self.a["regions"]["whole"], ["zachodniopomorskie"])
+
+    def test_updates(self):
+        self.assertEqual(len(self.a["updates"]), 1)
+        self.assertFalse(self.a["updates"][0]["ended"])
+
+    def test_status_ttl(self):
+        self.a.update(id="x", url="u", intro="")
+        start = dt.datetime(2026, 11, 7, 0, 0, tzinfo=rcb.TZ)
+        self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=23))[0], "active")
+        self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=25))[0], "expired")
+
+
+class DrillAlert(unittest.TestCase):
+    """Drill with a time window 'w godz. 08:00-12:00': planned before, active during, ended after."""
+    def setUp(self):
+        self.a = rcb.parse_detail(page("alert-rcb---trening-systemow-alarmowania-2111.html"), GAZ,
+                                  title="Alert RCB - trening systemów alarmowania (21.11)",
+                                  date="2026-11-21")
+        self.a.update(id="x", url="u", intro="")
+
+    def test_category_and_regions(self):
+        self.assertEqual(self.a["category"], "drill")
+        self.assertEqual(self.a["regions"]["voivodeships"], ["wielkopolskie"])
+        self.assertEqual(self.a["regions"]["powiaty"], ["wielkopolskie/gostynski"])
+        self.assertEqual(self.a["regions"]["whole"], [])
+
+    def test_updates(self):
+        self.assertEqual(len(self.a["updates"]), 1)
+        self.assertIn("w godz. 08:00-12:00", self.a["updates"][0]["message"])
+        self.assertFalse(self.a["updates"][0]["ended"])
+
+    def test_status_window(self):
+        at = lambda h, m: dt.datetime(2026, 11, 21, h, m, tzinfo=rcb.TZ)
+        self.assertEqual(rcb.status(self.a, at(7, 0))[0], "planned")
+        self.assertEqual(rcb.status(self.a, at(10, 0))[0], "active")
+        self.assertEqual(rcb.status(self.a, at(13, 0))[0], "ended")
+
+    def test_status_window_sets_start(self):
+        st, started, last = rcb.status(self.a, dt.datetime(2026, 11, 21, 10, 0, tzinfo=rcb.TZ))
+        self.assertEqual(started, "2026-11-21T08:00:00+01:00")  # the window start, not midnight
+
+
 class Archive(unittest.TestCase):
     def test_archive_keeps_old_and_adds_new(self):
         import tempfile
