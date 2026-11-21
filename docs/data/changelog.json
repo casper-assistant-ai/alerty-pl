@@ -15,6 +15,29 @@
  },
  "releases": [
   {
+   "version": "1.8.1",
+   "date": "2026-11-21",
+   "sha": "921dddd",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "process",
+     "breaking": false,
+     "text": "count agent-coach and process-retro as process agents, not builders",
+     "sha": "921dddd",
+     "date": "2026-11-21"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "retro 2026-11-21, dev share 60% (#11)",
+     "sha": "2d5145a",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
    "version": "1.8.0",
    "date": "2026-11-21",
    "sha": "33c96fe",
