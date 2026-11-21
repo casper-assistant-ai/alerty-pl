@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.8.0 (2026-11-21)
+
+### feat
+
+- **process:** weekly process-retro agent that keeps the team developing ([33c96fe](https://github.com/casper-assistant-ai/alerty-pl/commit/33c96fe))
+
 ## 1.7.0 (2026-11-21)
 
 ### feat

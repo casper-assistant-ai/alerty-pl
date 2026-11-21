@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.8.0",
+   "date": "2026-11-21",
+   "sha": "33c96fe",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "process",
+     "breaking": false,
+     "text": "weekly process-retro agent that keeps the team developing",
+     "sha": "33c96fe",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
    "version": "1.7.0",
    "date": "2026-11-21",
    "sha": "49e5f4a",
