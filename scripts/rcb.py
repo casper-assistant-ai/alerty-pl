@@ -47,8 +47,8 @@ CITY_GUARD = r"(?<!Biała )(?<!Białej )(?<!Ruda )(?<!Rudzie )(?<!Rudy )(?<!Piek
 TOWNS = {
     r"Warszaw(?:a|ie|y|ę|ą)": "mazowieckie/warszawa",
     r"Marki|Markach": "mazowieckie/wolominski",
-    r"Zielonk(?:a|i|ę|ą|ie)": "mazowieckie/wolominski",
-    r"Kobyłk(?:a|i|ę|ą|ie)": "mazowieckie/wolominski",
+    r"Zielonk(?:a|i|ę|ą|ie)|Zielonce": "mazowieckie/wolominski",
+    r"Kobyłk(?:a|i|ę|ą|ie)|Kobyłce": "mazowieckie/wolominski",
     r"Wołomin(?:ie|a|owi|em)?": "mazowieckie/wolominski",
     r"Legionow(?:o|a|ie|em)": "mazowieckie/legionowski",
 }
@@ -347,7 +347,7 @@ def write_if_changed(path, data, indent=1):
     return True
 
 
-PARSER_VERSION = 1
+PARSER_VERSION = 2  # 2: TOWNS rules for the Warsaw area (komunikat-1811) — re-parse cached alerts
 RECENT_DAYS = 60  # alerts.json keeps this many days; archive.json keeps everything
 
 

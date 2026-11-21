@@ -65,6 +65,18 @@ class Towns(unittest.TestCase):
         r = GAZ.regions("Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.")
         self.assertEqual(r["powiaty"], ["mazowieckie/legionowski", "mazowieckie/warszawa", "mazowieckie/wolominski"])
 
+    def test_warsaw_area_flares_page(self):
+        a = rcb.parse_detail(page("komunikat-1811.html"), GAZ)
+        self.assertEqual(a["regions"]["voivodeships"], ["mazowieckie"])
+        self.assertEqual(a["regions"]["powiaty"],
+                         ["mazowieckie/legionowski", "mazowieckie/warszawa", "mazowieckie/wolominski"])
+        self.assertEqual(a["regions"]["whole"], [])  # towns named, not the whole voivodeship
+
+    def test_palatalized_locative_towns(self):
+        # locative of Zielonka/Kobyłka palatalizes k -> c: "w Zielonce", "w Kobyłce"
+        r = GAZ.regions("testy odbędą się w Zielonce i Kobyłce")
+        self.assertEqual(r["powiaty"], ["mazowieckie/wolominski"])
+
     def test_town_does_not_mark_voivodeship(self):
         self.assertEqual(GAZ.regions("Biała Podlaska i Ruda Śląska")["whole"], [])
 
