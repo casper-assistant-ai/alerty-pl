@@ -51,7 +51,20 @@ jobs:
             for js in docs/*.js; do node --check "$js" || ok=0; done
             git checkout -q main
             if [ "$ok" = 1 ]; then
-              gh pr merge "$n" --squash --delete-branch && echo "merged #$n"
+              # the squash commit lands on main, so its subject must be a Conventional Commit
+              title=$(gh pr view "$n" --json title --jq .title)
+              agent=$(printf '%s' "$title" | sed -nE 's/^\[([a-z0-9-]+)\] .*/\1/p')
+              subject=$(printf '%s' "$title" | sed -E 's/^\[[a-z0-9-]+\] //')
+              if ! python3 -I scripts/changelog.py lint --title "$subject" 2>/dev/null; then
+                case "$agent" in
+                  site-fixer) type="fix(site)";; site-designer) type="feat(site)";;
+                  parser-doctor) type="fix(parser)";; region-keeper) type="fix(regions)";;
+                  security-auditor) type="fix(security)";; test-improver) type="test";;
+                  docs-keeper) type="docs";; *) type="chore";;
+                esac
+                subject="$type: $subject"
+              fi
+              gh pr merge "$n" --squash --delete-branch --subject "$subject (#$n)" && echo "merged #$n: $subject"
             else
               gh pr comment "$n" --body "Agent PR gate: tests or the live parse failed on this branch. The authoring agent should push a fix."
             fi

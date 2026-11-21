@@ -15,9 +15,22 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Conventional Commits
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            # agent PRs carry a "[agent-name] " prefix; the squash subject is the rest
+            python3 -I scripts/changelog.py lint --title "$(printf '%s' "$TITLE" | sed -E 's/^\[[a-z0-9-]+\] //')"
+          elif [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ]; then
+            python3 -I scripts/changelog.py lint "$BEFORE..${{ github.sha }}"
+          fi
       - name: Unit tests on saved RCB pages
         run: python3 -I -m unittest discover -s tests -v
       - name: Live smoke test (gov.pl list page parses)
         run: python3 -I scripts/rcb.py update --pages 1 --out /tmp/smoke && python3 -I -c "import json;d=json.load(open('/tmp/smoke/alerts.json'));assert d['alerts'],'no alerts';print(len(d['alerts']),'alerts')"
       - name: JavaScript syntax
-        run: node --check docs/app.js
+        run: for f in docs/*.js; do node --check "$f"; done

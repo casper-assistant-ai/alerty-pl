@@ -1,0 +1,153 @@
+{
+ "repo": "https://github.com/casper-assistant-ai/alerty-pl",
+ "types": {
+  "feat": "Nowe funkcje",
+  "fix": "Poprawki",
+  "perf": "Wydajność",
+  "revert": "Wycofane zmiany",
+  "docs": "Dokumentacja",
+  "style": "Wygląd kodu",
+  "refactor": "Porządki w kodzie",
+  "test": "Testy",
+  "build": "Budowanie",
+  "ci": "Automatyzacja",
+  "chore": "Inne"
+ },
+ "releases": [
+  {
+   "version": "1.5.1",
+   "date": "2026-11-21",
+   "sha": "480d5db",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "regions",
+     "breaking": false,
+     "text": "re-parse cached alerts after the Warsaw-area town rules (#7)",
+     "sha": "480d5db",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.5.0",
+   "date": "2026-11-21",
+   "sha": "d20eeb2",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": null,
+     "breaking": false,
+     "text": "alert history since 2021, analytics page and a redesign",
+     "sha": "d20eeb2",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.4.0",
+   "date": "2026-11-21",
+   "sha": "4f96f72",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "site",
+     "breaking": false,
+     "text": "honest status signals, reduced-motion opt-in, live-region alarm announcements (#5)",
+     "sha": "4f96f72",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.3.0",
+   "date": "2026-11-21",
+   "sha": "99f7d21",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "regions",
+     "breaking": false,
+     "text": "map Warsaw-area towns to powiaty (#4)",
+     "sha": "99f7d21",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.2.0",
+   "date": "2026-11-21",
+   "sha": "9876508",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "agents",
+     "breaking": false,
+     "text": "developer agents on z.ai (GLM-5.3) with the site-designer, security-auditor and agent-coach skills",
+     "sha": "9876508",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.1.1",
+   "date": "2026-11-21",
+   "sha": "518003b",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "deploy",
+     "breaking": false,
+     "text": "retry the Pages deploy when the artifact is not listed yet",
+     "sha": "518003b",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.1.0",
+   "date": "2026-11-21",
+   "sha": "6735655",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "monitoring",
+     "breaking": false,
+     "text": "agent monitoring with gh-cao, alert times in the history fixed",
+     "sha": "6735655",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.0.1",
+   "date": "2026-11-21",
+   "sha": "9022420",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "update",
+     "breaking": false,
+     "text": "autostash meta.json before the rebase",
+     "sha": "9022420",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
+   "version": "1.0.0",
+   "date": "2026-11-21",
+   "sha": "d9b56f4",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": null,
+     "breaking": false,
+     "text": "alert map of Poland from gov.pl RCB, run by an agent team",
+     "sha": "d9b56f4",
+     "date": "2026-11-21"
+    }
+   ]
+  }
+ ]
+}
