@@ -42,7 +42,7 @@ jobs:
           if ! git diff --cached --quiet; then
             msg=$(python3 -I -c 'import json;m=json.load(open("docs/data/meta.json"));print("data:",m["active"],"active,",m["count"],"alerts")')
             git commit -m "$msg"
-            git pull --rebase -X theirs origin main
+            git pull --rebase --autostash -X theirs origin main
             git push
           fi
       - uses: actions/configure-pages@v5
