@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.7.0",
+   "date": "2026-11-21",
+   "sha": "49e5f4a",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "map",
+     "breaking": false,
+     "text": "day slider, Esri Wayback and NASA imagery, NASA FIRMS fires",
+     "sha": "49e5f4a",
+     "date": "2026-11-21"
+    }
+   ]
+  },
+  {
    "version": "1.6.0",
    "date": "2026-11-21",
    "sha": "ffe1c84",
