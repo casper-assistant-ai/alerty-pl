@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Build docs/geo/poland.json: SVG paths of voivodeships and powiaty plus the gazetteer.
+"""Build docs/geo/poland.json (SVG paths of voivodeships and powiaty plus the gazetteer) and,
+with a fourth argument, docs/geo/poland.geojson (the same shapes and ids in WGS84 for the
+zoomable map).
 
 Input: GeoJSON from github.com/ppatrzyk/polska-geojson (MIT), files given on the command line.
 Output: projected SVG path strings (simple equirectangular with cos(lat) correction, fine for
 Poland) and, for each powiat, the voivodeship that holds its centroid.
 
-Usage: build_geo.py wojewodztwa-min.geojson powiaty-min.geojson docs/geo/poland.json
+Usage: build_geo.py wojewodztwa-min.geojson powiaty-min.geojson docs/geo/poland.json [docs/geo/poland.geojson]
 """
 import json
 import math
@@ -82,7 +84,29 @@ def slug(s):
     return s.translate(tr).lower()
 
 
-def main(woj_file, pow_file, out_file):
+def rounded(geom, nd=3):
+    """Coordinates to ~100 m: enough for powiat borders, a third of the size."""
+    def r(c):
+        return [round(c[0], nd), round(c[1], nd)] if isinstance(c[0], (int, float)) else [r(x) for x in c]
+    return {"type": geom["type"], "coordinates": r(geom["coordinates"])}
+
+
+def geojson(out, woj, pw, file):
+    feats = []
+    by_name = {f["properties"]["nazwa"]: f for f in woj}
+    for v in out["voivodeships"]:
+        feats.append({"type": "Feature", "properties": {"kind": "woj", "id": v["id"], "name": v["name"]},
+                      "geometry": rounded(by_name[v["name"]]["geometry"])})
+    for p, f in zip(out["powiaty"], sorted(pw, key=lambda f: f["properties"]["nazwa"])):
+        feats.append({"type": "Feature", "properties": {"kind": "pow", "id": p["id"], "name": p["name"],
+                      "v": p["voivodeship"], "city": p["city"]}, "geometry": rounded(f["geometry"])})
+    with open(file, "w", encoding="utf-8") as fh:
+        json.dump({"type": "FeatureCollection", "source": out["source"], "features": feats}, fh,
+                  ensure_ascii=False, separators=(",", ":"))
+    print(f"{len(feats)} features -> {file}")
+
+
+def main(woj_file, pow_file, out_file, geojson_file=None):
     woj = json.load(open(woj_file, encoding="utf-8"))["features"]
     pw = json.load(open(pow_file, encoding="utf-8"))["features"]
     p = projector(woj)
@@ -106,7 +130,9 @@ def main(woj_file, pow_file, out_file):
     with open(out_file, "w", encoding="utf-8") as fh:
         json.dump(out, fh, ensure_ascii=False, separators=(",", ":"))
     print(f"{len(out['voivodeships'])} voivodeships, {len(out['powiaty'])} powiaty -> {out_file}")
+    if geojson_file:
+        geojson(out, woj, pw, geojson_file)
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:4])
+    main(*sys.argv[1:5])

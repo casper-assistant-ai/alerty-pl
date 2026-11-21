@@ -7,6 +7,11 @@ A live map of Poland with the current alerts of the Government Centre for Securi
 Source: [gov.pl/web/rcb/komunikaty](https://www.gov.pl/web/rcb/komunikaty). Unofficial;
 the official channel is the RCB alert SMS.
 
+The map zooms down to a street. A day slider goes back to any day since 2021
+(`?dzien=2026-11-20`). Under the alerts lies a street map, Esri World Imagery Wayback with
+every imagery date of the visible area, or NASA's true-colour picture of that day
+(`&podklad=esri|nasa`). NASA FIRMS fires of that day can go on top (`&pozary=1`).
+
 This repository is also a demo of **an autonomous engineering team**: after the first commit, the
 site is run, repaired, tested and documented by [GitHub Agentic Workflows](https://github.github.com/gh-aw/)
 in the style of [Peli's Agent Factory](https://github.github.com/gh-aw/blog/2026-01-12-welcome-to-pelis-agent-factory/),
@@ -85,7 +90,7 @@ gh cao dashboard --repo casper-assistant-ai/alerty-pl   # needs Docker or Podman
 gh aw status && gh aw logs --start-date -1d
 ```
 
-Map data: [ppatrzyk/polska-geojson](https://github.com/ppatrzyk/polska-geojson) (MIT). Code: MIT.
+Map data: [ppatrzyk/polska-geojson](https://github.com/ppatrzyk/polska-geojson) (MIT). Map: [Leaflet](https://leafletjs.com) (BSD-2, vendored). Layers, all without keys: Esri Light/Dark Gray Canvas, [Esri World Imagery Wayback](https://livingatlas.arcgis.com/wayback/), [NASA GIBS](https://www.earthdata.nasa.gov/gibs) true colour and [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) VIIRS 375 m fires. Code: MIT.
 
 ## Versions and changelog
 

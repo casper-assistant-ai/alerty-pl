@@ -4,9 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alerty RCB — mapa alertów w Polsce</title>
-<meta name="description" content="Mapa aktualnych Alertów RCB w Polsce: zagrożenie z powietrza, woda, pogoda, ćwiczenia. Dane z gov.pl/web/rcb/komunikaty, odświeżane co 10 minut.">
+<meta name="description" content="Mapa Alertów RCB w Polsce, dziś i w dowolnym dniu od 2021 roku, na mapie lub zdjęciach satelitarnych z pożarami NASA: zagrożenie z powietrza, woda, pogoda, ćwiczenia. Dane z gov.pl/web/rcb/komunikaty, odświeżane co 10 minut.">
 <meta name="color-scheme" content="light dark">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='6' fill='%23c4122f'/%3E%3Crect x='11' y='11' width='10' height='10' rx='2' fill='white'/%3E%3C/svg%3E">
 </head>
@@ -24,17 +25,36 @@
 <div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main class="map-page">
   <section class="map-wrap" aria-label="Mapa">
-    <svg id="map" class="map" role="img" aria-label="Mapa Polski z województwami i powiatami; kolorem zaznaczone powiaty z aktywnym alertem"></svg>
+    <div class="day-bar">
+      <button type="button" class="btn icon" id="prev" aria-label="Poprzedni dzień" title="Poprzedni dzień">&#9664;</button>
+      <div class="day-track">
+        <svg id="spark" class="spark" aria-hidden="true" preserveAspectRatio="none"></svg>
+        <input type="range" id="day" min="0" max="0" step="1" aria-label="Dzień na mapie" aria-describedby="day-label">
+      </div>
+      <button type="button" class="btn icon" id="next" aria-label="Następny dzień" title="Następny dzień">&#9654;</button>
+      <output id="day-label" class="day-label mono" for="day"></output>
+      <button type="button" class="btn" id="today">Dziś</button>
+    </div>
+    <div id="map" class="lmap" role="region" aria-label="Mapa Polski z powiatami; kolorem zaznaczone powiaty z alertem w wybranym dniu"></div>
+    <div class="layers">
+      <div class="seg" role="radiogroup" aria-label="Podkład mapy">
+        <label><input type="radio" name="base" value="mapa" checked><span>Mapa</span></label>
+        <label><input type="radio" name="base" value="esri"><span>Satelita · Esri Wayback</span></label>
+        <label><input type="radio" name="base" value="nasa"><span>Satelita · NASA z dnia</span></label>
+      </div>
+      <label class="wb" id="wb-wrap" hidden><span class="visually-hidden">Data zdjęcia Esri Wayback</span><select id="wayback"></select></label>
+      <label class="chk"><input type="checkbox" id="fires"><span>Pożary (NASA FIRMS)</span></label>
+    </div>
+    <p class="base-note mono" id="base-note"></p>
     <ul class="legend" id="legend"></ul>
-    <div class="tip" id="tip" hidden></div>
   </section>
   <div class="panel">
     <section aria-labelledby="h-now">
-      <h2 id="h-now">Teraz <span class="n" id="active-count"></span></h2>
+      <h2 id="h-now"><span id="now-title">Teraz</span> <span class="n" id="active-count"></span></h2>
       <ul id="active" class="rows"></ul>
     </section>
     <section aria-labelledby="h-week">
-      <h2 id="h-week">Ostatnie 7 dni <span class="n" id="week-count"></span></h2>
+      <h2 id="h-week"><span id="week-title">Ostatnie 7 dni</span> <span class="n" id="week-count"></span></h2>
       <ul id="recent" class="rows compact"></ul>
       <a class="more" href="historia.html">Pełna historia od 2021 roku</a>
     </section>
@@ -45,10 +65,11 @@
     <p>Strona nieoficjalna. Dane z <a href="https://www.gov.pl/web/rcb/komunikaty">komunikatów Rządowego Centrum Bezpieczeństwa</a>,
     odświeżane co 10 minut. W razie zagrożenia słuchaj komunikatów służb i stosuj się do Alertów RCB w telefonie.</p>
     <p>Stronę rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>:
-    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>. Mapa: <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a>, krój: IBM Plex.
+    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>. Granice: <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a>; mapa <a href="https://leafletjs.com">Leaflet</a>, podkład Esri Light/Dark Gray Canvas (© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>); zdjęcia satelitarne <a href="https://livingatlas.arcgis.com/wayback/">Esri World Imagery Wayback</a> i <a href="https://www.earthdata.nasa.gov/gibs">NASA GIBS</a>, pożary <a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a> (VIIRS 375 m); krój: IBM Plex.
     <a class="mono" id="ver" href="zmiany.html"></a></p>
   </div>
 </footer>
+<script src="vendor/leaflet/leaflet.js" defer></script>
 <script src="common.js" defer></script>
 <script src="app.js" defer></script>
 </body>

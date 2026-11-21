@@ -28,9 +28,21 @@ const PAGES = [
   { path: "", name: "Mapa", check: `(() => { const p = [];
       if (document.querySelectorAll("#map path.pow, .leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
       if (!document.querySelector("#active li")) p.push("list of active alerts is empty");
+      if (!document.querySelector("#day") || !document.querySelector("#spark path")) p.push("day slider is missing");
       return p; })()` },
   { path: "?dzien=2026-11-20", name: "Mapa, dzień 20.11", check: `(() => { const p = [];
       if (document.querySelectorAll("#map path.pow, .leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
+      if (document.querySelectorAll("#map path.hit").length < 40) p.push("map: the alerts of 20.11.2026 (air alert in 2 voivodeships) are not coloured");
+      return p; })()` },
+  { path: "?dzien=2026-08-15&podklad=nasa&pozary=1", name: "Mapa, NASA i pożary 15.08", check: `(() => { const p = [];
+      if (document.querySelectorAll(".leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
+      if (document.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded").length < 4) p.push("NASA true colour tiles did not load");
+      if (!document.querySelector(".leaflet-fires-pane img")) p.push("NASA FIRMS fire layer is missing");
+      if (!/15\.08\.2026/.test(document.querySelector("#day-label")?.textContent || "")) p.push("day slider did not open 15.08.2026");
+      return p; })()` },
+  { path: "?podklad=esri", name: "Mapa, Esri Wayback", check: `(() => { const p = [];
+      if (document.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded").length < 4) p.push("Esri Wayback tiles did not load");
+      if (!document.querySelector("#wayback option")) p.push("Esri Wayback date list is empty");
       return p; })()` },
   { path: "historia.html", name: "Historia", check: `(() => { const p = [];
       if (document.querySelectorAll("#list li").length < 20) p.push("history list has fewer than 20 rows");
