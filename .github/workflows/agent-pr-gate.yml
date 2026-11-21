@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ github.token }}
-      ALLOWED: '^(scripts/|tests/|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$)'
+      ALLOWED: '^(scripts/|tests/|process/[a-z0-9-]+\.(md|json)$|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$)'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -60,7 +60,7 @@ jobs:
                   site-fixer) type="fix(site)";; site-designer) type="feat(site)";;
                   parser-doctor) type="fix(parser)";; region-keeper) type="fix(regions)";;
                   security-auditor) type="fix(security)";; test-improver) type="test";;
-                  docs-keeper) type="docs";; *) type="chore";;
+                  docs-keeper) type="docs";; process-retro) type="chore(process)";; *) type="chore";;
                 esac
                 subject="$type: $subject"
               fi

@@ -12,6 +12,10 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
 - Site check: `node scripts/site_check.mjs` opens every page of the live site in headless Chrome
   (desktop and phone) and lists JavaScript errors, failed requests and empty pages. The Site check
   workflow runs it hourly, files problems in an issue labelled `site-error` and calls `site-fixer`.
+- Process retro: `scripts/retro.py metrics` measures the week (development share of agent output,
+  builders with nothing merged, agents that only report, issues with no PR); the weekly
+  `process-retro` agent keeps the Process block below, `process/schedule.json` (extra agent runs,
+  started by the Agent dispatch workflow) and `process/retro-log.md`.
 - Releases: `scripts/changelog.py` tags `vMAJOR.MINOR.PATCH` from the commits since the last tag
   and builds `CHANGELOG.md` and `docs/data/changelog.json` (the Zmiany page). Both are generated.
 
@@ -28,6 +32,23 @@ Rules:
   parse pass. Touch only the paths your workflow allows.
 - Alert categories: air, drill, water, weather, ordnance, fire, chemical, other.
   An alert is `active` until an update says it ended or its category TTL passes.
+
+## Process
+
+The process-retro workflow keeps this block every week (at most three changes, each tied to a
+number in `process/retro-log.md`). Every agent follows it.
+
+<!-- process:start -->
+- Target: at least half of the agent output is product work (feat, fix, perf, refactor, test):
+  merged PRs that change the map, history, analytics, parser, tests or site check. Data commits,
+  reports and docs touch-ups are bookkeeping and do not count.
+- Builders (site-designer, site-fixer, parser-doctor, region-keeper, test-improver, docs-keeper):
+  before your own plan, look for open issues labelled `dev-task` that name you or fit your paths.
+  Take the oldest one, and say `Closes #<n>` in the PR body. Call `noop` only when no dev-task fits
+  and your own checklist finds nothing worth a PR.
+- Reporters (daily-status, ci-doctor, security-auditor): when a report finds something to build or
+  fix, name the builder that should take it, so the next retro can turn it into a dev-task.
+<!-- process:end -->
 
 ## Learned rules
 

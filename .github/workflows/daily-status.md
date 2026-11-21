@@ -29,6 +29,8 @@ timeout-minutes: 10
 
 # Daily status
 
+Read the Process block in `AGENTS.md` first: it says what the team needs from you this week.
+
 Write a short status report for the last 24 hours (UTC) of this repository.
 
 - **Service:** `docs/data/meta.json` (`checked_at`, `count`, `active`); count of failed and

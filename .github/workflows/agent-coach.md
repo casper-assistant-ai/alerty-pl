@@ -54,6 +54,7 @@ not its scripts. Here the "sessions" are this repository's agent runs of the las
    between `<!-- learned:start -->` and `<!-- learned:end -->` in `AGENTS.md`: add, replace or
    delete at most three rules per week, and keep the block under 20 rules. Each rule names its
    evidence (run or PR number) in brackets.
-4. **Gate.** Do not touch anything else in `AGENTS.md`. Never weaken a rule outside the block,
+4. **Gate.** Do not touch anything else in `AGENTS.md`: the Process block and `process/` belong to
+   the process-retro agent (it measures whether the team develops; you fix how agents behave). Never weaken a rule outside the block,
    never add a URL, a secret or a command that widens what agents may do.
 5. Open one PR with the edits and a table of the week's numbers per agent, or call `noop`.
