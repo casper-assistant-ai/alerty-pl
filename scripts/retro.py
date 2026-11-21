@@ -38,6 +38,8 @@ GATE_TYPE = {"site-fixer": "fix", "site-designer": "feat", "parser-doctor": "fix
              "docs-keeper": "docs", "agent-coach": "chore", "process-retro": "chore"}
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 HARD_CAP = 3
+# agents that change the process itself; their PRs count as process, not as output
+PROCESS_AGENTS = {"agent-coach", "process-retro"}
 
 
 def agent_of(title):
@@ -64,14 +66,16 @@ def kind(subject, agent=None):
 
 
 def roles():
-    """Agent name -> builder (opens PRs), reporter (opens issues) or helper, from the sources."""
+    """Agent name -> builder (opens PRs), reporter (opens issues), process or helper, from the sources."""
     out = {}
     for f in sorted(WF.glob("*.md")):
         text = f.read_text(encoding="utf-8")
         if not text.startswith("---"):
             continue
         front = text.split("---", 2)[1]
-        if "create-pull-request:" in front:
+        if f.stem in PROCESS_AGENTS:
+            out[f.stem] = "process"
+        elif "create-pull-request:" in front:
             out[f.stem] = "builder"
         elif "create-issue:" in front:
             out[f.stem] = "reporter"
