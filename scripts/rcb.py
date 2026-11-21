@@ -41,6 +41,16 @@ NOT_WORD_AFTER = r"(?![\w-])"
 # city names that contain a voivodeship stem: Biała Podlaska, Ruda Śląska, Piekary Śląskie
 CITY_GUARD = r"(?<!Biała )(?<!Białej )(?<!Ruda )(?<!Rudzie )(?<!Rudy )(?<!Piekary )(?<!Piekarach )"
 
+# towns (any case) that are not powiat names -> powiat id; matched capitalised, whole word
+TOWNS = {
+    r"Warszaw(?:a|ie|y|ę|ą)": "mazowieckie/warszawa",
+    r"Marki|Markach": "mazowieckie/wolominski",
+    r"Zielonk(?:a|i|ę|ą|ie)": "mazowieckie/wolominski",
+    r"Kobyłk(?:a|i|ę|ą|ie)": "mazowieckie/wolominski",
+    r"Wołomin(?:ie|a|owi|em)?": "mazowieckie/wolominski",
+    r"Legionow(?:o|a|ie|em)": "mazowieckie/legionowski",
+}
+
 CATEGORIES = [
     ("air", r"atak\w* z powietrza|zagrożeni\w* z powietrza|atak\w* powietrzn|obron\w* powietrzn|dron"),
     ("drill", r"trening|ćwiczeni|test\w* syren|próbn"),
@@ -161,7 +171,11 @@ class Gazetteer:
                 key = p["name"] + "@" + str(m.start())
                 if key not in found or dist < found[key][0]:
                     found[key] = (dist, p["id"])
-        pw = sorted({pid for _, pid in found.values()})
+        pw = {pid for _, pid in found.values()}
+        for rx, pid in TOWNS.items():
+            if re.search(NOT_WORD_BEFORE + r"(?:" + rx + r")" + NOT_WORD_AFTER, s):
+                pw.add(pid)
+        pw = sorted(pw)
         vs = sorted(set(vids) | {pid.split("/")[0] for pid in pw})
         # a whole voivodeship is alerted when it is named without a powiat list
         whole = [v for v in vs if not any(pid.startswith(v + "/") for pid in pw)]
