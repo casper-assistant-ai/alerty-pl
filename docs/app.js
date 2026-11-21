@@ -135,12 +135,17 @@ async function main() {
       const n = active.length, air = active.some((a) => a.category === "air");
       $("#active-count").textContent = n;
       $("#active-count").classList.toggle("zero", !n);
-      const st = $("#status");
-      st.textContent = (air ? "⚠ Zagrożenie z powietrza · " : "") + "sprawdzono " + fmtTime(meta.checked_at);
-      st.classList.toggle("alarm", air);
-      document.title = (air ? "⚠ " : "") + "Alerty RCB — mapa alertów w Polsce";
+      $("#active-count").classList.toggle("alarm", air);
+      const dot = $("#dot");
+      dot.classList.toggle("ok", !air);
+      dot.classList.toggle("alarm", air);
+      const alarmEl = $("#alarm");
+      const alarmTxt = air ? "Zagrożenie z powietrza" : "";
+      if (alarmEl.textContent !== alarmTxt) alarmEl.textContent = alarmTxt; // role=status: announced only on a real change
+      $("#checked").textContent = "sprawdzono " + fmtTime(meta.checked_at);
+      document.title = (air ? "Zagrożenie z powietrza — " : "") + "Alerty RCB — mapa alertów w Polsce";
     } catch (e) {
-      $("#status").textContent = "Nie udało się pobrać danych: " + e.message;
+      $("#checked").textContent = "Nie udało się pobrać danych: " + e.message;
     }
   }
   await refresh();
