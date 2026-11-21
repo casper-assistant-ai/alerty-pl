@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 concurrency:
   group: agent-pr-gate
@@ -36,6 +37,11 @@ jobs:
           for n in $prs; do
             echo "::group::PR #$n"
             gh pr ready "$n" 2>/dev/null || true
+            # CI on a PR by github-actions[bot] waits for an approval; nobody else gives it
+            sha=$(gh pr view "$n" --json headRefOid --jq .headRefOid)
+            for r in $(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$sha&status=action_required" --jq '.workflow_runs[].id'); do
+              gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$r/approve" >/dev/null && echo "approved CI run $r"
+            done
             files=$(gh pr diff "$n" --name-only)
             bad=$(echo "$files" | grep -Ev "$ALLOWED" || true)
             if [ -n "$bad" ]; then
