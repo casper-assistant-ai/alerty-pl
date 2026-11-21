@@ -2,6 +2,13 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.6.0 (2026-11-21)
+
+### feat
+
+- **site-check:** hourly headless check of the live site and a site-fixer agent ([ffe1c84](https://github.com/casper-assistant-ai/alerty-pl/commit/ffe1c84))
+- **changelog:** Zmiany page with semver releases built from Conventional Commits ([c39f61e](https://github.com/casper-assistant-ai/alerty-pl/commit/c39f61e))
+
 ## 1.5.1 (2026-11-21)
 
 ### fix
