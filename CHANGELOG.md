@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.8.1 (2026-11-21)
+
+### fix
+
+- **process:** count agent-coach and process-retro as process agents, not builders ([921dddd](https://github.com/casper-assistant-ai/alerty-pl/commit/921dddd))
+
+### chore
+
+- **process:** retro 2026-11-21, dev share 60% (#11) ([2d5145a](https://github.com/casper-assistant-ai/alerty-pl/commit/2d5145a))
+
 ## 1.8.0 (2026-11-21)
 
 ### feat
