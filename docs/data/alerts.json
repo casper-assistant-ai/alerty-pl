@@ -1,6 +1,6 @@
 {
  "source": "https://www.gov.pl/web/rcb/komunikaty",
- "parser": 1,
+ "parser": 2,
  "alerts": [
   {
    "title": "Alert RCB - trening systemów alarmowania (21.11)",
@@ -38,7 +38,7 @@
    "status": "ended",
    "started_at": "2026-11-21T08:00:00+01:00",
    "last_at": "2026-11-21T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - atak z powietrza (20.11)",
@@ -294,7 +294,7 @@
    "status": "ended",
    "started_at": "2026-11-20T06:30:00+01:00",
    "last_at": "2026-11-20T09:48:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemów alarmowania (20.11)",
@@ -332,7 +332,7 @@
    "status": "ended",
    "started_at": "2026-11-20T10:00:00+01:00",
    "last_at": "2026-11-20T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemów alarmowania (19.11)",
@@ -370,7 +370,7 @@
    "status": "ended",
    "started_at": "2026-11-19T09:00:00+01:00",
    "last_at": "2026-11-19T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - woda niezdatna do spożycia, pow. zgorzelecki (19.11)",
@@ -408,7 +408,7 @@
    "status": "active",
    "started_at": "2026-11-19T00:00:00+01:00",
    "last_at": "2026-11-19T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - woda niezdatna do spożycia, pow. ząbkowicki (19.11)",
@@ -446,7 +446,7 @@
    "status": "active",
    "started_at": "2026-11-19T00:00:00+01:00",
    "last_at": "2026-11-19T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Komunikat (18.11)",
@@ -458,25 +458,37 @@
      "message": "Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.",
      "ended": false,
      "regions": {
-      "voivodeships": [],
-      "powiaty": [],
+      "voivodeships": [
+       "mazowieckie"
+      ],
+      "powiaty": [
+       "mazowieckie/legionowski",
+       "mazowieckie/warszawa",
+       "mazowieckie/wolominski"
+      ],
       "whole": []
      },
      "region_text": "Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.\nDziś w godz. 16.00–18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.\nPociski powoli opadają na spadochronach i długo świecą.\nKilka takich świateł na niebie może przypominać wolno lecący samolot lub duży dron."
     }
    ],
    "regions": {
-    "voivodeships": [],
-    "powiaty": [],
+    "voivodeships": [
+     "mazowieckie"
+    ],
+    "powiaty": [
+     "mazowieckie/legionowski",
+     "mazowieckie/warszawa",
+     "mazowieckie/wolominski"
+    ],
     "whole": []
    },
    "id": "komunikat-1811",
    "url": "https://www.gov.pl/web/rcb/komunikat-1811",
-   "intro": "",
+   "intro": "Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.",
    "status": "expired",
    "started_at": "2026-11-18T00:00:00+01:00",
    "last_at": "2026-11-18T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (10.11)",
@@ -572,11 +584,11 @@
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-1011",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-1011",
-   "intro": "",
+   "intro": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
    "status": "ended",
    "started_at": "2026-11-10T10:20:00+01:00",
    "last_at": "2026-11-10T10:55:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (09.11)",
@@ -634,11 +646,11 @@
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-0911",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0911",
-   "intro": "",
+   "intro": "\"UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
    "status": "ended",
    "started_at": "2026-11-09T00:00:00+01:00",
    "last_at": "2026-11-09T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zła jakość powietrza (07.11)",
@@ -674,11 +686,11 @@
    },
    "id": "alert-rcb---zla-jakosc-powietrza",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zla-jakosc-powietrza",
-   "intro": "",
+   "intro": "\"UWAGA! Dziś (07.11) prognozowana zła jakość powietrza - SMOG (pył zawieszony - PM10). Jeśli możesz, unikaj aktywności na zewnątrz i nie wietrz pomieszczeń.\"",
    "status": "expired",
    "started_at": "2026-11-07T00:00:00+01:00",
    "last_at": "2026-11-07T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - neutralizacja niewybuchu (07.11)",
@@ -712,11 +724,11 @@
    },
    "id": "alert-rcb---neutralizacja-niewybuchu-0711",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---neutralizacja-niewybuchu-0711",
-   "intro": "",
+   "intro": "„KOMUNIKAT: 8.11 od godz. 7:00 neutralizacja niewybuchu na ul. Bałuki w Szczecinie. Zachowaj bezpieczną odległość i stosuj się do poleceń służb. Śledź komunikaty.”",
    "status": "expired",
    "started_at": "2026-11-07T00:00:00+01:00",
    "last_at": "2026-11-07T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania (06.11)",
@@ -752,11 +764,11 @@
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0611",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0611",
-   "intro": "",
+   "intro": "\"ĆWICZENIA: Dziś (06.11) w godz. 10:00-12:00 na terenie Gminy Mogilany odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"\n\"ĆWICZENIA: Dziś (06.11) w godz. 10:00-11:00 na terenie powiatu olkuskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"",
    "status": "ended",
    "started_at": "2026-11-06T10:00:00+01:00",
    "last_at": "2026-11-06T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania (05.11)",
@@ -790,11 +802,11 @@
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0511",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0511",
-   "intro": "",
+   "intro": "\"ĆWICZENIA: Jutro (06.11) w godz. 09:00-13:00 na terenie Gminy Bogatynia odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"",
    "status": "ended",
    "started_at": "2026-11-05T09:00:00+01:00",
    "last_at": "2026-11-05T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania (04.11)",
@@ -828,11 +840,11 @@
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0411",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0411",
-   "intro": "",
+   "intro": "\"ĆWICZENIA: Dziś (04.11) w godz. 10:00-18:00 na terenie powiatu sępoleńskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"",
    "status": "ended",
    "started_at": "2026-11-04T10:00:00+01:00",
    "last_at": "2026-11-04T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (03.11)",
@@ -881,11 +893,11 @@
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-0311",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0311",
-   "intro": "",
+   "intro": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
    "status": "ended",
    "started_at": "2026-11-03T06:49:00+01:00",
    "last_at": "2026-11-03T06:49:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania (03.11)",
@@ -919,11 +931,11 @@
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0311",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0311",
-   "intro": "",
+   "intro": "\"ĆWICZENIE: Dziś (03.11) w godz. 10:00-12:00 na terenie pow. radomszczańskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"",
    "status": "ended",
    "started_at": "2026-11-03T10:00:00+01:00",
    "last_at": "2026-11-03T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (03.11)",
@@ -979,11 +991,11 @@
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-0312",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0312",
-   "intro": "",
+   "intro": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
    "status": "ended",
    "started_at": "2026-11-03T00:00:00+01:00",
    "last_at": "2026-11-03T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania (29.10)",
@@ -1017,11 +1029,11 @@
    },
    "id": "alert-rcb---trening-systemu-alarmowania-2910",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-2910",
-   "intro": "",
+   "intro": "„ĆWICZENIA: Dziś (29.10) w godz. 10.00-12.00 na terenie powiatu leskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój\".",
    "status": "ended",
    "started_at": "2026-10-29T10:00:00+01:00",
    "last_at": "2026-10-29T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (28.10)",
@@ -1088,11 +1100,11 @@
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2810",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2810",
-   "intro": "",
+   "intro": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
    "status": "ended",
    "started_at": "2026-10-28T10:49:00+01:00",
    "last_at": "2026-10-28T10:49:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania",
@@ -1130,11 +1142,11 @@
    },
    "id": "alert-rcb---trening-systemu-alarmowania3",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania3",
-   "intro": "",
+   "intro": "„ĆWICZENIA: Dziś (27.10) na terenie powiatu jaworskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój\".\n„ĆWICZENIA: Dziś (27.10) od godz. 10:00 na terenie gminy Czernichów odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój\".",
    "status": "expired",
    "started_at": "2026-10-27T00:00:00+01:00",
    "last_at": "2026-10-27T00:00:00+01:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - ostrzeżenie przed silnym wiatrem (24.10)",
@@ -1172,11 +1184,11 @@
    },
    "id": "alert-rcb---ostrzezenie-przed-silnym-wiatrem-2510",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---ostrzezenie-przed-silnym-wiatrem-2510",
-   "intro": "",
+   "intro": "„Pogoda: jutro (25.10) prognozowany silny wiatr. Zachowaj ostrożność podczas aktywności na zewnątrz. Zabezpiecz rzeczy, które może porwać wiatr.”",
    "status": "expired",
    "started_at": "2026-10-25T00:00:00+02:00",
    "last_at": "2026-10-25T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - ostrzeżenie przed silnym wiatrem (25.10)",
@@ -1214,11 +1226,11 @@
    },
    "id": "alert-rcb---ostrzezenie-przed-silnym-wiatrem-2511",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---ostrzezenie-przed-silnym-wiatrem-2511",
-   "intro": "",
+   "intro": "„Pogoda: dziś (25.10) prognozowany silny wiatr. Zachowaj ostrożność podczas aktywności na zewnątrz. Zabezpiecz rzeczy, które może porwać wiatr.”",
    "status": "expired",
    "started_at": "2026-10-25T00:00:00+02:00",
    "last_at": "2026-10-25T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania (23.10)",
@@ -1252,11 +1264,11 @@
    },
    "id": "alert-rcb---trening-systemu-alarmowania-2310",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-2310",
-   "intro": "",
+   "intro": "„ĆWICZENIA: Dziś (23.10) w godz. 10:00-12:00 na terenie gminy Skała odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój”.",
    "status": "ended",
    "started_at": "2026-10-23T10:00:00+02:00",
    "last_at": "2026-10-23T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (23.10)",
@@ -1374,11 +1386,11 @@
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2310",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2310",
-   "intro": "",
+   "intro": "„UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.”",
    "status": "ended",
    "started_at": "2026-10-23T00:00:00+02:00",
    "last_at": "2026-10-23T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - trening systemu alarmowania",
@@ -1416,7 +1428,7 @@
    "status": "ended",
    "started_at": "2026-10-22T10:00:00+02:00",
    "last_at": "2026-10-22T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (21.10)",
@@ -1493,11 +1505,11 @@
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2111",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2111",
-   "intro": "",
+   "intro": "„UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.”",
    "status": "ended",
    "started_at": "2026-10-21T19:45:00+02:00",
    "last_at": "2026-10-21T23:03:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - niezdatna woda (21.10)",
@@ -1531,11 +1543,11 @@
    },
    "id": "alert-rcb---niezdatna-woda-2110",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---niezdatna-woda-2110",
-   "intro": "",
+   "intro": "\"KOMUNIKAT: woda z wodociągu Wrzos w części miejscowości Świeradów-Zdrój (pow. lubański) nie nadaje się do celów spożywczych. Śledź komunikaty.\"",
    "status": "expired",
    "started_at": "2026-10-21T00:00:00+02:00",
    "last_at": "2026-10-21T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (21.10)",
@@ -1577,7 +1589,7 @@
    "status": "ended",
    "started_at": "2026-10-21T00:00:00+02:00",
    "last_at": "2026-10-21T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - ćwiczenia w powiecie kamiennogórskim (20.10)",
@@ -1615,7 +1627,7 @@
    "status": "ended",
    "started_at": "2026-10-20T09:00:00+02:00",
    "last_at": "2026-10-20T00:00:00+02:00",
-   "parser": 1
+   "parser": 2
   },
   {
    "title": "Alert RCB - zagrożenie z powietrza (20.10)",
