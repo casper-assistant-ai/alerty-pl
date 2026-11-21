@@ -46,10 +46,17 @@ jobs:
             git push
           fi
       - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: docs
       - id: deploy
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Retry deploy (artifact listing can lag a few seconds)
+        if: steps.deploy.outcome == 'failure'
+        run: sleep 20
+      - id: deploy2
+        if: steps.deploy.outcome == 'failure'
         uses: actions/deploy-pages@v4
       - name: Call the parser doctor on failure
         if: failure() && steps.scrape.outcome == 'failure'
