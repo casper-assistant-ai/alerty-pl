@@ -1,8 +1,9 @@
 # Process retro log
 
-One line per weekly retro of the process-retro agent: the development share of agent output
-(product PRs merged / all agent output), what it changed, and the PR. Newest last.
+One row a day from the process-retro agent (weekly until 2026-11-21, daily since 2026-11-22):
+the development share of agent output over the rolling last 7 days (product PRs merged / all
+agent output) and what it changed. Newest last.
 
-| week from | dev share | product PRs | docs/chore + reports | change |
+| date | dev share (7 days) | product PRs | docs/chore + reports | change |
 |---|---|---|---|---|
 | 2026-11-14 | 60% | 3 | 2 | first retro (workflows live 11-21): dev-task status tests + dev-task site links, docs-keeper extra sun run (weekly slot missed go-live) |

@@ -13,7 +13,7 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   (desktop and phone) and lists JavaScript errors, failed requests and empty pages. The Site check
   workflow runs it hourly, files problems in an issue labelled `site-error` and calls `site-fixer`.
 - Process retro: `scripts/retro.py metrics` measures the week (development share of agent output,
-  builders with nothing merged, agents that only report, issues with no PR); the weekly
+  builders with nothing merged, agents that only report, issues with no PR); the daily
   `process-retro` agent keeps the Process block below, `process/schedule.json` (extra agent runs,
   started by the Agent dispatch workflow) and `process/retro-log.md`.
 - Releases: `scripts/changelog.py` tags `vMAJOR.MINOR.PATCH` from the commits since the last tag
@@ -35,8 +35,8 @@ Rules:
 
 ## Process
 
-The process-retro workflow keeps this block every week (at most three changes, each tied to a
-number in `process/retro-log.md`). Every agent follows it.
+The process-retro workflow keeps this block every day (at most two changes a run, none repeated
+within 7 days, each tied to a number in `process/retro-log.md`). Every agent follows it.
 
 <!-- process:start -->
 - Target: at least half of the agent output is product work (feat, fix, perf, refactor, test):
