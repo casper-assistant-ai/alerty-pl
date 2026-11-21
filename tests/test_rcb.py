@@ -60,6 +60,15 @@ class CityNames(unittest.TestCase):
         self.assertEqual(r["powiaty"], ["lubelskie/opolski", "lubelskie/swidnicki"])
 
 
+class Towns(unittest.TestCase):
+    def test_warsaw_area_flares(self):
+        r = GAZ.regions("Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.")
+        self.assertEqual(r["powiaty"], ["mazowieckie/legionowski", "mazowieckie/warszawa", "mazowieckie/wolominski"])
+
+    def test_town_does_not_mark_voivodeship(self):
+        self.assertEqual(GAZ.regions("Biała Podlaska i Ruda Śląska")["whole"], [])
+
+
 class WaterAlert(unittest.TestCase):
     def test_genitive_powiat(self):
         a = rcb.parse_detail(page("alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911.html"), GAZ)
