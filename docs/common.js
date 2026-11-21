@@ -103,6 +103,13 @@ const RCB = (() => {
     }
   }
 
+  // the footer shows the site's version from the changelog
+  const ver = $("#ver");
+  if (ver) getJSON("data/changelog.json").then((d) => {
+    const r = d.releases.find((x) => x.version);
+    if (r) ver.textContent = "wersja " + r.version + " · historia zmian";
+  }).catch(() => {});
+
   return { CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
     duration, regionText, plural, strip };
 })();
