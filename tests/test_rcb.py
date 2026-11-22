@@ -173,6 +173,56 @@ class FireAlert(unittest.TestCase):
         self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=25))[0], "expired")
 
 
+class ChemicalAlert(unittest.TestCase):
+    """The two chemical alerts since 2021 (Bóbr 2026-07-04, Warta 2026-05-27) have no saved
+    gov.pl page, so classification runs on their real archived wording. The Bóbr text says
+    'Woda nie może być wykorzystywana...' — river wording the water patterns do not catch,
+    so 'skażenie' decides: chemical."""
+    def test_bobr(self):
+        t = "Alert RCB - możliwe skażenie rzeki Bóbr wzdłuż gminy Wleń i Lwówek Śl (04.07)"
+        body = ("Uwaga! Możliwe skażenie rzeki Bóbr, wzdłuż gminy Wleń i Lwówek Śl. Woda nie może "
+                "być wykorzystywana do celów rekreacyjnych, gospodarczych i pojenia zwierząt.")
+        self.assertEqual(rcb.category(t, body), "chemical")
+
+    def test_warta(self):
+        t = "Alert RCB - możliwe skażenie i zanieczyszczenie rzeki Warta w pow. obornickim"
+        body = ("Uwaga! Możliwe skażenie i zanieczyszczenie rzeki Warta w pow. obornickim. "
+                "Ogranicz wszelką aktywność w rejonie rzeki.")
+        self.assertEqual(rcb.category(t, body), "chemical")
+
+    def test_chemical_fire_is_fire(self):
+        # 'pożar' is checked before chemical: the archived 2024-05-10 'pożar substancji
+        # chemicznych' alert is a fire alert, not chemical
+        t = "Alert RCB - pożar substancji chemicznych (10.05.2024)"
+        body = ("Uwaga! Pożar substancji chemicznych w Siemianowicach Śląskich. Nie zbliżaj się "
+                "do miejsca pożaru. Jeśli możesz, zostań w domu i zamknij okna.")
+        self.assertEqual(rcb.category(t, body), "fire")
+
+    def test_ttl_48h(self):
+        a = {"date": "2026-07-04", "category": "chemical",
+             "updates": [{"time": None, "ended": False, "message": "Uwaga!"}]}
+        start = dt.datetime(2026, 7, 4, 0, 0, tzinfo=rcb.TZ)
+        self.assertEqual(rcb.status(a, start + dt.timedelta(hours=47))[0], "active")
+        self.assertEqual(rcb.status(a, start + dt.timedelta(hours=49))[0], "expired")
+
+
+class OtherAlert(unittest.TestCase):
+    """Zrzut szczepionek dla lisów (2026-09-19, archived wording): no category pattern
+    matches, so it falls through to other, with the 24 h other TTL."""
+    def test_fallthrough(self):
+        t = "Alert RCB - zrzut szczepionek dla lisów (19.09)"
+        body = ("KOMUNIKAT: 20-30.09 w woj. małopolskim planowane zrzuty szczepionek dla lisów "
+                "przeciw wściekliźnie. Nie dotykaj kapsułki i nie dopuszczaj do niej zwierząt!")
+        self.assertEqual(rcb.category(t, body), "other")
+
+    def test_ttl_24h(self):
+        a = {"date": "2026-09-19", "category": "other",
+             "updates": [{"time": None, "ended": False, "message": "KOMUNIKAT"}]}
+        start = dt.datetime(2026, 9, 19, 0, 0, tzinfo=rcb.TZ)
+        self.assertEqual(rcb.status(a, start + dt.timedelta(hours=23))[0], "active")
+        self.assertEqual(rcb.status(a, start + dt.timedelta(hours=25))[0], "expired")
+
+
 class OrdnanceAlert(unittest.TestCase):
     """Niewybuch named by city and street only: the whole voivodeship is alerted, no powiat."""
     def setUp(self):
