@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-22",
+   "sha": "b95196c",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": null,
+     "breaking": false,
+     "text": "catch broken HTML and raw markup on the live site",
+     "sha": "b95196c",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.17.1",
    "date": "2026-11-22",
    "sha": "e7f8ef9",

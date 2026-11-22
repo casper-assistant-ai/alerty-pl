@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- catch broken HTML and raw markup on the live site ([b95196c](https://github.com/casper-assistant-ai/alerty-pl/commit/b95196c))
+
 ## 1.17.1 (2026-11-22)
 
 ### fix
