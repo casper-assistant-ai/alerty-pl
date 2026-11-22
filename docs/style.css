@@ -109,11 +109,33 @@ main { flex: 1; width: 100%; max-width: 1480px; margin: 0 auto; padding: 24px; }
 .blink { @media (prefers-reduced-motion: no-preference) { animation: blink 1.6s ease-in-out infinite; } }
 @keyframes blink { 50% { opacity: .55; } }
 /* the zoomable map (Leaflet): powiaty coloured in CSS, so the theme colours work */
-.day-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-.day-track { position: relative; flex: 1; min-width: 0; height: 32px; display: flex; align-items: flex-end; }
-.spark { position: absolute; left: 8px; right: 8px; top: 0; height: 16px; width: calc(100% - 16px); fill: var(--bar); opacity: .7; pointer-events: none; }
-.day-track input[type="range"] { width: 100%; margin: 0; accent-color: var(--text); height: 16px; }
-.day-label { min-width: 13ch; text-align: center; color: var(--text); }
+/* the period: two handles over the histogram, quick buttons, two dates */
+.period { margin-bottom: 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.brush { --a: 0; --b: 1; --pad: 14px; position: relative; min-width: 0; height: 52px; touch-action: none; cursor: pointer; user-select: none; }
+.spark { position: absolute; left: var(--pad); right: var(--pad); top: 4px; height: 28px; width: calc(100% - 2 * var(--pad)); fill: var(--bar); opacity: .8; pointer-events: none; }
+.brush::before { content: ""; position: absolute; left: var(--pad); right: var(--pad); top: 32px; border-top: 1px solid var(--line-strong); pointer-events: none; }
+.brush-sel { position: absolute; top: 0; height: 36px; left: calc(var(--pad) + (100% - 2 * var(--pad)) * var(--a));
+  width: max(3px, calc((100% - 2 * var(--pad)) * (var(--b) - var(--a)))); background: var(--accent); opacity: .22; border-radius: 3px; cursor: grab; }
+.brush.dragging .brush-sel { cursor: grabbing; }
+.brush-h { position: absolute; top: 0; width: 28px; height: 36px; margin-left: -14px; cursor: ew-resize; z-index: 1; }
+.brush-h::after { content: ""; position: absolute; left: 11px; top: 2px; width: 6px; height: 32px; border-radius: 3px; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+#h-from { left: calc(var(--pad) + (100% - 2 * var(--pad)) * var(--a)); }
+#h-to { left: calc(var(--pad) + (100% - 2 * var(--pad)) * var(--b)); }
+.brush-h:focus-visible { outline: none; }
+.brush-h:focus-visible::after { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--text); }
+.brush-axis { position: absolute; left: var(--pad); right: var(--pad); top: 36px; height: 16px; font-size: .6875rem; color: var(--muted); pointer-events: none; }
+.brush-axis span { position: absolute; left: calc(var(--at) * 100%); padding-left: 3px; border-left: 1px solid var(--line-strong); line-height: 16px; }
+.period-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.presets { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; padding: 2px; background: var(--surface); }
+.presets button { font: inherit; font-size: .8125rem; border: 0; background: none; color: var(--text-2); padding: 0 10px; min-height: 30px; border-radius: 6px; cursor: pointer; }
+.presets button:hover { color: var(--text); }
+.presets button[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+.dates { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.dates label { display: inline-flex; align-items: center; gap: 6px; color: var(--text-2); font-size: .8125rem; }
+.dates input { font: inherit; font-size: .8125rem; color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 8px; padding: 0 8px; min-height: 32px; }
+.day-label { color: var(--text); font-size: .8125rem; }
+#recent button.what { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; }
+#recent button.what[aria-pressed="true"] span { font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .btn { font: inherit; font-size: .8125rem; color: var(--text); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px;
   padding: 4px 10px; min-height: 32px; cursor: pointer; transition: background .15s var(--ease); }
 .btn:hover:not(:disabled) { background: var(--land-hover); }
@@ -307,9 +329,15 @@ footer p { margin: 0; max-width: 90ch; }
   main { padding: 16px; }
   .map-wrap { padding: 12px; }
   .lmap { height: 62dvh; min-height: 340px; }
-  .day-bar { flex-wrap: wrap; }
-  .day-track { order: -1; flex: 1 1 100%; }
-  .day-label { flex: 1; }
+  .brush { height: 60px; }
+  .brush-h { width: 36px; margin-left: -18px; }
+  .brush-h::after { left: 13px; width: 10px; }
+  .presets { display: flex; width: 100%; }
+  .presets button { flex: 1 1 0; min-width: 0; padding: 0 2px; min-height: 36px; }
+  .dates { width: 100%; flex-wrap: nowrap; gap: 6px; }
+  .dates label { flex: 1; min-width: 0; gap: 4px; }
+  .dates input { flex: 1; min-width: 0; min-height: 36px; padding: 0 4px; }
+  .dates .btn.icon { width: 36px; min-height: 36px; flex: none; }
   .seg { width: 100%; }
   .seg label { flex: 1; text-align: center; }
   .seg span { padding: 6px 4px; }

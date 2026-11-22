@@ -7,10 +7,13 @@ A live map of Poland with the current alerts of the Government Centre for Securi
 Source: [gov.pl/web/rcb/komunikaty](https://www.gov.pl/web/rcb/komunikaty). Unofficial;
 the official channel is the RCB alert SMS.
 
-The map zooms down to a street. A day slider goes back to any day since 2021
-(`?dzien=2026-11-20`). Under the alerts lies a street map, Esri World Imagery Wayback with
-every imagery date of the visible area, or NASA's true-colour picture of that day
-(`&podklad=esri|nasa`). NASA FIRMS fires of that day can go on top (`&pozary=1`).
+The map zooms down to a street. It shows any day or period since 2021: two handles over the
+histogram of alerts, quick buttons (24 h, 7 dni, 30 dni, rok, wszystko), two dates and ◀ ▶ that
+shift the period by its length (`?od=2026-10-24&do=2026-11-22`; the old `?dzien=` still opens one
+day). The map, the counts and the lists cover the whole period. Under the alerts lies a street
+map, Esri World Imagery Wayback (it switches to the newest image of the visible area taken on or
+before the period's end), or NASA's true-colour picture of its last day (`&podklad=esri|nasa`).
+NASA FIRMS fires of that day can go on top (`&pozary=1`).
 
 This repository is also a demo of **an autonomous engineering team**: after the first commit, the
 site is run, repaired, tested and documented by [GitHub Agentic Workflows](https://github.github.com/gh-aw/)
