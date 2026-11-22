@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.17.5 (2026-11-23)
+
+### fix
+
+- **mobile:** the tab menu scrolls only sideways, not up and down ([61dde92](https://github.com/casper-assistant-ai/alerty-pl/commit/61dde92))
+
 ## 1.17.4 (2026-11-23)
 
 ### fix

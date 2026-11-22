@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.17.5",
+   "date": "2026-11-23",
+   "sha": "61dde92",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "mobile",
+     "breaking": false,
+     "text": "the tab menu scrolls only sideways, not up and down",
+     "sha": "61dde92",
+     "date": "2026-11-23"
+    }
+   ]
+  },
+  {
    "version": "1.17.4",
    "date": "2026-11-23",
    "sha": "8103aa7",
