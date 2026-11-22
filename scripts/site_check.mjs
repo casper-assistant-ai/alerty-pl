@@ -54,6 +54,11 @@ const PAGES = [
       if (!/\\d/.test(document.querySelector(".stats")?.textContent || "")) p.push("analytics stats have no numbers");
       return p; })()` },
   { path: "analityka.html?okres=all", name: "Analityka, od 2021", check: `(() => [])()` },
+  { path: "schrony.html?lat=52.2297&lon=21.0122", name: "Schrony, Warszawa", check: `(() => { const p = [];
+      if (document.querySelectorAll("#near li .btn.primary").length < 5) p.push("shelters: fewer than 5 nearest points with a Nawiguj button");
+      if (!/\\d+(,\\d)? (m|km)/.test(document.querySelector("#near .sh-d")?.textContent || "")) p.push("shelters: no distance in the list");
+      if (!/punktów/.test(document.querySelector("#about-data")?.textContent || "")) p.push("shelters: data note is empty");
+      return p; })()` },
   { path: "zmiany.html", name: "Zmiany", check: `(() => { const p = [];
       if (!document.querySelector("#list .release")) p.push("changelog shows no releases");
       return p; })()` },

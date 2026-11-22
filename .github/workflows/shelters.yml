@@ -1,0 +1,41 @@
+name: Update shelters
+
+# Daily: read the State Fire Service's open data set «Punkty schronienia w Polsce» (dane.gov.pl,
+# updated weekly) and rebuild docs/data/shelters/ for the Schrony page. The next Update data run
+# deploys the site with it.
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["scripts/shelters.py", ".github/workflows/shelters.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data   # one writer of docs/data at a time, with the Update data workflow
+  cancel-in-progress: false
+
+jobs:
+  shelters:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: python3 -I -m unittest discover -s tests -p 'test_shelters.py' -v
+      - name: Download and rebuild
+        run: python3 -I scripts/shelters.py update
+      - name: Commit when the points changed
+        run: |
+          git config user.name "alerty-pl bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A docs/data/shelters
+          if ! git diff --cached --quiet; then
+            n=$(python3 -I -c 'import json;print(json.load(open("docs/data/shelters/index.json"))["count"])')
+            git commit -m "chore(data): $n shelter points"
+            git pull --rebase --autostash -X theirs origin main
+            git push
+          fi

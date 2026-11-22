@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schrony — najbliższe miejsca schronienia | Alerty RCB</title>
+<meta name="description" content="Mapa ponad 88 tysięcy punktów schronienia w Polsce z oficjalnych danych Państwowej Straży Pożarnej. Podaj swoją lokalizację lub adres, zobacz najbliższe schronienia z odległością i włącz nawigację w Google Maps, Apple Maps lub Waze.">
+<meta name="color-scheme" content="light dark">
+<link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='6' fill='%23c4122f'/%3E%3Crect x='11' y='11' width='10' height='10' rx='2' fill='white'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
+  <nav class="tabs" aria-label="Strony">
+    <a href="./">Mapa</a>
+    <a href="schrony.html" aria-current="page">Schrony</a>
+    <a href="historia.html">Historia</a>
+    <a href="analityka.html">Analityka</a>
+    <a href="powiadomienia.html">Powiadomienia</a>
+    <a href="zmiany.html">Zmiany</a>
+  </nav>
+  <a class="src mono" href="https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce">źródło: KG PSP, dane.gov.pl</a>
+</header>
+<div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
+<main class="map-page shelter-page">
+  <section class="map-wrap" aria-label="Mapa schronień">
+    <div class="finder">
+      <button type="button" class="btn primary" id="locate">Znajdź najbliższe schronienie</button>
+      <form class="addr" id="addr-form" role="search">
+        <label class="visually-hidden" for="addr">Adres</label>
+        <input type="search" id="addr" placeholder="lub wpisz adres, np. Puławska 1, Piaseczno" autocomplete="street-address" enterkeyhint="search">
+        <button type="submit" class="btn">Szukaj</button>
+      </form>
+      <button type="button" class="btn" id="pick" aria-pressed="false">Wskaż na mapie</button>
+    </div>
+    <ul class="addr-results" id="addr-results" hidden></ul>
+    <p class="find-note" id="find-note" role="status"></p>
+    <div id="map" class="lmap" role="region" aria-label="Mapa punktów schronienia w Polsce"></div>
+    <ul class="legend" id="legend">
+      <li><i class="sw acc-0" aria-hidden="true"></i>dostępne całodobowo</li>
+      <li><i class="sw acc-1" aria-hidden="true"></i>w określonych godzinach</li>
+      <li><i class="sw acc-2" aria-hidden="true"></i>na żądanie (otwiera zarządca)</li>
+      <li><i class="sw me-dot" aria-hidden="true"></i>Twoja lokalizacja</li>
+    </ul>
+  </section>
+  <div class="panel">
+    <section aria-labelledby="h-near">
+      <h2 id="h-near"><span>Najbliższe schronienia</span> <span class="n" id="near-count"></span></h2>
+      <ol id="near" class="rows shelters"><li class="empty">Podaj swoją lokalizację albo adres, a pokażemy najbliższe punkty schronienia z odległością i nawigacją.</li></ol>
+    </section>
+    <section aria-labelledby="h-about">
+      <h2 id="h-about">O danych</h2>
+      <p class="about" id="about">Punkty schronienia wyznaczone przez Państwową Straż Pożarną na podstawie ustawy o ochronie ludności i obronie cywilnej z 2024 r.: schrony, ukrycia i miejsca doraźnego schronienia, np. piwnice, garaże podziemne, przejścia i stacje metra.</p>
+      <p class="about muted" id="about-data"></p>
+      <p class="about muted">Odległość liczona w linii prostej; trasę pokaże aplikacja nawigacji. W razie alarmu słuchaj komunikatów służb.</p>
+    </section>
+  </div>
+</main>
+<dialog class="nav-sheet" id="nav-sheet" aria-labelledby="nav-title">
+  <form method="dialog">
+    <h2 id="nav-title">Nawiguj do schronienia</h2>
+    <p class="nav-to" id="nav-to"></p>
+    <ul class="nav-apps" id="nav-apps"></ul>
+    <button type="submit" class="btn wide">Anuluj</button>
+  </form>
+</dialog>
+<footer>
+  <div class="in">
+    <p>Strona nieoficjalna. Punkty schronienia: <a href="https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce">Komenda Główna Państwowej Straży Pożarnej, «Punkty schronienia w Polsce»</a> (dane.gov.pl, CC BY 4.0, aktualizowane co tydzień; oficjalna mapa: <a href="https://gdziesieukryc.pl">gdziesieukryc.pl</a>).
+    Wyszukiwanie adresów: <a href="https://nominatim.openstreetmap.org">Nominatim</a> (© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>); mapa <a href="https://leafletjs.com">Leaflet</a>, podkład Esri Light/Dark Gray Canvas.</p>
+    <p>Stronę rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>:
+    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>.
+    <a class="mono" id="ver" href="zmiany.html"></a></p>
+  </div>
+</footer>
+<script src="vendor/leaflet/leaflet.js" defer></script>
+<script src="common.js" defer></script>
+<script src="shelters.js" defer></script>
+</body>
+</html>
