@@ -33,7 +33,7 @@ safe-outputs:
     expires: 14d
   noop:
     report-as-issue: false
-timeout-minutes: 30
+timeout-minutes: 40
 ---
 
 # Security auditor

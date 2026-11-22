@@ -12,6 +12,7 @@ permissions:
   contents: write
   pull-requests: write
   actions: write
+  issues: write
 
 concurrency:
   group: agent-pr-gate
@@ -70,7 +71,14 @@ jobs:
                 esac
                 subject="$type: $subject"
               fi
-              gh pr merge "$n" --squash --delete-branch --subject "$subject (#$n)" && echo "merged #$n: $subject"
+              closes=$(gh pr view "$n" --json closingIssuesReferences --jq '.closingIssuesReferences[].number')
+              if gh pr merge "$n" --squash --delete-branch --subject "$subject (#$n)"; then
+                echo "merged #$n: $subject"
+                # a merge made with GITHUB_TOKEN does not apply "Closes #N"; do it here
+                for i in $closes; do
+                  gh issue close "$i" --reason completed --comment "Fixed by #$n, merged by the Agent PR gate." && echo "closed #$i"
+                done
+              fi
             else
               gh pr comment "$n" --body "Agent PR gate: tests or the live parse failed on this branch. The issue-worker replaces it with a fixed PR."
               gh pr edit "$n" --add-label needs-attention
