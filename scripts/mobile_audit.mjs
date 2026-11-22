@@ -116,7 +116,10 @@ const SCAN = `(() => {
   if (small.size > 12) p.push("text under 12 px: " + (small.size - 12) + " more elements");
   for (const el of all) { if (!shown(el)) continue; const cs = getComputedStyle(el);
     if ((cs.overflowX === "hidden" || cs.overflow === "hidden") && cs.textOverflow !== "ellipsis" && el.scrollWidth > el.clientWidth + 2 && el.clientWidth > 0 && el.textContent.trim() && !el.closest(".leaflet-container") && !el.matches(".visually-hidden"))
-      p.push("text clipped: " + name(el) + " content " + el.scrollWidth + " px in " + el.clientWidth); }
+      p.push("text clipped: " + name(el) + " content " + el.scrollWidth + " px in " + el.clientWidth);
+    // a side-scrolling strip (tabs, chips) must not also scroll up and down under the finger
+    if (/auto|scroll/.test(cs.overflowX) && /auto|scroll/.test(cs.overflowY) && el !== document.documentElement && el !== document.body && el.clientHeight > 0 && el.clientHeight < 120 && el.scrollHeight > el.clientHeight)
+      p.push("strip scrolls up and down: " + name(el) + " content " + el.scrollHeight + " px in " + el.clientHeight); }
   let fixed = 0; const bars = []; for (const el of all) { const cs = getComputedStyle(el);
     if ((cs.position === "fixed" || cs.position === "sticky") && shown(el)) { const r = el.getBoundingClientRect();
       const hgt = Math.max(0, Math.min(r.bottom, H) - Math.max(r.top, 0));
