@@ -10,7 +10,7 @@ function row(a) {
   return h("li", {},
     when,
     h("span", { class: "cat" }, swatch(a.category), CAT[a.category]),
-    h("span", { class: "msg" }, msg, h("span", { class: "reg", text: regionText(a.voivodeships, a.powiaty) })),
+    h("span", { class: "msg" }, msg, h("span", { class: "reg", text: regionText(a.voivodeships, a.powiaty, a.gminy) })),
     h("a", { class: "src", href: a.url, text: "komunikat" }));
 }
 
@@ -43,7 +43,7 @@ function render(rows, limit) {
 
 async function main() {
   RCB.strip();
-  const data = await getJSON("data/archive.json");
+  const [data] = await Promise.all([getJSON("data/archive.json"), RCB.names()]);
   const all = data.alerts.filter((a) => a.date >= "2020-01-01");
   const f = { cat: $("#f-cat"), voiv: $("#f-voiv"), year: $("#f-year"), q: $("#q") };
   const count = (pred) => all.filter(pred).length;
