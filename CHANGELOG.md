@@ -2,6 +2,30 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.10.0 (2026-11-22)
+
+### feat
+
+- **site:** cross-link analytics rankings to history with a powiat filter (#15) ([c1d2cae](https://github.com/casper-assistant-ai/alerty-pl/commit/c1d2cae))
+
+### fix
+
+- **agents:** count the worker's daily improvement by a visible first line ([642d0ad](https://github.com/casper-assistant-ai/alerty-pl/commit/642d0ad))
+- **agents:** gate closes the issues a merged agent PR fixes; audit timeout 40 min ([7b49a1e](https://github.com/casper-assistant-ai/alerty-pl/commit/7b49a1e))
+
+### test
+
+- **changelog:** cover lint subjects and the next version number (#16) ([561e2ad](https://github.com/casper-assistant-ai/alerty-pl/commit/561e2ad))
+- **parser:** cover status TTL, drill windows and weather/ordnance/drill alerts (#13) ([8d9d5d1](https://github.com/casper-assistant-ai/alerty-pl/commit/8d9d5d1))
+
+### ci
+
+- **gate:** approve the waiting CI runs of agent PRs ([5a1de20](https://github.com/casper-assistant-ai/alerty-pl/commit/5a1de20))
+
+### chore
+
+- **process:** needs a maintainer - raise security-auditor timeout to 40 (#14) ([6c97686](https://github.com/casper-assistant-ai/alerty-pl/commit/6c97686))
+
 ## 1.9.0 (2026-11-22)
 
 ### feat

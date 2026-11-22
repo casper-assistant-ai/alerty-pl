@@ -15,6 +15,69 @@
  },
  "releases": [
   {
+   "version": "1.10.0",
+   "date": "2026-11-22",
+   "sha": "642d0ad",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "count the worker's daily improvement by a visible first line",
+     "sha": "642d0ad",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "test",
+     "scope": "changelog",
+     "breaking": false,
+     "text": "cover lint subjects and the next version number (#16)",
+     "sha": "561e2ad",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "feat",
+     "scope": "site",
+     "breaking": false,
+     "text": "cross-link analytics rankings to history with a powiat filter (#15)",
+     "sha": "c1d2cae",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "gate closes the issues a merged agent PR fixes; audit timeout 40 min",
+     "sha": "7b49a1e",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "test",
+     "scope": "parser",
+     "breaking": false,
+     "text": "cover status TTL, drill windows and weather/ordnance/drill alerts (#13)",
+     "sha": "8d9d5d1",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "needs a maintainer - raise security-auditor timeout to 40 (#14)",
+     "sha": "6c97686",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "ci",
+     "scope": "gate",
+     "breaking": false,
+     "text": "approve the waiting CI runs of agent PRs",
+     "sha": "5a1de20",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.9.0",
    "date": "2026-11-22",
    "sha": "7eb6301",
