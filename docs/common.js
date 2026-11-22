@@ -21,8 +21,9 @@ const RCB = (() => {
 
   // The live service (casper-infra deploy/alerty-api): polls gov.pl every 20 s and streams new alerts.
   // localStorage "alerty-api" overrides it for local testing.
-  const API = localStorage.getItem("alerty-api") || "https://alerty-pl-cao.polandcentral.cloudapp.azure.com/alerty";
-  const TEST = new URLSearchParams(location.search).has("test");
+  const API = (typeof localStorage !== "undefined" && localStorage.getItem("alerty-api")) ||
+    "https://alerty-pl-cao.polandcentral.cloudapp.azure.com/alerty";
+  const TEST = typeof location !== "undefined" && new URLSearchParams(location.search).has("test");
 
   const $ = (s, root = document) => root.querySelector(s);
   const color = (c) => `var(--${c})`;
