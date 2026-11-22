@@ -15,6 +15,13 @@ map, Esri World Imagery Wayback (it switches to the newest image of the visible 
 before the period's end), or NASA's true-colour picture of its last day (`&podklad=esri|nasa`).
 NASA FIRMS fires of that day can go on top (`&pozary=1`).
 
+The [Schrony](https://casper-assistant-ai.github.io/alerty-pl/schrony.html) page maps about 88 000
+shelter points from the State Fire Service's open data
+([dane.gov.pl](https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce), CC BY 4.0, refreshed
+daily). Give it your location, an address or a tap on the map, and it lists the nearest shelters with
+the distance and a «Nawiguj» button that opens the phone's map apps (Apple Maps, Google Maps, Waze, or
+the Android chooser).
+
 This repository is also a demo of **an autonomous engineering team**: after the first commit, the
 site is run, repaired, tested and documented by [GitHub Agentic Workflows](https://github.github.com/gh-aw/)
 in the style of [Peli's Agent Factory](https://github.github.com/gh-aw/blog/2026-01-12-welcome-to-pelis-agent-factory/),
@@ -29,6 +36,7 @@ flowchart LR
   L -->|at once| N[Telegram · e-mail · Web Push<br/>subscribers]
   RCB -->|every 30 min| U[Update data<br/>scripts/rcb.py]
   U -->|alerts.json, archive.json| P[GitHub Pages<br/>map, history, analytics]
+  PSP[dane.gov.pl<br/>punkty schronienia] -->|daily| SH[Update shelters<br/>scripts/shelters.py] -->|data/shelters| P
   U -- fails --> PD[parser-doctor 🤖]
   U -- unmatched.json --> RK[region-keeper 🤖]
   CI[CI / Update / Gate fail] --> CD[ci-doctor 🤖] -->|issue| IW[issue-worker 🤖]
@@ -117,6 +125,7 @@ test alerts.
 python3 -I -m unittest discover -s tests
 python3 -I scripts/rcb.py update --pages 3      # writes docs/data/
 python3 -I scripts/rcb.py update --pages 120 --keep-going   # backfill the archive since 2021
+python3 -I scripts/shelters.py update          # shelter points into docs/data/shelters/
 python3 -m http.server -d docs 8000
 ```
 
