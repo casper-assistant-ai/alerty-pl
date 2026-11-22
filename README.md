@@ -21,7 +21,10 @@ with no human in the loop, and watched with [gh-cao](https://github.com/githubne
 
 ```mermaid
 flowchart LR
-  RCB[gov.pl/web/rcb/komunikaty] -->|every 10 min| U[Update data<br/>scripts/rcb.py]
+  RCB[gov.pl/web/rcb/komunikaty] -->|every 20 s| L[Live service<br/>server/app.py on Azure]
+  L -->|SSE, at once| P
+  L -->|at once| N[Telegram · e-mail · Web Push<br/>subscribers]
+  RCB -->|every 30 min| U[Update data<br/>scripts/rcb.py]
   U -->|alerts.json, archive.json| P[GitHub Pages<br/>map, history, analytics]
   U -- fails --> PD[parser-doctor 🤖]
   U -- unmatched.json --> RK[region-keeper 🤖]
@@ -43,7 +46,8 @@ flowchart LR
 
 | Workflow | Kind | Model | Trigger | May change |
 |---|---|---|---|---|
-| `update.yml` | plain Actions | — | every 10 min | `docs/data/`, release tag, `CHANGELOG.md`, Pages |
+| live service `server/app.py` | Python (aiohttp), Azure VM | — | polls RCB every 20 s | sends alerts to open pages (SSE), Telegram, e-mail and Web Push; deployed from `main` within 2 min |
+| `update.yml` | plain Actions | — | every 30 min | `docs/data/` (fallback and archive), release tag, `CHANGELOG.md`, Pages |
 | `site-check.yml` | plain Actions, headless Chrome | — | hourly and after each deploy | issue `site-error`, dispatches `site-fixer` |
 | `ci.yml` | plain Actions | — | push, PR | nothing |
 | `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent PRs that pass, sends broken ones to `pr-fixer` |
@@ -76,6 +80,27 @@ Guard rails: agents run read-only and write only through gh-aw safe outputs; eac
 its `allowed-files`; `.github/` is protected; public issues never start an agent (triage runs on a
 schedule); the gate merges only when unit tests and a live parse of gov.pl pass and the reviewer approves; a
 broken PR is fixed in its own branch by `pr-fixer` (three attempts) before the gate gives up on it.
+
+## Live alerts and notifications
+
+`server/app.py` is the main path for new alerts. It reads the RCB list every 20 seconds with the
+site's own parser (`scripts/rcb.py`) and sends each new alert, update or cancellation at once:
+
+- to every open page of the site, over Server-Sent Events (`/alerty/events`; a toast and a fresh map);
+- to the subscribers chosen on the [Powiadomienia](https://casper-assistant-ai.github.io/alerty-pl/powiadomienia.html)
+  page, filtered by voivodeship: the Telegram bot, e-mail (double opt-in, Azure Communication
+  Services) and Web Push (VAPID, `docs/sw.js`).
+
+It runs on the `alerty-cao` VM at `https://alerty-pl-cao.polandcentral.cloudapp.azure.com/alerty/`
+(`/health`, `/alerts`, `/events`, `/config`), set up by `deploy/alerty-api` in the private
+casper-infra repository. A timer there follows `main` every 2 minutes: when `server/`, `scripts/` or
+`docs/geo/` change it reinstalls, checks the import and `/health`, and returns to the previous commit
+if either fails. If the service is down, the pages fall back to `docs/data/`.
+
+Run it locally: `pip install -r server/requirements.txt`, then
+`STATE_DIR=/tmp/alerty PORT=8090 python3 server/app.py`, and in the browser console
+`localStorage.setItem("alerty-api", "http://127.0.0.1:8090")`. Add `?test` to a page URL to see
+test alerts.
 
 ## Run locally
 

@@ -19,6 +19,11 @@ const RCB = (() => {
   const MONTHS = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień",
     "wrzesień", "październik", "listopad", "grudzień"];
 
+  // The live service (casper-infra deploy/alerty-api): polls gov.pl every 20 s and streams new alerts.
+  // localStorage "alerty-api" overrides it for local testing.
+  const API = localStorage.getItem("alerty-api") || "https://alerty-pl-cao.polandcentral.cloudapp.azure.com/alerty";
+  const TEST = new URLSearchParams(location.search).has("test");
+
   const $ = (s, root = document) => root.querySelector(s);
   const color = (c) => `var(--${c})`;
 
@@ -81,12 +86,59 @@ const RCB = (() => {
     return t >= 2 && t <= 4 && !(tt >= 12 && tt <= 14) ? few : many;
   }
 
+  // live data first, the copy on GitHub Pages (Update data workflow) when the service does not answer
+  async function liveData() {
+    try {
+      const r = await fetch(API + "/alerts", { cache: "no-store", signal: AbortSignal.timeout(6000) });
+      if (r.ok) {
+        const j = await r.json();
+        if (j.meta && j.meta.checked_at && Array.isArray(j.alerts)) return [j, j.meta];
+      }
+    } catch (e) { /* fall back to Pages */ }
+    return Promise.all([getJSON("data/alerts.json"), getJSON("data/meta.json")]);
+  }
+
+  // a new alert slides in at the bottom right and stays until closed
+  function toast(d) {
+    const a = d.alert;
+    let box = $("#toasts");
+    if (!box) { box = h("div", { id: "toasts", class: "toasts", "aria-live": "assertive" }); document.body.append(box); }
+    const head = d.kind === "test" ? "Test powiadomień" : d.kind === "update" ? "Aktualizacja alertu" : "Nowy alert";
+    const msg = (a.updates && a.updates[0] && a.updates[0].message) || a.intro || "";
+    const close = h("button", { type: "button", class: "x", "aria-label": "Zamknij" }, "×");
+    const t = h("div", { class: "toast", role: "alert", "data-alert": a.id },
+      swatch(a.category), h("div", {}, h("strong", { text: head + ": " + (CAT[a.category] || CAT.other) }),
+        h("p", { text: msg.slice(0, 280) }), h("a", { href: a.url, text: a.title })), close);
+    close.addEventListener("click", () => t.remove());
+    box.prepend(t);
+  }
+
+  // Server-Sent Events from the live service: each new or updated alert arrives within seconds.
+  // Pages listen to the "rcb:alert" event on document; test alerts show only with ?test in the URL.
+  function live() {
+    if (!window.EventSource || live.es) return;
+    const es = live.es = new EventSource(API + "/events");
+    es.addEventListener("alert", (e) => {
+      const d = JSON.parse(e.data);
+      window.alertyLast = d;
+      if (d.kind === "test" && !TEST) { console.info("alerty-pl: test alert", d.alert.id); return; }
+      toast(d);
+      strip();
+      document.dispatchEvent(new CustomEvent("rcb:alert", { detail: d }));
+    });
+    es.addEventListener("ping", (e) => {
+      const d = JSON.parse(e.data);
+      const c = $("#strip .checked");
+      if (c && d.checked_at) { c.textContent = "na żywo · sprawdzono " + fmtTime(new Date(d.checked_at)); $("#strip").classList.remove("stale"); }
+    });
+  }
+
   // the status strip under the header: the same on every page
   async function strip() {
     const el = $("#strip");
     if (!el) return null;
     try {
-      const [data, meta] = await Promise.all([getJSON("data/alerts.json"), getJSON("data/meta.json")]);
+      const [data, meta] = await liveData();
       const active = data.alerts.filter((a) => a.status === "active" || a.status === "planned");
       const air = active.filter((a) => a.category === "air");
       const state = $(".state", el);
@@ -102,8 +154,9 @@ const RCB = (() => {
         ? (active.length > air.length ? `i ${active.length - air.length} inne alerty` : "")
         : (active.length ? `${active.length} ${plural(active.length, "inny alert", "inne alerty", "innych alertów")} w toku` : "inne alerty: brak");
       const checked = new Date(meta.checked_at);
-      const stale = Date.now() - checked > 30 * 60000;
-      $(".checked", el).textContent = (stale ? "dane nieaktualne, ostatnio " : "sprawdzono ") + fmtShort(checked);
+      const stale = Date.now() - checked > 45 * 60000;
+      $(".checked", el).textContent = (stale ? "dane nieaktualne, ostatnio " : meta.live ? "na żywo · sprawdzono " : "sprawdzono ")
+        + (meta.live && !stale ? fmtTime(checked) : fmtShort(checked));
       el.classList.toggle("alarm", air.length > 0);
       el.classList.toggle("stale", stale);
       document.title = (air.length ? "Zagrożenie z powietrza — " : "") + document.title.replace(/^Zagrożenie z powietrza — /, "");
@@ -123,6 +176,8 @@ const RCB = (() => {
     if (r) ver.textContent = "wersja " + r.version + " · historia zmian";
   }).catch(() => {});
 
-  return { CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
-    duration, regionText, names, plural, strip };
+  if ($("#strip")) live();
+
+  return { API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
+    duration, regionText, names, plural, strip, live };
 })();

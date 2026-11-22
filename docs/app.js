@@ -360,6 +360,8 @@ async function main() {
   if (q.get("podklad") && q.get("podklad") !== "mapa") setBase(q.get("podklad"));
   if (S.fires) fires();
   setInterval(refresh, 60000);
+  // a new alert from the live service redraws today's map at once
+  document.addEventListener("rcb:alert", (e) => { if (e.detail.kind !== "test") refresh(); });
 }
 
 main().catch((e) => {
