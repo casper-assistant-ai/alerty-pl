@@ -63,6 +63,8 @@ def latest_message(alert):
 
 
 def region_line(alert):
+    if alert.get("test"):
+        return "próba, bez obszaru"
     vs, whole = regions_of(alert)
     if whole:
         return "cała Polska"
