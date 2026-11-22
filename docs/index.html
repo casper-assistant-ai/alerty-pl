@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Alerty RCB — mapa alertów w Polsce</title>
-<meta name="description" content="Mapa Alertów RCB w Polsce, dziś i w dowolnym dniu od 2021 roku, na mapie lub zdjęciach satelitarnych z pożarami NASA: zagrożenie z powietrza, woda, pogoda, ćwiczenia. Dane z gov.pl/web/rcb/komunikaty, sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako <a href="powiadomienia.html">powiadomienia</a>.">
+<meta name="description" content="Mapa Alertów RCB w Polsce, dziś i w dowolnym dniu lub okresie od 2021 roku, na mapie lub zdjęciach satelitarnych z pożarami NASA: zagrożenie z powietrza, woda, pogoda, ćwiczenia. Dane z gov.pl/web/rcb/komunikaty, sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako powiadomienia.">
 <meta name="color-scheme" content="light dark">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
@@ -26,17 +26,28 @@
 <div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main class="map-page">
   <section class="map-wrap" aria-label="Mapa">
-    <div class="day-bar">
-      <button type="button" class="btn icon" id="prev" aria-label="Poprzedni dzień" title="Poprzedni dzień">&#9664;</button>
-      <div class="day-track">
-        <svg id="spark" class="spark" aria-hidden="true" preserveAspectRatio="none"></svg>
-        <input type="range" id="day" min="0" max="0" step="1" aria-label="Dzień na mapie" aria-describedby="day-label">
+    <div class="period" role="group" aria-label="Okres na mapie">
+      <div class="brush" id="brush">
+          <svg id="spark" class="spark" aria-hidden="true" preserveAspectRatio="none"></svg>
+          <div class="brush-sel" id="brush-sel"></div>
+          <div class="brush-h" id="h-from" role="slider" tabindex="0" aria-label="Początek okresu" aria-valuemin="0"></div>
+          <div class="brush-h" id="h-to" role="slider" tabindex="0" aria-label="Koniec okresu" aria-valuemin="0"></div>
+          <div class="brush-axis mono" id="brush-axis" aria-hidden="true"></div>
       </div>
-      <button type="button" class="btn icon" id="next" aria-label="Następny dzień" title="Następny dzień">&#9654;</button>
-      <output id="day-label" class="day-label mono" for="day"></output>
-      <button type="button" class="btn" id="today">Dziś</button>
+      <div class="period-ctl">
+        <div class="presets" id="presets" role="group" aria-label="Szybki wybór okresu">
+          <button type="button" data-days="1" title="Dziś">24 h</button><button type="button" data-days="7">7 dni</button><button type="button" data-days="30">30 dni</button><button type="button" data-days="365">rok</button><button type="button" data-days="all">wszystko</button>
+        </div>
+        <div class="dates">
+          <button type="button" class="btn icon" id="prev" aria-label="Poprzedni okres" title="Poprzedni okres">&#9664;</button>
+          <label><span>od</span><input type="date" id="from"></label>
+          <label><span>do</span><input type="date" id="to"></label>
+          <button type="button" class="btn icon" id="next" aria-label="Następny okres" title="Następny okres">&#9654;</button>
+        </div>
+      </div>
+      <output id="day-label" class="day-label mono" aria-live="polite"></output>
     </div>
-    <div id="map" class="lmap" role="region" aria-label="Mapa Polski z powiatami; kolorem zaznaczone powiaty z alertem w wybranym dniu"></div>
+    <div id="map" class="lmap" role="region" aria-label="Mapa Polski z powiatami; kolorem zaznaczone powiaty z alertem w wybranym okresie"></div>
     <div class="layers">
       <div class="seg" role="radiogroup" aria-label="Podkład mapy">
         <label><input type="radio" name="base" value="mapa" checked><span>Mapa</span></label>
