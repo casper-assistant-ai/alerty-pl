@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.10.2",
+   "date": "2026-11-22",
+   "sha": "05d68cc",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "CI doctor reads job logs of pull request runs",
+     "sha": "05d68cc",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.10.1",
    "date": "2026-11-22",
    "sha": "c62710e",
