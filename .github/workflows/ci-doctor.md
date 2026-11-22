@@ -26,8 +26,13 @@ permissions:
 strict: true
 network: defaults
 tools:
+  bash: false
+  cli-proxy: false
   github:
     toolsets: [default, actions]
+    # job logs of pull request runs are low-integrity content; the doctor only reads them
+    lockdown: false
+    min-integrity: none
 safe-outputs:
   create-issue:
     title-prefix: "[ci-doctor] "
