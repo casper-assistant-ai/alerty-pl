@@ -4,6 +4,8 @@ description: |
   files one issue per distinct cause with the evidence and the fix it suggests, and dispatches
   the issue-worker, which brings it to a fix PR or closes it with the reason.
 on:
+  # started by other workflows (CI, Site check, Update data, the CI doctor) with GITHUB_TOKEN
+  bots: ["github-actions[bot]"]
   workflow_run:
     workflows: ["CI", "Update data", "Agent PR gate"]
     types: [completed]

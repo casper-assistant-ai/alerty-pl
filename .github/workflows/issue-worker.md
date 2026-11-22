@@ -7,6 +7,8 @@ description: |
   upkeep) from process/improvements.md. Runs on every new issue, every two hours, and when the
   CI doctor dispatches it.
 on:
+  # started by other workflows (CI, Site check, Update data, the CI doctor) with GITHUB_TOKEN
+  bots: ["github-actions[bot]"]
   issues:
     types: [opened, reopened]
   schedule:
