@@ -41,7 +41,7 @@ Write a short status report for the last 24 hours (UTC) of this repository.
   and the items in `docs/data/unmatched.json`.
 - **Agent team:** PRs opened, merged and still open by each agent (title prefixes
   `[parser-doctor]`, `[region-keeper]`, `[test-improver]`, `[docs-keeper]`), issues by
-  `[ci-doctor]` and `[triage]`, and any PR labelled `needs-attention`.
+  `[ci-doctor]` and `[triage]`, and agent PRs the gate closed without merging (with the reason).
 - **Next:** at most three things the agents should do next.
 
 Plain Markdown, short bullet lists, no tables over 6 rows.
