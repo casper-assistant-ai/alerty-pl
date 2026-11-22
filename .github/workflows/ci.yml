@@ -34,6 +34,11 @@ jobs:
         run: python3 -I scripts/rcb.py update --pages 1 --out /tmp/smoke && python3 -I -c "import json;d=json.load(open('/tmp/smoke/alerts.json'));assert d['alerts'],'no alerts';print(len(d['alerts']),'alerts')"
       - name: JavaScript syntax
         run: for f in docs/*.js; do node --check "$f"; done
+      - name: Live service starts (server/, deployed by casper-infra deploy/alerty-api)
+        run: |
+          python3 -m venv /tmp/venv && /tmp/venv/bin/pip install -q -r server/requirements.txt
+          STATE_DIR=/tmp/live PORT=8099 POLL_SECONDS=600 timeout 20 /tmp/venv/bin/python -I server/app.py & sleep 8
+          curl -fsS http://127.0.0.1:8099/config && curl -fsS -o /dev/null http://127.0.0.1:8099/alerts
 
   doctor:
     # a failed pull request run of this repository starts the CI doctor (fork PRs have a
