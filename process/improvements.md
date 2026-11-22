@@ -7,7 +7,7 @@ reliability or simpler upkeep, never a report.
 
 ## Tests
 - [x] `scripts/changelog.py`: tests for `lint` (good and bad subjects, `!` and `BREAKING CHANGE:`) and for the next version number. — this PR
-- [ ] `docs/common.js`: a node test (no npm) for the date and category helpers used by every page.
+- [x] `docs/common.js`: a node test (no npm) for the date and category helpers used by every page. (#20)
 - [ ] `scripts/rcb.py update`: a test that a page that fails to load keeps the old `archive.json` entries.
 
 ## Reliability
