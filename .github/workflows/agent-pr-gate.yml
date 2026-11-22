@@ -29,7 +29,7 @@ concurrency:
 jobs:
   gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 90
     env:
       GH_TOKEN: ${{ github.token }}
       ALLOWED: '^(scripts/|tests/|process/[a-z0-9-]+\.(md|json)$|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$)'
@@ -43,8 +43,7 @@ jobs:
           git config user.name "alerty-pl bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           MAX_FIX=3
-          need_review=0; requeue=0; need_fix=0
-          fixer_busy=$(gh run list --workflow pr-fixer.lock.yml --limit 10 --json status --jq '[.[] | select(.status != "completed")] | length')
+          busy() { gh run list --workflow "$1" --limit 10 --json status --jq '[.[] | select(.status != "completed")] | length'; }
           bot='.user.login=="github-actions[bot]"'
           close_pr() {  # $1: the reason, quoted on the PR and on its linked issues
             local closes
@@ -79,6 +78,13 @@ jobs:
             gh pr comment "$n" --body-file "$body" && echo "fix attempt $k requested for #$n: $1"
             need_fix=1
           }
+          # Runs started with GITHUB_TOKEN fire no workflow_run event, so the gate itself waits for
+          # the reviewer and the fixer it starts, then looks at the PRs again: one gate run carries a
+          # PR from failing tests through fix attempts and review to the merge.
+          for round in 1 2 3 4 5 6 7 8; do
+          echo "::notice::round $round"
+          need_review=0; requeue=0; need_fix=0
+          fixer_busy=$(busy pr-fixer.lock.yml)
           prs=$(gh pr list --state open --label agent --json number,author,isDraft \
                 --jq '.[] | select(.author.login=="app/github-actions" or .author.login=="github-actions") | .number')
           for n in $prs; do
@@ -186,9 +192,17 @@ jobs:
             if [ "${fixer_busy:-0}" = 0 ]; then
               gh workflow run pr-fixer.lock.yml && echo "started the PR fixer"
             else
-              echo "the PR fixer is already running; its end starts this gate again"
+              echo "the PR fixer is already running"
             fi
           fi
           if [ "$requeue" = 1 ]; then
             gh workflow run issue-worker.lock.yml && echo "started the issue-worker for the returned issues"
           fi
+          [ "$need_review" = 1 ] || [ "$need_fix" = 1 ] || break
+          # wait (up to 40 minutes) until the reviewer and the fixer are idle, then look again
+          sleep 30
+          for _ in $(seq 1 80); do
+            [ "$(busy pr-reviewer.lock.yml)" = 0 ] && [ "$(busy pr-fixer.lock.yml)" = 0 ] && break
+            sleep 30
+          done
+          done
