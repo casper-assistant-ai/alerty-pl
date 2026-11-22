@@ -217,16 +217,27 @@ function renderNear() {
   });
 }
 
+// A denial that comes back at once means the browser did not ask: the
+// setting blocks it, so say where that setting is on this kind of phone.
+function deniedHint(silent) {
+  const ua = navigator.userAgent;
+  const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+  const head = silent ? "Telefon nie pyta o zgodę, bo lokalizacja jest zablokowana w ustawieniach. " : "Brak zgody na lokalizację. ";
+  if (ios) return head + "iPhone: Ustawienia → Prywatność i ochrona → Usługi lokalizacji → Witryny Safari → „Podczas używania aplikacji”; w Safari też aA → Ustawienia witryny → Lokalizacja → Pytaj. Potem odśwież stronę albo wpisz adres.";
+  if (/Android/.test(ua)) return head + "Android: ikona przy adresie strony → Uprawnienia → Lokalizacja → Zezwól; w telefonie włącz też Lokalizację. Potem odśwież stronę albo wpisz adres.";
+  return head + "Zezwól na nią w ustawieniach witryny (ikona przy adresie strony), odśwież stronę albo wpisz adres.";
+}
+
 function locate() {
   if (!("geolocation" in navigator)) { note("Ta przeglądarka nie podaje lokalizacji. Wpisz adres.", true); return; }
   note("Pytam telefon o lokalizację…");
   $("#locate").disabled = true;
+  const asked = Date.now();
   navigator.geolocation.getCurrentPosition(
     (pos) => { $("#locate").disabled = false; setMe(pos.coords.latitude, pos.coords.longitude, "Twoja lokalizacja", pos.coords.accuracy); },
     (err) => {
       $("#locate").disabled = false;
-      note(err.code === 1
-        ? "Brak zgody na lokalizację. Zezwól na nią w ustawieniach przeglądarki albo wpisz adres."
+      note(err.code === 1 ? deniedHint(Date.now() - asked < 1500)
         : "Nie udało się ustalić lokalizacji. Wpisz adres albo wskaż miejsce na mapie.", true);
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
