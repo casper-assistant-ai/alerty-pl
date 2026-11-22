@@ -2,8 +2,8 @@
 description: |
   Works every open issue to an end with no human in the loop: a fix PR for the Agent PR gate
   (with "Closes #N"), or closing the issue with the reason. Takes CI-doctor issues, site errors,
-  gh-aw notices, requests, dev-tasks the builders left and old reports; replaces agent PRs the
-  gate refused. When nothing waits, makes one improvement PR a day (tests, reliability, simpler
+  gh-aw notices, requests, dev-tasks the builders left and old reports; takes an issue again when
+  the gate closed its PR, and closes it with the reasons after two closed PRs. When nothing waits, makes one improvement PR a day (tests, reliability, simpler
   upkeep) from process/improvements.md. Runs on every new issue, every two hours, and when the
   CI doctor dispatches it.
 on:
@@ -74,7 +74,9 @@ a secret, a new tool or a wider permission.
 
 The queue was built before you started by `scripts/retro.py queue`: read
 `/tmp/gh-aw/agent/queue.md` and `/tmp/gh-aw/agent/queue.json`. Issues that already have an open
-PR are handled; skip them. When this run was started by a new issue
+PR are in work; skip them. The `rejected PRs` column lists PRs for that issue that the gate
+closed without merging: read the gate's and the PR reviewer's comments on them and do not repeat
+what they rejected. When this run was started by a new issue
 (#${{ github.event.issue.number }}), take that issue first.
 
 Every issue you touch ends in exactly one of two ways, and you say which in one comment on it:
@@ -96,9 +98,8 @@ Kinds in the queue, in the order you take them:
    A one-off network error with a later green run: close it with that run's link.
 2. `aw-notice` (gh-aw failure notices such as an engine rate limit or timeout): if a later run of
    that workflow succeeded, close with its link. If the fix needs a change in `.github/` (you
-   cannot push those), comment the exact change on the issue, add it as the first item of
-   `process/improvements.md` under "Needs a maintainer" in your PR, and close the issue with that PR
-   linked.
+   cannot push those), close the issue with the reason and the exact change in the closing comment,
+   so the record stays on the issue. Never add "needs a maintainer" items anywhere.
 3. `request` (issues from people): a bug or a missing alert gets a fix PR; a question gets an answer
    in the closing comment; an idea that fits the product goes into `process/improvements.md` in a
    PR and the issue closes with it linked.
@@ -109,10 +110,16 @@ Kinds in the queue, in the order you take them:
 6. `managed` (the gh-aw "No-Op Runs" tracker): close it only when no workflow source in
    `.github/workflows/*.md` still lacks `report-as-issue: false` under `noop:`, saying so.
 
-Agent PRs the gate refused (listed in the queue): read the gate's comment and the failing tests,
-and open a PR that replaces it with the fix (say `Replaces #<n>` in the body), then close the old
-PR with the reason and a link to its replacement. Close a refused PR that is no longer worth
-fixing (the change already landed, or it is out of scope) with the reason.
+**Issues the gate returned** (a closed PR in `rejected PRs`): the gate closed that PR because its
+tests failed, it touched paths agents may not change, or the PR reviewer rejected it (value, size
+or risk; the reason is quoted on the issue). Make a new, smaller PR that answers that reason, or
+close the issue with the reason when it is not worth doing. When the queue marks an issue
+`(close the issue)` (two closed PRs already), do not try again: close it, quoting the reasons the
+gate gave and linking both PRs.
+
+Every PR you open is judged by the PR reviewer agent before the gate merges it: keep it small,
+focused on one issue or item, with a test that checks behaviour, and say in the body what it fixes
+and how you checked it.
 
 **When nothing waits** (the queue says `improvement due: yes`): take the first unticked item of
 `process/improvements.md` (or, when it is done, find one yourself in tests, reliability or

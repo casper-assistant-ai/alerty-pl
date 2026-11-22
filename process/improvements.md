@@ -1,12 +1,9 @@
 # Improvements backlog
 
-The issue-worker takes the first open item when no issue, dev-task or refused agent PR waits,
+The issue-worker takes the first open item when no issue or dev-task waits,
 at most one improvement PR a day, and ticks the item (`- [x] … (#PR)`) in that PR. The
 process-retro adds items here when the list runs short. Every item is product work: tests,
 reliability or simpler upkeep, never a report.
-
-## Needs a maintainer
-- [x] `.github/workflows/security-auditor.md`: raise `timeout-minutes` from 30 to 40 and recompile, so the weekly audit survives an engine rate limit (HTTP 429) instead of being cut off with no terminal safe output — from #6, run 44917850467.
 
 ## Tests
 - [x] `scripts/changelog.py`: tests for `lint` (good and bad subjects, `!` and `BREAKING CHANGE:`) and for the next version number. — this PR

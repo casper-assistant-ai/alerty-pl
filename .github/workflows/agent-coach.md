@@ -48,7 +48,7 @@ not its scripts. Here the "sessions" are this repository's agent runs of the las
 
 1. **Harvest.** List the runs of the agentic workflows (`*.lock.yml`) and the plain ones
    (Update data, CI, Agent PR gate). For each agent: runs, failures, PRs opened, merged, and
-   those the gate commented on or labelled `needs-attention`, issues opened.
+   those the gate closed without merging (failed tests, paths, or a PR reviewer reject), issues opened.
 2. **Mine.** Find recurring problems: the same failure twice or more, a PR the gate rejected,
    an agent that called `noop` while work was waiting, a rule in `AGENTS.md` that agents broke.
 3. **Consolidate.** For each problem with clear evidence, write one short rule. Edit only the block

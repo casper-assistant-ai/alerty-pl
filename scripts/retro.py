@@ -111,7 +111,6 @@ def summarize(commits, prs, issues, runs, role, since):
             continue
         g = agents[a]
         g["prs"] += 1
-        labels = set(p.get("labels") or [])
         if p.get("merged_at"):
             g["merged"] += 1
             k = kind(p["title"], a)
@@ -119,7 +118,7 @@ def summarize(commits, prs, issues, runs, role, since):
             if k == "dev":
                 g["dev_merged"] += 1
                 dev_days.add(p["merged_at"][:10])
-        elif p.get("state") == "closed" or "needs-attention" in labels:
+        elif p.get("state") == "closed":
             g["rejected"] += 1
         else:
             g["open_prs"] += 1
@@ -273,14 +272,26 @@ def issue_kind(title, labels):
 ORDER = ["ci", "site-error", "aw-notice", "request", "dev-task", "report", "managed"]
 
 
+GIVE_UP = 2  # closed, unmerged PRs for one issue before the worker closes the issue instead
+
+
 def queue(issues, prs, today):
-    """Pure: the issue-worker's queue from open issues and all recent PRs (plain dicts)."""
-    refs = {}
+    """Pure: the issue-worker's queue from open issues and all recent PRs (plain dicts).
+
+    An open PR that names an issue means it is in work. A closed, unmerged PR that names it was
+    rejected (by the reviewer, the tests or the path check); after GIVE_UP of them the worker
+    closes the issue with the reasons instead of trying again."""
+    refs, rejected = {}, {}
     for p in prs:
-        if p.get("state") != "open":
+        nums = set(re.findall(r"#(\d+)", (p.get("title") or "") + " " + (p.get("body") or "")))
+        if p.get("state") == "open":
+            target = refs
+        elif p.get("state") == "closed" and not p.get("merged_at"):
+            target = rejected
+        else:
             continue
-        for n in set(re.findall(r"#(\d+)", (p.get("title") or "") + " " + (p.get("body") or ""))):
-            refs.setdefault(int(n), []).append(p["number"])
+        for n in nums:
+            target.setdefault(int(n), []).append(p["number"])
     items = []
     for i in issues:
         if i.get("state") != "open":
@@ -288,28 +299,29 @@ def queue(issues, prs, today):
         k = issue_kind(i.get("title"), i.get("labels"))
         items.append({"number": i["number"], "title": i["title"], "kind": k,
                       "labels": i.get("labels") or [], "created_at": i.get("created_at"),
-                      "open_prs": sorted(refs.get(i["number"], []))})
+                      "open_prs": sorted(refs.get(i["number"], [])),
+                      "rejected_prs": sorted(rejected.get(i["number"], []))})
     items.sort(key=lambda x: (ORDER.index(x["kind"]), x["created_at"] or ""))
-    refused = [{"number": p["number"], "title": p["title"]} for p in prs
-               if p.get("state") == "open" and "needs-attention" in (p.get("labels") or [])]
     actionable = [x for x in items if not x["open_prs"] and x["kind"] != "managed"]
+    give_up = [x["number"] for x in actionable if len(x["rejected_prs"]) >= GIVE_UP]
     improved_today = any(agent_of(p.get("title")) == WORKER and IMPROVEMENT.match(p.get("body") or "")
                          and (p.get("created_at") or "").startswith(today) for p in prs)
     return {"today": today, "issues": items, "actionable": [x["number"] for x in actionable],
-            "refused_prs": refused,
-            "improvement_due": not actionable and not refused and not improved_today}
+            "give_up": give_up,
+            "improvement_due": not actionable and not improved_today}
 
 
 def queue_md(q):
     lines = [f"Issue-worker queue on {q['today']}: {len(q['actionable'])} issue(s) to handle, "
-             f"{len(q['refused_prs'])} refused agent PR(s); improvement due: "
+             f"{len(q['give_up'])} to close after {GIVE_UP} rejected PRs; improvement due: "
              f"{'yes' if q['improvement_due'] else 'no'}.", "",
-             "| issue | kind | open PRs | title |", "|---|---|---|---|"]
+             "| issue | kind | open PRs | rejected PRs | title |", "|---|---|---|---|---|"]
     for x in q["issues"]:
         prs = ", ".join(f"#{n}" for n in x["open_prs"]) or "none"
-        lines.append(f"| #{x['number']} | {x['kind']} | {prs} | {x['title']} |")
-    for p in q["refused_prs"]:
-        lines.append(f"| PR #{p['number']} | refused by gate | | {p['title']} |")
+        rej = ", ".join(f"#{n}" for n in x["rejected_prs"]) or "none"
+        if x["number"] in q["give_up"]:
+            rej += " (close the issue)"
+        lines.append(f"| #{x['number']} | {x['kind']} | {prs} | {rej} | {x['title']} |")
     return "\n".join(lines) + "\n"
 
 

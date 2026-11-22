@@ -30,7 +30,7 @@ class Summarize(unittest.TestCase):
             {"number": 5, "title": "[site-designer] feat(site): dark mode", "body": "Refs #3",
              "created_at": "2026-11-20T10:00:00Z", "merged_at": "2026-11-20T11:00:00Z", "state": "closed", "labels": ["agent"]},
             {"number": 6, "title": "[test-improver] test: more", "body": "",
-             "created_at": "2026-11-20T10:00:00Z", "merged_at": None, "state": "open", "labels": ["agent", "needs-attention"]},
+             "created_at": "2026-11-20T10:00:00Z", "merged_at": None, "state": "closed", "labels": ["agent"]},
         ]
         issues = [
             {"number": 2, "title": "[daily-status] 2026-11-21", "state": "open", "created_at": "2026-11-21T00:00:00Z", "labels": ["report"]},
@@ -123,12 +123,22 @@ class Queue(unittest.TestCase):
         fix = [dict(done[0], body="Fixes the parser. An improvement too.")]
         self.assertTrue(retro.queue([], fix, "2026-11-22")["improvement_due"])
 
-    def test_refused_pr_blocks_improvement(self):
-        prs = [{"number": 31, "title": "[site-designer] feat: y", "body": "", "state": "open",
-                "created_at": "2026-11-22T08:00:00Z", "labels": ["needs-attention"]}]
-        q = retro.queue([], prs, "2026-11-22")
-        self.assertEqual(q["refused_prs"], [{"number": 31, "title": "[site-designer] feat: y"}])
+    def test_rejected_prs_and_give_up(self):
+        issues = [{"number": 40, "title": "Map bug", "state": "open", "labels": [],
+                   "created_at": "2026-11-21T00:00:00Z"},
+                  {"number": 41, "title": "Tooltip bug", "state": "open", "labels": [],
+                   "created_at": "2026-11-21T01:00:00Z"}]
+        closed = lambda n, ref: {"number": n, "title": "[issue-worker] fix: y", "body": f"Closes #{ref}",
+                                 "state": "closed", "merged_at": None, "labels": ["agent"],
+                                 "created_at": "2026-11-21T08:00:00Z"}
+        merged = dict(closed(52, 41), merged_at="2026-11-21T09:00:00Z")
+        q = retro.queue(issues, [closed(50, 40), closed(51, 40), closed(53, 41), merged], "2026-11-22")
+        by = {x["number"]: x for x in q["issues"]}
+        self.assertEqual(by[40]["rejected_prs"], [50, 51])
+        self.assertEqual(by[41]["rejected_prs"], [53])
+        self.assertEqual(q["give_up"], [40])
         self.assertFalse(q["improvement_due"])
+        self.assertIn("| #40 | request | none | #50, #51 (close the issue) |", retro.queue_md(q))
 
 
 if __name__ == "__main__":
