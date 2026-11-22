@@ -72,4 +72,13 @@ within 7 days, each tied to a number in `process/retro-log.md`). Every agent fol
 The agent-coach workflow keeps this block (bounded edits, each with its evidence).
 
 <!-- learned:start -->
+- A diff that only renames or restyles code, with no behavioural change, is churn: close the
+  issue with that reason instead of opening a PR — the reviewer rejects behaviour-free churn
+  even when the issue asks for it [PR #23, issue #21].
+- Run the checks on the exact tree you push (unittest with the node suite, the one-page live
+  parse, `node --check` on every `docs/*.js`) and quote their real output in the PR body; a
+  green claim the CI contradicts costs a fixer round [PR #22, CI run 44997317672].
+- Write the PR title as a Conventional Commit on the first attempt: the gate squashes with it
+  and CI lints it, and a prose title that slips through must be hand-mapped into the changelog
+  [PR #5, PR #7].
 <!-- learned:end -->
