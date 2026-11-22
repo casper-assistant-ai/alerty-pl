@@ -25,17 +25,20 @@ flowchart LR
   U -->|alerts.json, archive.json| P[GitHub Pages<br/>map, history, analytics]
   U -- fails --> PD[parser-doctor 🤖]
   U -- unmatched.json --> RK[region-keeper 🤖]
-  CI[CI / Update / Gate fail] --> CD[ci-doctor 🤖] -->|issue| PD
+  CI[CI / Update / Gate fail] --> CD[ci-doctor 🤖] -->|issue| IW[issue-worker 🤖]
   PD & RK & TI[test-improver 🤖] & DK[docs-keeper 🤖] -->|PR label agent| G[Agent PR gate<br/>tests + live parse]
   G -->|squash merge| main[(main)]
   G -->|tests fail / changes| PF[pr-fixer 🤖] -->|commit to the same PR| G
+  G -->|closed PR: issue back| IW
+  IW -->|fix PR| G
   IT[issue-triage 🤖] -->|labels| RK & PD
-  DS[daily-status 🤖] -->|daily report issue| main
+  DS[daily-status 🤖] -->|daily report issue| IW
   SD[site-designer 🤖] -->|PR| G
   SC[site check<br/>headless Chrome] -->|issue site-error| SF[site-fixer 🤖]
   SF -->|PR| G
-  SA[security-auditor 🤖] -->|issue| PD
+  SA[security-auditor 🤖] -->|issue| IW
   AC[agent-coach 🤖] -->|learned rules PR| G
+  RETRO[process-retro 🤖] -->|process PR| G
   CAO[gh-cao] -.monitors.-> PD & RK & CD & DS & IT & TI & DK & SD & SA & AC
 ```
 
@@ -47,8 +50,10 @@ flowchart LR
 | `site-check.yml` | plain Actions, headless Chrome | — | hourly and after each deploy | issue `site-error`, dispatches `site-fixer` |
 | `ci.yml` | plain Actions | — | push, PR | nothing |
 | `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent PRs that pass, sends broken ones to `pr-fixer` |
+| `agent-dispatch.yml` | plain Actions | — | daily | nothing; starts the extra agent runs planned in `process/schedule.json` |
 | `pr-reviewer` | agent | GLM-5.3 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
 | `pr-fixer` | agent | GLM-5.3 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |
+| `issue-worker` | agent | GLM-5.3 (z.ai) | every 2 h, on each new issue, when the CI doctor or the gate dispatches it | fix PR (`Closes #N`) or closes the issue; improvement PR from `process/improvements.md` |
 | `parser-doctor` | agent | GLM-5.3 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
 | `region-keeper` | agent | GLM-5.3 (z.ai) | daily | PR: `scripts/`, `tests/` |
 | `test-improver` | agent | GLM-5.3 (z.ai) | weekly | PR: `tests/` |
@@ -57,6 +62,7 @@ flowchart LR
 | `site-designer` | agent + skills unslop, modern-web-guidance | GLM-5.3 (z.ai) | weekly | PR: `docs/*.html\|js\|css` |
 | `security-auditor` | agent + skill security-audit | GLM-5.3 (z.ai) | weekly | issue |
 | `agent-coach` | agent + skill skillopt-sleep | GLM-5.3 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
+| `process-retro` | agent | GLM-5.3 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues |
 | `ci-doctor` | agent | Copilot | a failed run on main | issue |
 | `issue-triage` | agent | Copilot | every 12 h | labels, comments |
 | `daily-status` | agent | Copilot | daily | report issue |
@@ -94,7 +100,7 @@ gh cao dashboard --repo casper-assistant-ai/alerty-pl   # needs Docker or Podman
 gh aw status && gh aw logs --start-date -1d
 ```
 
-Map data: [ppatrzyk/polska-geojson](https://github.com/ppatrzyk/polska-geojson) (MIT). Map: [Leaflet](https://leafletjs.com) (BSD-2, vendored). Layers, all without keys: Esri Light/Dark Gray Canvas, [Esri World Imagery Wayback](https://livingatlas.arcgis.com/wayback/), [NASA GIBS](https://www.earthdata.nasa.gov/gibs) true colour and [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) VIIRS 375 m fires. Code: MIT.
+Map data: [ppatrzyk/polska-geojson](https://github.com/ppatrzyk/polska-geojson) (MIT); gmina names: GUGiK PRG. Map: [Leaflet](https://leafletjs.com) (BSD-2, vendored). Layers, all without keys: Esri Light/Dark Gray Canvas, [Esri World Imagery Wayback](https://livingatlas.arcgis.com/wayback/), [NASA GIBS](https://www.earthdata.nasa.gov/gibs) true colour and [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/) VIIRS 375 m fires. Code: MIT.
 
 ## Versions and changelog
 
