@@ -34,6 +34,8 @@ jobs:
         run: python3 -I scripts/rcb.py update --pages 1 --out /tmp/smoke && python3 -I -c "import json;d=json.load(open('/tmp/smoke/alerts.json'));assert d['alerts'],'no alerts';print(len(d['alerts']),'alerts')"
       - name: JavaScript syntax
         run: for f in docs/*.js; do node --check "$f"; done
+      - name: HTML pages are valid (html-validate, structural rules in .htmlvalidate.json)
+        run: npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html && python3 -I scripts/html_check.py
       - name: Live service starts (server/, deployed by casper-infra deploy/alerty-api)
         run: |
           python3 -m venv /tmp/venv && /tmp/venv/bin/pip install -q -r server/requirements.txt

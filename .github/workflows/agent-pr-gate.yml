@@ -2,7 +2,7 @@ name: Agent PR gate
 
 # No humans in the loop: agent PRs are merged or closed by this gate, never left for a person.
 # A PR is merged only when (1) a gh-aw agent opened it, (2) it touches allowed paths only,
-# (3) unit tests, a live parse of gov.pl and node --check pass on its head, (4) it merges into main
+# (3) unit tests, a live parse of gov.pl, node --check and html-validate pass on its head, (4) it merges into main
 # cleanly, and (5) the PR reviewer agent approved that same head. When (2), (3) or (4) fails, or the
 # reviewer says "Verdict: changes", the gate asks the PR fixer agent to fix the PR in its own branch
 # ("Agent PR gate: fix attempt k of 3", with the reason and the test log) and tests the new head
@@ -126,6 +126,7 @@ jobs:
             { python3 -I -m unittest discover -s tests 2>&1 || { ok=0; echo "FAILED: unit tests"; }; } | tee -a "$log"
             { python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n 2>&1 || { ok=0; echo "FAILED: live parse of gov.pl"; }; } | tee -a "$log"
             for js in docs/*.js; do { node --check "$js" 2>&1 || { ok=0; echo "FAILED: node --check $js"; }; } | tee -a "$log"; done
+            { npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html 2>&1 || { ok=0; echo "FAILED: html-validate docs/*.html"; }; } | tee -a "$log"
             grep -q '^FAILED: ' "$log" && ok=0
             git checkout -q main
             if [ "$ok" != 1 ]; then
