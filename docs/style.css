@@ -154,6 +154,12 @@ main { flex: 1; width: 100%; max-width: 1480px; margin: 0 auto; padding: 24px; }
 .base-note:empty { display: none; }
 .sw.fire-dot { background: #ff2a1a; border-radius: 50%; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 12px 0 0; padding: 0; list-style: none; color: var(--text-2); font-size: .8125rem; }
+/* each legend category is a filter button: one click isolates it, the second clears it */
+.legend button { display: inline-flex; align-items: center; font: inherit; color: inherit; background: none; border: 0;
+  border-radius: 6px; padding: 5px 8px; margin: -5px -8px; cursor: pointer;
+  transition: background-color .15s var(--ease), color .15s var(--ease); }
+.legend button:hover { background: var(--surface-2); color: var(--text); }
+.legend button[aria-pressed="true"] { background: var(--surface-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line-strong); }
 .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; background: var(--c, var(--other)); margin-right: 8px; flex: none; }
 .tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--text); border: 1px solid var(--line-strong);
   box-shadow: 0 4px 16px rgb(0 0 0 / .12); padding: 8px 12px; border-radius: 8px; font-size: .8125rem; max-width: 260px; z-index: 2; }
