@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Powiadomienia — Alerty RCB</title>
+<meta name="description" content="Powiadomienia o Alertach RCB w Telegramie, e-mailem i w przeglądarce, w ciągu minuty od komunikatu na gov.pl. Wybierz województwa.">
+<meta name="color-scheme" content="light dark">
+<link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='6' fill='%23c4122f'/%3E%3Crect x='11' y='11' width='10' height='10' rx='2' fill='white'/%3E%3C/svg%3E">
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
+  <nav class="tabs" aria-label="Strony">
+    <a href="./">Mapa</a>
+    <a href="historia.html">Historia</a>
+    <a href="analityka.html">Analityka</a>
+    <a href="powiadomienia.html" aria-current="page">Powiadomienia</a>
+    <a href="zmiany.html">Zmiany</a>
+  </nav>
+  <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty">źródło: gov.pl/web/rcb</a>
+</header>
+<div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
+<main>
+  <div class="page-head">
+    <div>
+      <h1>Powiadomienia</h1>
+      <p>Nowy Alert RCB przychodzi w ciągu minuty od komunikatu na gov.pl: serwer sprawdza go co 20 sekund. Wybierz obszar, a potem kanał. Strona jest nieoficjalna; prawdziwe Alerty RCB nadal przychodzą SMS-em.</p>
+    </div>
+  </div>
+  <div class="notify">
+    <section class="card" aria-labelledby="h-area">
+      <h2 id="h-area">Obszar</h2>
+      <p class="sub">Bez zaznaczenia: cała Polska. Alerty dla całego kraju przychodzą zawsze.</p>
+      <div class="areas" id="areas"></div>
+      <label class="chk"><input type="checkbox" id="drills"> <span>Także ćwiczenia i testy syren</span></label>
+    </section>
+    <div class="channels">
+      <section class="card" id="c-tg" aria-labelledby="h-tg">
+        <h2 id="h-tg">Telegram</h2>
+        <p>Bot wyśle każdy alert z wybranego obszaru. Wyłączysz go komendą /stop.</p>
+        <button type="button" class="btn" id="tg-go">Otwórz bota</button>
+        <div class="out" id="tg-out" role="status"></div>
+      </section>
+      <section class="card" id="c-mail" aria-labelledby="h-mail">
+        <h2 id="h-mail">E-mail</h2>
+        <p>Najpierw przyjdzie list z linkiem potwierdzenia. Każdy list ma link do wypisania.</p>
+        <form id="mail-form">
+          <label class="visually-hidden" for="mail">Adres e-mail</label>
+          <input type="email" id="mail" required autocomplete="email" placeholder="adres@przyklad.pl">
+          <p></p>
+          <button type="submit" class="btn">Zapisz</button>
+        </form>
+        <div class="out" id="mail-out" role="status"></div>
+      </section>
+      <section class="card" id="c-push" aria-labelledby="h-push">
+        <h2 id="h-push">Przeglądarka</h2>
+        <p>Powiadomienie systemowe w tej przeglądarce, także przy zamkniętej karcie. Na iPhonie: najpierw „Do ekranu początkowego”.</p>
+        <button type="button" class="btn" id="push-go">Włącz</button>
+        <button type="button" class="btn" id="push-off" hidden>Wyłącz</button>
+        <div class="out" id="push-out" role="status"></div>
+      </section>
+    </div>
+  </div>
+</main>
+<footer>
+  <div class="in">
+    <p>Strona nieoficjalna. Dane z <a href="https://www.gov.pl/web/rcb/komunikaty">komunikatów Rządowego Centrum Bezpieczeństwa</a>,
+    sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako <a href="powiadomienia.html">powiadomienia</a>. W razie zagrożenia słuchaj komunikatów służb i stosuj się do Alertów RCB w telefonie.</p>
+    <p>Stronę rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>:
+    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>. Mapa: <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a>, krój: IBM Plex.
+    <a class="mono" id="ver" href="zmiany.html"></a></p>
+  </div>
+</footer>
+<script src="common.js" defer></script>
+<script src="notify.js" defer></script>
+</body>
+</html>

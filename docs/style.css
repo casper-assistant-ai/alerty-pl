@@ -327,3 +327,30 @@ footer p { margin: 0; max-width: 90ch; }
   nav.tabs { flex: 1 1 100%; height: 40px; }
   nav.tabs a { flex: 1; justify-content: center; padding: 0 4px; }
 }
+
+/* live alerts: toasts from the Server-Sent Events stream */
+.toasts { position: fixed; right: 16px; bottom: 16px; z-index: 2000; display: grid; gap: 8px; width: min(420px, calc(100vw - 32px)); }
+.toast { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: start; background: var(--surface);
+  border: 1px solid var(--line-strong); border-left: 4px solid var(--alarm); border-radius: var(--r); padding: 12px 14px;
+  box-shadow: 0 8px 24px rgb(0 0 0 / .18); animation: toast-in .25s var(--ease); }
+.toast .sw { margin-top: 6px; }
+.toast p { margin: 4px 0; color: var(--text-2); font-size: .875rem; }
+.toast a { font-size: .8125rem; color: var(--text-2); }
+.toast .x { border: 0; background: none; color: var(--muted); font-size: 1.25rem; line-height: 1; cursor: pointer; padding: 0 2px; }
+@keyframes toast-in { from { transform: translateY(8px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .toast { animation: none; } }
+
+/* notifications page */
+.notify { display: grid; gap: 24px; max-width: 960px; }
+.notify .areas { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 16px; margin: 12px 0; }
+.notify label.chk { display: flex; gap: 8px; align-items: center; font-size: .9375rem; }
+.channels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.channels .card { display: flex; flex-direction: column; gap: 12px; }
+.channels .card p { margin: 0; color: var(--text-2); font-size: .875rem; }
+.channels input[type="email"] { font: inherit; font-size: .875rem; color: var(--text); background: var(--surface);
+  border: 1px solid var(--line-strong); border-radius: 8px; height: 36px; padding: 0 10px; width: 100%; }
+.channels .btn { align-self: flex-start; }
+.channels .out { min-height: 1.5em; font-size: .875rem; color: var(--text-2); }
+.channels .out.err { color: var(--accent); }
+.channels .card[aria-disabled="true"] { opacity: .6; }
+@media (max-width: 860px) { .channels { grid-template-columns: minmax(0, 1fr); } }
