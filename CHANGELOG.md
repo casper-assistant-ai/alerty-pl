@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.10.1 (2026-11-22)
+
+### fix
+
+- **agents:** let workflows started by github-actions[bot] activate the agents ([c62710e](https://github.com/casper-assistant-ai/alerty-pl/commit/c62710e))
+
 ## 1.10.0 (2026-11-22)
 
 ### feat

@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.10.1",
+   "date": "2026-11-22",
+   "sha": "c62710e",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "let workflows started by github-actions[bot] activate the agents",
+     "sha": "c62710e",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.10.0",
    "date": "2026-11-22",
    "sha": "642d0ad",
