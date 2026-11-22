@@ -2,6 +2,22 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.15.0 (2026-11-22)
+
+### feat
+
+- **map:** pick a period instead of a day; Wayback follows its end ([ca2cba3](https://github.com/casper-assistant-ai/alerty-pl/commit/ca2cba3))
+- **map:** filter the map to one category from the legend (#29) ([4694989](https://github.com/casper-assistant-ai/alerty-pl/commit/4694989))
+
+### fix
+
+- **live:** name test alerts' area as a trial ([7aa1064](https://github.com/casper-assistant-ai/alerty-pl/commit/7aa1064))
+
+### docs
+
+- complete the team roster and the geo data notes (#27) ([5ca5717](https://github.com/casper-assistant-ai/alerty-pl/commit/5ca5717))
+- **agents:** three learned rules from the first week of agent runs (#28) ([712ddc4](https://github.com/casper-assistant-ai/alerty-pl/commit/712ddc4))
+
 ## 1.14.0 (2026-11-22)
 
 ### feat
