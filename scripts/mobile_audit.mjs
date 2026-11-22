@@ -172,6 +172,8 @@ async function audit(cdp, sid, path, vp) {
         el.scrollIntoView({ block: "center" }); el.click(); return el.tagName.toLowerCase() + ' "' + t + '"'; })()`);
       if (!what) continue;
       await sleep(600);
+      // a button that leaves the page (Otwórz bota -> t.me) ends the round: the next page is not ours
+      if ((await ev(cdp, sid, "location.href")) !== url) { off(); return finish(); }
       const after = await ev(cdp, sid, SCAN);
       for (const d of after) if (!problems.some((p) => p.detail === d || p.detail.endsWith(d))) problems.push({ kind: "after-click", detail: `after ${what}: ${d}` });
       if ((await ev(cdp, sid, "location.href")) !== url) { off(); return finish(); }
