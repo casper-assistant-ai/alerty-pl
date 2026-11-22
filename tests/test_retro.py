@@ -116,10 +116,12 @@ class Queue(unittest.TestCase):
         q = retro.queue([], [], "2026-11-22")
         self.assertTrue(q["improvement_due"])
         done = [{"number": 30, "title": "[issue-worker] test: more cases",
-                 "body": "x\n<!-- improvement -->", "state": "open",
+                 "body": "Improvement PR (queue empty): changelog tests", "state": "open",
                  "created_at": "2026-11-22T08:00:00Z", "labels": ["agent"]}]
         self.assertFalse(retro.queue([], done, "2026-11-22")["improvement_due"])
         self.assertTrue(retro.queue([], done, "2026-11-23")["improvement_due"])
+        fix = [dict(done[0], body="Fixes the parser. An improvement too.")]
+        self.assertTrue(retro.queue([], fix, "2026-11-22")["improvement_due"])
 
     def test_refused_pr_blocks_improvement(self):
         prs = [{"number": 31, "title": "[site-designer] feat: y", "body": "", "state": "open",
