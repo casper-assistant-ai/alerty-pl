@@ -1,0 +1,1295 @@
+{
+ "note": "Hand-kept: confirmed cases of missiles and drones in Polish airspace, each with sources. Routes are approximate.",
+ "events": [
+  {
+   "id": "2022-11-15-przewodow",
+   "date": "2022-11-15",
+   "time_local": "15:40",
+   "title_pl": "Przewodów: rakieta S-300 spadła na suszarnię zboża",
+   "summary_pl": "15.11.2022 ok. 15:40 pocisk 5W55 z systemu S-300, wystrzelony przez ukraińską obronę powietrzną podczas rosyjskiego ataku rakietowego, uderzył w suszarnię zboża w Przewodowie. Zginęło dwóch pracowników. Prokuratura Krajowa zawiesiła śledztwo w styczniu 2024 r. (brak pomocy prawnej od Ukrainy).",
+   "weapons": [
+    {
+     "kind": "missile",
+     "label_pl": "rakieta przeciwlotnicza S-300 (5W55), ukraińska obrona powietrzna",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.55,
+       24.45
+      ],
+      [
+       50.5,
+       24.15
+      ],
+      [
+       50.4745,
+       23.9233
+      ]
+     ],
+     "end": {
+      "type": "explosion",
+      "place": "Przewodów (gm. Dołhobyczów, pow. hrubieszowski)",
+      "lat": 50.4745,
+      "lon": 23.9233
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "explosion",
+     "place": "Przewodów (gm. Dołhobyczów, pow. hrubieszowski)",
+     "lat": 50.4745,
+     "lon": 23.9233,
+     "note_pl": "Suszarnia zboża na terenie dawnego PGR, ok. 6 km od granicy; 2 ofiary śmiertelne, lej ok. 5 m."
+    }
+   ],
+   "route_note_pl": "Miejsce uderzenia pewne; miejsce startu pocisku nie zostało ujawnione (dokumenty niejawne), więc trasa jest schematyczna: z Ukrainy ze wschodu na Przewodów.",
+   "sources": [
+    {
+     "title": "Prokuratura zawiesiła śledztwo ws. wybuchu rakiety w Przewodowie",
+     "publisher": "TVN24",
+     "url": "https://tvn24.pl/lublin/przewodow-prokuratura-zawiesila-sledztwo-ws-wybuchu-rakiety-w-przewodowie-st7736699",
+     "date": "2024-01-23"
+    },
+    {
+     "title": "Prokuratura zawiesiła śledztwo ws. wybuchu rakiety w Przewodowie",
+     "publisher": "PAP",
+     "url": "https://www.pap.pl/aktualnosci/prokuratura-zawiesila-sledztwo-ws-wybuchu-rakiety-w-przewodowie-0",
+     "date": "2024-01-23"
+    },
+    {
+     "title": "Zawieszono śledztwo ws. wybuchu ukraińskiej rakiety w Przewodowie",
+     "publisher": "RMF24",
+     "url": "https://www.rmf24.pl/raporty/raport-wybuch-w-przewodowie/news-zawieszono-sledztwo-ws-wybuchu-ukrainskiej-rakiety-w-przewod,nId,7286874",
+     "date": "2024-01-23"
+    },
+    {
+     "title": "Komunikat w związku z wezwaniem ambasadora Federacji Rosyjskiej do MSZ",
+     "publisher": "MSZ (gov.pl)",
+     "url": "https://www.gov.pl/web/dyplomacja/komunikat-w-zwiazku-z-wezwaniem-ambasadora-federacji-rosyjskiej-do-msz",
+     "date": "2022-11-15"
+    },
+    {
+     "title": "Polish experts confirm missile that hit grain facility was Ukrainian",
+     "publisher": "Reuters",
+     "url": "https://www.reuters.com/world/europe/polish-experts-confirm-missile-that-hit-grain-facility-was-ukrainian-media-2023-09-26/",
+     "date": "2023-09-26"
+    }
+   ]
+  },
+  {
+   "id": "2022-12-16-kh55-zamosc-bydgoszcz",
+   "date": "2022-12-16",
+   "time_local": null,
+   "title_pl": "Rosyjska rakieta Ch-55 przeleciała nad Polską i spadła w lesie pod Bydgoszczą",
+   "summary_pl": "Podczas rosyjskiego ataku na Ukrainę 16.12.2022 radary wykryły obiekt, który wleciał do Polski i zniknął z radarów w rejonie Bydgoszczy; wojsko go nie znalazło. Szczątki nieuzbrojonej rakiety Ch-55 (z balastem zamiast głowicy) znalazła przypadkowa osoba w lesie w Zamościu (gm. Szubin) pod koniec kwietnia 2023 r.; sprawa wyszła na jaw 27.04.2023. Prokuratura nadal ma wątpliwości co do daty upadku.",
+   "weapons": [
+    {
+     "kind": "missile",
+     "label_pl": "rosyjska rakieta manewrująca Ch-55 (bez głowicy bojowej, balast)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.15,
+       24.4
+      ],
+      [
+       52.08,
+       23.65
+      ],
+      [
+       52.6,
+       21.0
+      ],
+      [
+       53.0,
+       18.6
+      ],
+      [
+       53.0741,
+       17.8079
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Zamość (gm. Szubin, pow. nakielski), las",
+      "lat": 53.0741,
+      "lon": 17.8079
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "crash",
+     "place": "Zamość (gm. Szubin, pow. nakielski), ok. 13-15 km od Bydgoszczy",
+     "lat": 53.0741,
+     "lon": 17.8079,
+     "note_pl": "Szczątki w lesie, bez śladów eksplozji; radar stracił obiekt ok. 2 km od miejsca znalezienia (RMF24)."
+    }
+   ],
+   "route_note_pl": "Trasa umowna (linia prosta ok. 450-500 km): źródła nie podają śladu radarowego. RMF24: wlot z Białorusi; Polityka i OKO.press: pierwszą informację dała strona ukraińska, więc wlot znad Ukrainy nie jest wykluczony. Punkt końcowy pewny co do wsi.",
+   "sources": [
+    {
+     "title": "Wraca sprawa rosyjskiej rakiety pod Bydgoszczą. Ustalenia RMF FM",
+     "publisher": "RMF24",
+     "url": "https://www.rmf24.pl/raporty/raport-rosyjska-rakieta/news-rosyjska-rakieta-pod-bydgoszcza-kolejny-ruch-prokuratury,nId,8005149",
+     "date": "2025-07-30"
+    },
+    {
+     "title": "Odnaleziono głowicę z rosyjskiej rakiety, która spadła pod Bydgoszczą",
+     "publisher": "Rzeczpospolita",
+     "url": "https://www.rp.pl/kraj/art38497641-odnaleziono-glowice-z-rosyjskiej-rakiety-ktora-spadla-pod-bydgoszcza",
+     "date": "2023-05-19"
+    },
+    {
+     "title": "NEWS RMF FM: Biegli wstępnie potwierdzili, że pod Bydgoszczą spadła rosyjska rakieta Ch-55",
+     "publisher": "RMF24",
+     "url": "https://www.rmf24.pl/wojna-w-ukrainie/news-news-rmf-fm-biegli-wstepnie-potwierdzili-ze-pod-bydgoszcza-s,nId,6767139",
+     "date": null
+    },
+    {
+     "title": "Rosyjski pocisk Ch-55 pod Bydgoszczą. Kuriozum!",
+     "publisher": "Polityka",
+     "url": "https://www.polityka.pl/tygodnikpolityka/kraj/2212134,1,rosyjski-ch-55-pod-bydgoszcza-kuriozum-na-te-pytania-trzeba-odpowiedziec.read",
+     "date": null
+    },
+    {
+     "title": "Sześć pewników i 12 niewiadomych w sprawie rakiety spod Bydgoszczy",
+     "publisher": "OKO.press",
+     "url": "https://oko.press/blaszczak-pocisk-pewniki-niewiadome",
+     "date": null
+    }
+   ]
+  },
+  {
+   "id": "2023-12-29-hrubieszow-komarow",
+   "date": "2023-12-29",
+   "time_local": "07:12",
+   "title_pl": "Rosyjska rakieta w polskiej przestrzeni na ok. 3 minuty (Lubelszczyzna)",
+   "summary_pl": "29.12.2023 o 7:12 rosyjska rakieta manewrująca wleciała z Ukrainy w rejonie Hrubieszowa i przebywała nad Polską niecałe 3 minuty, pokonując ok. 40 km. Była śledzona przez radary polskie i sojusznicze, po czym opuściła polską przestrzeń. Naziemne poszukiwania (WOT) nie znalazły szczątków.",
+   "weapons": [
+    {
+     "kind": "missile",
+     "label_pl": "rosyjska rakieta manewrująca (typ nieustalony)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.95,
+       24.5
+      ],
+      [
+       50.8,
+       23.93
+      ],
+      [
+       50.6,
+       23.54
+      ],
+      [
+       50.5,
+       23.99
+      ],
+      [
+       50.45,
+       24.3
+      ]
+     ],
+     "end": {
+      "type": "left_airspace",
+      "place": "granica z Ukrainą, okolice pow. tomaszowskiego/hrubieszowskiego (miejsce wylotu niepodane)",
+      "lat": 50.5,
+      "lon": 23.99
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "debris",
+     "place": "Sosnowa-Dębowa (gm. Komarów-Osada, pow. zamojski)",
+     "lat": 50.6039,
+     "lon": 23.5449,
+     "note_pl": "Rejon przeszukiwań po doniesieniach mieszkańców gm. Komarów; nic nie znaleziono (doniesienie o upadku w Wożuczynie zdementowano)."
+    }
+   ],
+   "route_note_pl": "Oficjalnie: wlot od strony Ukrainy w rejonie Hrubieszowa, ok. 3 min i ok. 40 km nad Polską. Przebieg wewnątrz kraju i punkt wylotu są szacunkowe (obserwacje mieszkańców gm. Komarów); kształt trasy z zawróceniem jest schematyczny.",
+   "sources": [
+    {
+     "title": "Szef Sztabu Generalnego: Wszystko wskazuje, że rakieta rosyjska wtargnęła w polską przestrzeń powietrzną",
+     "publisher": "Rzeczpospolita",
+     "url": "https://www.rp.pl/wojsko/art39634961-szef-sztabu-generalnego-wszystko-wskazuje-ze-rakieta-rosyjska-wtargnela-w-polska-przestrzen-powietrzna",
+     "date": "2023-12-29"
+    },
+    {
+     "title": "Sztab Generalny: Wszystko wskazuje na to, że rakieta rosyjska wtargnęła w polską przestrzeń powietrzną",
+     "publisher": "Bankier.pl (PAP)",
+     "url": "https://www.bankier.pl/wiadomosc/Niezidentyfikowany-obiekt-w-polskiej-przestrzeni-powietrznej-Sluzby-zadzialaly-natychmiastowo-8671045.html",
+     "date": "2023-12-29"
+    },
+    {
+     "title": "Rosyjska rakieta nad Polską. Wojsko zakończyło poszukiwania",
+     "publisher": "Rzeczpospolita",
+     "url": "https://www.rp.pl/wojsko/art39639281-rosyjska-rakieta-nad-polska-wojsko-zakonczylo-poszukiwania",
+     "date": "2023-12-30"
+    },
+    {
+     "title": "3 minuty na naszym niebie, 40 km od granicy",
+     "publisher": "Tygodnik Zamojski",
+     "url": "https://tygodnikzamojski.pl/artykul/region-3-minuty-na-naszym-n2077995",
+     "date": "2023-12-29"
+    },
+    {
+     "title": "Poland says Russian rocket entered its airspace, summons diplomat",
+     "publisher": "Reuters",
+     "url": "https://www.reuters.com/world/europe/unidentified-object-entered-polish-airspace-2023-12-29/",
+     "date": "2023-12-30"
+    }
+   ]
+  },
+  {
+   "id": "2024-03-24-oserdow",
+   "date": "2024-03-24",
+   "time_local": "04:23",
+   "title_pl": "Rosyjska rakieta manewrująca w polskiej przestrzeni przez 39 sekund (Oserdów)",
+   "summary_pl": "24.03.2024 o 4:23 jedna z rakiet manewrujących odpalonych na zachodnią Ukrainę naruszyła polską przestrzeń na wysokości Oserdowa (woj. lubelskie) na 39 sekund. Obiekt był śledzony przez radary; poderwano polskie i sojusznicze lotnictwo. Nie zestrzelono go, uznając to za zbyt ryzykowne.",
+   "weapons": [
+    {
+     "kind": "missile",
+     "label_pl": "rosyjska rakieta manewrująca (typ nieustalony)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.4,
+       24.4
+      ],
+      [
+       50.4242,
+       23.9833
+      ],
+      [
+       50.44,
+       23.93
+      ],
+      [
+       50.48,
+       24.02
+      ],
+      [
+       50.5,
+       24.3
+      ]
+     ],
+     "end": {
+      "type": "left_airspace",
+      "place": "okolice Oserdowa (gm. Ulhówek, pow. tomaszowski)",
+      "lat": 50.48,
+      "lon": 24.02
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "debris",
+     "place": "Oserdów (gm. Ulhówek, pow. tomaszowski)",
+     "lat": 50.4242,
+     "lon": 23.9833,
+     "note_pl": "Miejsce wlotu podane przez DORSZ (na wysokości Oserdowa); brak szczątków."
+    }
+   ],
+   "route_note_pl": "Wlot na wysokości Oserdowa i 39 s w polskiej przestrzeni to dane DORSZ; ok. 8 km trasy (prędkość ok. 800 km/h). Kształt trasy po wlocie jest schematyczny.",
+   "sources": [
+    {
+     "title": "Rosyjska rakieta w polskiej przestrzeni. Komunikat Dowództwa Operacyjnego",
+     "publisher": "Polskie Radio 24",
+     "url": "https://polskieradio24.pl/artykul/3354312,rosyjska-rakieta-w-polskiej-przestrzeni-komunikat-dowodztwa-operacyjnego",
+     "date": "2024-03-24"
+    },
+    {
+     "title": "Rosyjska rakieta nad Polską. Poderwano myśliwce",
+     "publisher": "Polsat News",
+     "url": "https://www.polsatnews.pl/wiadomosc/2024-03-24/zmasowany-atak-w-ukrainie-polska-poderwala-swoje-mysliwce/",
+     "date": "2024-03-24"
+    },
+    {
+     "title": "Rosyjska rakieta naruszyła polską przestrzeń powietrzną",
+     "publisher": "Wirtualna Polska",
+     "url": "https://wiadomosci.wp.pl/rosyjska-rakieta-naruszyla-polska-przestrzen-powietrzna-7009316579785632a",
+     "date": "2024-03-24"
+    },
+    {
+     "title": "Poland activates aircraft after Russian cruise missile aimed at Ukraine enters its airspace",
+     "publisher": "CNN",
+     "url": "https://www.cnn.com/2024/03/24/europe/poland-activates-aircraft-russia-attacks-lviv-intl/index.html",
+     "date": "2024-03-24"
+    }
+   ]
+  },
+  {
+   "id": "2025-08-20-osiny",
+   "date": "2025-08-20",
+   "time_local": "02:22",
+   "title_pl": "Osiny: dron wybuchł na polu kukurydzy",
+   "summary_pl": "W nocy z 19 na 20.08.2025 niezidentyfikowany dron spadł i wybuchł na polu kukurydzy w Osinach (pow. łukowski); zgłoszenie do policji o 2:22. Prokuratura Okręgowa w Lublinie potwierdziła dron wojskowy (bez głowicy bojowej, z niewielką ilością materiału wybuchowego; napisy prawdopodobnie po koreańsku), a minister obrony nazwał to rosyjską prowokacją. Prokurator wskazał na przelot z Białorusi, choć DORSZ nie odnotowało naruszenia przestrzeni powietrznej.",
+   "weapons": [
+    {
+     "kind": "drone",
+     "label_pl": "dron wojskowy, najprawdopodobniej Shahed/Geran-2 (nieoficjalnie)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.1,
+       24.0
+      ],
+      [
+       52.0,
+       23.0
+      ],
+      [
+       51.8673,
+       22.0902
+      ]
+     ],
+     "end": {
+      "type": "explosion",
+      "place": "Osiny (gm. Wola Mysłowska, pow. łukowski)",
+      "lat": 51.8673,
+      "lon": 22.0902
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "explosion",
+     "place": "Osiny (gm. Wola Mysłowska, pow. łukowski)",
+     "lat": 51.8673,
+     "lon": 22.0902,
+     "note_pl": "Spalony obszar 8-10 m, odłamki na kilkudziesięciu metrach; uszkodzone zabudowania, brak ofiar."
+    }
+   ],
+   "route_note_pl": "Trasa schematyczna z granicy z Białorusią (ok. 100 km od miejsca wybuchu) wg wypowiedzi prokuratora; dron nie został wykryty przez radary, więc nie ma śladu.",
+   "sources": [
+    {
+     "title": "Niezidentyfikowany obiekt spadł i wybuchł na polu w Osinach - prokuratura wstępnie potwierdza",
+     "publisher": "Rzeczpospolita",
+     "url": "https://www.rp.pl/policja/art42881371-niezidentyfikowany-obiekt-spadl-na-lubelszczyznie-prokuratura-wstepnie-potwierdza-ustalenia-rzeczpospolitej",
+     "date": "2025-08-20"
+    },
+    {
+     "title": "Osiny: wybuch na polu kukurydzy - wstępne ustalenia prokuratury",
+     "publisher": "Kurier Lubelski",
+     "url": "https://kurierlubelski.pl/osiny-wybuch-na-polu-kukurydzy-wstepne-ustalenia-prokuratury-wskazuja-na-dron-wojskowy-uszkodzony-przez-materialy-wybuchowe-zdjecia/ar/c1p2-27887871",
+     "date": "2025-08-20"
+    },
+    {
+     "title": "Wybuch drona w polskiej wsi. Prokuratura wydała pilny komunikat",
+     "publisher": "Goniec.pl",
+     "url": "https://goniec.pl/wybuch-drona-w-polskiej-wsi-prokuratura-wydala-pilny-komunikat-mp-wkg-220825",
+     "date": "2025-08-22"
+    },
+    {
+     "title": "Russian drone fell in eastern Poland, Warsaw says",
+     "publisher": "Reuters",
+     "url": "https://www.reuters.com/world/russian-drone-fell-eastern-poland-warsaw-says-2025-08-20/",
+     "date": "2025-08-20"
+    }
+   ]
+  },
+  {
+   "id": "2025-09-10-drony",
+   "date": "2025-09-10",
+   "time_local": null,
+   "title_pl": "Masowe wtargnięcie rosyjskich dronów (noc 9/10 września 2025)",
+   "summary_pl": "Od ok. 23:30 9.09 do ok. 6:30 10.09.2025 polską przestrzeń naruszyło co najmniej 19 dronów (Rzeczpospolita: ok. 23), głównie wabików Gerbera, podczas rosyjskiego ataku na Ukrainę. Premier Tusk: spora część nadleciała po raz pierwszy bezpośrednio z Białorusi; polskie i sojusznicze samoloty (m.in. holenderskie F-35) zestrzeliły kilka. Szczątki 17 dronów znaleziono w pięciu województwach; Polska uruchomiła art. 4 NATO.",
+   "weapons": [
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.15,
+       24.2
+      ],
+      [
+       52.0145,
+       23.2259
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Czosnówka (gm. Biała Podlaska, pow. bialski)",
+      "lat": 52.0145,
+      "lon": 23.2259
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.1,
+       24.35
+      ],
+      [
+       51.8414,
+       23.5721
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Zabłocie-Kolonia (gm. Kodeń, pow. bialski)",
+      "lat": 51.8414,
+      "lon": 23.5721
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       51.95,
+       24.4
+      ],
+      [
+       51.5617,
+       23.3654
+      ]
+     ],
+     "end": {
+      "type": "debris",
+      "place": "Wyryki-Wola (gm. Wyryki, pow. włodawski)",
+      "lat": 51.5617,
+      "lon": 23.3654
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       51.9,
+       24.3
+      ],
+      [
+       51.4837,
+       23.2049
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Wielki Łan (gm. Stary Brus, pow. włodawski)",
+      "lat": 51.4837,
+      "lon": 23.2049
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       51.95,
+       24.35
+      ],
+      [
+       51.5942,
+       23.1567
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Krzywowierzba-Kolonia (gm. Dębowa Kłoda, pow. parczewski)",
+      "lat": 51.5942,
+      "lon": 23.1567
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron (zestrzelony), typ nieustalony",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       51.95,
+       24.3
+      ],
+      [
+       51.6186,
+       23.1654
+      ]
+     ],
+     "end": {
+      "type": "shotdown",
+      "place": "Wyhalew (gm. Dębowa Kłoda, pow. parczewski)",
+      "lat": 51.6186,
+      "lon": 23.1654
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.1,
+       24.0
+      ],
+      [
+       51.7562,
+       22.7863
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Wohyń (gm. Wohyń, pow. radzyński)",
+      "lat": 51.7562,
+      "lon": 22.7863
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron (zestrzelony), typ nieustalony",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.6,
+       24.45
+      ],
+      [
+       50.7031,
+       23.4408
+      ]
+     ],
+     "end": {
+      "type": "shotdown",
+      "place": "Cześniki (gm. Sitno, pow. zamojski)",
+      "lat": 50.7031,
+      "lon": 23.4408
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.95,
+       24.4
+      ],
+      [
+       51.0669,
+       22.5317
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Bychawka Trzecia (gm. Bychawa, pow. lubelski)",
+      "lat": 51.0669,
+      "lon": 22.5317
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.3,
+       24.25
+      ],
+      [
+       50.409,
+       22.786
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Przymiarki (gm. Księżpol, pow. biłgorajski)",
+      "lat": 50.409,
+      "lon": 22.786
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.0,
+       24.5
+      ],
+      [
+       51.3702,
+       20.0356
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Mniszków (gm. Mniszków, pow. opoczyński, łódzkie)",
+      "lat": 51.3702,
+      "lon": 20.0356
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.05,
+       24.5
+      ],
+      [
+       51.6167,
+       20.5796
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Nowe Miasto nad Pilicą (pow. grójecki, mazowieckie)",
+      "lat": 51.6167,
+      "lon": 20.5796
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       52.4,
+       24.0
+      ],
+      [
+       52.4138,
+       21.7862
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Rabiany (gm. Korytnica, pow. węgrowski, mazowieckie)",
+      "lat": 52.4138,
+      "lon": 21.7862
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Belarus",
+     "path": [
+      [
+       53.5,
+       25.0
+      ],
+      [
+       54.0791,
+       19.2865
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Oleśno (gm. Gronowo Elbląskie, pow. elbląski, warmińsko-mazurskie)",
+      "lat": 54.0791,
+      "lon": 19.2865
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.4,
+       24.0
+      ],
+      [
+       50.4832,
+       20.9985
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Czyżów (gm. Stopnica, pow. buski, świętokrzyskie)",
+      "lat": 50.4832,
+      "lon": 20.9985
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.5,
+       24.1
+      ],
+      [
+       50.7122,
+       20.893
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Smyków (gm. Raków, pow. kielecki, świętokrzyskie)",
+      "lat": 50.7122,
+      "lon": 20.893
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.6,
+       24.25
+      ],
+      [
+       50.7951,
+       21.6826
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Sobótka (gm. Ożarów, pow. opatowski, świętokrzyskie)",
+      "lat": 50.7951,
+      "lon": 21.6826
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "crash",
+     "place": "Czosnówka (gm. Biała Podlaska, pow. bialski)",
+     "lat": 52.0145,
+     "lon": 23.2259,
+     "note_pl": "Dron Gerbera znaleziony w polu, prawie nieuszkodzony; uszkodzenia cywilnego mienia."
+    },
+    {
+     "type": "crash",
+     "place": "Zabłocie-Kolonia (gm. Kodeń, pow. bialski)",
+     "lat": 51.8414,
+     "lon": 23.5721,
+     "note_pl": "Dron odzyskany po upadku (wg prokuratury)."
+    },
+    {
+     "type": "debris",
+     "place": "Wyryki-Wola (gm. Wyryki, pow. włodawski)",
+     "lat": 51.5617,
+     "lon": 23.3654,
+     "note_pl": "Uszkodzony dach i elewacja domu; bez szczątków drona. Wg Rzeczpospolitej szkoda od pocisku AIM-120 z polskiego F-16 (sporne)."
+    },
+    {
+     "type": "crash",
+     "place": "Wielki Łan (gm. Stary Brus, pow. włodawski)",
+     "lat": 51.4837,
+     "lon": 23.2049,
+     "note_pl": "Dron odzyskany po upadku."
+    },
+    {
+     "type": "crash",
+     "place": "Krzywowierzba-Kolonia (gm. Dębowa Kłoda, pow. parczewski)",
+     "lat": 51.5942,
+     "lon": 23.1567,
+     "note_pl": "Dron znaleziony w polu."
+    },
+    {
+     "type": "shotdown",
+     "place": "Wyhalew (gm. Dębowa Kłoda, pow. parczewski)",
+     "lat": 51.6186,
+     "lon": 23.1654,
+     "note_pl": "Zestrzelony, rozbił się w polu; znaleziono też szczątki pocisku AIM-120."
+    },
+    {
+     "type": "crash",
+     "place": "Wohyń (gm. Wohyń, pow. radzyński)",
+     "lat": 51.7562,
+     "lon": 22.7863,
+     "note_pl": "Dron Gerbera odzyskany po upadku."
+    },
+    {
+     "type": "shotdown",
+     "place": "Cześniki (gm. Sitno, pow. zamojski)",
+     "lat": 50.7031,
+     "lon": 23.4408,
+     "note_pl": "Tylko fragmenty drona, prawdopodobnie po zestrzeleniu."
+    },
+    {
+     "type": "crash",
+     "place": "Bychawka Trzecia (gm. Bychawa, pow. lubelski)",
+     "lat": 51.0669,
+     "lon": 22.5317,
+     "note_pl": "Gerbera, prawdopodobnie zahaczyła o linię energetyczną i spadła na dach klatek królików."
+    },
+    {
+     "type": "crash",
+     "place": "Przymiarki (gm. Księżpol, pow. biłgorajski)",
+     "lat": 50.409,
+     "lon": 22.786,
+     "note_pl": "17. odnaleziony dron (Gerbera), zgłoszony 11.09.2025."
+    },
+    {
+     "type": "crash",
+     "place": "Mniszków (gm. Mniszków, pow. opoczyński, łódzkie)",
+     "lat": 51.3702,
+     "lon": 20.0356,
+     "note_pl": "Gerbera znaleziona w polu, ok. 300 km od granicy."
+    },
+    {
+     "type": "crash",
+     "place": "Nowe Miasto nad Pilicą (pow. grójecki, mazowieckie)",
+     "lat": 51.6167,
+     "lon": 20.5796,
+     "note_pl": "Szczątki Gerbery na terenie jednostki WOT."
+    },
+    {
+     "type": "crash",
+     "place": "Rabiany (gm. Korytnica, pow. węgrowski, mazowieckie)",
+     "lat": 52.4138,
+     "lon": 21.7862,
+     "note_pl": "Szczątki Gerbery (Rabiany/Sewerynów)."
+    },
+    {
+     "type": "crash",
+     "place": "Oleśno (gm. Gronowo Elbląskie, pow. elbląski, warmińsko-mazurskie)",
+     "lat": 54.0791,
+     "lon": 19.2865,
+     "note_pl": "Gerbera; najdalej na północny zachód, tuż przy granicy z obwodem królewieckim."
+    },
+    {
+     "type": "crash",
+     "place": "Czyżów (gm. Stopnica, pow. buski, świętokrzyskie)",
+     "lat": 50.4832,
+     "lon": 20.9985,
+     "note_pl": "Gerbera (MSWiA)."
+    },
+    {
+     "type": "crash",
+     "place": "Smyków (gm. Raków, pow. kielecki, świętokrzyskie)",
+     "lat": 50.7122,
+     "lon": 20.893,
+     "note_pl": "Szczątki niezidentyfikowane (MSWiA)."
+    },
+    {
+     "type": "crash",
+     "place": "Sobótka (gm. Ożarów, pow. opatowski, świętokrzyskie)",
+     "lat": 50.7951,
+     "lon": 21.6826,
+     "note_pl": "Gerbera (MSWiA)."
+    },
+    {
+     "type": "debris",
+     "place": "Sulmice (gm. Skierbieszów, pow. zamojski)",
+     "lat": 50.872,
+     "lon": 23.311,
+     "note_pl": "Dron znaleziony w lesie 21.09.2025 (TVP World)."
+    },
+    {
+     "type": "debris",
+     "place": "Wodynie (gm. Wodynie, pow. siedlecki)",
+     "lat": 52.0405,
+     "lon": 21.9562,
+     "note_pl": "Szczątki drona znalezione przez grzybiarzy 21.09.2025 (TVP World)."
+    },
+    {
+     "type": "debris",
+     "place": "Korsze (gm. Korsze, pow. kętrzyński)",
+     "lat": 54.1707,
+     "lon": 21.1442,
+     "note_pl": "Styropianowy dron na bagnie, znaleziony 20.09.2025; prawdopodobnie ostatni z nocy 9/10.09 (TVP World)."
+    }
+   ],
+   "route_note_pl": "Dla każdego drona podano tylko punkt końcowy (miejsce znalezienia) z MSWiA; punkt startu i kraj wlotu są wnioskiem z geometrii, nie danymi oficjalnymi (oficjalnie: znaczna część z Białorusi, reszta znad Ukrainy). Ślady radarowe nie zostały opublikowane. Liczba 19 naruszeń jest od premiera, a pozycji z listy MSWiA jest 17.",
+   "sources": [
+    {
+     "title": "Komunikat ws. sytuacji dotyczącej naruszenia polskiej przestrzeni powietrznej przez rosyjskie drony - podsumowanie dnia",
+     "publisher": "MSWiA (gov.pl)",
+     "url": "https://www.gov.pl/web/mswia/komunikat-ws-sytuacji-dotyczacej-naruszenia-polskiej-przestrzeni-powietrznej-przez-rosyjskie-drony-podsumowanie-dnia",
+     "date": "2025-09-10"
+    },
+    {
+     "title": "Dowództwo Operacyjne RSZ na X (@DowOperSZ)",
+     "publisher": "Dowództwo Operacyjne RSZ",
+     "url": "https://x.com/DowOperSZ/status/1967964049133428873",
+     "date": "2025-09-15"
+    },
+    {
+     "title": "Sytuacja bezpieczeństwa przestrzeni powietrznej. Jest komunikat Dowództwa Operacyjnego",
+     "publisher": "PAP",
+     "url": "https://www.pap.pl/aktualnosci/dowodztwo-operacyjne-bezpieczenstwo-polskiej-przestrzeni-powietrznej",
+     "date": "2025-09-10"
+    },
+    {
+     "title": "Wielokrotne naruszenie polskiej przestrzeni powietrznej. Donald Tusk: Użyto uzbrojenia",
+     "publisher": "Rzeczpospolita",
+     "url": "https://www.rp.pl/konflikty-zbrojne/art42986481-wielokrotne-naruszenie-polskiej-przestrzeni-powietrznej-donald-tusk-uzyto-uzbrojenia-akt-agresji",
+     "date": "2025-09-10"
+    },
+    {
+     "title": "Tu spadły rosyjskie drony w Polsce. Lista miejscowości i województw",
+     "publisher": "Forsal.pl",
+     "url": "https://forsal.pl/kraj/bezpieczenstwo/artykuly/9885018,gdzie-spadly-rosyjskie-drony-w-polsce-aktualna-lista-miejscowosci-mapa.html",
+     "date": "2025-09-11"
+    },
+    {
+     "title": "Rosyjskie drony nad Polską. Spadły w trzech województwach [MAPA]",
+     "publisher": "Polsat News",
+     "url": "https://www.polsatnews.pl/wiadomosc/2025-09-10/to-tu-spadaly-zestrzelone-rosyjskie-drony-mapa/",
+     "date": "2025-09-10"
+    },
+    {
+     "title": "Podsumowanie sytuacji naruszeń polskiej granicy przez rosyjskie drony z 9/10 września 2025",
+     "publisher": "Świat Dronów",
+     "url": "https://www.swiatdronow.pl/podsumowanie-sytuacji-naruszen-polskiej-granicy-przez-rosyjskie-drony-z-9-10-wrzesnia-2025",
+     "date": "2025-09-15"
+    }
+   ]
+  },
+  {
+   "id": "2026-05-09-osieka-bartoszyce",
+   "date": "2026-05-09",
+   "time_local": null,
+   "title_pl": "Rosyjski dron rozpoznawczy znaleziony koło Bartoszyc (Osieka/Osęka)",
+   "summary_pl": "W sobotę 9.05.2026 (wg części źródeł 8.05) na polu pod wsią Osieka (Osęka) koło Bartoszyc znaleziono wojskowego drona rozpoznawczego z cyrylicą i kamerami, bez cech bojowych, ok. 20 km od granicy z obwodem królewieckim. Żandarmeria Wojskowa i prokuratura w Olsztynie uznały, że dron nielegalnie przekroczył granicę polsko-rosyjską.",
+   "weapons": [
+    {
+     "kind": "drone",
+     "label_pl": "rosyjski dron rozpoznawczy (typ nieujawniony), bez ładunku bojowego",
+     "count": 1,
+     "from": "Russia-Kaliningrad",
+     "path": [
+      [
+       54.45,
+       20.25
+      ],
+      [
+       54.36,
+       20.55
+      ],
+      [
+       54.2113,
+       20.7847
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Osieka/Osęka (gm. Bartoszyce, pow. bartoszycki)",
+      "lat": 54.2113,
+      "lon": 20.7847
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "crash",
+     "place": "Osieka/Osęka (gm. Bartoszyce, pow. bartoszycki)",
+     "lat": 54.2113,
+     "lon": 20.7847,
+     "note_pl": "Znaleziony na polu rzepaku; nieuzbrojony, bez zagrożenia."
+    }
+   ],
+   "route_note_pl": "Trasa schematyczna z Obwodu Królewieckiego; dron przeleciał niewykryty przez radary.",
+   "sources": [
+    {
+     "title": "Bartoszyce, dron spadł w Polsce. Niedaleko granicy z Rosją",
+     "publisher": "Polsat News",
+     "url": "https://www.polsatnews.pl/wiadomosc/2026-05-09/dron-blisko-granicy-z-rosja-trwa-akcja-sluzb/",
+     "date": "2026-05-09"
+    },
+    {
+     "title": "Niezidentyfikowany dron znaleziony w pobliżu granicy z Rosją",
+     "publisher": "Defence24",
+     "url": "https://defence24.pl/sily-zbrojne/niezidentyfikowany-dron-znaleziony-w-poblizu-granicy-z-rosja",
+     "date": "2026-05-09"
+    },
+    {
+     "title": "Bartoszyce. Dron przy granicy z Rosją. Akcja służb",
+     "publisher": "Interia",
+     "url": "https://wydarzenia.interia.pl/kraj/news-prawdopodobnie-dron-pochodzenia-wojskowego-niedaleko-granicy,nId,23475156",
+     "date": "2026-05-09"
+    },
+    {
+     "title": "Russian Drone Found in Poland Identified as Reconnaissance UAV",
+     "publisher": "Militarnyi",
+     "url": "https://militarnyi.com/en/news/russian-drone-found-in-poland-identified-as-reconnaissance-uav/",
+     "date": "2026-05-13"
+    }
+   ]
+  },
+  {
+   "id": "2026-07-30-tarnawa-kolonia",
+   "date": "2026-07-30",
+   "time_local": "03:46",
+   "title_pl": "Rakieta Ch-101 wybuchła pod Tarnawą-Kolonią",
+   "summary_pl": "W nocy z 29 na 30.07.2026, podczas zmasowanego ataku na zachodnią Ukrainę, o 3:40 radary wykryły w polskiej przestrzeni obiekt lecący na zachód; o 3:46 zniknął z radarów, zanim F-16 zdążył go zidentyfikować. Obiekt spadł i wybuchł ok. 2 km od Tarnawy-Kolonii (gm. Turobin), tworząc lej o średnicy ok. 10 m; prokuratura potwierdziła rosyjską rakietę Ch-101 z dużą ilością materiału wybuchowego (wyprodukowaną w II kw. 2026). Wcześniej inna rakieta zbliżyła się do granicy i zawróciła.",
+   "weapons": [
+    {
+     "kind": "missile",
+     "label_pl": "rosyjska rakieta manewrująca Ch-101",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.9,
+       24.55
+      ],
+      [
+       50.83,
+       23.95
+      ],
+      [
+       50.8524,
+       22.6528
+      ]
+     ],
+     "end": {
+      "type": "explosion",
+      "place": "ok. 2 km od Tarnawy-Kolonii (gm. Turobin, pow. biłgorajski)",
+      "lat": 50.8524,
+      "lon": 22.6528
+     }
+    }
+   ],
+   "points": [
+    {
+     "type": "explosion",
+     "place": "Tarnawa-Kolonia (gm. Turobin, pow. biłgorajski)",
+     "lat": 50.8524,
+     "lon": 22.6528,
+     "note_pl": "Lej ok. 10 m szer. i ok. 5 m głęb.; współrzędne wsi, dokładne miejsce uderzenia ok. 2 km od niej, bez publikacji współrzędnych."
+    }
+   ],
+   "route_note_pl": "DORSZ: obiekt w polskiej przestrzeni od 3:40, zanik 3:46 (ok. 80-90 km w linii prostej od granicy, kierunek zachodni); dokładny punkt wlotu nie został podany, więc wlot przy Hrubieszowie jest szacunkiem.",
+   "sources": [
+    {
+     "title": "Tarnawa-Kolonia. Generał tłumaczy dlaczego wojsko nie strzelało do obiektu",
+     "publisher": "Interia",
+     "url": "https://wydarzenia.interia.pl/kraj/news-dlaczego-wojsko-nie-zestrzelilo-obiektu-ze-wschodu-general-w,nId,23521857",
+     "date": "2026-07-30"
+    },
+    {
+     "title": "Rosyjska rakieta Ch-101 wybuchła pod Tarnawą-Kolonią. Reakcja Zełenskiego i ustalenia MON",
+     "publisher": "Dziennik Gazeta Prawna",
+     "url": "https://www.gazetaprawna.pl/wiadomosci/kraj/artykuly/11283136,rosyjska-rakieta-ch101-w-polsce-zelenski-apeluje-tomczyk-potwierdza-2026.html",
+     "date": "2026-07-30"
+    },
+    {
+     "title": "Tarnawa-Kolonia: prokuratorzy zakończyli prace w miejscu upadku rakiety",
+     "publisher": "Radio Lublin",
+     "url": "https://radio.lublin.pl/2026/07/tarnawa-kolonia-prokuratorzy-zakonczyli-prace-w-miejscu-upadku-rakiety/",
+     "date": "2026-07"
+    },
+    {
+     "title": "Jest nagranie z uderzenia w Tarnawie-Kolonii. To prawdopodobnie rosyjska rakieta Ch-101",
+     "publisher": "RMF24",
+     "url": "https://www.rmf24.pl/regiony/lublin/news-jest-nagranie-z-uderzenia-w-tarnawie-kolonii-to-prawdopodobn,nIdn,1011927",
+     "date": "2026-07-30"
+    },
+    {
+     "title": "Missile that left crater deep inside Poland was probably Russian - Polish PM",
+     "publisher": "BBC",
+     "url": "https://www.bbc.com/news/articles/cwymkgenv2ro",
+     "date": "2026-07-30"
+    }
+   ]
+  },
+  {
+   "id": "2026-11-20-nowy-lipowiec",
+   "date": "2026-11-20",
+   "time_local": "06:36",
+   "title_pl": "Dwie rakiety i dron odrzutowy na Lubelszczyźnie i Podkarpaciu",
+   "summary_pl": "W nocy z 19 na 20 listopada Rosja przeprowadziła jeden z największych ataków na Ukrainę: 26 Kalibrów, 72 rakiety Ch-101 i 503 drony. Do granicy zbliżyło się 11 obiektów, trzy weszły w polską przestrzeń powietrzną i spadły. Rakieta Ch-101 spadła na pole w Nowym Lipowcu, druga rakieta prawdopodobnie koło Rudnika nad Sanem, a szczątki prawdopodobnie drona odrzutowego znaleziono w Mołodyczu. Nikt nie został ranny.",
+   "weapons": [
+    {
+     "kind": "missile",
+     "label_pl": "rakieta manewrująca Ch-101",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.18,
+       24.05
+      ],
+      [
+       50.3,
+       23.45
+      ],
+      [
+       50.4403,
+       22.8375
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "Nowy Lipowiec (gm. Księżpol, pow. biłgorajski)",
+      "lat": 50.4403,
+      "lon": 22.8375
+     }
+    },
+    {
+     "kind": "missile",
+     "label_pl": "rakieta (prawdopodobnie)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       50.12,
+       23.95
+      ],
+      [
+       50.28,
+       23.2
+      ],
+      [
+       50.4448,
+       22.244
+      ]
+     ],
+     "end": {
+      "type": "crash",
+      "place": "okolice Rudnika nad Sanem (pow. niżański)",
+      "lat": 50.4448,
+      "lon": 22.244
+     }
+    },
+    {
+     "kind": "drone",
+     "label_pl": "dron odrzutowy (prawdopodobnie)",
+     "count": 1,
+     "from": "Ukraine",
+     "path": [
+      [
+       49.98,
+       23.7
+      ],
+      [
+       50.08,
+       23.15
+      ],
+      [
+       50.1585,
+       22.8318
+      ]
+     ],
+     "end": {
+      "type": "debris",
+      "place": "Mołodycz (gm. Wiązownica, pow. jarosławski)",
+      "lat": 50.1585,
+      "lon": 22.8318
+     }
+    }
+   ],
+   "points": [],
+   "route_note_pl": "Trasy orientacyjne: wojsko podało tylko, że obiekty weszły w przestrzeń RP znad Ukrainy, oraz miejsca upadku. Rudnik nad Sanem i dron w Mołodyczu to wstępne ustalenia ministra obrony; prokuratura 20.11 potwierdziła upadek w Nowym Lipowcu.",
+   "sources": [
+    {
+     "title": "Dwie rakiety i dron. Kosiniak-Kamysz zdradza, co spadło na terytorium Polski",
+     "publisher": "Rzeczpospolita",
+     "url": "https://www.rp.pl/konflikty-zbrojne/art45519451-kosiniak-kamysz-na-terytorium-polski-spadly-dwie-rakiety-i-dron",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Naruszenie polskiej przestrzeni powietrznej i upadek niezidentyfikowanego obiektu w powiecie biłgorajskim",
+     "publisher": "PAP / Portal Obronny",
+     "url": "https://portalobronny.se.pl/aktualnosci/naruszenie-polskiej-przestrzeni-powietrznej-i-upadek-niezidentyfikowanego-obiektu-sluzby-w-akcji-po-alarmie-w-powiecie-bilgorajskim-aa-4uiz-m12n-PBiB.html",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Rakieta manewrująca czy dron odrzutowy? Służby pracują w trzech miejscach",
+     "publisher": "PAP / misyjne.pl",
+     "url": "https://misyjne.pl/rakieta-manewrujaca-czy-dron-odrzutowy-sluzby-pracuja-w-trzech-miejscach-premier-zwoluje-narade-galeria/",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Na teren Polski spadły rosyjskie rakiety",
+     "publisher": "wnp.pl",
+     "url": "https://www.wnp.pl/polityka-i-sondaze/na-teren-polski-spadly-rosyjskie-rakiety-to-byl-jeden-z-najwiekszych-atakow-od-poczatku-wojny,1121870.html",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Podejrzenie naruszenia przestrzeni powietrznej Polski. Komunikat dowództwa (DORSZ 7:07)",
+     "publisher": "TVN24",
+     "url": "https://tvn24.pl/polska/podejrzenie-naruszenia-przestrzeni-powietrznej-polski-komunikat-dowodztwa-st9348327",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Naruszenie przestrzeni powietrznej RP. Rosyjski dron i rakiety spadły w miejscowościach: Nowy Lipowiec, Rudnik nad Sanem i Mołodycz",
+     "publisher": "RMF24",
+     "url": "https://www.rmf24.pl/regiony/news-naruszenie-przestrzeni-powietrznej-rp-rosyjski-dron-i-rakiet,nIdn,1026906",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Naruszenie przestrzeni powietrznej Polski. Co dotychczas wiadomo (chronologia)",
+     "publisher": "Rzeczpospolita",
+     "url": "https://rp.pl/konflikty-zbrojne/art45519291-polska-przestrzen-powietrzna-naruszona-trwa-sprawdzanie-kolejnych-doniesien",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Co spadło na Lubelszczyźnie? Ważne słowa dowódcy operacyjnego (gen. Nowak)",
+     "publisher": "Wirtualna Polska",
+     "url": "https://wiadomosci.wp.pl/co-spadlo-na-lubelszczyznie-wazne-slowa-dowodcy-operacyjnego-7353058595248160v",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Rzecznik DORSZ o obiekcie, który spadł na Lubelszczyźnie",
+     "publisher": "PAP",
+     "url": "https://www.pap.pl/aktualnosci/rzecznik-dorsz-o-obiekcie-ktory-spadl-na-lubelszczyznie-rakieta-manewrujaca-albo-dron",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "RCB odwołało alert. W Lublinie zawyły syreny",
+     "publisher": "PAP",
+     "url": "https://www.pap.pl/aktualnosci/rcb-odwolalo-alert-w-lublinie-zawyly-syreny",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Alert RCB dla Lubelszczyzny i Podkarpacia. Zagrożenie atakiem z powietrza",
+     "publisher": "Polsat News",
+     "url": "https://www.polsatnews.pl/wiadomosc/2026-11-20/podniesiono-gotowosc-nocny-alert-rcb-wojsko-poderwalo-mysliwce/",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Rosyjska rakieta Ch-101 w Polsce. Prokuratura ma nowe informacje",
+     "publisher": "Polsat News",
+     "url": "https://www.polsatnews.pl/wiadomosc/2026-11-21/rakieta-w-nowym-lipowcu-prokuratura-ma-kolejne-informacje-czwarty-kwartal-roku/",
+     "date": "2026-11-21"
+    },
+    {
+     "title": "Two Russian missiles and a drone hit Poland",
+     "publisher": "Notes from Poland",
+     "url": "https://notesfrompoland.com/2026/11/20/unidentified-object-hits-poland-amid-russian-attacks-on-western-ukraine/",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Poland condemns Russian airspace 'provocation'",
+     "publisher": "RTE (Reuters)",
+     "url": "https://www.rte.ie/news/2026/1120/1600008-poland-russia-airspace-violations/",
+     "date": "2026-11-20"
+    }
+   ]
+  }
+ ]
+}
