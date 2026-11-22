@@ -34,9 +34,12 @@ Rules:
 - Every parser change comes with a test on a saved page.
 - Never edit `docs/data/` by hand: the Update data workflow owns it.
 - Agent PRs carry the `agent` label. No human reviews them: the `pr-reviewer` agent judges each
-  head (value, size, risk) and writes `Verdict: approve|reject` with a reason; the Agent PR gate
-  merges a PR only when tests, a live parse and that approve hold, and otherwise closes it with the
-  reason and sends its issue back to the issue-worker. Keep PRs small and focused, with a test.
+  head (value, size, risk) and writes `Verdict: approve|changes|reject` with a reason; the Agent PR
+  gate merges a PR only when tests, a live parse, a clean merge and that approve hold. A failing
+  check, a stray path, a conflict or `changes` goes to the `pr-fixer` agent, which fixes the PR in
+  its own branch (three attempts). The gate closes a PR only after `reject` (wrong on substance),
+  the fixer's `no fix`, or three failed attempts, and sends its issue back to the issue-worker.
+  Keep PRs small and focused, with a test.
   Touch only the paths your workflow allows.
 - Alert categories: air, drill, water, weather, ordnance, fire, chemical, other.
   An alert is `active` until an update says it ended or its category TTL passes.

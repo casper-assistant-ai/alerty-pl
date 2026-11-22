@@ -2,14 +2,18 @@ name: Agent PR gate
 
 # No humans in the loop: agent PRs are merged or closed by this gate, never left for a person.
 # A PR is merged only when (1) a gh-aw agent opened it, (2) it touches allowed paths only,
-# (3) unit tests, a live parse of gov.pl and node --check pass on its head, and (4) the PR reviewer
-# agent approved that same head. Otherwise the gate closes it with the reason, tells its linked
-# issues, and starts the issue-worker, which takes them again (and gives up after two rejections).
+# (3) unit tests, a live parse of gov.pl and node --check pass on its head, (4) it merges into main
+# cleanly, and (5) the PR reviewer agent approved that same head. When (2), (3) or (4) fails, or the
+# reviewer says "Verdict: changes", the gate asks the PR fixer agent to fix the PR in its own branch
+# ("Agent PR gate: fix attempt k of 3", with the reason and the test log) and tests the new head
+# again. It closes a PR only when the reviewer rejects it on substance, the fixer finds it cannot be
+# fixed, or three fix attempts did not help; then it tells the linked issues and starts the
+# issue-worker, which takes them again (and gives up after two closed PRs).
 on:
   schedule:
     - cron: "17,47 * * * *"
   workflow_run:
-    workflows: ["PR reviewer"]
+    workflows: ["PR reviewer", "PR fixer"]
     types: [completed]
   workflow_dispatch:
 
@@ -38,7 +42,10 @@ jobs:
           set -u
           git config user.name "alerty-pl bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          need_review=0; requeue=0
+          MAX_FIX=3
+          need_review=0; requeue=0; need_fix=0
+          fixer_busy=$(gh run list --workflow pr-fixer.lock.yml --limit 10 --json status --jq '[.[] | select(.status != "completed")] | length')
+          bot='.user.login=="github-actions[bot]"'
           close_pr() {  # $1: the reason, quoted on the PR and on its linked issues
             local closes
             closes=$(gh pr view "$n" --json closingIssuesReferences --jq '.closingIssuesReferences[].number')
@@ -48,6 +55,30 @@ jobs:
             done
             requeue=1
           }
+          request_fix() {  # $1: the reason; $2: a log file whose end goes into the request
+            local k body
+            if [ "$nofix" -gt 0 ]; then
+              close_pr "$1 The PR fixer found it cannot be fixed in this branch: ${nofix_cause:-see its comment}"; return
+            fi
+            if [ "$attempts" -ge "$MAX_FIX" ]; then
+              close_pr "$1 It still fails after $MAX_FIX fix attempts by the PR fixer."; return
+            fi
+            k=$((attempts + 1))
+            body="/tmp/fix-$n.md"
+            { echo "Agent PR gate: fix attempt $k of $MAX_FIX"
+              echo "Fix-Head: $sha"
+              echo
+              echo "Reason: $1"
+              echo
+              echo "The PR fixer agent fixes this in the PR's own branch; the gate then tests the new head again."
+              if [ -n "${2:-}" ] && [ -s "$2" ]; then
+                echo; echo "<details><summary>end of the log</summary>"; echo; echo '```text'
+                tail -n 60 "$2" | sed 's/```/` ` `/g'; echo '```'; echo; echo "</details>"
+              fi
+            } > "$body"
+            gh pr comment "$n" --body-file "$body" && echo "fix attempt $k requested for #$n: $1"
+            need_fix=1
+          }
           prs=$(gh pr list --state open --label agent --json number,author,isDraft \
                 --jq '.[] | select(.author.login=="app/github-actions" or .author.login=="github-actions") | .number')
           for n in $prs; do
@@ -55,33 +86,56 @@ jobs:
             gh pr ready "$n" 2>/dev/null || true
             # CI on a PR by github-actions[bot] waits for an approval; nobody else gives it
             sha=$(gh pr view "$n" --json headRefOid --jq .headRefOid)
+            gh api "repos/$GITHUB_REPOSITORY/issues/$n/comments" --paginate > "/tmp/comments-$n.json"
+            # fix attempts so far, and the requests and fixer answers for this exact head
+            attempts=$(jq -s "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: fix attempt\")))) | length" "/tmp/comments-$n.json")
+            asked=$(jq -s --arg sha "$sha" "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: fix attempt\")) and (.body | test(\"(?m)^Fix-Head: *\" + \$sha)))) | length" "/tmp/comments-$n.json")
+            asked_at=$(jq -rs --arg sha "$sha" "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: fix attempt\")) and (.body | test(\"(?m)^Fix-Head: *\" + \$sha)))) | last | .created_at // \"\"" "/tmp/comments-$n.json")
+            answers=$(jq -s --arg sha "$sha" "add // [] | map(select($bot and (.body | contains(\"workflow_id: pr-fixer\")) and (.body | test(\"(?m)^Head: *\" + \$sha)))) | length" "/tmp/comments-$n.json")
+            jq -rs --arg sha "$sha" "add // [] | map(select($bot and (.body | contains(\"workflow_id: pr-fixer\")) and (.body | test(\"(?m)^Head: *\" + \$sha)) and (.body | test(\"(?m)^PR fixer: no fix\")))) | last | .body // \"\"" "/tmp/comments-$n.json" | tr -d '\r' > "/tmp/nofix-$n.txt"
+            nofix=$(grep -c '^PR fixer: no fix' "/tmp/nofix-$n.txt" || true)
+            nofix_cause=$(sed -nE 's/^Cause: *//p' "/tmp/nofix-$n.txt" | head -1)
+            if [ "$asked" -gt "$answers" ] && [ "$nofix" = 0 ]; then
+              # a fix was asked for this head and the fixer has not answered: wait for it, unless
+              # it is idle and the request is over three hours old (then that attempt failed)
+              age=$(( $(date +%s) - $(date -d "$asked_at" +%s) ))
+              if [ "${fixer_busy:-0}" != 0 ] || [ "$age" -lt 10800 ]; then
+                echo "waiting for the PR fixer on $sha (attempt $attempts of $MAX_FIX)"
+                need_fix=1
+                echo "::endgroup::"; continue
+              fi
+            fi
             for r in $(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$sha&status=action_required" --jq '.workflow_runs[].id'); do
               gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$r/approve" >/dev/null && echo "approved CI run $r"
             done
             files=$(gh pr diff "$n" --name-only)
             bad=$(echo "$files" | grep -Ev "$ALLOWED" || true)
             if [ -n "$bad" ]; then
-              close_pr "It changes files outside the allowed paths: $(echo $bad)."
+              request_fix "It changes files outside the allowed paths: $(echo $bad). Revert them."
               echo "::endgroup::"; continue
             fi
             git checkout -q --detach
             gh pr checkout "$n" --force
-            ok=1
-            python3 -I -m unittest discover -s tests || ok=0
-            python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n || ok=0
-            for js in docs/*.js; do node --check "$js" || ok=0; done
+            ok=1; log="/tmp/gate-log-$n.txt"; : > "$log"
+            { python3 -I -m unittest discover -s tests 2>&1 || { ok=0; echo "FAILED: unit tests"; }; } | tee -a "$log"
+            { python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n 2>&1 || { ok=0; echo "FAILED: live parse of gov.pl"; }; } | tee -a "$log"
+            for js in docs/*.js; do { node --check "$js" 2>&1 || { ok=0; echo "FAILED: node --check $js"; }; } | tee -a "$log"; done
+            grep -q '^FAILED: ' "$log" && ok=0
             git checkout -q main
             if [ "$ok" != 1 ]; then
-              close_pr "Unit tests, the live parse of gov.pl or node --check failed on $sha (see this gate run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)."
+              request_fix "$(grep '^FAILED: ' "$log" | sed 's/^FAILED: //' | paste -sd, - | sed 's/,/, /g') failed on $sha (gate run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)." "$log"
+              echo "::endgroup::"; continue
+            fi
+            if [ "$(gh pr view "$n" --json mergeable --jq .mergeable)" = CONFLICTING ]; then
+              request_fix "It conflicts with main: merge origin/main into the branch and resolve the conflict."
               echo "::endgroup::"; continue
             fi
             # the PR reviewer's verdict on this exact head (its comments carry gh-aw's workflow_id footer)
-            gh api "repos/$GITHUB_REPOSITORY/issues/$n/comments" --paginate > "/tmp/comments-$n.json"
             jq -rs --arg sha "$sha" 'add // [] | map(select(.user.login=="github-actions[bot]"
                   and (.body | contains("workflow_id: pr-reviewer"))
                   and (.body | test("(?m)^Head: *" + $sha)))) | last | .body // ""' "/tmp/comments-$n.json" \
               | tr -d '\r' > "/tmp/verdict-$n.txt"
-            verdict=$(sed -nE 's/^Verdict: *(approve|reject).*/\1/p' "/tmp/verdict-$n.txt" | head -1)
+            verdict=$(sed -nE 's/^Verdict: *(approve|changes|reject).*/\1/p' "/tmp/verdict-$n.txt" | head -1)
             reason=$(sed -nE 's/^Reason: *//p' "/tmp/verdict-$n.txt" | head -1)
             if [ -z "$verdict" ]; then
               echo "tests pass; no reviewer verdict for $sha yet"
@@ -89,7 +143,11 @@ jobs:
               echo "::endgroup::"; continue
             fi
             if [ "$verdict" = reject ]; then
-              close_pr "The PR reviewer rejected it: ${reason:-see its comment}"
+              close_pr "The PR reviewer rejected it on substance: ${reason:-see its comment}"
+              echo "::endgroup::"; continue
+            fi
+            if [ "$verdict" = changes ]; then
+              request_fix "The PR reviewer asked for changes: ${reason:-see its comment}"
               echo "::endgroup::"; continue
             fi
             # the squash commit lands on main, so its subject must be a Conventional Commit
@@ -122,6 +180,13 @@ jobs:
               gh workflow run pr-reviewer.lock.yml && echo "started the PR reviewer"
             else
               echo "the PR reviewer is already running"
+            fi
+          fi
+          if [ "$need_fix" = 1 ]; then
+            if [ "${fixer_busy:-0}" = 0 ]; then
+              gh workflow run pr-fixer.lock.yml && echo "started the PR fixer"
+            else
+              echo "the PR fixer is already running; its end starts this gate again"
             fi
           fi
           if [ "$requeue" = 1 ]; then
