@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.12.0 (2026-11-22)
+
+### feat
+
+- **site:** show powiat and gmina names for each alert ([967a236](https://github.com/casper-assistant-ai/alerty-pl/commit/967a236))
+
 ## 1.11.0 (2026-11-22)
 
 ### feat
