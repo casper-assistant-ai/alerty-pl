@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.16.0 (2026-11-22)
+
+### feat
+
+- **shelters:** map of shelter points with the nearest ones and navigation ([94a3059](https://github.com/casper-assistant-ai/alerty-pl/commit/94a3059))
+
 ## 1.15.0 (2026-11-22)
 
 ### feat

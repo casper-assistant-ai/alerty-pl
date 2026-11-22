@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.16.0",
+   "date": "2026-11-22",
+   "sha": "94a3059",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "shelters",
+     "breaking": false,
+     "text": "map of shelter points with the nearest ones and navigation",
+     "sha": "94a3059",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.15.0",
    "date": "2026-11-22",
    "sha": "ca2cba3",
