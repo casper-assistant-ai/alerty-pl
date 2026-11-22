@@ -132,7 +132,16 @@ jobs:
               request_fix "$(grep '^FAILED: ' "$log" | sed 's/^FAILED: //' | paste -sd, - | sed 's/,/, /g') failed on $sha (gate run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)." "$log"
               echo "::endgroup::"; continue
             fi
-            if [ "$(gh pr view "$n" --json mergeable --jq .mergeable)" = CONFLICTING ]; then
+            mergeable() {  # GitHub computes it lazily: ask again while it says UNKNOWN
+              local m
+              for _ in 1 2 3 4 5 6; do
+                m=$(gh pr view "$n" --json mergeable --jq .mergeable)
+                [ "$m" != UNKNOWN ] && break
+                sleep 5
+              done
+              echo "$m"
+            }
+            if [ "$(mergeable)" = CONFLICTING ]; then
               request_fix "It conflicts with main: merge origin/main into the branch and resolve the conflict."
               echo "::endgroup::"; continue
             fi
@@ -177,6 +186,10 @@ jobs:
               for i in $closes; do
                 gh issue close "$i" --reason completed --comment "Fixed by #$n, merged by the Agent PR gate." && echo "closed #$i"
               done
+            elif [ "$(mergeable)" = CONFLICTING ]; then
+              request_fix "It conflicts with main: merge origin/main into the branch and resolve the conflict."
+            else
+              echo "merge of #$n failed; the next round tries again"
             fi
             echo "::endgroup::"
           done
