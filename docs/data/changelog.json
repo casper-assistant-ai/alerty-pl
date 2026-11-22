@@ -15,6 +15,53 @@
  },
  "releases": [
   {
+   "version": "1.13.1",
+   "date": "2026-11-22",
+   "sha": "83e04d6",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "retro 2026-11-22, dev share 70% (#26)",
+     "sha": "83e04d6",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "the PR gate sends a conflicting PR to the fixer",
+     "sha": "3a4fc42",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "test",
+     "scope": "site",
+     "breaking": false,
+     "text": "cover the common.js date and category helpers with node (#22)",
+     "sha": "7bf415c",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "the PR reviewer rejects behaviour-free churn even when an issue asks for it",
+     "sha": "9ae99f9",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "the PR gate waits for the reviewer and fixer it starts",
+     "sha": "75d0e41",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.13.0",
    "date": "2026-11-22",
    "sha": "29d36d3",
