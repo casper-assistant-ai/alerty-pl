@@ -1,9 +1,11 @@
 name: Update data
 
-# Every 10 minutes: read gov.pl/web/rcb/komunikaty, rebuild docs/data, deploy the site.
+# Every 30 minutes: read gov.pl/web/rcb/komunikaty, rebuild docs/data (archive, history, analytics), deploy the site.
+# Live alerts no longer wait for this: the live service (server/, casper-infra deploy/alerty-api) polls gov.pl every
+# 20 s and streams them to open pages, Telegram, e-mail and Web Push. docs/data stays the fallback and the archive.
 on:
   schedule:
-    - cron: "*/10 * * * *"
+    - cron: "*/30 * * * *"
   workflow_dispatch:
   push:
     branches: [main]
