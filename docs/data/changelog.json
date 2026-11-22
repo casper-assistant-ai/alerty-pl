@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.17.4",
+   "date": "2026-11-23",
+   "sha": "8103aa7",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "mobile-audit",
+     "breaking": false,
+     "text": "stop the click round when a button leaves the page",
+     "sha": "8103aa7",
+     "date": "2026-11-23"
+    }
+   ]
+  },
+  {
    "version": "1.17.3",
    "date": "2026-11-23",
    "sha": "c8f4d4e",
