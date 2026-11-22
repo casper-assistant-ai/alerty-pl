@@ -15,7 +15,16 @@
     explosion: "wybuch", crash: "upadek", shotdown: "zestrzelenie", debris: "szczątki",
     left_airspace: "opuścił przestrzeń RP", not_found: "nie odnaleziono",
   };
-  const FROM = { Ukraine: "z Ukrainy", Belarus: "z Białorusi", "Russia-Kaliningrad": "z obwodu królewieckiego", Russia: "z Rosji" };
+  // from = the country that launched it, via = the country it flew over before Poland (never the other way round)
+  const FROM = { Russia: "z Rosji", "Russia-Kaliningrad": "z obwodu królewieckiego (Rosja)", Belarus: "z Białorusi" };
+  const VIA = { Ukraine: "nad Ukrainą", Belarus: "nad Białorusią" };
+  function origin(w) {
+    if (w.role === "air_defense") return "podczas rosyjskiego ataku";
+    const m = w.kind === "missile", out = [];
+    if (FROM[w.from]) out.push((m ? "odpalona " : "wystrzelony ") + FROM[w.from]);
+    if (VIA[w.via]) out.push((m ? "przeleciała " : "przeleciał ") + VIA[w.via]);
+    return out.join(", ");
+  }
 
   // icons point north (up); the flight turns them along the route
   const ICON = {
@@ -116,6 +125,8 @@
         const t = track(path);
         flights.push({ w, path, t, delay: slot * 450 + c * 250, dur: Math.min(8000, Math.max(3000, t.len * 5)), done: false,
           route: c ? null : L.polyline(w.path, { pane: "raid", className: "raid-route k-" + w.kind, interactive: false }).addTo(layer),
+          start: c || !w.launch ? null : L.circleMarker(w.path[0], { pane: "raid", radius: 5, weight: 2, color: "#b3122e", fillColor: "#fff", fillOpacity: 1, className: "raid-start" })
+            .bindTooltip(`Start: ${w.launch.area_pl}${w.launch.certain ? "" : " (miejsce umowne)"}`, { className: "tip", direction: "top" }).addTo(layer),
           trail: L.polyline([], { pane: "raid", className: "raid-trail k-" + w.kind, interactive: false }).addTo(layer),
           m: null, label: copies > 1 && c === copies - 1 && w.count > copies ? w.count : 0 });
       }
@@ -172,7 +183,7 @@
     const kinds = [...new Set((ev.weapons || []).map((w) => w.kind))];
     const weapons = (ev.weapons || []).map((w) => h("li", {},
       h("i", { class: "raid-sw k-" + w.kind, "aria-hidden": "true" }),
-      `${w.label_pl}${w.count > 1 ? " ×" + w.count : ""}${FROM[w.from] ? ", " + FROM[w.from] : ""}${w.end ? " → " + (END[w.end.type] || w.end.type) + (w.end.place ? " (" + w.end.place + ")" : "") : ""}`));
+      `${w.label_pl}${w.count > 1 ? " ×" + w.count : ""}${origin(w) ? ", " + origin(w) : ""}${w.end ? " → " + (END[w.end.type] || w.end.type) + (w.end.place ? " (" + w.end.place + ")" : "") : ""}`));
     const replay = h("button", { type: "button", class: "btn", text: still.matches ? "Pokaż" : "Odtwórz ponownie" });
     replay.addEventListener("click", () => play(ev));
     const others = list.length > 1 ? h("div", { class: "raid-pick" }, ...list.map((e) => {
