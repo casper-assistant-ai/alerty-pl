@@ -145,10 +145,12 @@ function heatMap(geo, byV) {
   $("#ramp-max").textContent = max;
 }
 
-function ranked(ul, items, fmt) {
+// each row can link to the history page with the matching filter already in the URL
+function ranked(ul, items, fmt, href) {
   const max = Math.max(1, ...items.map((i) => i.n));
   ul.replaceChildren(...items.map((i) => h("li", {},
-    h("span", { class: "name" }, i.cat ? swatch(i.cat) : null, h("span", { text: fmt(i) })),
+    h("span", { class: "name" }, i.cat ? swatch(i.cat) : null,
+      href ? h("a", { href: href(i), text: fmt(i) }) : h("span", { text: fmt(i) })),
     h("span", { class: "num", text: fmtN(i.n) }),
     h("span", { class: "track", "aria-hidden": "true" }, h("i", { style: `width:${(100 * i.n / max).toFixed(1)}%${i.cat ? `;--c:var(--${i.cat})` : ""}` })))));
   if (!items.length) ul.replaceChildren(h("li", { class: "muted", text: "Brak danych w tym okresie" }));
@@ -198,15 +200,15 @@ async function main() {
     timeChart(cur, p, now);
     const byV = countVoiv(cur.rows);
     heatMap(geo, byV);
-    ranked($("#c-voiv"), Object.entries(byV).sort((a, b) => b[1] - a[1]).map(([v, n]) => ({ v, n })), (i) => VOIV[i.v]);
+    ranked($("#c-voiv"), Object.entries(byV).sort((a, b) => b[1] - a[1]).map(([v, n]) => ({ v, n })), (i) => VOIV[i.v], (i) => "historia.html?voiv=" + i.v);
     const byC = {};
     for (const a of cur.rows) byC[a.category] = (byC[a.category] || 0) + 1;
-    ranked($("#c-cat"), Object.entries(byC).sort((a, b) => b[1] - a[1]).map(([cat, n]) => ({ cat, n })), (i) => CAT[i.cat]);
+    ranked($("#c-cat"), Object.entries(byC).sort((a, b) => b[1] - a[1]).map(([cat, n]) => ({ cat, n })), (i) => CAT[i.cat], (i) => "historia.html?cat=" + i.cat);
     const names = Object.fromEntries(geo.powiaty.map((p) => [p.id, (p.city ? "" : "pow. ") + p.name]));
     const byP = {};
     for (const a of cur.rows) for (const p of a.powiaty) byP[p] = (byP[p] || 0) + 1;
     ranked($("#c-pow"), Object.entries(byP).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([p, n]) => ({ p, n })),
-      (i) => `${names[i.p] || i.p} · ${VOIV[i.p.split("/")[0]]}`);
+      (i) => `${names[i.p] || i.p} · ${VOIV[i.p.split("/")[0]]}`, (i) => "historia.html?powiat=" + encodeURIComponent(i.p));
     hourChart(cur);
     $("#span-note").textContent = `Ile Alertów RCB wysłano, gdzie i o jakiej porze. Archiwum: ${fmtN(all.length)} alertów od ${fmtDay(new Date(all[all.length - 1].started_at))}.`;
   }
