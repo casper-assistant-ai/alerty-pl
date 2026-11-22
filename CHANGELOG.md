@@ -2,7 +2,15 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.17.2 (2026-11-22)
+
+### fix
+
+- **shelters:** say where to unblock location when the phone does not ask ([74fa73a](https://github.com/casper-assistant-ai/alerty-pl/commit/74fa73a))
+
+### test
+
+- **parser:** cover the chemical and other categories (#33) ([9a0605e](https://github.com/casper-assistant-ai/alerty-pl/commit/9a0605e))
 
 ### ci
 
