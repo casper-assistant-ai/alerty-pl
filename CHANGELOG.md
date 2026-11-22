@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.17.4 (2026-11-23)
+
+### fix
+
+- **mobile-audit:** stop the click round when a button leaves the page ([8103aa7](https://github.com/casper-assistant-ai/alerty-pl/commit/8103aa7))
+
 ## 1.17.3 (2026-11-23)
 
 ### fix
