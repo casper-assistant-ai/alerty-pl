@@ -6,9 +6,9 @@ import assert from "node:assert/strict";
 
 // docs/common.js is a plain script: an IIFE over `const RCB` that looks up #ver on load.
 // Evaluate it with a document stub whose querySelector answers null, then return RCB.
-const load = () => {
+const load = (doc = { querySelector: () => null }) => {
   const source = readFileSync(new URL("../docs/common.js", import.meta.url), "utf8");
-  return new Function("document", `${source}\n;return RCB;`)({ querySelector: () => null });
+  return new Function("document", `${source}\n;return RCB;`)(doc);
 };
 const RCB = load();
 
@@ -58,4 +58,35 @@ test("plural picks the Polish form for one, a few and many", () => {
   assert.equal(f(12), "alertów"); // 12–14 take the many form like 5–21, despite ending in 2–4
   assert.equal(f(22), "alerty");
   assert.equal(f(25), "alertów");
+});
+
+// a document stub for the leaflet() retry path: records the script tag it appends
+const retryDoc = (scripts) => ({
+  querySelector: () => null,
+  createElement: () => ({ src: "", onload: null, onerror: null, remove() {} }),
+  head: { append: (s) => scripts.push(s) },
+});
+
+test("leaflet() hands back Leaflet at once when the defer load worked", async () => {
+  globalThis.L = { here: true };
+  try { assert.equal(await RCB.leaflet(), globalThis.L); }
+  finally { delete globalThis.L; }
+});
+
+test("leaflet() retries the vendored script when the first load was dropped", async () => {
+  const scripts = [];
+  const p = load(retryDoc(scripts)).leaflet();
+  assert.equal(scripts.length, 1); // the retry script tag is appended right away
+  assert.equal(scripts[0].src, "vendor/leaflet/leaflet.js");
+  globalThis.L = { back: true };
+  scripts[0].onload();
+  try { assert.equal(await p, globalThis.L); }
+  finally { delete globalThis.L; }
+});
+
+test("leaflet() fails with a Polish message when the retry is refused too", async () => {
+  const scripts = [];
+  const p = load(retryDoc(scripts)).leaflet();
+  scripts[0].onerror();
+  await assert.rejects(p, /biblioteka mapy/);
 });
