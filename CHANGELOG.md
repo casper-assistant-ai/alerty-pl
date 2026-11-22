@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.17.1 (2026-11-22)
+
+### fix
+
+- **map:** incursions start where they were launched; Ukraine only as transit ([e7f8ef9](https://github.com/casper-assistant-ai/alerty-pl/commit/e7f8ef9))
+
 ## 1.17.0 (2026-11-22)
 
 ### feat

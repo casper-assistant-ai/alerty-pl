@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.17.1",
+   "date": "2026-11-22",
+   "sha": "e7f8ef9",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "map",
+     "breaking": false,
+     "text": "incursions start where they were launched; Ukraine only as transit",
+     "sha": "e7f8ef9",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.17.0",
    "date": "2026-11-22",
    "sha": "6ebac81",
