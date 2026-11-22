@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.13.0 (2026-11-22)
+
+### feat
+
+- **agents:** PR fixer repairs agent PRs in their own branch before the gate gives up ([29d36d3](https://github.com/casper-assistant-ai/alerty-pl/commit/29d36d3))
+
 ## 1.12.0 (2026-11-22)
 
 ### feat
