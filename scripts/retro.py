@@ -247,7 +247,8 @@ def repo_name(arg):
 # gh-aw keeps these issues itself (no-op tracker); they are closed by fixing the cause
 MANAGED = re.compile(r"^\[aw\] No-Op Runs")
 WORKER = "issue-worker"
-IMPROVEMENT = "<!-- improvement -->"  # the issue-worker puts this line in an improvement PR body
+# the issue-worker starts an improvement PR body with "Improvement: ..." (gh-aw strips HTML comments)
+IMPROVEMENT = re.compile(r"^\s*Improvement\b", re.I)
 
 
 def issue_kind(title, labels):
@@ -292,7 +293,7 @@ def queue(issues, prs, today):
     refused = [{"number": p["number"], "title": p["title"]} for p in prs
                if p.get("state") == "open" and "needs-attention" in (p.get("labels") or [])]
     actionable = [x for x in items if not x["open_prs"] and x["kind"] != "managed"]
-    improved_today = any(agent_of(p.get("title")) == WORKER and IMPROVEMENT in (p.get("body") or "")
+    improved_today = any(agent_of(p.get("title")) == WORKER and IMPROVEMENT.match(p.get("body") or "")
                          and (p.get("created_at") or "").startswith(today) for p in prs)
     return {"today": today, "issues": items, "actionable": [x["number"] for x in actionable],
             "refused_prs": refused,

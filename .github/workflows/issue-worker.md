@@ -115,5 +115,5 @@ fixing (the change already landed, or it is out of scope) with the reason.
 **When nothing waits** (the queue says `improvement due: yes`): take the first unticked item of
 `process/improvements.md` (or, when it is done, find one yourself in tests, reliability or
 simpler upkeep: a missing test, an unhandled error, duplicated code), make it, tick it in the same
-PR (`- [x] … `), and put the line `<!-- improvement -->` at the end of the PR body. One such PR a
-day. Call `noop` only when the queue is empty and an improvement PR was already made today.
+PR (`- [x] … `), and start the PR body with the line `Improvement: <the item>` (the queue counts
+it by that line). One such PR a day. Call `noop` only when the queue is empty and an improvement PR was already made today.
