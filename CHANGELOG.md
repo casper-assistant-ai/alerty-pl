@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.11.0 (2026-11-22)
+
+### feat
+
+- **agents:** PR reviewer agent; gate merges or closes every agent PR itself ([143adb0](https://github.com/casper-assistant-ai/alerty-pl/commit/143adb0))
+
+### test
+
+- **parser:** cover nationwide drill, fire alert and multi-update alerts (#18) ([09eeeb6](https://github.com/casper-assistant-ai/alerty-pl/commit/09eeeb6))
+
 ## 1.10.2 (2026-11-22)
 
 ### fix

@@ -15,6 +15,29 @@
  },
  "releases": [
   {
+   "version": "1.11.0",
+   "date": "2026-11-22",
+   "sha": "143adb0",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "agents",
+     "breaking": false,
+     "text": "PR reviewer agent; gate merges or closes every agent PR itself",
+     "sha": "143adb0",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "test",
+     "scope": "parser",
+     "breaking": false,
+     "text": "cover nationwide drill, fire alert and multi-update alerts (#18)",
+     "sha": "09eeeb6",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.10.2",
    "date": "2026-11-22",
    "sha": "05d68cc",
