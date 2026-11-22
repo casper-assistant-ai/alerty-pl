@@ -2,6 +2,22 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.13.1 (2026-11-22)
+
+### fix
+
+- **agents:** the PR gate sends a conflicting PR to the fixer ([3a4fc42](https://github.com/casper-assistant-ai/alerty-pl/commit/3a4fc42))
+- **agents:** the PR reviewer rejects behaviour-free churn even when an issue asks for it ([9ae99f9](https://github.com/casper-assistant-ai/alerty-pl/commit/9ae99f9))
+- **agents:** the PR gate waits for the reviewer and fixer it starts ([75d0e41](https://github.com/casper-assistant-ai/alerty-pl/commit/75d0e41))
+
+### test
+
+- **site:** cover the common.js date and category helpers with node (#22) ([7bf415c](https://github.com/casper-assistant-ai/alerty-pl/commit/7bf415c))
+
+### chore
+
+- **process:** retro 2026-11-22, dev share 70% (#26) ([83e04d6](https://github.com/casper-assistant-ai/alerty-pl/commit/83e04d6))
+
 ## 1.13.0 (2026-11-22)
 
 ### feat
