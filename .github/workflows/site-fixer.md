@@ -5,6 +5,8 @@ description: |
   It reproduces the problem, fixes the front end (or the data script), and opens one PR that
   the Agent PR gate merges after tests pass.
 on:
+  # started by other workflows (CI, Site check, Update data, the CI doctor) with GITHUB_TOKEN
+  bots: ["github-actions[bot]"]
   workflow_dispatch:
   schedule: daily
 permissions:

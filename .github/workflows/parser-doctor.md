@@ -5,6 +5,8 @@ description: |
   scripts/rcb.py, saves the new page as a test fixture and opens a PR that the
   Agent PR gate merges after tests pass.
 on:
+  # started by other workflows (CI, Site check, Update data, the CI doctor) with GITHUB_TOKEN
+  bots: ["github-actions[bot]"]
   schedule: daily
   workflow_dispatch:
 permissions:
