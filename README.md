@@ -28,6 +28,7 @@ flowchart LR
   CI[CI / Update / Gate fail] --> CD[ci-doctor 🤖] -->|issue| PD
   PD & RK & TI[test-improver 🤖] & DK[docs-keeper 🤖] -->|PR label agent| G[Agent PR gate<br/>tests + live parse]
   G -->|squash merge| main[(main)]
+  G -->|tests fail / changes| PF[pr-fixer 🤖] -->|commit to the same PR| G
   IT[issue-triage 🤖] -->|labels| RK & PD
   DS[daily-status 🤖] -->|daily report issue| main
   SD[site-designer 🤖] -->|PR| G
@@ -45,7 +46,9 @@ flowchart LR
 | `update.yml` | plain Actions | — | every 10 min | `docs/data/`, release tag, `CHANGELOG.md`, Pages |
 | `site-check.yml` | plain Actions, headless Chrome | — | hourly and after each deploy | issue `site-error`, dispatches `site-fixer` |
 | `ci.yml` | plain Actions | — | push, PR | nothing |
-| `agent-pr-gate.yml` | plain Actions | — | twice an hour | merges agent PRs that pass |
+| `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent PRs that pass, sends broken ones to `pr-fixer` |
+| `pr-reviewer` | agent | GLM-5.3 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
+| `pr-fixer` | agent | GLM-5.3 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |
 | `parser-doctor` | agent | GLM-5.3 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
 | `region-keeper` | agent | GLM-5.3 (z.ai) | daily | PR: `scripts/`, `tests/` |
 | `test-improver` | agent | GLM-5.3 (z.ai) | weekly | PR: `tests/` |
@@ -71,7 +74,8 @@ Watchers and reporters stay on GitHub Copilot.
 
 Guard rails: agents run read-only and write only through gh-aw safe outputs; each PR is limited to
 its `allowed-files`; `.github/` is protected; public issues never start an agent (triage runs on a
-schedule); the gate merges only when unit tests and a live parse of gov.pl pass.
+schedule); the gate merges only when unit tests and a live parse of gov.pl pass and the reviewer approves; a
+broken PR is fixed in its own branch by `pr-fixer` (three attempts) before the gate gives up on it.
 
 ## Run locally
 
