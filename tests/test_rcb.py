@@ -11,7 +11,7 @@ import rcb  # noqa: E402
 
 FIX = os.path.join(ROOT, "tests", "fixtures")
 GEO = json.load(open(os.path.join(ROOT, "docs/geo/poland.json"), encoding="utf-8"))
-GAZ = rcb.Gazetteer(GEO)
+GAZ = rcb.load_gazetteer()
 
 
 def page(name):
@@ -240,7 +240,7 @@ class NationwideDrillAlert(unittest.TestCase):
     def test_category_and_regions(self):
         self.assertEqual(self.a["category"], "drill")
         self.assertEqual(self.a["regions"],
-                         {"voivodeships": [], "powiaty": [], "whole": []})
+                         {"voivodeships": [], "powiaty": [], "whole": [], "gminy": []})
         self.assertIn("całego kraju", self.a["updates"][0]["message"])
 
     def test_updates(self):
@@ -286,6 +286,44 @@ class Gazetteer(unittest.TestCase):
     def test_counts(self):
         self.assertEqual(len(GEO["voivodeships"]), 16)
         self.assertEqual(len(GEO["powiaty"]), 380)
+
+
+class Gminy(unittest.TestCase):
+    def test_list(self):
+        gm = json.load(open(os.path.join(ROOT, "docs/geo/gminy.json"), encoding="utf-8"))["gminy"]
+        self.assertGreater(len(gm), 2400)
+        pids = {p["id"] for p in GEO["powiaty"]}
+        self.assertTrue(all(g["powiat"] in pids for g in gm))
+
+    def test_after_gmina_word(self):
+        s = "Woda w części gminy Chęciny, Morawica i Piekoszów (wodociąg Chęciny) nie nadaje się do spożycia."
+        self.assertEqual(GAZ.gminy(s, ["swietokrzyskie"], []), ["Chęciny", "Morawica", "Piekoszów"])
+        s = "woda w Gaworzycach, Kłobuczynie (gm. Gaworzyce) nadaje się do spożycia tylko po przegotowaniu"
+        self.assertEqual(GAZ.gminy(s, ["dolnoslaskie"], []), ["Gaworzyce"])
+
+    def test_town_of_the_powiat(self):
+        s = "Woda z wodociągu Złoty Stok nie nadaje się do celów spożywczych w miejscowościach: Złoty Stok, Płonica"
+        self.assertEqual(GAZ.gminy(s, ["dolnoslaskie"], ["dolnoslaskie/zabkowicki"]), ["Złoty Stok"])
+        self.assertEqual(GAZ.gminy(s, ["dolnoslaskie"], []), [])  # no powiat: a bare town is not enough
+
+    def test_longer_name_and_city_powiat(self):
+        s = "na terenie gm. Kamienna Góra odbędzie się trening"
+        self.assertEqual(GAZ.gminy(s, ["dolnoslaskie"], []), ["Kamienna Góra"])
+        s = "na terenie gminy Wrocław odbędzie się trening"
+        self.assertEqual(GAZ.gminy(s, ["dolnoslaskie"], ["dolnoslaskie/wroclaw"]), [])
+
+    def test_alert_page(self):
+        a = rcb.parse_detail(page("alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911.html"), GAZ)
+        self.assertEqual(a["regions"]["gminy"], ["Złoty Stok"])
+
+    def test_backfill_old_records(self):
+        a = {"regions": {"voivodeships": ["wielkopolskie"], "powiaty": ["wielkopolskie/gostynski"], "whole": []},
+             "updates": [{"message": "na terenie gminy Gostyń odbędzie się trening", "region_text": "",
+                          "regions": {"voivodeships": ["wielkopolskie"], "powiaty": ["wielkopolskie/gostynski"],
+                                      "whole": []}}]}
+        rcb.add_gminy(a, GAZ)
+        self.assertEqual(a["regions"]["gminy"], ["Gostyń"])
+        self.assertEqual(a["updates"][0]["regions"]["gminy"], ["Gostyń"])
 
 
 if __name__ == "__main__":

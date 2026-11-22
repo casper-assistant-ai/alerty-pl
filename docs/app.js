@@ -98,7 +98,7 @@ function activeRow(a) {
   return h("li", {},
     h("div", { class: "row-head" }, swatch(a.category), CAT[a.category]),
     h("p", { class: "row-msg", text: msg.replace(/^"|"$/g, "") }),
-    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.regions.voivodeships, a.regions.powiaty) }), h("span", { text: since }), h("a", { href: a.url, text: "komunikat" })));
+    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.regions.voivodeships, a.regions.powiaty, a.regions.gminy) }), h("span", { text: since }), h("a", { href: a.url, text: "komunikat" })));
 }
 
 function archiveRow(a) {
@@ -107,7 +107,7 @@ function archiveRow(a) {
   return h("li", {},
     h("div", { class: "row-head" }, swatch(a.category), CAT[a.category]),
     h("p", { class: "row-msg", text: (a.message || a.title || "").replace(/^"|"$/g, "") }),
-    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.voivodeships, a.powiaty) }), h("span", { text: when }), h("a", { href: a.url, text: "komunikat" })));
+    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.voivodeships, a.powiaty, a.gminy) }), h("span", { text: when }), h("a", { href: a.url, text: "komunikat" })));
 }
 
 function recentRow(a) {
@@ -303,7 +303,7 @@ function fires() {
 
 // ---------- start ----------
 async function main() {
-  const [geo, archive] = await Promise.all([getJSON("geo/poland.geojson"), getJSON("data/archive.json")]);
+  const [geo, archive] = await Promise.all([getJSON("geo/poland.geojson"), getJSON("data/archive.json"), RCB.names()]);
   S.archive = archive.alerts;
   S.start = S.archive.map((a) => a.started_at.slice(0, 10)).filter((d) => d >= "2021-01-01").sort()[0] || "2021-01-01";
   S.geo = { powByV: {} };

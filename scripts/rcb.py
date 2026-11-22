@@ -133,9 +133,19 @@ def quotes(chunk):
     return [re.sub(r"\s+", " ", q).strip() for q in re.findall(r"[„\"“](.+?)[”\"“]", chunk, re.S)]
 
 
+GMINA_WORD = re.compile(r"(?<![\w-])(?:gm\.|gmin(?:a|y|ie|ę|ą|ach|ami|om)?)(?![\w-])\s*:?\s*", re.I)
+# where the list of gmina names after "gminy ..." ends
+GMINA_END = re.compile(r"[.;()\n„\"”]|(?<![\w-])(?:pow|powiat\w*|woj|wojew\w*|miejscowoś\w*|w miejsc\w*)(?![\w])", re.I)
+
+
 class Gazetteer:
-    def __init__(self, geo):
+    def __init__(self, geo, gminy=()):
         self.powiaty = geo["powiaty"]
+        self.city = {p["id"]: p["name"] for p in self.powiaty if p["city"]}
+        self.gminy_by_p = {}
+        for g in gminy:
+            self.gminy_by_p.setdefault(g["powiat"], []).append(g)
+        self.gmina_rx = {}
         self.by_v = {}
         for p in self.powiaty:
             self.by_v.setdefault(p["voivodeship"], []).append(p)
@@ -183,6 +193,42 @@ class Gazetteer:
         whole = [v for v in vs if not any(pid.startswith(v + "/") for pid in pw)]
         return {"voivodeships": vs, "powiaty": pw, "whole": whole}
 
+    def gminy(self, s, voivodeships, powiaty):
+        """Names of the gminas an alert names: any gmina of its voivodeships listed after "gm.",
+        "gmina", "gminy" ..., and a gmina of its powiaty named on its own (a town that is also a
+        gmina, "Złoty Stok"). A city powiat is not repeated as its own gmina."""
+        if not self.gminy_by_p:
+            return []
+        near = [g for pid in powiaty for g in self.gminy_by_p.get(pid, [])]
+        wide = [g for pid, gs in self.gminy_by_p.items() if pid.split("/")[0] in voivodeships for g in gs]
+        found = set()
+        for m in GMINA_WORD.finditer(s):
+            span = s[m.end():m.end() + 200]
+            end = GMINA_END.search(span)
+            span = span[:end.start()] if end else span
+            for g in (wide or near):
+                if self._rx(g["name"]).search(span):
+                    found.add(g["name"])
+        for g in near:
+            if self._rx(g["name"]).search(s):
+                found.add(g["name"])
+        # "Góra" found only inside "Kamienna Góra" is not a gmina of its own
+        for name in list(found):
+            longer = [o for o in found if o != name and self._rx(name).search(o)]
+            rest = s
+            for o in longer:
+                rest = rest.replace(o, " ")
+            if longer and not self._rx(name).search(rest):
+                found.discard(name)
+        cities = {self.city[pid] for pid in powiaty if pid in self.city}
+        return sorted(found - cities)
+
+    def _rx(self, name):
+        rx = self.gmina_rx.get(name)
+        if rx is None:
+            rx = self.gmina_rx[name] = re.compile(NOT_WORD_BEFORE + re.escape(name) + NOT_WORD_AFTER)
+        return rx
+
 
 def region_sentences(chunk):
     out = re.findall(r"(?:został\w* wysłan\w*|wysłan\w*|na terenie|dotyczy|w miejscowości|w gminie|gmin\w)"
@@ -200,9 +246,10 @@ def parse_detail(page_html, gaz, title="", date=None):
         date = f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else None
     body = body.replace(title, "", 1) if title else body
     body = re.sub(r"^\s*\d{2}\.\d{2}\.\d{4}\s*", "", body)
-    updates, all_regions = [], {"voivodeships": set(), "powiaty": set(), "whole": set()}
+    updates, all_regions = [], {"voivodeships": set(), "powiaty": set(), "whole": set(), "gminy": set()}
     for t, chunk in split_updates(body):
         rg = gaz.regions(region_sentences(chunk))
+        rg["gminy"] = gaz.gminy(chunk, rg["voivodeships"], rg["powiaty"])
         msgs = quotes(chunk) or [chunk.split("\n")[0][:500]]
         ended = any(re.search(ENDED, q, re.I) for q in msgs)
         updates.append({"time": t, "message": msgs[0], "ended": ended,
@@ -259,16 +306,35 @@ def compact(a):
             "category": a["category"], "status": a["status"],
             "started_at": a["started_at"], "last_at": a["last_at"],
             "voivodeships": a["regions"]["voivodeships"], "powiaty": a["regions"]["powiaty"],
-            "whole": a["regions"]["whole"], "updates": len(a["updates"]),
+            "whole": a["regions"]["whole"], "gminy": a["regions"].get("gminy", []),
+            "updates": len(a["updates"]),
             "message": (first or "")[:400]}
 
 
-def update_archive(out_dir, alerts):
+def add_gminy(a, gaz):
+    """Fill regions.gminy of an alert parsed before gminas were named, from its saved text."""
+    rg = a["regions"]
+    if "gminy" in rg:
+        return a
+    found = set()
+    for u in a["updates"]:
+        u["regions"]["gminy"] = gaz.gminy(u["message"] + "\n" + u.get("region_text", ""),
+                                          u["regions"]["voivodeships"], u["regions"]["powiaty"])
+        found |= set(u["regions"]["gminy"])
+    rg["gminy"] = sorted(found)
+    return a
+
+
+def update_archive(out_dir, alerts, gaz=None):
     """archive.json keeps every alert ever seen, newest first; it is never trimmed."""
     path = os.path.join(out_dir, "archive.json")
     arch = {}
     if os.path.exists(path):
         arch = {a["id"]: a for a in json.load(open(path, encoding="utf-8")).get("alerts", [])}
+    if gaz:  # records written before gminas were named get them from their message
+        for r in arch.values():
+            if "gminy" not in r:
+                r["gminy"] = gaz.gminy(r.get("message", ""), r["voivodeships"], r["powiaty"])
     for a in alerts:
         arch[a["id"]] = compact(a)
     rows = sorted(arch.values(), key=lambda a: (a["date"], a["started_at"]), reverse=True)
@@ -278,8 +344,7 @@ def update_archive(out_dir, alerts):
 
 
 def update(pages, out_dir, keep_going=False):
-    geo = json.load(open(os.path.join(ROOT, "docs/geo/poland.json"), encoding="utf-8"))
-    gaz = Gazetteer(geo)
+    gaz = load_gazetteer()
     path = os.path.join(out_dir, "alerts.json")
     old = {}
     if os.path.exists(path):
@@ -311,7 +376,7 @@ def update(pages, out_dir, keep_going=False):
                 print(f"skip {it['url']}: {e}", file=sys.stderr)
                 continue
             a["parser"] = PARSER_VERSION
-        alerts.append(a)
+        alerts.append(add_gminy(a, gaz))
         if a["category"] != "other" and not a["regions"]["voivodeships"] and "cała polska" not in json.dumps(a, ensure_ascii=False).lower():
             unmatched.append({"id": a["id"], "title": a["title"], "url": a["url"],
                               "region_text": [u["region_text"] for u in a["updates"]][:3]})
@@ -320,10 +385,10 @@ def update(pages, out_dir, keep_going=False):
     for a in old.values():
         if a["id"] not in seen:
             a["status"], a["started_at"], a["last_at"] = status(a, now)
-            alerts.append(a)
+            alerts.append(add_gminy(a, gaz))
     alerts.sort(key=lambda a: (a["date"], a["last_at"]), reverse=True)
     os.makedirs(out_dir, exist_ok=True)
-    total = update_archive(out_dir, alerts)
+    total = update_archive(out_dir, alerts, gaz)
     # the live map needs only recent alerts; the history lives in archive.json
     cutoff = (now.date() - dt.timedelta(days=RECENT_DAYS)).isoformat()
     alerts = [a for a in alerts if a["date"] >= cutoff or a["status"] in ("active", "planned")][:400]
@@ -336,6 +401,12 @@ def update(pages, out_dir, keep_going=False):
     with open(os.path.join(out_dir, "meta.json"), "w", encoding="utf-8") as fh:
         json.dump(meta, fh, ensure_ascii=False, indent=1)
     print(json.dumps(meta, ensure_ascii=False))
+
+
+def load_gazetteer():
+    geo = json.load(open(os.path.join(ROOT, "docs/geo/poland.json"), encoding="utf-8"))
+    gm = json.load(open(os.path.join(ROOT, "docs/geo/gminy.json"), encoding="utf-8"))["gminy"]
+    return Gazetteer(geo, gm)
 
 
 def write_if_changed(path, data, indent=1):
@@ -364,8 +435,7 @@ def main():
     if a.cmd == "update":
         update(a.pages, a.out, a.keep_going)
     else:
-        geo = json.load(open(os.path.join(ROOT, "docs/geo/poland.json"), encoding="utf-8"))
-        r = parse_detail(open(a.file, encoding="utf-8").read(), Gazetteer(geo))
+        r = parse_detail(open(a.file, encoding="utf-8").read(), load_gazetteer())
         json.dump(r, sys.stdout, ensure_ascii=False, indent=1)
 
 

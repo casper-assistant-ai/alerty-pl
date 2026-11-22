@@ -55,11 +55,24 @@ const RCB = (() => {
     return hrs < 48 ? `${hrs} h ${min % 60} min` : `${Math.floor(hrs / 24)} dni`;
   }
 
-  function regionText(voivodeships, powiaty) {
+  // powiat id -> "pow. zgorzelecki" or "Wrocław" (geo/names.json); pages await names() before rendering
+  let NAMES = {}, namesP = null;
+  const names = () => namesP || (namesP = getJSON("geo/names.json").then((d) => { NAMES = d.powiaty || {}; })
+    .catch(() => {}));
+
+  // up to three items, then "i N inne"
+  const few = (xs) => xs.length > 3 ? `${xs.slice(0, 3).join(", ")} i ${xs.length - 3} inne` : xs.join(", ");
+
+  // "woj. dolnośląskie · pow. zgorzelecki · gm. Pieńsk"; a powiat with no known name is counted
+  function regionText(voivodeships, powiaty, gminy = []) {
     if (!voivodeships.length) return "obszar nieustalony";
-    const vs = voivodeships.map((v) => VOIV[v] || v);
-    const head = vs.length > 3 ? `${vs.slice(0, 3).join(", ")} i ${vs.length - 3} inne` : vs.join(", ");
-    return "woj. " + head + (powiaty.length ? ` · ${powiaty.length} pow.` : "");
+    const parts = ["woj. " + few(voivodeships.map((v) => VOIV[v] || v))];
+    if (powiaty.length) {
+      const known = powiaty.map((p) => NAMES[p]).filter(Boolean);
+      parts.push(known.length === powiaty.length ? few(known) : `${powiaty.length} pow.`);
+    }
+    if (gminy && gminy.length) parts.push("gm. " + few(gminy));
+    return parts.join(" · ");
   }
 
   function plural(n, one, few, many) {
@@ -111,5 +124,5 @@ const RCB = (() => {
   }).catch(() => {});
 
   return { CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
-    duration, regionText, plural, strip };
+    duration, regionText, names, plural, strip };
 })();
