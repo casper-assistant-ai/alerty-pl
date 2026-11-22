@@ -18,7 +18,10 @@
       "powiaty": [
        "wielkopolskie/gostynski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Gostyń"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu gostyńskiego (woj. wielkopolskie)."
     }
@@ -30,7 +33,10 @@
     "powiaty": [
      "wielkopolskie/gostynski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Gostyń"
+    ]
    },
    "id": "alert-rcb---trening-systemow-alarmowania-2111",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-2111",
@@ -58,7 +64,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
     },
@@ -75,7 +82,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie województwa lubelskiego i podkarpackiego."
     },
@@ -132,7 +140,8 @@
        "podkarpackie/tarnobrzeg",
        "podkarpackie/tarnobrzeski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski;\n- podkarpackiego - powiaty: Tarnobrzeg, tarnobrzeski, stalowowolski, niżański, leżajski, kolbuszowski, mielecki, dębicki, ropczycko-sędziszowski, Rzeszów, rzeszowski, łańcucki, przeworski, jarosławski, lubaczowski, jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki."
     },
@@ -179,7 +188,8 @@
        "podkarpackie/tarnobrzeg",
        "podkarpackie/tarnobrzeski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski\n- podkarpackiego - powiaty: Tarnobrzeg, tarnobrzeski, stalowowolski, niżański, leżajski, kolbuszowski, mielecki, dębicki, ropczycko-sędziszowski, Rzeszów, rzeszowski, łańcucki, przeworski, jarosławski, lubaczowski."
     },
@@ -218,7 +228,8 @@
        "podkarpackie/sanocki",
        "podkarpackie/strzyzowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie pow. hrubieszowskiego, m. Zamość, zamojskiego, tomaszowskiego, biłgorajskiego (woj. lubelskie). został wysłany do odbiorców na terenie województw:\n- lubelskiego - powiaty: hrubieszowski, m. Zamość, zamojski, tomaszowski, biłgorajski\n- podkarpackiego - powiaty: dębicki, ropczycko-sędziszowski, Rzeszów, rzeszowski, łańcucki, przeworski, jarosławski, lubaczowski, jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki."
     },
@@ -229,7 +240,8 @@
      "regions": {
       "voivodeships": [],
       "powiaty": [],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "„UWAGA! UWAGA! UWAGA! Zagrożenie atakiem z powietrza. Znajdź bezpieczne miejsce. Stosuj się do poleceń służb. Oczekuj dalszych komunikatów.”"
     }
@@ -286,7 +298,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---atak-z-powietrza-2011",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-z-powietrza-2011",
@@ -312,7 +325,10 @@
       "powiaty": [
        "malopolskie/krakowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Sułoszowa"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie)."
     }
@@ -324,7 +340,10 @@
     "powiaty": [
      "malopolskie/krakowski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Sułoszowa"
+    ]
    },
    "id": "alert-rcb---trening-systemow-alarmowania-2011",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-2011",
@@ -350,7 +369,8 @@
       "powiaty": [
        "lubelskie/radzynski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "na terenie powiatu radzyńskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.“\nAlert RCB został wysłany do odbiorców na terenie powiatu radzyńskiego (woj. lubelskie)."
     }
@@ -362,7 +382,8 @@
     "powiaty": [
      "lubelskie/radzynski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---trening-systemow-alarmowania-1912",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-1912",
@@ -388,7 +409,10 @@
       "powiaty": [
        "dolnoslaskie/zgorzelecki"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Pieńsk"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu zgorzeleckiego (woj. dolnośląskie)."
     }
@@ -400,7 +424,10 @@
     "powiaty": [
      "dolnoslaskie/zgorzelecki"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Pieńsk"
+    ]
    },
    "id": "alert-rcb---woda-niezdatna-do-picia-pow-zgorzelecki-1911",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---woda-niezdatna-do-picia-pow-zgorzelecki-1911",
@@ -426,7 +453,10 @@
       "powiaty": [
        "dolnoslaskie/zabkowicki"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Złoty Stok"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu ząbkowickiego (woj. dolnośląskie)."
     }
@@ -438,7 +468,10 @@
     "powiaty": [
      "dolnoslaskie/zabkowicki"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Złoty Stok"
+    ]
    },
    "id": "alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
@@ -466,7 +499,8 @@
        "mazowieckie/warszawa",
        "mazowieckie/wolominski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "Dziś w godz. 16.00-18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.\nDziś w godz. 16.00–18.30 w Warszawie, Markach, Zielonce, Kobyłce, Wołominie i Legionowie odbędą się testy pocisków oświetlających.\nPociski powoli opadają na spadochronach i długo świecą.\nKilka takich świateł na niebie może przypominać wolno lecący samolot lub duży dron."
     }
@@ -480,7 +514,8 @@
      "mazowieckie/warszawa",
      "mazowieckie/wolominski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "komunikat-1811",
    "url": "https://www.gov.pl/web/rcb/komunikat-1811",
@@ -518,7 +553,8 @@
        "lubelskie/swidnicki",
        "lubelskie/wlodawski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski."
     },
@@ -545,7 +581,8 @@
        "lubelskie/swidnicki",
        "lubelskie/wlodawski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski."
     },
@@ -556,7 +593,8 @@
      "regions": {
       "voivodeships": [],
       "powiaty": [],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”"
     }
@@ -580,7 +618,8 @@
      "lubelskie/swidnicki",
      "lubelskie/wlodawski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-1011",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-1011",
@@ -618,7 +657,8 @@
        "lubelskie/swidnicki",
        "lubelskie/wlodawski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski\n- podlaskiego- powiaty: Suwałki, suwalski, augustowski, sejneński, sokólski, Białystok, białostocki, zambrowski, wysokomazowiecki, bielski, hajnowski, siemiatycki"
     }
@@ -642,7 +682,8 @@
      "lubelskie/swidnicki",
      "lubelskie/wlodawski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-0911",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0911",
@@ -669,7 +710,8 @@
        "slaskie/myszkowski",
        "slaskie/zawiercianski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie powiatów zawierciańskiego i myszkowskiego (woj. śląskie)."
     }
@@ -682,7 +724,8 @@
      "slaskie/myszkowski",
      "slaskie/zawiercianski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---zla-jakosc-powietrza",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zla-jakosc-powietrza",
@@ -708,7 +751,8 @@
       "powiaty": [],
       "whole": [
        "zachodniopomorskie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie Szczecina (woj. zachodniopomorskie)."
     }
@@ -720,7 +764,8 @@
     "powiaty": [],
     "whole": [
      "zachodniopomorskie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---neutralizacja-niewybuchu-0711",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---neutralizacja-niewybuchu-0711",
@@ -747,7 +792,10 @@
        "malopolskie/krakowski",
        "malopolskie/olkuski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Mogilany"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie). został wysłany do odbiorców na terenie powiatu olkuskiego (woj. małopolskie)."
     }
@@ -760,7 +808,10 @@
      "malopolskie/krakowski",
      "malopolskie/olkuski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Mogilany"
+    ]
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0611",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0611",
@@ -786,7 +837,10 @@
       "powiaty": [
        "dolnoslaskie/zgorzelecki"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Bogatynia"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu zgorzeleckiego (woj. dolnośląskie)."
     }
@@ -798,7 +852,10 @@
     "powiaty": [
      "dolnoslaskie/zgorzelecki"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Bogatynia"
+    ]
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0511",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0511",
@@ -824,7 +881,8 @@
       "powiaty": [
        "kujawsko-pomorskie/sepolenski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu sępoleńskiego (woj. kujawsko-pomorskie)."
     }
@@ -836,7 +894,8 @@
     "powiaty": [
      "kujawsko-pomorskie/sepolenski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0411",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0411",
@@ -864,7 +923,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego i podkarpackiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
     },
@@ -875,7 +935,8 @@
      "regions": {
       "voivodeships": [],
       "powiaty": [],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”"
     }
@@ -889,7 +950,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-0311",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0311",
@@ -915,7 +977,8 @@
       "powiaty": [
        "lodzkie/radomszczanski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu radomszczańskiego (woj. łódzkie)."
     }
@@ -927,7 +990,8 @@
     "powiaty": [
      "lodzkie/radomszczanski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---trening-systemu-alarmowania-0311",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-0311",
@@ -964,7 +1028,8 @@
        "lubelskie/zamojski",
        "lubelskie/zamosc"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa: - lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszow"
     }
@@ -987,7 +1052,8 @@
      "lubelskie/zamojski",
      "lubelskie/zamosc"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-0312",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0312",
@@ -1013,7 +1079,8 @@
       "powiaty": [
        "podkarpackie/leski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "na terenie powiatu leskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój“.\nAlert RCB został wysłany do odbiorców na terenie powiatu leskiego (woj. podkarpackie)."
     }
@@ -1025,7 +1092,8 @@
     "powiaty": [
      "podkarpackie/leski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---trening-systemu-alarmowania-2910",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-2910",
@@ -1062,7 +1130,8 @@
        "lubelskie/zamojski",
        "lubelskie/zamosc"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski."
     },
@@ -1073,7 +1142,8 @@
      "regions": {
       "voivodeships": [],
       "powiaty": [],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”"
     }
@@ -1096,7 +1166,8 @@
      "lubelskie/zamojski",
      "lubelskie/zamosc"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2810",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2810",
@@ -1124,7 +1195,10 @@
        "dolnoslaskie/jaworski",
        "malopolskie/krakowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Czernichów"
+      ]
      },
      "region_text": "na terenie gminy Czernichów odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój“.\nAlert RCB został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie). na terenie powiatu jaworskiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój“.\nAlert RCB został wysłany do odbiorców na terenie powiatu jaworskiego (woj. dolnośląskie)."
     }
@@ -1138,7 +1212,10 @@
      "dolnoslaskie/jaworski",
      "malopolskie/krakowski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Czernichów"
+    ]
    },
    "id": "alert-rcb---trening-systemu-alarmowania3",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania3",
@@ -1166,7 +1243,8 @@
        "dolnoslaskie/lwowecki",
        "dolnoslaskie/walbrzyski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do mieszkańców Jeleniej Góry, Wałbrzycha oraz pow. kamiennogórskiego, karkonoskiego, lwóweckiego i wałbrzyskiego (woj. dolnośląskie)."
     }
@@ -1180,7 +1258,8 @@
      "dolnoslaskie/lwowecki",
      "dolnoslaskie/walbrzyski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---ostrzezenie-przed-silnym-wiatrem-2510",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---ostrzezenie-przed-silnym-wiatrem-2510",
@@ -1208,7 +1287,8 @@
        "slaskie/cieszynski",
        "slaskie/zywiecki"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do mieszkańców Bielska Białej oraz pow. bielskiego, cieszyńskiego oraz żywieckiego (woj. śląskie)."
     }
@@ -1222,7 +1302,8 @@
      "slaskie/cieszynski",
      "slaskie/zywiecki"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---ostrzezenie-przed-silnym-wiatrem-2511",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---ostrzezenie-przed-silnym-wiatrem-2511",
@@ -1248,7 +1329,10 @@
       "powiaty": [
        "malopolskie/krakowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Skała"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu krakowskiego (woj. małopolskie)."
     }
@@ -1260,7 +1344,10 @@
     "powiaty": [
      "malopolskie/krakowski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Skała"
+    ]
    },
    "id": "alert-rcb---trening-systemu-alarmowania-2310",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-2310",
@@ -1328,7 +1415,8 @@
        "podkarpackie/sanocki",
        "podkarpackie/strzyzowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie części województwa- lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski.\n został wysłany do odbiorców na terenie części województwa: - lubelskiego - powiaty: puławski, opolski, Lublin, lubelski, kraśnicki, janowski, włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłg"
     }
@@ -1382,7 +1470,8 @@
      "podkarpackie/sanocki",
      "podkarpackie/strzyzowski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2310",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2310",
@@ -1408,7 +1497,10 @@
       "powiaty": [
        "malopolskie/dabrowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Radgoszcz"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu dąbrowskiego (woj. małopolskie)."
     }
@@ -1420,7 +1512,10 @@
     "powiaty": [
      "malopolskie/dabrowski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Radgoszcz"
+    ]
    },
    "id": "alert-rcb---trening-systemu-alarmowania2",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania2",
@@ -1446,7 +1541,8 @@
       "powiaty": [],
       "whole": [
        "lubelskie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego."
     },
@@ -1461,7 +1557,8 @@
       "powiaty": [],
       "whole": [
        "lubelskie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego."
     },
@@ -1476,7 +1573,8 @@
       "powiaty": [],
       "whole": [
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego. został wysłany do odbiorców na terenie woj. podkarpackiego."
     },
@@ -1487,7 +1585,8 @@
      "regions": {
       "voivodeships": [],
       "powiaty": [],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "„UWAGA! Rosyjski atak powietrzny na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.”"
     }
@@ -1501,7 +1600,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2111",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2111",
@@ -1527,7 +1627,10 @@
       "powiaty": [
        "dolnoslaskie/lubanski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Świeradów-Zdrój"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu lubańskiego (woj. dolnośląskie)."
     }
@@ -1539,7 +1642,10 @@
     "powiaty": [
      "dolnoslaskie/lubanski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Świeradów-Zdrój"
+    ]
    },
    "id": "alert-rcb---niezdatna-woda-2110",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---niezdatna-woda-2110",
@@ -1567,7 +1673,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
     }
@@ -1581,7 +1688,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2110",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2110",
@@ -1607,7 +1715,10 @@
       "powiaty": [
        "dolnoslaskie/kamiennogorski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Kamienna Góra"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu kamiennogórskiego (woj. dolnośląskie)."
     }
@@ -1619,7 +1730,10 @@
     "powiaty": [
      "dolnoslaskie/kamiennogorski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Kamienna Góra"
+    ]
    },
    "id": "alert-rcb---cwiczenia-w-powiecie-kamiennogorskim-2010",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-w-powiecie-kamiennogorskim-2010",
@@ -1656,7 +1770,8 @@
        "podkarpackie/sanocki",
        "podkarpackie/strzyzowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie powiatów: jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki, woj. podkarpackie.\n został wysłany do odbiorców na terenie powiatów: : jasielski, strzyżowski, brzozowski, Przemyśl, przemyski, sanocki, leski, Krosno, krośnieński, bieszczadzki, woj. podkarpackie.\n został wysłany do odbi"
     }
@@ -1679,7 +1794,8 @@
      "podkarpackie/sanocki",
      "podkarpackie/strzyzowski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-2010",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-2010",
@@ -1705,7 +1821,8 @@
       "powiaty": [],
       "whole": [
        "mazowieckie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie Warszawy (woj. mazowieckie)."
     }
@@ -1717,7 +1834,8 @@
     "powiaty": [],
     "whole": [
      "mazowieckie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---cwiczenia-sluzb-1910",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-sluzb-1910",
@@ -1745,7 +1863,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego i podkarpackiego.\n został wysłany do odbiorców na terenie woj. podkarpackiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. podkarpackiego."
     }
@@ -1759,7 +1878,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza2",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza2",
@@ -1787,7 +1907,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego. został wysłany do odbiorców na terenie woj. podkarpackiego. został wysłany do odbiorców na terenie woj. lubelskiego. na terenie Ukrainy. Sytuacja jest monitorowana. W przestrzeni RP operuje polskie lotnictwo. Oczekuj dalszych komunikatów.\nAlert RCB został wysłany do odbiorców na terenie woj. lubelskiego."
     }
@@ -1801,7 +1922,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-z-powietrza-1810",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-1810",
@@ -1827,7 +1949,8 @@
       "powiaty": [
        "dolnoslaskie/polkowicki"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie powiatu polkowickiego (woj. dolnośląskie)."
     }
@@ -1839,7 +1962,8 @@
     "powiaty": [
      "dolnoslaskie/polkowicki"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---niezdatna-woda-1710",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---niezdatna-woda-1710",
@@ -1869,7 +1993,11 @@
        "malopolskie/krakowski",
        "warminsko-mazurskie/lidzbarski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Ciepłowody",
+       "Słomniki"
+      ]
      },
      "region_text": "W związku z zaplanowanymi ćwiczeniami, do odbiorców na terenie powiatu ząbkowickiego, krakowskiego oraz lidzbarskiego przesłano Alert RCB.\nW związku z zaplanowanymi ćwiczeniami przesłano Alert RCB na teren 3 powiatów:\nząbkowickiego (woj. dolnośląskie) - o treści: \"ĆWICZENIE: Dziś (17.10) w godz. 10:00-14:00 na terenie gminy Ciepłowody odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"\nkrakowskiego (woj. małopolskie) - o treści: \"ĆWICZENIA: Dziś (17.10) w godz. 13:00-15:00 na terenie gminy Słomniki odbędzie się trening systemu alarmowania z wykorzystaniem syren. "
     }
@@ -1885,7 +2013,11 @@
      "malopolskie/krakowski",
      "warminsko-mazurskie/lidzbarski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Ciepłowody",
+     "Słomniki"
+    ]
    },
    "id": "alert-rcb---cwiczenia-systemu-alarmowania-w-powiecie-zabkowickim-1710",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-systemu-alarmowania-w-powiecie-zabkowickim-1710",
@@ -1920,7 +2052,8 @@
       ],
       "whole": [
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego i podkarpackiego.\n został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie woj. lubelskiego.\n został wysłany do odbiorców na terenie powiatów:\nwłodawskiego,\nłęczyńskiego,\nświdnickiego,\nChełm, chełmskiego,\nkrasnostawskiego,\nWoj. lubelskie.\n został wysłany do odbiorców na terenie powiatów:\nwłodawskiego, łęczyńskieg"
     }
@@ -1941,7 +2074,8 @@
     ],
     "whole": [
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-atakiem-z-powietrza-1611",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-atakiem-z-powietrza-1611",
@@ -1967,7 +2101,10 @@
       "powiaty": [
        "dolnoslaskie/olawski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": [
+       "Oława"
+      ]
      },
      "region_text": "został wysłany do odbiorców na terenie pow. oławskiego (woj. dolnośląskie)."
     }
@@ -1979,7 +2116,10 @@
     "powiaty": [
      "dolnoslaskie/olawski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": [
+     "Oława"
+    ]
    },
    "id": "alert-rcb---trening-systemu-alarmowania-z-wykorzystaniem-syren-1610",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-z-wykorzystaniem-syren-1610",
@@ -2005,7 +2145,8 @@
       "powiaty": [],
       "whole": [
        "lubelskie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego. został wysłany do odbiorców na terenie woj. lubelskiego"
     }
@@ -2017,7 +2158,8 @@
     "powiaty": [],
     "whole": [
      "lubelskie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---zagrozenie-atakiem-z-powietrza-1511",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-atakiem-z-powietrza-1511",
@@ -2043,7 +2185,8 @@
       "powiaty": [
        "lubelskie/tomaszowski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "wysłano do odbiorców na terenie powiatu tomaszowskiego (woj. lubelskie)."
     }
@@ -2055,7 +2198,8 @@
     "powiaty": [
      "lubelskie/tomaszowski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---trening-systemow-alarmowania-pow-tomaszowski-1510",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemow-alarmowania-pow-tomaszowski-1510",
@@ -2081,7 +2225,8 @@
       "powiaty": [
        "kujawsko-pomorskie/wabrzeski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "wysłano do odbiorców na terenie powiatu wąbrzeskiego (woj. kujawsko-pomorskie)."
     }
@@ -2093,7 +2238,8 @@
     "powiaty": [
      "kujawsko-pomorskie/wabrzeski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---trening-systemu-alarmowania-pow-wabrzeski-1511",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-systemu-alarmowania-pow-wabrzeski-1511",
@@ -2119,7 +2265,8 @@
       "powiaty": [],
       "whole": [
        "lubelskie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego."
     }
@@ -2131,7 +2278,8 @@
     "powiaty": [],
     "whole": [
      "lubelskie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1510",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1510",
@@ -2157,7 +2305,8 @@
       "powiaty": [
        "lodzkie/laski"
       ],
-      "whole": []
+      "whole": [],
+      "gminy": []
      },
      "region_text": "wysłano do odbiorców na terenie powiatu łaskiego (woj.łódzkie)."
     }
@@ -2169,7 +2318,8 @@
     "powiaty": [
      "lodzkie/laski"
     ],
-    "whole": []
+    "whole": [],
+    "gminy": []
    },
    "id": "alert-rcb---cwiczenia-powiat-laski",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-powiat-laski",
@@ -2197,7 +2347,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego"
     }
@@ -2211,7 +2362,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---atak-powietrzny-na-terenie-ukrainy",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-powietrzny-na-terenie-ukrainy",
@@ -2237,7 +2389,8 @@
       "powiaty": [],
       "whole": [
        "lubelskie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. lubelskiego"
     }
@@ -2249,7 +2402,8 @@
     "powiaty": [],
     "whole": [
      "lubelskie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---atak-powietrzny-na-terenie-ukrainy-1310",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-powietrzny-na-terenie-ukrainy-1310",
@@ -2279,7 +2433,8 @@
       ],
       "whole": [
        "mazowieckie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie województwa mazowieckiego. został wysłany do odbiorców na terenie powiatu wałbrzyskiego i miasta Wałbrzych (woj. dolnośląskie)"
     }
@@ -2295,7 +2450,8 @@
     ],
     "whole": [
      "mazowieckie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---cwiczenia-z-wykorzystaniem-syren-1110",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---cwiczenia-z-wykorzystaniem-syren-1110",
@@ -2323,7 +2479,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
     }
@@ -2337,7 +2494,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1110",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1110",
@@ -2365,7 +2523,8 @@
       "whole": [
        "lubelskie",
        "podkarpackie"
-      ]
+      ],
+      "gminy": []
      },
      "region_text": "został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego. został wysłany do odbiorców na terenie woj. podkarpackiego i lubelskiego."
     }
@@ -2379,7 +2538,8 @@
     "whole": [
      "lubelskie",
      "podkarpackie"
-    ]
+    ],
+    "gminy": []
    },
    "id": "alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1011",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---rosyjski-atak-powietrzny-na-terenie-ukrainy-1011",
