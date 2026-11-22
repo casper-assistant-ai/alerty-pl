@@ -25,7 +25,7 @@ imports:
 network:
   allowed: [defaults, node, "casper-assistant-ai.github.io"]
 tools:
-  bash: ["cat:*", "ls:*", "grep:*", "head:*", "tail:*", "wc:*", "node:*", "python3:*", "curl:*", "find:*", "git:*", "jq:*", "diff:*"]
+  bash: ["cat:*", "ls:*", "grep:*", "head:*", "tail:*", "wc:*", "node:*", "npx:*", "python3:*", "curl:*", "find:*", "git:*", "jq:*", "diff:*"]
   edit:
   github:
     toolsets: [default, actions]
@@ -54,13 +54,20 @@ beyond the problem it describes.
 1. Find the open issue labelled `site-error`. Its newest report (body or last comment) lists, per page
    and screen (desktop, phone), the problems the Site check saw: `exception` (a JavaScript error),
    `console`, `http`/`network` (a failed request), `content` (a page that did not fill in),
-   `stale` (old data). If there is no open issue, call `noop` and stop.
+   `markup` (broken HTML a visitor sees: a raw tag or attribute in the page text, text above the
+   header, markup inside an attribute, or a finding of `scripts/html_check.py` on the HTML as served),
+   `stale` (old data). If there is no open issue, call `noop` and stop. The Site check run linked in
+   the report keeps a screenshot of every page on the desktop and the phone (artifact `site-check`).
 2. Reproduce what you can: `curl` the page and the data files it loads, read the script named in the
-   stack trace, run `node --check docs/*.js`. A `stale` problem is the Update data workflow: look at its
+   stack trace, run `node --check docs/*.js`. For `markup`, run `python3 -I scripts/html_check.py`
+   and `npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html`; they name the file
+   and line (a quote or `<a>` inside an attribute value is the usual cause). A `stale` problem is the Update data workflow: look at its
    last runs instead of the front end, and fix `scripts/` only when the scraper is at fault.
 3. Fix the cause with the smallest change in `docs/*.html|js|css` (or `scripts/`, `tests/`). Never edit
    `docs/data/`, `docs/geo/` or `.github/`. Keep the Polish UI text, the RCB links and the footer.
-4. Check: `node --check` on every changed script and `python3 -I -m unittest discover -s tests`.
+4. Check: `node --check` on every changed script, `python3 -I -m unittest discover -s tests`, and
+   `npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html` (the Agent PR gate runs
+   all three and sends a failing PR back). For a new kind of defect, add a test that catches it.
 5. Open one PR. Its title is a Conventional Commit after the prefix, e.g. `fix(map): …`.
    Its body says: the problem from the report, the cause, the fix, how you checked it, and
    `Refs #<issue>`. Then add one comment on the issue with the PR's title.

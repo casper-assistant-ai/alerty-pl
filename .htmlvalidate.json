@@ -1,0 +1,29 @@
+{
+  "root": true,
+  "extends": [],
+  "rules": {
+    "attr-pattern": ["error", { "pattern": "^[a-z][a-z0-9\\-._:]*$" }],
+    "attr-quotes": "error",
+    "attribute-allowed-values": "error",
+    "close-attr": "error",
+    "close-order": "error",
+    "deprecated": "error",
+    "element-name": "error",
+    "element-permitted-content": "error",
+    "element-permitted-occurrences": "error",
+    "element-permitted-order": "error",
+    "element-permitted-parent": "error",
+    "element-required-attributes": "error",
+    "element-required-content": "error",
+    "no-dup-attr": "error",
+    "no-dup-id": "error",
+    "no-raw-characters": ["error", { "relaxed": true }],
+    "unrecognized-char-ref": "error",
+    "void-content": "error",
+    "valid-id": ["error", { "relaxed": true }],
+    "missing-doctype": "error",
+    "no-missing-references": "error",
+    "map-dup-name": "error",
+    "no-implicit-close": "error"
+  }
+}

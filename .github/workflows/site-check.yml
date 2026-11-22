@@ -34,12 +34,15 @@ jobs:
         id: visit
         run: |
           set +e
-          CHROME=$(command -v google-chrome || command -v chromium) node scripts/site_check.mjs --out /tmp/site-check.json --md /tmp/site-check.md
+          CHROME=$(command -v google-chrome || command -v chromium) node scripts/site_check.mjs --out /tmp/site-check.json --md /tmp/site-check.md --shots /tmp/site-check-shots
           echo "rc=$?" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
+          # the report and a screenshot of every page on the desktop and the phone screen
           name: site-check
-          path: /tmp/site-check.*
+          path: |
+            /tmp/site-check.*
+            /tmp/site-check-shots/
       - name: Report to an issue and call the fixer
         if: steps.visit.outputs.rc == '1'
         run: |

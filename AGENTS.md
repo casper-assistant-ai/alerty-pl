@@ -19,8 +19,12 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
 - Tests: `python3 -I -m unittest discover -s tests`. Fixtures are saved gov.pl pages in `tests/fixtures/`.
 - Live check: `python3 -I scripts/rcb.py update --pages 1 --out /tmp/gh-aw/agent/live`.
 - Site check: `node scripts/site_check.mjs` opens every page of the live site in headless Chrome
-  (desktop and phone) and lists JavaScript errors, failed requests, empty pages and stale data. The Site check
+  (desktop and phone) and lists JavaScript errors, failed requests, empty pages, stale data and broken
+  markup a visitor sees (`markup`: raw tags or attributes in the page text, text above the header, the HTML
+  as served through `scripts/html_check.py`); `--shots DIR` keeps a screenshot of every page view. The Site check
   workflow runs it hourly, files problems in an issue labelled `site-error` and calls `site-fixer`.
+- HTML: `python3 -I scripts/html_check.py` (in the unit tests too) and
+  `npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html` (CI and the PR gate) on every page.
 - Process retro: `scripts/retro.py metrics` measures the week (development share of agent output,
   builders with nothing merged, agents that only report, issues with no PR); the daily
   `process-retro` agent keeps the Process block below, `process/schedule.json` (extra agent runs,
@@ -88,7 +92,7 @@ The agent-coach workflow keeps this block (bounded edits, each with its evidence
   issue with that reason instead of opening a PR — the reviewer rejects behaviour-free churn
   even when the issue asks for it [PR #23, issue #21].
 - Run the checks on the exact tree you push (unittest with the node suite, the one-page live
-  parse, `node --check` on every `docs/*.js`) and quote their real output in the PR body; a
+  parse, `node --check` on every `docs/*.js`, html-validate on `docs/*.html`) and quote their real output in the PR body; a
   green claim the CI contradicts costs a fixer round [PR #22, CI run 44997317672].
 - Write the PR title as a Conventional Commit on the first attempt: the gate squashes with it
   and CI lints it, and a prose title that slips through must be hand-mapped into the changelog

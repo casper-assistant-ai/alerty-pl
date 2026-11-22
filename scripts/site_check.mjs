@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 // Site check: opens every page of the live site in headless Chrome, the way a visitor does,
 // on a desktop and a phone screen, and collects what goes wrong: JavaScript exceptions,
-// console errors, failed or 4xx/5xx requests, pages that do not fill in, stale data.
+// console errors, failed or 4xx/5xx requests, pages that do not fill in, stale data, and broken
+// markup a visitor sees (raw tags or attributes in the page text, text above the header; the HTML
+// as served goes through scripts/html_check.py). --shots DIR keeps a screenshot of every page view.
 // Plain Node (22+) and the Chrome DevTools Protocol; no npm.
 //
-//   node scripts/site_check.mjs [--base URL] [--out report.json] [--md report.md]
+//   node scripts/site_check.mjs [--base URL] [--out report.json] [--md report.md] [--shots DIR]
 // CHROME=/path/to/chrome overrides the browser. Exit code 1 when anything is wrong.
-import { spawn } from "node:child_process";
-import { mkdtempSync, writeFileSync, existsSync, rmSync } from "node:fs";
+import { spawn, spawnSync } from "node:child_process";
+import { mkdtempSync, mkdirSync, writeFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, v, i, all) =>
   (v.startsWith("--") ? a.concat([[v.slice(2), all[i + 1]]]) : a), []));
@@ -23,6 +26,33 @@ const COMMON = `(() => { const p = [];
   const ver = document.querySelector("#ver");
   if (ver && !ver.textContent.trim()) p.push("footer version is empty");
   if (document.documentElement.scrollWidth > innerWidth + 2) p.push("page scrolls sideways: " + document.documentElement.scrollWidth + "px wide on a " + innerWidth + "px screen");
+  return p; })()`;
+// Broken markup that shows: 22.11.2026 a link inside <meta name="description"> ended the attribute
+// early and every visitor saw 'powiadomienia.">' above the header. Each line is a "markup" problem.
+const MARKUP = `(() => { const p = [];
+  const text = document.body.innerText;
+  const tag = text.match(/<\\/?(a|abbr|b|br|button|div|em|h[1-6]|i|img|input|label|li|link|meta|nav|ol|option|p|script|section|select|small|span|strong|style|table|td|th|tr|ul)(\\s[^<>]*)?\\/?>/i);
+  if (tag) p.push("raw HTML tag in the page text: " + JSON.stringify(tag[0].slice(0, 80)));
+  const attr = text.match(/\\b(href|src|class|content|style|alt|name|aria-[a-z]+)\\s*=\\s*["'][^"'\\n]{0,60}["']?/);
+  if (attr) p.push("raw HTML attribute in the page text: " + JSON.stringify(attr[0].slice(0, 80)));
+  const tail = text.match(/[^\\s]{0,30}["']\\s*\\/?>/);
+  if (tail) p.push("leftover end of a tag in the page text: " + JSON.stringify(tail[0]));
+  const head = document.querySelector("header.top");
+  const lead = [];
+  for (const n of document.body.childNodes) {
+    if (n === head) break;
+    if (n.nodeType === 3 && n.textContent.trim()) lead.push(n.textContent.trim());
+    else if (n.nodeType === 1 && !/^(SCRIPT|STYLE|LINK|META|NOSCRIPT|TEMPLATE)$/.test(n.tagName) && n.innerText && n.innerText.trim()) lead.push(n.innerText.trim());
+  }
+  if (lead.length) p.push("text above the header: " + JSON.stringify(lead.join(" ").slice(0, 80)));
+  if (head && scrollY < 2 && head.getBoundingClientRect().top > 2) p.push("header starts " + Math.round(head.getBoundingClientRect().top) + "px below the top of the screen");
+  const desc = document.querySelector('meta[name="description"]');
+  if (!desc || !desc.content.trim()) p.push('no <meta name="description">');
+  else if (/[<>]/.test(desc.content)) p.push('<meta name="description"> holds markup: ' + JSON.stringify(desc.content.slice(0, 80)));
+  for (const el of document.querySelectorAll("header.top, main, footer, h1, h2, nav")) {
+    const r = el.getBoundingClientRect();
+    if (r.width && (r.right > innerWidth + 2 || r.left < -2)) p.push((el.id ? "#" + el.id : el.tagName.toLowerCase()) + " sticks out of the screen: " + Math.round(r.left) + ".." + Math.round(r.right) + "px of " + innerWidth);
+  }
   return p; })()`;
 const PAGES = [
   { path: "", name: "Mapa", check: `(() => { const p = [];
@@ -161,17 +191,53 @@ async function visit(cdp, sid, page, vp) {
   while (!loaded && Date.now() - t0 < 30000) await sleep(100);
   if (!loaded) problems.push({ kind: "timeout", detail: "page did not load in 30 s" });
   await sleep(3500); // data files and charts load after the load event
-  for (const expr of [COMMON, page.check]) {
+  for (const [kind, expr] of [["content", COMMON], ["markup", MARKUP], ["content", page.check]]) {
     const r = await cdp.send("Runtime.evaluate", { expression: expr, returnByValue: true }, sid);
     if (r.exceptionDetails) problems.push({ kind: "check", detail: "check failed: " + r.exceptionDetails.text });
-    else for (const d of r.result.value || []) problems.push({ kind: "content", detail: d });
+    else for (const d of r.result.value || []) problems.push({ kind, detail: d });
+  }
+  let shot;
+  if (args.shots) {
+    await cdp.send("Runtime.evaluate", { expression: "scrollTo(0, 0)" }, sid);
+    const { data } = await cdp.send("Page.captureScreenshot", { format: "png" }, sid);
+    shot = join(args.shots, `${vp.name}-${(page.path || "index").replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "")}.png`);
+    writeFileSync(shot, Buffer.from(data, "base64"));
   }
   cdp.handlers = cdp.handlers.filter((h) => h !== handler);
   // a few failed 3rd-party tiles (a satellite day with no image) are normal; many are not
   const third = problems.filter((p) => p.kind.endsWith("-3rd"));
   const rest = problems.filter((p) => !p.kind.endsWith("-3rd"));
   if (third.length > 8) rest.push({ kind: "3rd-party", detail: `${third.length} failed requests to other sites, e.g. ${third[0].detail}` });
-  return { page: page.name, url, viewport: vp.name, ms: Date.now() - t0, problems: rest };
+  return { page: page.name, url, viewport: vp.name, ms: Date.now() - t0, problems: rest, ...(shot ? { shot } : {}) };
+}
+
+// The HTML of each page as the server sends it, through scripts/html_check.py (plain Python).
+async function served() {
+  const out = [];
+  const files = [...new Set(PAGES.map((p) => new URL(BASE + p.path).pathname))];
+  const tmp = mkdtempSync(join(tmpdir(), "site-html-"));
+  const checker = join(dirname(fileURLToPath(import.meta.url)), "html_check.py");
+  try {
+    for (const path of files) {
+      const url = new URL(path, BASE).href;
+      try {
+        const r = await fetch(url + "?t=" + Date.now());
+        if (!r.ok) continue; // the page visit reports the HTTP error
+        const f = join(tmp, (path.split("/").pop() || "index.html"));
+        writeFileSync(f, await r.text());
+        const c = spawnSync("python3", ["-I", checker, f], { encoding: "utf8" });
+        const problems = c.stdout.split("\n").filter((l) => l.startsWith(f + ":"))
+          .map((l) => ({ kind: "markup", detail: "HTML as served, line " + l.slice(f.length + 1).replace(/^(\d+): /, "$1: ") }));
+        if (c.status !== 0 && !problems.length) problems.push({ kind: "check", detail: "html_check.py failed: " + (c.stderr || c.stdout).slice(0, 200) });
+        if (problems.length) out.push({ page: "HTML " + (path.split("/").pop() || "index.html"), url, viewport: "-", problems });
+      } catch (e) {
+        out.push({ page: "HTML " + path, url, viewport: "-", problems: [{ kind: "http", detail: e.message }] });
+      }
+    }
+  } finally {
+    rmSync(tmp, { recursive: true, force: true });
+  }
+  return out;
 }
 
 async function freshness() {
@@ -195,7 +261,9 @@ async function main() {
     const { sessionId: sid } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
     for (const d of ["Page", "Runtime", "Network"]) await cdp.send(d + ".enable", {}, sid);
     await cdp.send("Network.setCacheDisabled", { cacheDisabled: true }, sid);
+    if (args.shots) mkdirSync(args.shots, { recursive: true });
     for (const vp of VIEWPORTS) for (const page of PAGES) results.push(await visit(cdp, sid, page, vp));
+    results.push(...await served());
     results.push(...await freshness());
   } finally {
     proc.kill("SIGKILL");
