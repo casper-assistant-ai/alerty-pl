@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.17.3 (2026-11-23)
+
+### fix
+
+- **mobile:** phone audit fixes and a mobile audit in the site check ([c8f4d4e](https://github.com/casper-assistant-ai/alerty-pl/commit/c8f4d4e))
+
 ## 1.17.2 (2026-11-22)
 
 ### fix

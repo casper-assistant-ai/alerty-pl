@@ -15,6 +15,21 @@
  },
  "releases": [
   {
+   "version": "1.17.3",
+   "date": "2026-11-23",
+   "sha": "c8f4d4e",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "mobile",
+     "breaking": false,
+     "text": "phone audit fixes and a mobile audit in the site check",
+     "sha": "c8f4d4e",
+     "date": "2026-11-23"
+    }
+   ]
+  },
+  {
    "version": "1.17.2",
    "date": "2026-11-22",
    "sha": "74fa73a",
