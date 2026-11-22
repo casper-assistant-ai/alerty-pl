@@ -55,7 +55,7 @@ test("plural picks the Polish form for one, a few and many", () => {
   const f = (n) => RCB.plural(n, "alert", "alerty", "alertów");
   assert.equal(f(1), "alert");
   assert.equal(f(3), "alerty");
-  assert.equal(f(12), "alerty");
+  assert.equal(f(12), "alertów"); // 12–14 take the many form like 5–21, despite ending in 2–4
   assert.equal(f(22), "alerty");
   assert.equal(f(25), "alertów");
 });
