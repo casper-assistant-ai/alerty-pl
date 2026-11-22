@@ -1,12 +1,12 @@
 {
- "note": "Hand-kept: confirmed cases of missiles and drones in Polish airspace, each with sources. Routes are approximate.",
+ "note": "Hand-kept: confirmed cases of missiles and drones in Polish airspace, each with sources. Routes are approximate. Each weapon: from = the country that launched it (Russia, Russia-Kaliningrad, Belarus; Ukraine only for its own air defence, role air_defense), via = the country it flew over before Poland (Ukraine, Belarus or null), launch = the launch area and whether a source names it; the path starts there.",
  "events": [
   {
    "id": "2022-11-15-przewodow",
    "date": "2022-11-15",
    "time_local": "15:40",
-   "title_pl": "Przewodów: rakieta S-300 spadła na suszarnię zboża",
-   "summary_pl": "15.11.2022 ok. 15:40 pocisk 5W55 z systemu S-300, wystrzelony przez ukraińską obronę powietrzną podczas rosyjskiego ataku rakietowego, uderzył w suszarnię zboża w Przewodowie. Zginęło dwóch pracowników. Prokuratura Krajowa zawiesiła śledztwo w styczniu 2024 r. (brak pomocy prawnej od Ukrainy).",
+   "title_pl": "Przewodów: pocisk ukraińskiej obrony powietrznej podczas rosyjskiego ataku",
+   "summary_pl": "Atak prowadziła Rosja: 15.11.2022 ok. 15:40 pocisk 5W55 z systemu S-300, wystrzelony przez ukraińską obronę powietrzną podczas rosyjskiego ataku rakietowego, uderzył w suszarnię zboża w Przewodowie. Zginęło dwóch pracowników. Prokuratura Krajowa zawiesiła śledztwo w styczniu 2024 r. (brak pomocy prawnej od Ukrainy).",
    "weapons": [
     {
      "kind": "missile",
@@ -32,6 +32,12 @@
       "place": "Przewodów (gm. Dołhobyczów, pow. hrubieszowski)",
       "lat": 50.4745,
       "lon": 23.9233
+     },
+     "role": "air_defense",
+     "via": null,
+     "launch": {
+      "area_pl": "Ukraina, stanowisko obrony powietrznej (niejawne)",
+      "certain": false
      }
     }
    ],
@@ -44,7 +50,7 @@
      "note_pl": "Suszarnia zboża na terenie dawnego PGR, ok. 6 km od granicy; 2 ofiary śmiertelne, lej ok. 5 m."
     }
    ],
-   "route_note_pl": "Miejsce uderzenia pewne; miejsce startu pocisku nie zostało ujawnione (dokumenty niejawne), więc trasa jest schematyczna: z Ukrainy ze wschodu na Przewodów.",
+   "route_note_pl": "Miejsce uderzenia pewne. Pocisk obrony powietrznej wystrzeliła Ukraina, broniąc się przed rosyjskimi rakietami; miejsce startu nie zostało ujawnione (dokumenty niejawne), więc trasa jest schematyczna: ze wschodu na Przewodów.",
    "sources": [
     {
      "title": "Prokuratura zawiesiła śledztwo ws. wybuchu rakiety w Przewodowie",
@@ -76,7 +82,8 @@
      "url": "https://www.reuters.com/world/europe/polish-experts-confirm-missile-that-hit-grain-facility-was-ukrainian-media-2023-09-26/",
      "date": "2023-09-26"
     }
-   ]
+   ],
+   "attack_by": "Russia"
   },
   {
    "id": "2022-12-16-kh55-zamosc-bydgoszcz",
@@ -89,8 +96,12 @@
      "kind": "missile",
      "label_pl": "rosyjska rakieta manewrująca Ch-55 (bez głowicy bojowej, balast)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       54.75,
+       32.4
+      ],
       [
        52.15,
        24.4
@@ -117,6 +128,11 @@
       "place": "Zamość (gm. Szubin, pow. nakielski), las",
       "lat": 53.0741,
       "lon": 17.8079
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, lotnictwo strategiczne (rejon nieujawniony)",
+      "certain": false
      }
     }
    ],
@@ -129,7 +145,7 @@
      "note_pl": "Szczątki w lesie, bez śladów eksplozji; radar stracił obiekt ok. 2 km od miejsca znalezienia (RMF24)."
     }
    ],
-   "route_note_pl": "Trasa umowna (linia prosta ok. 450-500 km): źródła nie podają śladu radarowego. RMF24: wlot z Białorusi; Polityka i OKO.press: pierwszą informację dała strona ukraińska, więc wlot znad Ukrainy nie jest wykluczony. Punkt końcowy pewny co do wsi.",
+   "route_note_pl": "Trasa umowna (linia prosta ok. 450-500 km): źródła nie podają śladu radarowego. RMF24: wlot znad Białorusi; Polityka i OKO.press: pierwszą informację dała strona ukraińska, więc wlot znad Ukrainy nie jest wykluczony. Punkt końcowy pewny co do wsi. Rakietę odpaliła Rosja; rejon startu nie został podany; punkt startu jest umowny (w Rosji, za Białorusią).",
    "sources": [
     {
      "title": "Wraca sprawa rosyjskiej rakiety pod Bydgoszczą. Ustalenia RMF FM",
@@ -168,14 +184,18 @@
    "date": "2023-12-29",
    "time_local": "07:12",
    "title_pl": "Rosyjska rakieta w polskiej przestrzeni na ok. 3 minuty (Lubelszczyzna)",
-   "summary_pl": "29.12.2023 o 7:12 rosyjska rakieta manewrująca wleciała z Ukrainy w rejonie Hrubieszowa i przebywała nad Polską niecałe 3 minuty, pokonując ok. 40 km. Była śledzona przez radary polskie i sojusznicze, po czym opuściła polską przestrzeń. Naziemne poszukiwania (WOT) nie znalazły szczątków.",
+   "summary_pl": "29.12.2023 o 7:12 rosyjska rakieta manewrująca, odpalona z Rosji z bombowca Tu-95MS, przeleciała nad Ukrainą i weszła nad Polskę w rejonie Hrubieszowa i przebywała nad Polską niecałe 3 minuty, pokonując ok. 40 km. Była śledzona przez radary polskie i sojusznicze, po czym opuściła polską przestrzeń. Naziemne poszukiwania (WOT) nie znalazły szczątków.",
    "weapons": [
     {
      "kind": "missile",
      "label_pl": "rosyjska rakieta manewrująca (typ nieustalony)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       51.0,
+       38.6
+      ],
       [
        50.95,
        24.5
@@ -202,6 +222,11 @@
       "place": "granica z Ukrainą, okolice pow. tomaszowskiego/hrubieszowskiego (miejsce wylotu niepodane)",
       "lat": 50.5,
       "lon": 23.99
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, bombowce Tu-95MS z lotniska Olenia (rubież startu nieujawniona)",
+      "certain": false
      }
     }
    ],
@@ -214,7 +239,7 @@
      "note_pl": "Rejon przeszukiwań po doniesieniach mieszkańców gm. Komarów; nic nie znaleziono (doniesienie o upadku w Wożuczynie zdementowano)."
     }
    ],
-   "route_note_pl": "Oficjalnie: wlot od strony Ukrainy w rejonie Hrubieszowa, ok. 3 min i ok. 40 km nad Polską. Przebieg wewnątrz kraju i punkt wylotu są szacunkowe (obserwacje mieszkańców gm. Komarów); kształt trasy z zawróceniem jest schematyczny.",
+   "route_note_pl": "Oficjalnie: wlot znad Ukrainy w rejonie Hrubieszowa, ok. 3 min i ok. 40 km nad Polską. Przebieg wewnątrz kraju i punkt wylotu są szacunkowe (obserwacje mieszkańców gm. Komarów); kształt trasy z zawróceniem jest schematyczny. Siły Powietrzne Ukrainy: rakiety odpaliły Tu-95MS z lotniska Olenia; rejon startu nie został podany; punkt startu jest umowny (w Rosji, na wschód od Ukrainy).",
    "sources": [
     {
      "title": "Szef Sztabu Generalnego: Wszystko wskazuje, że rakieta rosyjska wtargnęła w polską przestrzeń powietrzną",
@@ -245,6 +270,12 @@
      "publisher": "Reuters",
      "url": "https://www.reuters.com/world/europe/unidentified-object-entered-polish-airspace-2023-12-29/",
      "date": "2023-12-30"
+    },
+    {
+     "title": "Наймасованіша атака з повітря: ЗСУ знищили 114 із 158 цілей",
+     "publisher": "Слово і діло",
+     "url": "https://www.slovoidilo.ua/2023/12/29/novyna/bezpeka/najmasovanisha-ataka-povitrya-zsu-znyshhyly-114-158-czilej",
+     "date": "2023-12-29"
     }
    ]
   },
@@ -253,14 +284,30 @@
    "date": "2024-03-24",
    "time_local": "04:23",
    "title_pl": "Rosyjska rakieta manewrująca w polskiej przestrzeni przez 39 sekund (Oserdów)",
-   "summary_pl": "24.03.2024 o 4:23 jedna z rakiet manewrujących odpalonych na zachodnią Ukrainę naruszyła polską przestrzeń na wysokości Oserdowa (woj. lubelskie) na 39 sekund. Obiekt był śledzony przez radary; poderwano polskie i sojusznicze lotnictwo. Nie zestrzelono go, uznając to za zbyt ryzykowne.",
+   "summary_pl": "24.03.2024 o 4:23 jedna z 29 rakiet manewrujących Ch-101/Ch-555, odpalonych przez Rosję z bombowców Tu-95MS z rejonu Engelsa na Ukrainę, przeleciała nad Ukrainą i naruszyła polską przestrzeń na wysokości Oserdowa (woj. lubelskie) na 39 sekund. Obiekt był śledzony przez radary; poderwano polskie i sojusznicze lotnictwo. Nie zestrzelono go, uznając to za zbyt ryzykowne.",
    "weapons": [
     {
      "kind": "missile",
      "label_pl": "rosyjska rakieta manewrująca (typ nieustalony)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       51.48,
+       46.2
+      ],
+      [
+       50.9,
+       34.8
+      ],
+      [
+       49.6,
+       34.5
+      ],
+      [
+       50.3,
+       30.6
+      ],
       [
        50.4,
        24.4
@@ -287,6 +334,11 @@
       "place": "okolice Oserdowa (gm. Ulhówek, pow. tomaszowski)",
       "lat": 50.48,
       "lon": 24.02
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, rejon Engelsa (obwód saratowski), bombowce Tu-95MS",
+      "certain": true
      }
     }
    ],
@@ -299,7 +351,7 @@
      "note_pl": "Miejsce wlotu podane przez DORSZ (na wysokości Oserdowa); brak szczątków."
     }
    ],
-   "route_note_pl": "Wlot na wysokości Oserdowa i 39 s w polskiej przestrzeni to dane DORSZ; ok. 8 km trasy (prędkość ok. 800 km/h). Kształt trasy po wlocie jest schematyczny.",
+   "route_note_pl": "Start: rejon Engelsa (Siły Powietrzne Ukrainy). Nad Ukrainą rakiety leciały przez obwody sumski i połtawski na Kijowszczyznę, potem na południowy zachód (relacje Sił Powietrznych w mediach); te punkty są orientacyjne. Wlot na wysokości Oserdowa i 39 s w polskiej przestrzeni to dane DORSZ; ok. 8 km trasy (prędkość ok. 800 km/h). Kształt trasy po wlocie jest schematyczny.",
    "sources": [
     {
      "title": "Rosyjska rakieta w polskiej przestrzeni. Komunikat Dowództwa Operacyjnego",
@@ -324,6 +376,24 @@
      "publisher": "CNN",
      "url": "https://www.cnn.com/2024/03/24/europe/poland-activates-aircraft-russia-attacks-lviv-intl/index.html",
      "date": "2024-03-24"
+    },
+    {
+     "title": "Активність Ту-95: Повітряні Сили зафіксували пуски ракет із району Енгельсу",
+     "publisher": "Суспільне",
+     "url": "https://suspilne.media/884695-povitrani-sili-rosijski-tu-95-jmovirno-zdijsnili-puski-krilatih-raket/",
+     "date": "2024-03-24"
+    },
+    {
+     "title": "UA MIL REPORT for MARCH 24, 2024 (zvit Povitrianykh syl)",
+     "publisher": "Mission Ukraine",
+     "url": "https://uamission.com/ua-mil-report-for-march-24-2024/",
+     "date": "2024-03-24"
+    },
+    {
+     "title": "Нічна атака дронами та ракетами (хроніка, маршрути ракет)",
+     "publisher": "NV",
+     "url": "https://nv.ua/ukr/ukraine/events/rosiya-atakuye-shahedami-ta-raketami-vibuhi-chuli-u-harkovi-ta-mikolayevi-onlayn-novini-ukrajini-50403817.html",
+     "date": "2024-03-24"
     }
    ]
   },
@@ -332,14 +402,18 @@
    "date": "2025-08-20",
    "time_local": "02:22",
    "title_pl": "Osiny: dron wybuchł na polu kukurydzy",
-   "summary_pl": "W nocy z 19 na 20.08.2025 niezidentyfikowany dron spadł i wybuchł na polu kukurydzy w Osinach (pow. łukowski); zgłoszenie do policji o 2:22. Prokuratura Okręgowa w Lublinie potwierdziła dron wojskowy (bez głowicy bojowej, z niewielką ilością materiału wybuchowego; napisy prawdopodobnie po koreańsku), a minister obrony nazwał to rosyjską prowokacją. Prokurator wskazał na przelot z Białorusi, choć DORSZ nie odnotowało naruszenia przestrzeni powietrznej.",
+   "summary_pl": "W nocy z 19 na 20.08.2025 niezidentyfikowany dron spadł i wybuchł na polu kukurydzy w Osinach (pow. łukowski); zgłoszenie do policji o 2:22. Prokuratura Okręgowa w Lublinie potwierdziła dron wojskowy (bez głowicy bojowej, z niewielką ilością materiału wybuchowego; napisy prawdopodobnie po koreańsku), a minister obrony nazwał to rosyjską prowokacją. Prokurator wskazał na przelot znad Białorusi, choć DORSZ nie odnotowało naruszenia przestrzeni powietrznej.",
    "weapons": [
     {
      "kind": "drone",
      "label_pl": "dron wojskowy, najprawdopodobniej Shahed/Geran-2 (nieoficjalnie)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       54.0,
+       32.4
+      ],
       [
        52.1,
        24.0
@@ -358,6 +432,11 @@
       "place": "Osiny (gm. Wola Mysłowska, pow. łukowski)",
       "lat": 51.8673,
       "lon": 22.0902
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja (rejon nieujawniony)",
+      "certain": false
      }
     }
    ],
@@ -370,7 +449,7 @@
      "note_pl": "Spalony obszar 8-10 m, odłamki na kilkudziesięciu metrach; uszkodzone zabudowania, brak ofiar."
     }
    ],
-   "route_note_pl": "Trasa schematyczna z granicy z Białorusią (ok. 100 km od miejsca wybuchu) wg wypowiedzi prokuratora; dron nie został wykryty przez radary, więc nie ma śladu.",
+   "route_note_pl": "Trasa schematyczna z granicy z Białorusią (ok. 100 km od miejsca wybuchu) wg wypowiedzi prokuratora; dron nie został wykryty przez radary, więc nie ma śladu. Minister obrony nazwał to rosyjską prowokacją; rejon startu nie został podany; punkt startu jest umowny (w Rosji, za Białorusią).",
    "sources": [
     {
      "title": "Niezidentyfikowany obiekt spadł i wybuchł na polu w Osinach - prokuratura wstępnie potwierdza",
@@ -403,14 +482,18 @@
    "date": "2025-09-10",
    "time_local": null,
    "title_pl": "Masowe wtargnięcie rosyjskich dronów (noc 9/10 września 2025)",
-   "summary_pl": "Od ok. 23:30 9.09 do ok. 6:30 10.09.2025 polską przestrzeń naruszyło co najmniej 19 dronów (Rzeczpospolita: ok. 23), głównie wabików Gerbera, podczas rosyjskiego ataku na Ukrainę. Premier Tusk: spora część nadleciała po raz pierwszy bezpośrednio z Białorusi; polskie i sojusznicze samoloty (m.in. holenderskie F-35) zestrzeliły kilka. Szczątki 17 dronów znaleziono w pięciu województwach; Polska uruchomiła art. 4 NATO.",
+   "summary_pl": "Od ok. 23:30 9.09 do ok. 6:30 10.09.2025 polską przestrzeń naruszyło co najmniej 19 dronów (Rzeczpospolita: ok. 23), głównie wabików Gerbera, podczas rosyjskiego ataku na Ukrainę. Premier Tusk: spora część nadleciała po raz pierwszy bezpośrednio znad Białorusi; polskie i sojusznicze samoloty (m.in. holenderskie F-35) zestrzeliły kilka. Szczątki 17 dronów znaleziono w pięciu województwach; Polska uruchomiła art. 4 NATO. Prokuratura ustaliła, że drony wystartowały z mobilnych wyrzutni w rosyjskich obwodach briańskim, kurskim i biełgorodzkim oraz z terenów okupowanych; kilka przeleciało nad Białorusią.",
    "weapons": [
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        52.15,
        24.2
@@ -425,14 +508,23 @@
       "place": "Czosnówka (gm. Biała Podlaska, pow. bialski)",
       "lat": 52.0145,
       "lon": 23.2259
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        52.1,
        24.35
@@ -447,14 +539,23 @@
       "place": "Zabłocie-Kolonia (gm. Kodeń, pow. bialski)",
       "lat": 51.8414,
       "lon": 23.5721
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        51.95,
        24.4
@@ -469,14 +570,23 @@
       "place": "Wyryki-Wola (gm. Wyryki, pow. włodawski)",
       "lat": 51.5617,
       "lon": 23.3654
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        51.9,
        24.3
@@ -491,14 +601,23 @@
       "place": "Wielki Łan (gm. Stary Brus, pow. włodawski)",
       "lat": 51.4837,
       "lon": 23.2049
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        51.95,
        24.35
@@ -513,14 +632,23 @@
       "place": "Krzywowierzba-Kolonia (gm. Dębowa Kłoda, pow. parczewski)",
       "lat": 51.5942,
       "lon": 23.1567
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron (zestrzelony), typ nieustalony",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        51.95,
        24.3
@@ -535,14 +663,23 @@
       "place": "Wyhalew (gm. Dębowa Kłoda, pow. parczewski)",
       "lat": 51.6186,
       "lon": 23.1654
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        52.1,
        24.0
@@ -557,14 +694,23 @@
       "place": "Wohyń (gm. Wohyń, pow. radzyński)",
       "lat": 51.7562,
       "lon": 22.7863
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron (zestrzelony), typ nieustalony",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       50.6,
+       36.6
+      ],
       [
        50.6,
        24.45
@@ -579,14 +725,23 @@
       "place": "Cześniki (gm. Sitno, pow. zamojski)",
       "lat": 50.7031,
       "lon": 23.4408
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód biełgorodzki (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       50.6,
+       36.6
+      ],
       [
        50.95,
        24.4
@@ -601,14 +756,23 @@
       "place": "Bychawka Trzecia (gm. Bychawa, pow. lubelski)",
       "lat": 51.0669,
       "lon": 22.5317
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód biełgorodzki (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       50.6,
+       36.6
+      ],
       [
        50.3,
        24.25
@@ -623,14 +787,23 @@
       "place": "Przymiarki (gm. Księżpol, pow. biłgorajski)",
       "lat": 50.409,
       "lon": 22.786
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód biełgorodzki (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        52.0,
        24.5
@@ -645,14 +818,23 @@
       "place": "Mniszków (gm. Mniszków, pow. opoczyński, łódzkie)",
       "lat": 51.3702,
       "lon": 20.0356
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        52.05,
        24.5
@@ -667,14 +849,23 @@
       "place": "Nowe Miasto nad Pilicą (pow. grójecki, mazowieckie)",
       "lat": 51.6167,
       "lon": 20.5796
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        52.4,
        24.0
@@ -689,14 +880,23 @@
       "place": "Rabiany (gm. Korytnica, pow. węgrowski, mazowieckie)",
       "lat": 52.4138,
       "lon": 21.7862
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Belarus",
+     "from": "Russia",
      "path": [
+      [
+       53.25,
+       34.37
+      ],
       [
        53.5,
        25.0
@@ -711,14 +911,23 @@
       "place": "Oleśno (gm. Gronowo Elbląskie, pow. elbląski, warmińsko-mazurskie)",
       "lat": 54.0791,
       "lon": 19.2865
+     },
+     "via": "Belarus",
+     "launch": {
+      "area_pl": "Rosja, obwód briański (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       50.6,
+       36.6
+      ],
       [
        50.4,
        24.0
@@ -733,14 +942,23 @@
       "place": "Czyżów (gm. Stopnica, pow. buski, świętokrzyskie)",
       "lat": 50.4832,
       "lon": 20.9985
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód biełgorodzki (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       50.6,
+       36.6
+      ],
       [
        50.5,
        24.1
@@ -755,14 +973,23 @@
       "place": "Smyków (gm. Raków, pow. kielecki, świętokrzyskie)",
       "lat": 50.7122,
       "lon": 20.893
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód biełgorodzki (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron Gerbera / wabik (typ wg MSWiA; trasa wlotu umowna)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       50.6,
+       36.6
+      ],
       [
        50.6,
        24.25
@@ -777,6 +1004,11 @@
       "place": "Sobótka (gm. Ożarów, pow. opatowski, świętokrzyskie)",
       "lat": 50.7951,
       "lon": 21.6826
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód biełgorodzki (jeden z trzech wskazanych przez prokuraturę)",
+      "certain": false
      }
     }
    ],
@@ -922,7 +1154,7 @@
      "note_pl": "Styropianowy dron na bagnie, znaleziony 20.09.2025; prawdopodobnie ostatni z nocy 9/10.09 (TVP World)."
     }
    ],
-   "route_note_pl": "Dla każdego drona podano tylko punkt końcowy (miejsce znalezienia) z MSWiA; punkt startu i kraj wlotu są wnioskiem z geometrii, nie danymi oficjalnymi (oficjalnie: znaczna część z Białorusi, reszta znad Ukrainy). Ślady radarowe nie zostały opublikowane. Liczba 19 naruszeń jest od premiera, a pozycji z listy MSWiA jest 17.",
+   "route_note_pl": "Dla każdego drona podano tylko punkt końcowy (miejsce znalezienia) z MSWiA; punkt startu i kraj wlotu są wnioskiem z geometrii, nie danymi oficjalnymi (oficjalnie: znaczna część znad Białorusi, reszta znad Ukrainy). Ślady radarowe nie zostały opublikowane. Liczba 19 naruszeń jest od premiera, a pozycji z listy MSWiA jest 17. Start: prokuratura podała trzy obwody Rosji; który dron wystartował skąd, nie podano, więc drony znad Białorusi zaczynają w obwodzie briańskim, a znad Ukrainy w biełgorodzkim (umownie).",
    "sources": [
     {
      "title": "Komunikat ws. sytuacji dotyczącej naruszenia polskiej przestrzeni powietrznej przez rosyjskie drony - podsumowanie dnia",
@@ -965,6 +1197,12 @@
      "publisher": "Świat Dronów",
      "url": "https://www.swiatdronow.pl/podsumowanie-sytuacji-naruszen-polskiej-granicy-przez-rosyjskie-drony-z-9-10-wrzesnia-2025",
      "date": "2025-09-15"
+    },
+    {
+     "title": "Prokuratura nie ustaliła, kto kierował atakiem 30 rosyjskich dronów na Polskę",
+     "publisher": "Rzeczpospolita",
+     "url": "https://www.rp.pl/przestepczosc/art45255791-prokuratura-umorzyla-sledztwo-w-sprawie-dronowego-ataku-na-polske",
+     "date": "2026-10-06"
     }
    ]
   },
@@ -999,6 +1237,11 @@
       "place": "Osieka/Osęka (gm. Bartoszyce, pow. bartoszycki)",
       "lat": 54.2113,
       "lon": 20.7847
+     },
+     "via": null,
+     "launch": {
+      "area_pl": "Rosja, obwód królewiecki",
+      "certain": true
      }
     }
    ],
@@ -1050,8 +1293,12 @@
      "kind": "missile",
      "label_pl": "rosyjska rakieta manewrująca Ch-101",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       51.0,
+       38.6
+      ],
       [
        50.9,
        24.55
@@ -1070,6 +1317,11 @@
       "place": "ok. 2 km od Tarnawy-Kolonii (gm. Turobin, pow. biłgorajski)",
       "lat": 50.8524,
       "lon": 22.6528
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, bombowce Tu-95MS i Tu-160 (rubież startu nieujawniona)",
+      "certain": false
      }
     }
    ],
@@ -1082,7 +1334,7 @@
      "note_pl": "Lej ok. 10 m szer. i ok. 5 m głęb.; współrzędne wsi, dokładne miejsce uderzenia ok. 2 km od niej, bez publikacji współrzędnych."
     }
    ],
-   "route_note_pl": "DORSZ: obiekt w polskiej przestrzeni od 3:40, zanik 3:46 (ok. 80-90 km w linii prostej od granicy, kierunek zachodni); dokładny punkt wlotu nie został podany, więc wlot przy Hrubieszowie jest szacunkiem.",
+   "route_note_pl": "DORSZ: obiekt w polskiej przestrzeni od 3:40, zanik 3:46 (ok. 80-90 km w linii prostej od granicy, kierunek zachodni); dokładny punkt wlotu nie został podany, więc wlot przy Hrubieszowie jest szacunkiem. Siły Powietrzne Ukrainy: kilka fal Ch-101 z Tu-95MS i Tu-160; rejon startu nie został podany; punkt startu jest umowny (w Rosji, na wschód od Ukrainy).",
    "sources": [
     {
      "title": "Tarnawa-Kolonia. Generał tłumaczy dlaczego wojsko nie strzelało do obiektu",
@@ -1113,6 +1365,12 @@
      "publisher": "BBC",
      "url": "https://www.bbc.com/news/articles/cwymkgenv2ro",
      "date": "2026-07-30"
+    },
+    {
+     "title": "Масований удар РФ по Україні 30 липня: Повітряні сили ЗСУ розповіли деталі обстрілу",
+     "publisher": "Суспільне",
+     "url": "https://suspilne.media/amp/1367248-povitrani-sili-vnoci-ppo-zbila-55-raket-i-265-droniv-e-vlucanna/",
+     "date": "2026-07-30"
     }
    ]
   },
@@ -1121,14 +1379,22 @@
    "date": "2026-11-20",
    "time_local": "06:36",
    "title_pl": "Dwie rakiety i dron odrzutowy na Lubelszczyźnie i Podkarpaciu",
-   "summary_pl": "W nocy z 19 na 20 listopada Rosja przeprowadziła jeden z największych ataków na Ukrainę: 26 Kalibrów, 72 rakiety Ch-101 i 503 drony. Do granicy zbliżyło się 11 obiektów, trzy weszły w polską przestrzeń powietrzną i spadły. Rakieta Ch-101 spadła na pole w Nowym Lipowcu, druga rakieta prawdopodobnie koło Rudnika nad Sanem, a szczątki prawdopodobnie drona odrzutowego znaleziono w Mołodyczu. Nikt nie został ranny.",
+   "summary_pl": "W nocy z 19 na 20 listopada Rosja przeprowadziła jeden z największych ataków na Ukrainę: 26 Kalibrów, 72 rakiety Ch-101 i 503 drony. Do granicy zbliżyło się 11 obiektów, trzy weszły w polską przestrzeń powietrzną i spadły. Rakiety Ch-101 Rosja odpaliła z obwodu wołogodzkiego, przeleciały nad Ukrainą. Rakieta Ch-101 spadła na pole w Nowym Lipowcu, druga rakieta prawdopodobnie koło Rudnika nad Sanem, a szczątki prawdopodobnie drona odrzutowego znaleziono w Mołodyczu. Nikt nie został ranny.",
    "weapons": [
     {
      "kind": "missile",
      "label_pl": "rakieta manewrująca Ch-101",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       59.2,
+       39.9
+      ],
+      [
+       51.3,
+       34.6
+      ],
       [
        50.18,
        24.05
@@ -1147,14 +1413,27 @@
       "place": "Nowy Lipowiec (gm. Księżpol, pow. biłgorajski)",
       "lat": 50.4403,
       "lon": 22.8375
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód wołogodzki (Siły Powietrzne Ukrainy)",
+      "certain": true
      }
     },
     {
      "kind": "missile",
      "label_pl": "rakieta (prawdopodobnie)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       59.2,
+       39.9
+      ],
+      [
+       51.3,
+       34.6
+      ],
       [
        50.12,
        23.95
@@ -1173,14 +1452,23 @@
       "place": "okolice Rudnika nad Sanem (pow. niżański)",
       "lat": 50.4448,
       "lon": 22.244
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód wołogodzki (Siły Powietrzne Ukrainy)",
+      "certain": true
      }
     },
     {
      "kind": "drone",
      "label_pl": "dron odrzutowy (prawdopodobnie)",
      "count": 1,
-     "from": "Ukraine",
+     "from": "Russia",
      "path": [
+      [
+       51.73,
+       36.19
+      ],
       [
        49.98,
        23.7
@@ -1199,11 +1487,16 @@
       "place": "Mołodycz (gm. Wiązownica, pow. jarosławski)",
       "lat": 50.1585,
       "lon": 22.8318
+     },
+     "via": "Ukraine",
+     "launch": {
+      "area_pl": "Rosja, obwód kurski (jeden z rejonów startu dronów wg Sił Powietrznych Ukrainy)",
+      "certain": false
      }
     }
    ],
    "points": [],
-   "route_note_pl": "Trasy orientacyjne: wojsko podało tylko, że obiekty weszły w przestrzeń RP znad Ukrainy, oraz miejsca upadku. Rudnik nad Sanem i dron w Mołodyczu to wstępne ustalenia ministra obrony; prokuratura 20.11 potwierdziła upadek w Nowym Lipowcu.",
+   "route_note_pl": "Start: rakiety z obwodu wołogodzkiego (Siły Powietrzne Ukrainy); punkt wejścia nad Ukrainę (obwód sumski) jest umowny. Dron: Siły Powietrzne podały kilka rejonów startu dronów (Orzeł, Kursk, Millerowo, Primorsko-Achtarsk i tereny okupowane); start w obwodzie kurskim jest umowny. Wojsko podało tylko, że obiekty weszły w przestrzeń RP znad Ukrainy, oraz miejsca upadku. Rudnik nad Sanem i dron w Mołodyczu to wstępne ustalenia ministra obrony; prokuratura 20.11 potwierdziła upadek w Nowym Lipowcu.",
    "sources": [
     {
      "title": "Dwie rakiety i dron. Kosiniak-Kamysz zdradza, co spadło na terytorium Polski",
@@ -1287,6 +1580,12 @@
      "title": "Poland condemns Russian airspace 'provocation'",
      "publisher": "RTE (Reuters)",
      "url": "https://www.rte.ie/news/2026/1120/1600008-poland-russia-airspace-violations/",
+     "date": "2026-11-20"
+    },
+    {
+     "title": "Сили ППО вночі знешкодили 82 ракети та 380 російських дронів: деталі атаки",
+     "publisher": "Слово і діло",
+     "url": "https://www.slovoidilo.ua/2026/11/20/novyna/bezpeka/syly-ppo-vnochi-zneshkodyly-82-rakety-ta-380-rosijskyx-droniv-detali-ataky",
      "date": "2026-11-20"
     }
    ]

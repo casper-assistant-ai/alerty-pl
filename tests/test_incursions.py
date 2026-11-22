@@ -16,8 +16,19 @@ POINTS = {"explosion", "crash", "shotdown", "debris"}
 
 
 def inside(lat, lon):
-    # Poland and its neighbours, where the routes start
-    return 47.0 <= lat <= 57.0 and 12.0 <= lon <= 30.0
+    # Poland, its neighbours and western Russia, where the routes start
+    return 44.0 <= lat <= 62.0 and 12.0 <= lon <= 50.0
+
+
+def in_poland(lat, lon):
+    kaliningrad = lat >= 54.35 and 19.6 <= lon <= 22.9
+    return 49.0 <= lat <= 54.9 and 14.1 <= lon <= 24.2 and not kaliningrad
+
+
+LAUNCHERS = {"Russia", "Russia-Kaliningrad", "Belarus"}
+TRANSIT = {"Ukraine", "Belarus", None}
+# wording that makes a transit country the origin: «wleciała z Ukrainy», «nadleciał z Białorusi»
+WRONG_ORIGIN = re.compile(r"\b(?:wleci\w*|nadleci\w*|przylecia\w*|odpalon\w*|wystrzelon\w*|przelot|wlot)\s+z\s+(?:Ukrainy|Białorusi)", re.I)
 
 
 class Incursions(unittest.TestCase):
@@ -53,6 +64,35 @@ class Incursions(unittest.TestCase):
                     self.assertIn(p["type"], POINTS)
                     self.assertTrue(inside(p["lat"], p["lon"]), p)
                     self.assertTrue(p["place"].strip())
+
+    def test_origin_is_the_launcher(self):
+        # from = who launched it, via = whose airspace it crossed before Poland; Ukraine is never the
+        # origin of a Russian missile or drone, only of its own air defence (Przewodów, 2022)
+        for e in self.events:
+            with self.subTest(e["id"]):
+                for k in ("title_pl", "summary_pl", "route_note_pl"):
+                    self.assertIsNone(WRONG_ORIGIN.search(e.get(k) or ""), k)
+                for w in e.get("weapons", []):
+                    self.assertIsNone(WRONG_ORIGIN.search(w["label_pl"]))
+                    self.assertIn("via", w, "say which country it crossed, or null")
+                    self.assertIn(w["via"], TRANSIT)
+                    self.assertNotEqual(w["from"], w["via"])
+                    if w.get("role") == "air_defense":
+                        self.assertEqual(w["from"], "Ukraine")
+                        self.assertEqual(e.get("attack_by"), "Russia")
+                    else:
+                        self.assertIn(w["from"], LAUNCHERS)
+                    launch = w["launch"]
+                    self.assertTrue(launch["area_pl"].strip())
+                    self.assertIsInstance(launch["certain"], bool)
+                    lat, lon = w["path"][0]
+                    self.assertFalse(in_poland(lat, lon), "the route starts where it was launched")
+                    if w["from"] == "Russia":
+                        self.assertGreaterEqual(lon, 31.5, "a Russian launch starts in Russia")
+                    if w["from"] == "Russia-Kaliningrad":
+                        self.assertTrue(54.3 <= lat <= 55.3 and 19.6 <= lon <= 22.9)
+                    if not launch["certain"] and w.get("role") != "air_defense":
+                        self.assertRegex(e["route_note_pl"], r"umown", "an unnamed launch area is marked as assumed")
 
     def test_sources(self):
         for e in self.events:
