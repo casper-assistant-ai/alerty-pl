@@ -28,11 +28,17 @@ const PAGES = [
   { path: "", name: "Mapa", check: `(() => { const p = [];
       if (document.querySelectorAll("#map path.pow, .leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
       if (!document.querySelector("#active li")) p.push("list of active alerts is empty");
-      if (!document.querySelector("#day") || !document.querySelector("#spark path")) p.push("day slider is missing");
+      if (!document.querySelector("#brush") || !document.querySelector("#spark path")) p.push("period picker is missing");
       return p; })()` },
   { path: "?dzien=2026-11-20", name: "Mapa, dzień 20.11", check: `(() => { const p = [];
       if (document.querySelectorAll("#map path.pow, .leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
       if (document.querySelectorAll("#map path.hit").length < 40) p.push("map: the alerts of 20.11.2026 (air alert in 2 voivodeships) are not coloured");
+      return p; })()` },
+  { path: "?dzien=2025-09-10", name: "Mapa, zalot dronów 10.09.2025", check: `(() => { const p = [];
+      if (document.querySelectorAll(".raid-tick").length < 5) p.push("slider: red days of missile and drone incursions are missing");
+      const card = document.querySelector("#raid");
+      if (!card || card.hidden || !card.querySelector(".raid-src a")) p.push("incursion card with its sources is not shown for 10.09.2025");
+      if (!document.querySelector(".leaflet-raid-pane .raid-trail, .leaflet-raid-pane .raid-route")) p.push("incursion routes are not drawn on the map");
       return p; })()` },
   { path: "?dzien=2026-08-15&podklad=nasa&pozary=1", name: "Mapa, NASA i pożary 15.08", check: `(() => { const p = [];
       if (document.querySelectorAll(".leaflet-interactive").length < 300) p.push("map: powiaty not drawn");

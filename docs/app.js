@@ -286,6 +286,7 @@ function setPeriod(from, to, push = true) {
   S.wbManual = false;
   clearTimeout(S.wbTimer);
   S.wbTimer = setTimeout(waybackFollow, 250);
+  dispatchEvent(new CustomEvent("rcb:day", { detail: { day: S.from === S.to ? S.to : null, from: S.from, to: S.to } }));
 }
 
 function brush() {
@@ -528,13 +529,17 @@ async function main() {
     const res = await RCB.strip();
     const t = todayISO();
     const was = S.today;
-    if (t !== S.today) { S.today = t; spark(); }
+    if (t !== S.today) { S.today = t; spark(); dispatchEvent(new Event("rcb:range")); }
     if (res) { S.live = res.data; S.liveActive = res.active; }
     // a period that ended today keeps ending today after midnight
     if (S.to === null) setPeriod(wantFrom, wantTo, false);
     else if (S.to === was) place(addDays(S.from, dayDiff(was, t)), t);
   }
   await refresh();
+  // attacks.js (missiles and drones over Poland) draws on the same map and slider through this
+  window.RCBMap = { map, setDay: (d) => setPeriod(d, d), day: () => (S.from === S.to ? S.to : null), today: () => S.today,
+    frac: (d) => (dayDiff(S.start, d) + 0.5) / nDays() };
+  dispatchEvent(new CustomEvent("rcb:ready", { detail: window.RCBMap }));
   if (q.get("podklad") && q.get("podklad") !== "mapa") setBase(q.get("podklad"));
   if (S.fires) fires();
   setInterval(refresh, 60000);

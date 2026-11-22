@@ -34,6 +34,7 @@
           <div class="brush-h" id="h-from" role="slider" tabindex="0" aria-label="Początek okresu" aria-valuemin="0"></div>
           <div class="brush-h" id="h-to" role="slider" tabindex="0" aria-label="Koniec okresu" aria-valuemin="0"></div>
           <div class="brush-axis mono" id="brush-axis" aria-hidden="true"></div>
+          <div class="raid-ticks" id="raid-ticks"></div>
       </div>
       <div class="period-ctl">
         <div class="presets" id="presets" role="group" aria-label="Szybki wybór okresu">
@@ -48,6 +49,8 @@
       </div>
       <output id="day-label" class="day-label mono" aria-live="polite"></output>
     </div>
+    <div class="raid-days" id="raid-days" hidden></div>
+    <section class="raid" id="raid" aria-live="polite" hidden></section>
     <div id="map" class="lmap" role="region" aria-label="Mapa Polski z powiatami; kolorem zaznaczone powiaty z alertem w wybranym okresie"></div>
     <div class="layers">
       <div class="seg" role="radiogroup" aria-label="Podkład mapy">
@@ -85,5 +88,6 @@
 <script src="vendor/leaflet/leaflet.js" defer></script>
 <script src="common.js" defer></script>
 <script src="app.js" defer></script>
+<script src="attacks.js" defer></script>
 </body>
 </html>
