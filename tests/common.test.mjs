@@ -50,3 +50,12 @@ test("duration reads in minutes, hours and days, and never goes negative", () =>
   assert.equal(RCB.duration(started(3 * 24 * 60)), "3 dni");
   assert.equal(RCB.duration(new Date(Date.now() + 60000).toISOString()), "0 min");
 });
+
+test("plural picks the Polish form for one, a few and many", () => {
+  const f = (n) => RCB.plural(n, "alert", "alerty", "alertów");
+  assert.equal(f(1), "alert");
+  assert.equal(f(3), "alerty");
+  assert.equal(f(12), "alerty");
+  assert.equal(f(22), "alerty");
+  assert.equal(f(25), "alertów");
+});
