@@ -56,6 +56,22 @@ async function main() {
   const params = new URLSearchParams(location.search);
   for (const k of Object.keys(f)) if (params.get(k)) f[k].value = params.get(k);
 
+  // a powiat filter, deep-linked from the analytics page: ?powiat=<województwo/powiat>.
+  // It counts an alert that lists the powiat and one that covers its whole voivodeship,
+  // like the map does. The name is resolved only when the filter is on.
+  let powiat = params.get("powiat") || "";
+  const chipName = h("span");
+  const chipBtn = h("button", { type: "button", "aria-label": "Usuń filtr powiatu", text: "×" });
+  const chip = h("span", { class: "chip", hidden: true }, chipName, chipBtn);
+  chipBtn.addEventListener("click", () => { powiat = ""; chip.hidden = true; apply(); });
+  const setChip = (name) => { chipName.textContent = name; chip.hidden = !powiat; };
+  setChip(powiat || "");
+  if (powiat) fetch("geo/poland.json").then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); }).then((geo) => {
+    const p = geo.powiaty.find((x) => x.id === powiat);
+    if (p) setChip((p.city ? "" : "pow. ") + p.name);
+  }).catch(() => {});
+  $("#filters").append(chip);
+
   const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
   function apply() {
     const q = norm(f.q.value.trim());
@@ -63,11 +79,14 @@ async function main() {
       (!f.cat.value || a.category === f.cat.value) &&
       (!f.voiv.value || a.voivodeships.includes(f.voiv.value)) &&
       (!f.year.value || a.date.startsWith(f.year.value)) &&
+      (!powiat || a.powiaty.includes(powiat) || (a.whole || []).includes(powiat.split("/")[0])) &&
       (!q || norm(a.title + " " + a.message).includes(q)));
     const p = new URLSearchParams();
     for (const [k, e] of Object.entries(f)) if (e.value) p.set(k, e.value);
+    if (powiat) p.set("powiat", powiat);
     history.replaceState(null, "", p.size ? "?" + p : location.pathname);
     render(rows, PAGE);
+    if (powiat) $("#count").textContent += " · w tym alerty dla całego województwa";
   }
   let t;
   f.q.addEventListener("input", () => { clearTimeout(t); t = setTimeout(apply, 150); });
