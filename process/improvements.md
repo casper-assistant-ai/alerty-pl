@@ -9,7 +9,7 @@ reliability or simpler upkeep, never a report.
 - [x] `.github/workflows/security-auditor.md`: raise `timeout-minutes` from 30 to 40 and recompile, so the weekly audit survives an engine rate limit (HTTP 429) instead of being cut off with no terminal safe output — from #6, run 44917850467.
 
 ## Tests
-- [ ] `scripts/changelog.py`: tests for `lint` (good and bad subjects, `!` and `BREAKING CHANGE:`) and for the next version number.
+- [x] `scripts/changelog.py`: tests for `lint` (good and bad subjects, `!` and `BREAKING CHANGE:`) and for the next version number. — this PR
 - [ ] `docs/common.js`: a node test (no npm) for the date and category helpers used by every page.
 - [ ] `scripts/rcb.py update`: a test that a page that fails to load keeps the old `archive.json` entries.
 

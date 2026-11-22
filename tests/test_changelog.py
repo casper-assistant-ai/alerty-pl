@@ -1,9 +1,13 @@
+import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import changelog  # noqa: E402
+
+SCRIPT = Path(__file__).resolve().parent.parent / "scripts" / "changelog.py"
 
 
 def c(subject, body=""):
@@ -41,6 +45,83 @@ class Versions(unittest.TestCase):
     def test_lint(self):
         self.assertEqual(changelog.lint_subjects(["feat: a", "chore(data): 1 active, 2 alerts", "data: old bot"]), 0)
         self.assertEqual(changelog.lint_subjects(["Update stuff"]), 1)
+
+    def test_lint_good_subjects(self):
+        good = [
+            "feat(map): day slider over the archive",
+            "fix(parser): keep the old archive on a failed page",
+            "feat(site)!: alerts.json moves to per-powiat files",
+            'revert: "feat(map): day slider" again',
+            "perf(parser): fewer detail-page fetches",
+            "chore(release): v1.0.0",
+        ]
+        self.assertEqual(changelog.lint_subjects(good), 0)
+
+    def test_lint_breaking_subjects(self):
+        self.assertEqual(changelog.lint_subjects(["feat!: new data format", "fix(parser)!: drop legacy fields",
+                                                  "fix: x (BREAKING CHANGE: alerts.json moved)"]), 0)
+        self.assertTrue(changelog.parse("fix: x", "BREAKING CHANGE: alerts.json moved")["breaking"])
+        self.assertEqual(changelog.level([c("fix: x", "BREAKING CHANGE: alerts.json moved")]), "major")
+
+    def test_lint_bad_subjects(self):
+        bad = ["Add a map", "feature: a map", "feat:no space", "fix:", "feat(): empty scope",
+               "feat(Map): uppercase scope", "feat: ", "fix\nsecond line"]
+        self.assertEqual(changelog.lint_subjects(bad), 1)
+
+
+class LintCli(unittest.TestCase):
+    """`lint --title` checks one PR title without touching git."""
+
+    def run_lint(self, title):
+        return subprocess.run([sys.executable, "-I", str(SCRIPT), "lint", "--title", title],
+                              capture_output=True, text=True)
+
+    def test_good_title_passes(self):
+        # ci.yml strips the "[agent-name] " prefix before linting a PR title
+        r = self.run_lint("test(changelog): cover lint")
+        self.assertEqual(r.returncode, 0, r.stderr)
+
+    def test_agent_prefix_alone_is_not_conventional(self):
+        self.assertEqual(changelog.lint_subjects(["[issue-worker] test(changelog): cover lint"]), 1)
+
+    def test_bad_title_fails_with_a_hint(self):
+        r = self.run_lint("Honest status signals")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("not a Conventional Commit", r.stderr)
+        self.assertIn("feat", r.stderr)
+
+
+class NextVersion(unittest.TestCase):
+    """next_version() cuts the unreleased commits against the last version tag."""
+
+    def releases(self, pending, last="1.2.3"):
+        rels = []
+        if pending:
+            rels.append({"version": None, "date": "2026-11-22", "sha": "f" * 40, "commits": pending})
+        if last:
+            rels.append({"version": last, "date": "2026-11-20", "sha": "e" * 40, "commits": []})
+        return rels
+
+    def next(self, pending, last="1.2.3"):
+        with mock.patch.object(changelog, "releases", return_value=self.releases(pending, last)):
+            return changelog.next_version()
+
+    def test_fix_perf_and_feat(self):
+        self.assertEqual(self.next([c("fix(map): label")]), "1.2.4")
+        self.assertEqual(self.next([c("perf(parser): cache pages"), c("docs: readme")]), "1.2.4")
+        self.assertEqual(self.next([c("fix: y"), c("feat(map): slider")]), "1.3.0")
+
+    def test_breaking_asks_for_a_major(self):
+        self.assertEqual(self.next([c("feat(site)!: new data format")]), "2.0.0")
+        self.assertEqual(self.next([c("fix: x", "BREAKING CHANGE: alerts.json moved")]), "2.0.0")
+
+    def test_nothing_releasable(self):
+        self.assertIsNone(self.next([c("docs: readme"), c("chore(data): 2 active")]))
+        self.assertIsNone(self.next([]))  # everything is tagged already
+
+    def test_first_release(self):
+        self.assertEqual(self.next([c("feat: the map")], last=None), "0.1.0")
+        self.assertEqual(self.next([c("feat!: the map")], last=None), "1.0.0")
 
 
 if __name__ == "__main__":
