@@ -48,6 +48,36 @@ class AirAlert(unittest.TestCase):
         self.assertEqual(rcb.status(self.a, now)[0], "ended")
 
 
+class AirAlertSeveralUpdates(unittest.TestCase):
+    """Air alert with four updates: the newest update (23:03) ends it even though an earlier
+    one (19:45) had already ended it and 21:08 re-alerted; regions accumulate over updates."""
+    def setUp(self):
+        self.a = rcb.parse_detail(page("alert-rcb---zagrozenie-z-powietrza-2111.html"), GAZ,
+                                  title="Alert RCB - zagrożenie z powietrza (21.10)",
+                                  date="2026-10-21")
+        self.a.update(id="x", url="u", intro="")
+
+    def test_updates_newest_first_untimed_last(self):
+        self.assertEqual([u["time"] for u in self.a["updates"]],
+                         ["23:03", "21:08", "19:45", None])
+
+    def test_ended_flags_follow_the_story(self):
+        self.assertTrue(self.a["updates"][0]["ended"])   # 23:03 attack over
+        self.assertFalse(self.a["updates"][1]["ended"])  # 21:08 re-alerted after an end
+        self.assertTrue(self.a["updates"][2]["ended"])   # 19:45 earlier end
+
+    def test_regions_accumulate_over_updates(self):
+        self.assertEqual(self.a["regions"]["voivodeships"], ["lubelskie", "podkarpackie"])
+        self.assertEqual(self.a["regions"]["powiaty"], [])
+        self.assertEqual(self.a["regions"]["whole"], ["lubelskie", "podkarpackie"])
+
+    def test_status_latest_update_wins(self):
+        st, started, last = rcb.status(self.a, dt.datetime(2026, 10, 22, 0, 30, tzinfo=rcb.TZ))
+        self.assertEqual(st, "ended")  # the newest update ended the alert, no TTL wait
+        self.assertEqual(started, "2026-10-21T19:45:00+02:00")
+        self.assertEqual(last, "2026-10-21T23:03:00+02:00")
+
+
 class CityNames(unittest.TestCase):
     def test_biala_podlaska_is_not_podlaskie(self):
         a = rcb.parse_detail(page("alert-rcb---zagrozenie-z-powietrza-1011.html"), GAZ)
@@ -115,6 +145,34 @@ class WeatherAlert(unittest.TestCase):
         self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=25))[0], "expired")
 
 
+class FireAlert(unittest.TestCase):
+    """Fire in Chorzów: cities named without the word 'powiat' still resolve to their city
+    powiaty (Chorzów, Bytom, ...); fire alerts expire after the 24 h TTL."""
+    def setUp(self):
+        self.a = rcb.parse_detail(page("alert-rcb---pozar-w-chorzowie-0709.html"), GAZ,
+                                  title="Alert RCB - pożar w Chorzowie (07.09)", date="2026-09-07")
+        self.a.update(id="x", url="u", intro="")
+
+    def test_category_and_regions(self):
+        self.assertEqual(self.a["category"], "fire")
+        self.assertEqual(self.a["regions"]["voivodeships"], ["slaskie"])
+        self.assertEqual(self.a["regions"]["powiaty"],
+                         ["slaskie/bytom", "slaskie/chorzow", "slaskie/siemianowice-slaskie",
+                          "slaskie/swietochlowice"])
+        self.assertEqual(self.a["regions"]["whole"], [])
+
+    def test_updates(self):
+        self.assertEqual(len(self.a["updates"]), 1)
+        self.assertIsNone(self.a["updates"][0]["time"])
+        self.assertFalse(self.a["updates"][0]["ended"])
+        self.assertIn("Pożar", self.a["updates"][0]["message"])
+
+    def test_status_ttl(self):
+        start = dt.datetime(2026, 9, 7, 0, 0, tzinfo=rcb.TZ)
+        self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=23))[0], "active")
+        self.assertEqual(rcb.status(self.a, start + dt.timedelta(hours=25))[0], "expired")
+
+
 class OrdnanceAlert(unittest.TestCase):
     """Niewybuch named by city and street only: the whole voivodeship is alerted, no powiat."""
     def setUp(self):
@@ -166,6 +224,43 @@ class DrillAlert(unittest.TestCase):
     def test_status_window_sets_start(self):
         st, started, last = rcb.status(self.a, dt.datetime(2026, 11, 21, 10, 0, tzinfo=rcb.TZ))
         self.assertEqual(started, "2026-11-21T08:00:00+01:00")  # the window start, not midnight
+
+
+class NationwideDrillAlert(unittest.TestCase):
+    """Siren test for the whole country ('na terenie całego kraju'): no voivodeship is named,
+    so regions stay empty and the site treats the alert as nationwide. Dotted window times
+    ('w godz. 7.00-19.00') open the drill window."""
+    def setUp(self):
+        self.a = rcb.parse_detail(
+            page("alert-rcb---cwiczenie-systemu-alarmowania-z-wykorzystaniem-syren.html"), GAZ,
+            title="Alert RCB - ćwiczenia systemu alarmowania z wykorzystaniem syren (20.07)",
+            date="2026-07-20")
+        self.a.update(id="x", url="u", intro="")
+
+    def test_category_and_regions(self):
+        self.assertEqual(self.a["category"], "drill")
+        self.assertEqual(self.a["regions"],
+                         {"voivodeships": [], "powiaty": [], "whole": []})
+        self.assertIn("całego kraju", self.a["updates"][0]["message"])
+
+    def test_updates(self):
+        self.assertEqual(len(self.a["updates"]), 1)
+        self.assertFalse(self.a["updates"][0]["ended"])
+
+    def test_status_window_from_dotted_times(self):
+        st, started, last = rcb.status(self.a, dt.datetime(2026, 7, 20, 8, 0, tzinfo=rcb.TZ))
+        self.assertEqual(st, "active")  # inside 7.00-19.00 on the publication day
+        self.assertEqual(started, "2026-07-20T07:00:00+02:00")
+        self.assertEqual(rcb.status(self.a, dt.datetime(2026, 7, 20, 6, 0, tzinfo=rcb.TZ))[0],
+                         "planned")
+
+    @unittest.expectedFailure
+    def test_status_jutro_shifts_window_to_next_day(self):
+        # BUG: the message says 'Jutro (21.07) w godz. 7.00-19.00' but status() anchors the
+        # window to the publication date (20.07), so during the real drill (21.07 morning)
+        # the map already shows the alert as ended. See the PR body.
+        now = dt.datetime(2026, 7, 21, 8, 0, tzinfo=rcb.TZ)
+        self.assertEqual(rcb.status(self.a, now)[0], "active")
 
 
 class Archive(unittest.TestCase):
