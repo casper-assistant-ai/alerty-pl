@@ -15,6 +15,53 @@
  },
  "releases": [
   {
+   "version": "1.15.0",
+   "date": "2026-11-22",
+   "sha": "ca2cba3",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "map",
+     "breaking": false,
+     "text": "pick a period instead of a day; Wayback follows its end",
+     "sha": "ca2cba3",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "docs",
+     "scope": null,
+     "breaking": false,
+     "text": "complete the team roster and the geo data notes (#27)",
+     "sha": "5ca5717",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "docs",
+     "scope": "agents",
+     "breaking": false,
+     "text": "three learned rules from the first week of agent runs (#28)",
+     "sha": "712ddc4",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "feat",
+     "scope": "map",
+     "breaking": false,
+     "text": "filter the map to one category from the legend (#29)",
+     "sha": "4694989",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "fix",
+     "scope": "live",
+     "breaking": false,
+     "text": "name test alerts' area as a trial",
+     "sha": "7aa1064",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.14.0",
    "date": "2026-11-22",
    "sha": "4054612",
