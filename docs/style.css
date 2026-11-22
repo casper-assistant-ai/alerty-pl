@@ -70,7 +70,7 @@ h1, h2, h3 { font-weight: 500; margin: 0; }
 /* header and navigation */
 .top { display: flex; align-items: center; gap: 32px; padding: 0 24px; height: 56px;
   background: var(--surface); border-bottom: 1px solid var(--line); }
-.logo { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 1rem; text-decoration: none; }
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 500; font-size: 1rem; text-decoration: none; white-space: nowrap; }
 .logo .mark { width: 14px; height: 14px; border-radius: 3px; background: var(--text); position: relative; }
 .logo .mark::after { content: ""; position: absolute; inset: 4px; border-radius: 1px; background: var(--surface); }
 nav.tabs { display: flex; gap: 4px; height: 100%; }
@@ -514,3 +514,35 @@ footer p { margin: 0; max-width: 90ch; }
 .channels .out.err { color: var(--accent); }
 .channels .card[aria-disabled="true"] { opacity: .6; }
 @media (max-width: 860px) { .channels { grid-template-columns: minmax(0, 1fr); } }
+
+/* phones (mobile audit #35–#41, 23.11.2026): form fields at 16 px so iOS does not zoom in on focus,
+   tap targets at least 24 px high (most 32+), no text under 12 px. Also a phone held sideways (low screen)
+   and any touch screen. */
+@media (max-width: 640px), (max-height: 500px), (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea { font-size: 16px !important; }
+  .chk, .notify label.chk { min-height: 36px; }
+  summary { padding: 8px 0; }
+  .more { padding: 8px 0; margin-top: 4px; }
+  .row-meta a, .hist a.src, .changes .sha { display: inline-block; padding: 4px 0; min-height: 26px; line-height: 18px; }
+  .rows.compact .what { min-height: 32px; align-items: center; }
+  .ranked .name a { display: inline-block; padding: 4px 0; min-height: 28px; }
+  .dates input { min-height: 40px; }
+  .dates .btn.icon { width: 40px; min-height: 40px; font-size: .875rem; }
+  .brush-axis { font-size: .75rem; }
+  /* the red days on the slider are 3 px wide: on a phone they only mark the days, the chips below are the buttons,
+     so they do not cover the period handles */
+  .raid-tick { pointer-events: none; }
+}
+@media (max-width: 640px) {
+  .dates { display: grid; grid-template-columns: 36px minmax(0, 1fr) minmax(0, 1fr) 36px; align-items: end; gap: 4px; }
+  .dates .btn.icon { width: 36px; }
+  .dates label { flex-direction: column; align-items: stretch; gap: 2px; font-size: .75rem; }
+  .dates input { width: 100%; padding: 0 2px; text-align: center; letter-spacing: -.01em; }
+  /* a tap on the field opens the date picker; the calendar icon only takes the room the date needs */
+  .dates input::-webkit-calendar-picker-indicator { display: none; }
+  nav.tabs a { min-height: 40px; }
+}
+/* the tab row scrolls sideways on a narrow phone: fade the side that has more tabs (common.js sets the flags) */
+nav.tabs[data-more~="r"] { mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); }
+nav.tabs[data-more~="l"] { mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent); }
+nav.tabs[data-more~="l"][data-more~="r"] { mask-image: linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
