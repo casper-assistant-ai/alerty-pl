@@ -49,7 +49,7 @@ function canvasLayer() {
 }
 
 const S = {
-  today: todayISO(), start: "2021-01-01", day: null, base: "mapa", fires: false,
+  today: todayISO(), start: "2021-01-01", day: null, base: "mapa", fires: false, cat: null,
   archive: [], live: null, liveActive: [], geo: null,
   map: null, pow: null, baseLayer: null, fireLayers: [],
   wayback: null, wbRelease: null, wbLocal: null, wbSeq: 0,
@@ -63,24 +63,49 @@ function alertsOf(day) {
 const regionsOf = (a) => a.regions || { voivodeships: a.voivodeships, powiaty: a.powiaty, whole: a.whole };
 
 function paint(alerts) {
-  const fill = {};
-  const put = (id, cat) => { if (!fill[id] || PRIORITY.indexOf(cat) < PRIORITY.indexOf(fill[id])) fill[id] = cat; };
+  const fill = {}; // powiat id -> the categories covering it
+  const put = (id, cat) => (fill[id] = fill[id] || new Set()).add(cat);
   for (const a of alerts) {
     const r = regionsOf(a);
     for (const p of r.powiaty) put(p, a.category);
     for (const v of r.whole) S.geo.powByV[v]?.forEach((id) => put(id, a.category));
   }
+  // with a chosen category only its powiaty stay lit; otherwise the most urgent one wins
+  const on = (id) => S.cat ? (fill[id]?.has(S.cat) ? S.cat : null) : PRIORITY.find((c) => fill[id]?.has(c));
   S.pow.eachLayer((l) => {
     const el = l.getElement();
     if (!el) return;
-    const cat = fill[l.feature.properties.id];
+    const cat = on(l.feature.properties.id);
     el.setAttribute("class", "pow leaflet-interactive" + (cat ? " hit c-" + cat : "") + (cat === "air" && S.day === S.today ? " blink" : ""));
   });
-  const used = new Set(Object.values(fill));
-  const cats = used.size ? PRIORITY.filter((c) => used.has(c)) : ["air", "water", "weather", "drill"];
-  const items = cats.map((c) => h("li", {}, swatch(c), CAT[c]));
+  const used = new Set(Object.values(fill).flatMap((s) => [...s]));
+  let cats = used.size ? PRIORITY.filter((c) => used.has(c)) : ["air", "water", "weather", "drill"];
+  if (S.cat && !cats.includes(S.cat)) cats = PRIORITY.filter((c) => c === S.cat || cats.includes(c));
+  // the legend doubles as a filter: one click isolates a category, the second clears it
+  const leg = $("#legend");
+  const refocus = leg.contains(document.activeElement) ? document.activeElement.textContent : null;
+  const items = cats.map((c) => {
+    const b = h("button", { type: "button", "aria-pressed": S.cat === c ? "true" : "false" }, swatch(c), CAT[c]);
+    b.addEventListener("click", () => setCat(S.cat === c ? null : c));
+    return h("li", {}, b);
+  });
   if (S.fires) items.push(h("li", {}, h("i", { class: "sw fire-dot", "aria-hidden": "true" }), "Pożar lub anomalia termiczna (VIIRS)"));
-  $("#legend").replaceChildren(...items);
+  leg.replaceChildren(...items);
+  if (refocus) { // the legend is rebuilt on every paint: keep the keyboard where it was
+    const btns = [...leg.querySelectorAll("button")];
+    (btns.find((b) => b.textContent === refocus) || btns[0])?.focus();
+  }
+}
+
+function setCat(c, push = true) {
+  S.cat = c;
+  if (push) {
+    const u = new URL(location.href);
+    if (c) u.searchParams.set("kategoria", c); else u.searchParams.delete("kategoria");
+    history.replaceState(null, "", u);
+  }
+  paint(alertsOf(S.day));
+  panel();
 }
 
 function tooltip(layer) {
@@ -119,19 +144,19 @@ function recentRow(a) {
 
 function panel() {
   const today = S.day === S.today;
-  const list = alertsOf(S.day);
+  const list = alertsOf(S.day).filter((a) => !S.cat || a.category === S.cat);
   $("#now-title").textContent = today ? "Teraz" : `${fmtISO(S.day)}, ${WEEKDAY[toDate(S.day).getUTCDay()]}`;
   $("#active-count").textContent = list.length;
   $("#active").replaceChildren(...(list.length ? list.map(today && S.live ? activeRow : archiveRow)
-    : [h("li", { class: "empty", text: today ? "Żaden alert RCB nie jest teraz aktywny." : "Tego dnia nie było alertów RCB." })]));
-  // the week before the chosen day, without the alerts already listed above
+    : [h("li", { class: "empty", text: S.cat ? "Brak alertów w tej kategorii." : today ? "Żaden alert RCB nie jest teraz aktywny." : "Tego dnia nie było alertów RCB." })]));
+  // the week before the chosen day, without the alerts already listed above; "other" only when picked
   const from = addDays(S.day, -7), ids = new Set(list.map((a) => a.id));
-  const recent = S.archive.filter((a) => { const s = a.started_at.slice(0, 10); return s > from && s <= S.day && !ids.has(a.id) && a.category !== "other"; })
+  const recent = S.archive.filter((a) => { const s = a.started_at.slice(0, 10); return s > from && s <= S.day && !ids.has(a.id) && (S.cat ? a.category === S.cat : a.category !== "other"); })
     .sort((a, b) => b.started_at.localeCompare(a.started_at));
   $("#week-title").textContent = today ? "Ostatnie 7 dni" : `7 dni do ${fmtISO(S.day)}`;
   $("#week-count").textContent = recent.length;
   $("#recent").replaceChildren(...(recent.length ? recent.slice(0, 12).map(recentRow)
-    : [h("li", { class: "empty", text: today ? "W tym tygodniu nie było alertów." : "W tym tygodniu nie było innych alertów." })]));
+    : [h("li", { class: "empty", text: S.cat ? "W tym tygodniu nie było alertów w tej kategorii." : today ? "W tym tygodniu nie było alertów." : "W tym tygodniu nie było innych alertów." })]));
 }
 
 // ---------- the day slider ----------
@@ -343,9 +368,11 @@ async function main() {
   $("#today").addEventListener("click", () => setDay(S.today));
   spark();
 
-  // ?dzien=YYYY-MM-DD opens a past day; &podklad=esri|nasa and &pozary=1 open the layers
+  // ?dzien=YYYY-MM-DD opens a past day; &podklad=esri|nasa and &pozary=1 open the layers;
+  // &kategoria=<cat> filters the map and the lists to one category
   const q = new URLSearchParams(location.search);
   const want = /^\d{4}-\d\d-\d\d$/.test(q.get("dzien") || "") ? q.get("dzien") : S.today;
+  if (CAT[q.get("kategoria")]) S.cat = q.get("kategoria");
   if (q.get("pozary") === "1") { S.fires = true; $("#fires").checked = true; }
   if (["esri", "nasa"].includes(q.get("podklad"))) { document.querySelector(`input[name="base"][value="${q.get("podklad")}"]`).checked = true; }
 
