@@ -15,6 +15,37 @@
  },
  "releases": [
   {
+   "version": "1.14.0",
+   "date": "2026-11-22",
+   "sha": "4054612",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "live",
+     "breaking": false,
+     "text": "load common.js outside a browser too",
+     "sha": "4054612",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "ci",
+     "scope": null,
+     "breaking": false,
+     "text": "start the live service in CI; update data every 30 min",
+     "sha": "13337a4",
+     "date": "2026-11-22"
+    },
+    {
+     "type": "feat",
+     "scope": "live",
+     "breaking": false,
+     "text": "alerts within seconds, with Telegram, e-mail and Web Push",
+     "sha": "0423ed9",
+     "date": "2026-11-22"
+    }
+   ]
+  },
+  {
    "version": "1.13.1",
    "date": "2026-11-22",
    "sha": "83e04d6",

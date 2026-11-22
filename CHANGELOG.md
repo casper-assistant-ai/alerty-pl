@@ -2,6 +2,20 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.14.0 (2026-11-22)
+
+### feat
+
+- **live:** alerts within seconds, with Telegram, e-mail and Web Push ([0423ed9](https://github.com/casper-assistant-ai/alerty-pl/commit/0423ed9))
+
+### fix
+
+- **live:** load common.js outside a browser too ([4054612](https://github.com/casper-assistant-ai/alerty-pl/commit/4054612))
+
+### ci
+
+- start the live service in CI; update data every 30 min ([13337a4](https://github.com/casper-assistant-ai/alerty-pl/commit/13337a4))
+
 ## 1.13.1 (2026-11-22)
 
 ### fix
