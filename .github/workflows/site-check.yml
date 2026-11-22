@@ -1,7 +1,9 @@
 name: Site check
 
 # Every hour and after each deploy: open the live site in headless Chrome like a visitor
-# (desktop and phone), collect JavaScript errors, failed requests, empty pages and stale data.
+# (desktop and phone), collect JavaScript errors, failed requests, empty pages and stale data,
+# then the mobile audit (scripts/mobile_audit.mjs: 360, 390 px and landscape, every button pressed;
+# sideways scroll, small tap targets and text, form fields that make iOS zoom, covered controls).
 # A problem opens (or updates) one issue labelled site-error and calls the site-fixer agent,
 # which opens a PR for the Agent PR gate. When the site is clean again, the issue closes.
 on:
@@ -22,7 +24,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
@@ -34,8 +36,16 @@ jobs:
         id: visit
         run: |
           set +e
-          CHROME=$(command -v google-chrome || command -v chromium) node scripts/site_check.mjs --out /tmp/site-check.json --md /tmp/site-check.md --shots /tmp/site-check-shots
-          echo "rc=$?" >> "$GITHUB_OUTPUT"
+          export CHROME=$(command -v google-chrome || command -v chromium)
+          node scripts/site_check.mjs --out /tmp/site-check.json --md /tmp/site-check.md --shots /tmp/site-check-shots
+          a=$?
+          node scripts/mobile_audit.mjs --out /tmp/mobile-audit.json --md /tmp/mobile-audit.md --shots /tmp/mobile-audit-shots
+          b=$?
+          # one report for the issue and the fixer: the mobile audit's results join the site check's
+          python3 -I -c 'import json;s=json.load(open("/tmp/site-check.json"));m=json.load(open("/tmp/mobile-audit.json"));s["results"]+=[dict(r,page="mobile "+r["url"]) for r in m["results"]];json.dump(s,open("/tmp/site-check.json","w"),indent=1)' || b=2
+          [ "$b" = "1" ] && { echo; cat /tmp/mobile-audit.md; } >> /tmp/site-check.md
+          if [ "$a" -gt 1 ] || [ "$b" -gt 1 ]; then rc=2; elif [ "$a" = "1" ] || [ "$b" = "1" ]; then rc=1; else rc=0; fi
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
       - uses: actions/upload-artifact@v4
         with:
           # the report and a screenshot of every page on the desktop and the phone screen
@@ -43,6 +53,8 @@ jobs:
           path: |
             /tmp/site-check.*
             /tmp/site-check-shots/
+            /tmp/mobile-audit.*
+            /tmp/mobile-audit-shots/
       - name: Report to an issue and call the fixer
         if: steps.visit.outputs.rc == '1'
         run: |

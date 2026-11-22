@@ -182,3 +182,24 @@ const RCB = (() => {
   return { API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
     duration, regionText, names, plural, strip, live };
 })();
+
+// The tab row scrolls sideways on a narrow phone (six tabs): show the current tab and fade the side with more tabs.
+(() => {
+  if (typeof document === "undefined") return;
+  const go = () => {
+    const nav = document.querySelector("nav.tabs");
+    if (!nav) return;
+    const flag = () => {
+      const more = [];
+      if (nav.scrollLeft > 2) more.push("l");
+      if (nav.scrollLeft + nav.clientWidth < nav.scrollWidth - 2) more.push("r");
+      if (more.length) nav.dataset.more = more.join(" "); else delete nav.dataset.more;
+    };
+    const cur = nav.querySelector('[aria-current="page"]');
+    if (cur && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = cur.offsetLeft - nav.offsetLeft - (nav.clientWidth - cur.offsetWidth) / 2;
+    flag();
+    nav.addEventListener("scroll", flag, { passive: true });
+    addEventListener("resize", flag);
+  };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
+})();

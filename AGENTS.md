@@ -23,6 +23,12 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   markup a visitor sees (`markup`: raw tags or attributes in the page text, text above the header, the HTML
   as served through `scripts/html_check.py`); `--shots DIR` keeps a screenshot of every page view. The Site check
   workflow runs it hourly, files problems in an issue labelled `site-error` and calls `site-fixer`.
+- Mobile audit: `node scripts/mobile_audit.mjs [--base URL] [--shots DIR]` opens every page at 360×740, 390×844
+  and 844×390 with touch, presses every button, tab and summary, and lists sideways scroll, elements sticking
+  out, tap targets under 24 px, text under 12 px, form fields under 16 px (iOS zooms in), covered controls,
+  clipped text, a cut-off current tab and fixed bars over 30% of the screen. The Site check workflow runs it
+  after the site check, in the same report. Phone rules live at the end of `docs/style.css`
+  (`@media (max-width: 640px), (max-height: 500px), (pointer: coarse)`). First audit: issues #35–#41.
 - HTML: `python3 -I scripts/html_check.py` (in the unit tests too) and
   `npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html` (CI and the PR gate) on every page.
 - Process retro: `scripts/retro.py metrics` measures the week (development share of agent output,
