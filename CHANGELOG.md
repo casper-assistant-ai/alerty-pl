@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.17.6 (2026-11-23)
+
+### fix
+
+- **map:** retry vendored Leaflet once when its first load is dropped (#47) ([14c5021](https://github.com/casper-assistant-ai/alerty-pl/commit/14c5021))
+
 ## 1.17.5 (2026-11-23)
 
 ### fix
