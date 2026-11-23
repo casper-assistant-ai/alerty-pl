@@ -127,10 +127,12 @@ def releases():
     for c in commits():
         cur.append(c)
         if c["sha"] in tagged:
-            out.append({"version": vstr(tagged[c["sha"]]), "date": c["date"][:10], "sha": c["sha"], "commits": cur})
+            out.append({"version": vstr(tagged[c["sha"]]), "date": c["date"][:10], "time": c["date"],
+                        "sha": c["sha"], "commits": cur})
             cur = []
     if cur:
-        out.append({"version": None, "date": cur[-1]["date"][:10], "sha": cur[-1]["sha"], "commits": cur})
+        out.append({"version": None, "date": cur[-1]["date"][:10], "time": cur[-1]["date"],
+                    "sha": cur[-1]["sha"], "commits": cur})
     return list(reversed(out))
 
 
@@ -148,13 +150,13 @@ def next_version():
 def entry(c):
     cc = c["cc"] or {"type": "chore", "scope": None, "breaking": False, "desc": c["subject"]}
     return {"type": cc["type"], "scope": cc["scope"], "breaking": cc["breaking"], "text": cc["desc"],
-            "sha": c["sha"][:7], "date": c["date"][:10]}
+            "sha": c["sha"][:7], "date": c["date"][:10], "time": c["date"]}
 
 
 def build(repo_url):
     rels = releases()
     data = {"repo": repo_url, "types": TYPES, "releases": [
-        {"version": r["version"], "date": r["date"], "sha": r["sha"][:7],
+        {"version": r["version"], "date": r["date"], "time": r["time"], "sha": r["sha"][:7],
          "changes": [entry(c) for c in reversed(r["commits"])]} for r in rels]}
     out = ROOT / "docs" / "data" / "changelog.json"
     out.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")

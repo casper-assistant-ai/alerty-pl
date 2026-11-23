@@ -66,6 +66,11 @@ const RCB = (() => {
   const fmtDay = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
   const fmtShort = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const fmtTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  // a full ISO stamp -> "d.mm.yyyy, hh:mm" in Warsaw time, whatever the visitor's clock;
+  // "" for anything new Date cannot read, so callers can fall back to the plain date
+  const WARSAW = new Intl.DateTimeFormat("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit",
+    year: "numeric", hour: "2-digit", minute: "2-digit" });
+  const fmtStamp = (iso) => { const d = new Date(iso); return isNaN(d.getTime()) ? "" : WARSAW.format(d); };
   // an alert without an hour on gov.pl starts at 00:00: show the day only
   const hasTime = (iso) => !/T00:00:00/.test(iso);
 
@@ -194,8 +199,8 @@ const RCB = (() => {
 
   if ($("#strip")) live();
 
-  return { API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
-    duration, regionText, names, plural, strip, live };
+  return { API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON, fmtDay, fmtShort, fmtTime, fmtStamp,
+    hasTime, duration, regionText, names, plural, strip, live };
 })();
 
 // The tab row scrolls sideways on a narrow phone (six tabs): show the current tab and fade the side with more tabs.
