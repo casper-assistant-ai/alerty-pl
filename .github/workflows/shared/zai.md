@@ -3,7 +3,7 @@
 # The engine itself is set in each workflow (gh-aw takes the engine id from the importer):
 #   engine:
 #     id: claude
-#     model: glm-5.3
+#     model: glm-5.4
 #     env:
 #       ANTHROPIC_BASE_URL: https://api.z.ai/api/anthropic
 # Secret ANTHROPIC_API_KEY holds the z.ai API key. The AWF api-proxy keeps the key outside

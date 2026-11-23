@@ -17,7 +17,7 @@ permissions:
 strict: true
 engine:
   id: claude
-  model: glm-5.3
+  model: glm-5.4
   env:
     ANTHROPIC_BASE_URL: https://api.z.ai/api/anthropic
 imports:

@@ -68,19 +68,19 @@ flowchart LR
 | `ci.yml` | plain Actions | — | push, PR | nothing |
 | `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent PRs that pass, sends broken ones to `pr-fixer` |
 | `agent-dispatch.yml` | plain Actions | — | daily | nothing; starts the extra agent runs planned in `process/schedule.json` |
-| `pr-reviewer` | agent | GLM-5.3 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
-| `pr-fixer` | agent | GLM-5.3 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |
-| `issue-worker` | agent | GLM-5.3 (z.ai) | every 2 h, on each new issue, when the CI doctor or the gate dispatches it | fix PR (`Closes #N`) or closes the issue; improvement PR from `process/improvements.md` |
-| `parser-doctor` | agent | GLM-5.3 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
-| `region-keeper` | agent | GLM-5.3 (z.ai) | daily | PR: `scripts/`, `tests/` |
-| `test-improver` | agent | GLM-5.3 (z.ai) | weekly | PR: `tests/` |
-| `docs-keeper` | agent | GLM-5.3 (z.ai) | weekly | PR: `README.md`, `AGENTS.md` |
-| `site-fixer` | agent | GLM-5.3 (z.ai) | on a site-check issue, daily | PR: `docs/*.html\|js\|css`, `scripts/`, `tests/` |
-| `site-designer` | agent + skills unslop, modern-web-guidance | GLM-5.3 (z.ai) | weekly | PR: `docs/*.html\|js\|css` |
-| `security-auditor` | agent + skill security-audit | GLM-5.3 (z.ai) | weekly | issue |
-| `security-fixer` | agent | GLM-5.3 (z.ai) | when Security watch (hourly, plain code) sees an alert no PR or issue covers; weekly | fix PR (`Alerts: code-scanning#N`), reasoned dismiss, or an issue for Casper (leaked secret, `server/`) |
-| `agent-coach` | agent + skill skillopt-sleep | GLM-5.3 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
-| `process-retro` | agent | GLM-5.3 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues |
+| `pr-reviewer` | agent | GLM-5.4 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
+| `pr-fixer` | agent | GLM-5.4 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |
+| `issue-worker` | agent | GLM-5.4 (z.ai) | every 2 h, on each new issue, when the CI doctor or the gate dispatches it | fix PR (`Closes #N`) or closes the issue; improvement PR from `process/improvements.md` |
+| `parser-doctor` | agent | GLM-5.4 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
+| `region-keeper` | agent | GLM-5.4 (z.ai) | daily | PR: `scripts/`, `tests/` |
+| `test-improver` | agent | GLM-5.4 (z.ai) | weekly | PR: `tests/` |
+| `docs-keeper` | agent | GLM-5.4 (z.ai) | weekly | PR: `README.md`, `AGENTS.md` |
+| `site-fixer` | agent | GLM-5.4 (z.ai) | on a site-check issue, daily | PR: `docs/*.html\|js\|css`, `scripts/`, `tests/` |
+| `site-designer` | agent + skills unslop, modern-web-guidance | GLM-5.4 (z.ai) | weekly | PR: `docs/*.html\|js\|css` |
+| `security-auditor` | agent + skill security-audit | GLM-5.4 (z.ai) | weekly | issue |
+| `security-fixer` | agent | GLM-5.4 (z.ai) | when Security watch (hourly, plain code) sees an alert no PR or issue covers; weekly | fix PR (`Alerts: code-scanning#N`), reasoned dismiss, or an issue for Casper (leaked secret, `server/`) |
+| `agent-coach` | agent + skill skillopt-sleep | GLM-5.4 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
+| `process-retro` | agent | GLM-5.4 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues |
 | `ci-doctor` | agent | Copilot | a failed run on main | issue |
 | `issue-triage` | agent | Copilot | every 12 h | labels, comments |
 | `daily-status` | agent | Copilot | daily | report issue |
