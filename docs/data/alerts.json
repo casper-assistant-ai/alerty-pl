@@ -3,6 +3,46 @@
  "parser": 2,
  "alerts": [
   {
+   "title": "Alert RCB - pożar złomu w Porcie Gdańsk (23.11)",
+   "date": "2026-11-23",
+   "category": "fire",
+   "updates": [
+    {
+     "time": null,
+     "message": "KOMUNIKAT: Trwa akcja gaszenia złomu na terenie portu Gdańsk. Zamknij okna i drzwi. Jeżeli możesz zostań w domu. Nie zbliżaj się do miejsca akcji.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "pomorskie"
+      ],
+      "powiaty": [],
+      "whole": [
+       "pomorskie"
+      ],
+      "gminy": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie Gdańska (woj. pomorskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "pomorskie"
+    ],
+    "powiaty": [],
+    "whole": [
+     "pomorskie"
+    ],
+    "gminy": []
+   },
+   "id": "alert-rcb---pozar-zlomu-w-porcie-gdansk-2311",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---pozar-zlomu-w-porcie-gdansk-2311",
+   "intro": "„KOMUNIKAT: Trwa akcja gaszenia złomu na terenie portu Gdańsk. Zamknij okna i drzwi. Jeżeli możesz zostań w domu. Nie zbliżaj się do miejsca akcji.”",
+   "status": "active",
+   "started_at": "2026-11-23T00:00:00+01:00",
+   "last_at": "2026-11-23T00:00:00+01:00",
+   "parser": 2
+  },
+  {
    "title": "Alert RCB - trening systemów alarmowania (21.11)",
    "date": "2026-11-21",
    "category": "drill",
@@ -627,70 +667,6 @@
    "status": "ended",
    "started_at": "2026-11-10T10:20:00+01:00",
    "last_at": "2026-11-10T10:55:00+01:00",
-   "parser": 2
-  },
-  {
-   "title": "Alert RCB - zagrożenie z powietrza (09.11)",
-   "date": "2026-11-09",
-   "category": "air",
-   "updates": [
-    {
-     "time": null,
-     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
-     "ended": true,
-     "regions": {
-      "voivodeships": [
-       "lubelskie"
-      ],
-      "powiaty": [
-       "lubelskie/biala-podlaska",
-       "lubelskie/bialski",
-       "lubelskie/chelm",
-       "lubelskie/chelmski",
-       "lubelskie/krasnostawski",
-       "lubelskie/leczynski",
-       "lubelskie/lubartowski",
-       "lubelskie/lukowski",
-       "lubelskie/parczewski",
-       "lubelskie/radzynski",
-       "lubelskie/rycki",
-       "lubelskie/swidnicki",
-       "lubelskie/wlodawski"
-      ],
-      "whole": [],
-      "gminy": []
-     },
-     "region_text": "został wysłany do odbiorców na terenie części województwa:\n- lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski\n- podlaskiego- powiaty: Suwałki, suwalski, augustowski, sejneński, sokólski, Białystok, białostocki, zambrowski, wysokomazowiecki, bielski, hajnowski, siemiatycki"
-    }
-   ],
-   "regions": {
-    "voivodeships": [
-     "lubelskie"
-    ],
-    "powiaty": [
-     "lubelskie/biala-podlaska",
-     "lubelskie/bialski",
-     "lubelskie/chelm",
-     "lubelskie/chelmski",
-     "lubelskie/krasnostawski",
-     "lubelskie/leczynski",
-     "lubelskie/lubartowski",
-     "lubelskie/lukowski",
-     "lubelskie/parczewski",
-     "lubelskie/radzynski",
-     "lubelskie/rycki",
-     "lubelskie/swidnicki",
-     "lubelskie/wlodawski"
-    ],
-    "whole": [],
-    "gminy": []
-   },
-   "id": "alert-rcb---zagrozenie-z-powietrza-0911",
-   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-z-powietrza-0911",
-   "intro": "\"UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
-   "status": "ended",
-   "started_at": "2026-11-09T00:00:00+01:00",
-   "last_at": "2026-11-09T00:00:00+01:00",
    "parser": 2
   },
   {
