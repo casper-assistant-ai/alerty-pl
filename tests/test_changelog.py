@@ -91,6 +91,36 @@ class LintCli(unittest.TestCase):
         self.assertIn("feat", r.stderr)
 
 
+class FullTimestamp(unittest.TestCase):
+    """Releases and changes keep the full commit stamp: the Zmiany page shows HH:MM (#49)."""
+
+    def commit(self, sha, date, subject):
+        return {"sha": sha, "date": date, "subject": subject, "body": "", "cc": changelog.parse(subject)}
+
+    def test_entry_keeps_the_full_stamp_next_to_the_day(self):
+        e = changelog.entry(self.commit("a" * 40, "2026-11-21T21:32:05+01:00", "feat(map): slider"))
+        self.assertEqual(e["date"], "2026-11-21")
+        self.assertEqual(e["time"], "2026-11-21T21:32:05+01:00")
+
+    def test_released_cut_carries_the_tagged_commit_stamp(self):
+        first = self.commit("a" * 40, "2026-11-21T20:00:00+01:00", "feat: the map")
+        tagged = self.commit("b" * 40, "2026-11-22T23:04:12+01:00", "fix(map): label")
+        with mock.patch.object(changelog, "tags", return_value={tagged["sha"]: (1, 0, 0)}), \
+                mock.patch.object(changelog, "commits", return_value=[first, tagged]):
+            rels = changelog.releases()
+        self.assertEqual(rels[0]["date"], "2026-11-22")
+        self.assertEqual(rels[0]["time"], "2026-11-22T23:04:12+01:00")
+
+    def test_unreleased_entry_carries_the_last_commit_stamp(self):
+        pending = self.commit("c" * 40, "2026-11-23T06:12:00+01:00", "docs: readme")
+        with mock.patch.object(changelog, "tags", return_value={}), \
+                mock.patch.object(changelog, "commits", return_value=[pending]):
+            rels = changelog.releases()
+        self.assertIsNone(rels[0]["version"])
+        self.assertEqual(rels[0]["date"], "2026-11-23")
+        self.assertEqual(rels[0]["time"], "2026-11-23T06:12:00+01:00")
+
+
 class NextVersion(unittest.TestCase):
     """next_version() cuts the unreleased commits against the last version tag."""
 
