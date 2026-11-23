@@ -28,7 +28,7 @@ steps:
       mkdir -p /tmp/gh-aw/agent
       python3 -I scripts/retro.py gave-up --days 1 --out /tmp/gh-aw/agent/gave-up.json --md /tmp/gh-aw/agent/gave-up.md
 tools:
-  bash: ["cat", "jq", "ls", "head", "wc", "date"]
+  bash: ["cat:*", "jq:*", "ls:*", "head:*", "tail:*", "grep:*", "wc:*", "date:*"]
   github:
     toolsets: [default, actions]
 safe-outputs:
