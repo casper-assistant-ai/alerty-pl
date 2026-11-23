@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.20.0 (2026-11-23)
+
+### feat
+
+- **map:** links to a place and an Esri image, side-by-side image comparison ([108286f](https://github.com/casper-assistant-ai/alerty-pl/commit/108286f))
+
 ## 1.19.0 (2026-11-23)
 
 ### feat
