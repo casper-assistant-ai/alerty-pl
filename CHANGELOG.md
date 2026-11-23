@@ -2,6 +2,20 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.18.0 (2026-11-23)
+
+### feat
+
+- **site:** show the hour and minute of every release and change (#50) ([c329fef](https://github.com/casper-assistant-ai/alerty-pl/commit/c329fef))
+
+### test
+
+- **parser:** a failing page keeps the old archive entries (#51) ([c2f3e5f](https://github.com/casper-assistant-ai/alerty-pl/commit/c2f3e5f))
+
+### chore
+
+- **process:** retro 2026-11-23, dev share 69% (#53) ([793006f](https://github.com/casper-assistant-ai/alerty-pl/commit/793006f))
+
 ## 1.17.6 (2026-11-23)
 
 ### fix
