@@ -17,9 +17,18 @@
   {
    "version": null,
    "date": "2026-11-23",
-   "time": "2026-11-23T16:01:45+01:00",
-   "sha": "d164ea9",
+   "time": "2026-11-23T18:09:23+01:00",
+   "sha": "a9cc367",
    "changes": [
+    {
+     "type": "chore",
+     "scope": "agents",
+     "breaking": false,
+     "text": "move the z.ai agents from GLM-5.3 to GLM-5.4",
+     "sha": "a9cc367",
+     "date": "2026-11-23",
+     "time": "2026-11-23T18:09:23+01:00"
+    },
     {
      "type": "chore",
      "scope": null,

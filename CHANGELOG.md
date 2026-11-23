@@ -16,6 +16,7 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### chore
 
+- **agents:** move the z.ai agents from GLM-5.3 to GLM-5.4 ([a9cc367](https://github.com/casper-assistant-ai/alerty-pl/commit/a9cc367))
 - no AI co-author lines in commits; SHA references after the history rewrite ([d164ea9](https://github.com/casper-assistant-ai/alerty-pl/commit/d164ea9))
 
 ## 1.18.1 (2026-11-23)
