@@ -15,11 +15,38 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.18.2",
    "date": "2026-11-23",
-   "time": "2026-11-23T18:09:23+01:00",
-   "sha": "a9cc367",
+   "time": "2026-11-23T19:30:27+01:00",
+   "sha": "eab8920",
    "changes": [
+    {
+     "type": "ci",
+     "scope": null,
+     "breaking": false,
+     "text": "run every node test file in its own step",
+     "sha": "eab8920",
+     "date": "2026-11-23",
+     "time": "2026-11-23T19:30:27+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "map",
+     "breaking": false,
+     "text": "ignore impossible dates in the period URL and test the period logic",
+     "sha": "e98fe93",
+     "date": "2026-11-23",
+     "time": "2026-11-23T19:30:27+01:00"
+    },
+    {
+     "type": "test",
+     "scope": "parser",
+     "breaking": false,
+     "text": "pin the status clock, update splitting, list edges and what update() keeps",
+     "sha": "82aa7b4",
+     "date": "2026-11-23",
+     "time": "2026-11-23T19:30:27+01:00"
+    },
     {
      "type": "chore",
      "scope": "agents",

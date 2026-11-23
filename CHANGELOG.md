@@ -2,14 +2,20 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.18.2 (2026-11-23)
+
+### fix
+
+- **map:** ignore impossible dates in the period URL and test the period logic ([e98fe93](https://github.com/casper-assistant-ai/alerty-pl/commit/e98fe93))
 
 ### test
 
+- **parser:** pin the status clock, update splitting, list edges and what update() keeps ([82aa7b4](https://github.com/casper-assistant-ai/alerty-pl/commit/82aa7b4))
 - **changelog:** cover the LEGACY hand-mapping of prose commits (#59) ([4890bda](https://github.com/casper-assistant-ai/alerty-pl/commit/4890bda))
 
 ### ci
 
+- run every node test file in its own step ([eab8920](https://github.com/casper-assistant-ai/alerty-pl/commit/eab8920))
 - **security:** security-fixer agent closes Security and quality alerts ([57c284e](https://github.com/casper-assistant-ai/alerty-pl/commit/57c284e))
 - make the Dependabot config valid and map its web-editor commit ([845fd66](https://github.com/casper-assistant-ai/alerty-pl/commit/845fd66))
 - weekly Dependabot checks ([8253358](https://github.com/casper-assistant-ai/alerty-pl/commit/8253358))
