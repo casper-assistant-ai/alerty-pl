@@ -11,13 +11,17 @@
 import { spawn, spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, dirname } from "node:path";
+import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const args = Object.fromEntries(process.argv.slice(2).reduce((a, v, i, all) =>
   (v.startsWith("--") ? a.concat([[v.slice(2), all[i + 1]]]) : a), []));
 const BASE = (args.base || "https://casper-assistant-ai.github.io/alerty-pl/").replace(/\/?$/, "/");
 const STALE_MIN = Number(args["stale-min"] || 90);
+// The live notification service, `API` in docs/common.js (tests/site_check.test.mjs keeps the two in step).
+// Every page with a status strip opens its Server-Sent Events stream, and while the service is down
+// (server/, outside this repository) every reconnect of every page view fails.
+export const LIVE = "https://alerty-pl-cao.polandcentral.cloudapp.azure.com/alerty/";
 
 // What each page must show once it has loaded. Each check returns a list of problems.
 // The checks are template literals evaluated in the page, so a regex inside one writes its
@@ -166,6 +170,41 @@ class CDP {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const third = (p) => p.kind.endsWith("-3rd");
+const isLive = (p) => third(p) && String(p.url || "").startsWith(LIVE);
+const host = (url) => { try { return new URL(url).host; } catch { return url; } };
+// the items with their counts, the most frequent first
+function tally(items) {
+  const m = new Map();
+  for (const x of items) m.set(x, (m.get(x) || 0) + 1);
+  return [...m.entries()].sort((a, b) => b[1] - a[1]);
+}
+
+// One page view's problems sorted out: what the view reports, and the live service's failed requests
+// (for liveLine). A few failed 3rd-party tiles (a satellite day with no image) are normal; many are
+// not. The stream's reconnects are not tiles: counted with them, they tipped the NASA view over the
+// limit on every run of a service outage (#61, #70).
+export function judge(problems) {
+  const live = problems.filter(isLive);
+  const tiles = problems.filter((p) => third(p) && !isLive(p));
+  const rest = problems.filter((p) => !third(p));
+  if (tiles.length > 8) {
+    const hosts = tally(tiles.map((p) => host(p.url))).map(([h, n]) => `${n} × ${h}`);
+    rest.push({ kind: "3rd-party", detail: `${tiles.length} failed requests to other sites (${hosts.join(", ")}), e.g. ${tiles[0].detail}` });
+  }
+  return { problems: rest, live };
+}
+
+// One line for the run when the live service did not answer on some page views, or null.
+export function liveLine(results) {
+  const views = results.filter((r) => r.viewport !== "-");
+  const down = views.filter((r) => r.live && r.live.length);
+  if (!down.length) return null;
+  const [[top]] = tally(down.flatMap((r) => r.live).map((p) => p.detail));
+  return { page: "Live notification service", url: LIVE, viewport: "-", problems: [{ kind: "live", detail:
+    `${top} on ${down.length} of ${views.length} page views; the pages fall back to the Pages copy of the data until it answers (server/, outside this repository)` }] };
+}
+
 async function visit(cdp, sid, page, vp) {
   const problems = [];
   const origin = new URL(BASE).origin;
@@ -186,13 +225,14 @@ async function visit(cdp, sid, page, vp) {
       case "Network.responseReceived":
         if (p.response.status >= 400) {
           const own = p.response.url.startsWith(origin);
-          problems.push({ kind: own ? "http" : "http-3rd", detail: `${p.response.status} ${p.response.url.slice(0, 200)}` });
+          const url = p.response.url.slice(0, 200);
+          problems.push({ kind: own ? "http" : "http-3rd", detail: `${p.response.status} ${url}`, url });
         }
         break;
       case "Network.loadingFailed": {
         const url = pending.get(p.requestId) || "?";
         if (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(p.errorText) && !p.canceled)
-          problems.push({ kind: url.startsWith(origin) ? "network" : "network-3rd", detail: `${p.errorText} ${url.slice(0, 200)}` });
+          problems.push({ kind: url.startsWith(origin) ? "network" : "network-3rd", detail: `${p.errorText} ${url.slice(0, 200)}`, url: url.slice(0, 200) });
         break;
       }
       case "Page.loadEventFired": loaded = true; break;
@@ -219,11 +259,8 @@ async function visit(cdp, sid, page, vp) {
     writeFileSync(shot, Buffer.from(data, "base64"));
   }
   cdp.handlers = cdp.handlers.filter((h) => h !== handler);
-  // a few failed 3rd-party tiles (a satellite day with no image) are normal; many are not
-  const third = problems.filter((p) => p.kind.endsWith("-3rd"));
-  const rest = problems.filter((p) => !p.kind.endsWith("-3rd"));
-  if (third.length > 8) rest.push({ kind: "3rd-party", detail: `${third.length} failed requests to other sites, e.g. ${third[0].detail}` });
-  return { page: page.name, url, viewport: vp.name, ms: Date.now() - t0, problems: rest, ...(shot ? { shot } : {}) };
+  const { problems: rest, live } = judge(problems);
+  return { page: page.name, url, viewport: vp.name, ms: Date.now() - t0, problems: rest, ...(live.length ? { live } : {}), ...(shot ? { shot } : {}) };
 }
 
 // The HTML of each page as the server sends it, through scripts/html_check.py (plain Python).
@@ -278,6 +315,8 @@ async function main() {
     await cdp.send("Network.setCacheDisabled", { cacheDisabled: true }, sid);
     if (args.shots) mkdirSync(args.shots, { recursive: true });
     for (const vp of VIEWPORTS) for (const page of PAGES) results.push(await visit(cdp, sid, page, vp));
+    const service = liveLine(results);
+    if (service) results.push(service);
     results.push(...await served());
     results.push(...await freshness());
   } finally {
@@ -298,4 +337,7 @@ async function main() {
   process.exit(bad.length ? 1 : 0);
 }
 
-main().catch((e) => { console.error(e); process.exit(2); });
+// runs from the command line; tests/site_check.test.mjs imports judge and liveLine
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  main().catch((e) => { console.error(e); process.exit(2); });
+}
