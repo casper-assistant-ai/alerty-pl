@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-23",
+   "time": "2026-11-23T12:49:28+01:00",
+   "sha": "be7bc8c",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": null,
+     "breaking": false,
+     "text": "make the Dependabot config valid and map its web-editor commit",
+     "sha": "be7bc8c",
+     "date": "2026-11-23",
+     "time": "2026-11-23T12:49:28+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": null,
+     "breaking": false,
+     "text": "weekly Dependabot checks",
+     "sha": "7f096cc",
+     "date": "2026-11-23",
+     "time": "2026-11-23T13:43:27+02:00"
+    }
+   ]
+  },
+  {
    "version": "1.18.1",
    "date": "2026-11-23",
    "time": "2026-11-23T10:30:08Z",

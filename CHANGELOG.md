@@ -2,6 +2,13 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- make the Dependabot config valid and map its web-editor commit ([be7bc8c](https://github.com/casper-assistant-ai/alerty-pl/commit/be7bc8c))
+- weekly Dependabot checks ([7f096cc](https://github.com/casper-assistant-ai/alerty-pl/commit/7f096cc))
+
 ## 1.18.1 (2026-11-23)
 
 ### fix
