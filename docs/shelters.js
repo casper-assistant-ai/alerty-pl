@@ -322,6 +322,7 @@ function navigate(p) {
 
 // ---------- start ----------
 async function main() {
+  await RCB.leaflet(); // a dropped request for leaflet.js gets one retry here, not "L is not defined"
   S.index = await loadIndex();
   const upd = new Date(S.index.updated_at);
   $("#about-data").textContent = `${S.index.count.toLocaleString("pl-PL")} punktów, dane z ${RCB.fmtDay(upd)}: ${S.index.source} (dane.gov.pl, ${S.index.license}).`;

@@ -47,6 +47,21 @@ const RCB = (() => {
 
   const swatch = (cat) => h("i", { class: "sw", style: `--c:${color(cat)}`, "aria-hidden": "true" });
 
+  // Leaflet sits in the map pages' <script defer> row before this file, but one dropped request on a phone
+  // leaves it unloaded and kills the page with "L is not defined". Wait for it, retrying the script once.
+  function leaflet() {
+    if (typeof L !== "undefined") return Promise.resolve(L);
+    return new Promise((ok, bad) => {
+      const miss = () => bad(new Error("biblioteka mapy (Leaflet) nie jest dostępna"));
+      const s = document.createElement("script");
+      s.src = "vendor/leaflet/leaflet.js";
+      const late = setTimeout(() => { s.remove(); miss(); }, 15000);
+      s.onload = () => { clearTimeout(late); ok(L); };
+      s.onerror = () => { clearTimeout(late); s.remove(); miss(); };
+      document.head.append(s);
+    });
+  }
+
   const pad = (n) => String(n).padStart(2, "0");
   const fmtDay = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
   const fmtShort = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
@@ -179,7 +194,7 @@ const RCB = (() => {
 
   if ($("#strip")) live();
 
-  return { API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
+  return { API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON, fmtDay, fmtShort, fmtTime, hasTime,
     duration, regionText, names, plural, strip, live };
 })();
 
