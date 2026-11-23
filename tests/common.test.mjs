@@ -38,6 +38,13 @@ test("fmtDay, fmtShort and fmtTime pad day, month and clock", () => {
   assert.equal(RCB.fmtTime(when), "09:03");
 });
 
+test("fmtStamp shows day and clock of a full ISO stamp in Warsaw time", () => {
+  assert.equal(RCB.fmtStamp("2026-11-21T21:32:05+01:00"), "21.11.2026, 21:32");
+  assert.equal(RCB.fmtStamp("2026-11-21T23:30:00Z"), "22.11.2026, 00:30"); // 23:30 UTC is 00:30 in Warsaw (+1, winter)
+  assert.equal(RCB.fmtStamp("2026-07-01T22:30:00Z"), "02.07.2026, 00:30"); // CEST (+2) moves it to the next day
+  assert.equal(RCB.fmtStamp("nie-data"), ""); // unreadable input: empty, so the caller can fall back to the day
+});
+
 test("hasTime hides the hour of a day-only alert (midnight start)", () => {
   assert.equal(RCB.hasTime("2026-11-22T00:00:00"), false);
   assert.equal(RCB.hasTime("2026-11-22T08:00:00"), true);

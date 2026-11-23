@@ -1,9 +1,17 @@
 // Alerty RCB — the changelog page: data/changelog.json, built by scripts/changelog.py from Conventional Commits.
 "use strict";
-const { $, h, getJSON } = RCB;
+const { $, h, getJSON, fmtStamp } = RCB;
 // the order of groups inside a release; the rest go under "Inne"
 const ORDER = ["breaking", "feat", "fix", "perf", "revert"];
 const LABEL = { breaking: "Zmiany łamiące", feat: "Nowe funkcje", fix: "Poprawki", perf: "Wydajność", revert: "Wycofane", other: "Inne zmiany" };
+
+// "21.11.2026, 21:32" in Warsaw time; the day only while the JSON predates the full stamp
+function when(x) {
+  const stamp = x.time ? fmtStamp(x.time) : "";
+  if (stamp) return stamp;
+  const [y, m, d] = x.date.split("-");
+  return `${d}.${m}.${y}`;
+}
 
 function bumpOf(rel, prev) {
   if (!rel.version || !prev) return "";
@@ -18,11 +26,10 @@ function release(rel, prev, repo) {
     (groups[g] = groups[g] || []).push(c);
   }
   const kind = bumpOf(rel, prev);
-  const [y, m, d] = rel.date.split("-");
   const head = h("h2", { id: rel.version ? "v" + rel.version : "niewydane" },
     rel.version ? h("span", { class: "ver mono", text: rel.version }) : h("span", { class: "ver", text: "Jeszcze niewydane" }),
     kind ? h("span", { class: "bump " + kind, text: kind }) : null,
-    h("span", { class: "n mono", text: `${d}.${m}.${y}` }));
+    h("time", { class: "n mono", datetime: rel.time || rel.date, text: when(rel) }));
   const parts = [head];
   for (const g of [...ORDER, "other"]) {
     if (!groups[g]) continue;
@@ -30,6 +37,7 @@ function release(rel, prev, repo) {
       h("ul", { class: "changes" }, ...groups[g].map((c) => h("li", {},
         c.scope ? h("span", { class: "scope mono", text: c.scope }) : null,
         h("span", { text: c.text }),
+        h("time", { class: "when mono", datetime: c.time || c.date, text: when(c) }),
         h("a", { class: "sha mono", href: `${repo}/commit/${c.sha}`, text: c.sha })))));
   }
   return h("section", { class: "month release" }, ...parts);
