@@ -8,7 +8,7 @@ reliability or simpler upkeep, never a report.
 ## Tests
 - [x] `scripts/changelog.py`: tests for `lint` (good and bad subjects, `!` and `BREAKING CHANGE:`) and for the next version number. — this PR
 - [x] `docs/common.js`: a node test (no npm) for the date and category helpers used by every page. (#20)
-- [ ] `scripts/rcb.py update`: a test that a page that fails to load keeps the old `archive.json` entries.
+- [x] `scripts/rcb.py update`: a test that a page that fails to load keeps the old `archive.json` entries. — this PR
 
 ## Reliability
 - [ ] `scripts/rcb.py`: retry a gov.pl request once on a timeout or a 5xx before failing the run, with a test.

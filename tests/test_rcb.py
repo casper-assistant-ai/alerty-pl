@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import unittest
+from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
@@ -330,6 +331,70 @@ class Archive(unittest.TestCase):
         self.assertEqual(rows[0]["category"], "air")
         self.assertIn("podkarpackie", rows[0]["voivodeships"])
         self.assertLessEqual(len(rows[0]["message"]), 400)
+
+
+class UpdateFailingPage(unittest.TestCase):
+    """update() when a detail page fails to load: the old archive.json entries survive.
+    A normal run fails loudly before writing anything; a backfill (--keep-going) skips the
+    broken page but still merges the pages that did load into the old archive."""
+    BROKEN = "https://www.gov.pl/web/rcb/alert-rcb---atak-z-powietrza-2011"
+
+    def fetch(self, url, tries=3):
+        """The saved list page for every list request, one saved detail page for the rest —
+        except BROKEN, which fails to load."""
+        if url == self.BROKEN:
+            raise RuntimeError(f"fetch failed: {url}: timed out")
+        if "komunikaty?page=" in url:
+            return page("komunikaty-page1.html")
+        return page("alert-rcb---trening-systemow-alarmowania-2111.html")
+
+    def records(self):
+        a = rcb.parse_detail(page("alert-rcb---atak-z-powietrza-2011.html"), GAZ,
+                             title="Alert RCB - atak z powietrza (20.11)", date="2026-11-20")
+        a.update({"id": "alert-rcb---atak-z-powietrza-2011", "url": self.BROKEN, "intro": ""})
+        a["status"], a["started_at"], a["last_at"] = rcb.status(
+            a, dt.datetime(2026, 11, 20, 10, 0, tzinfo=rcb.TZ))
+        broken = rcb.compact(a)  # the record of the page that is about to fail
+        older = dict(broken, id="woda-2024", url="https://www.gov.pl/web/rcb/woda-2024",
+                     title="Alert RCB - woda niezdatna do spożycia (01.05.2024)", date="2024-05-01",
+                     started_at="2024-05-01T10:00:00+02:00", last_at="2024-05-01T12:00:00+02:00")
+        return broken, older
+
+    def seed(self, d):
+        broken, older = self.records()
+        path = os.path.join(d, "archive.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump({"alerts": [broken, older]}, fh, ensure_ascii=False)
+        with open(path, encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_failing_page_fails_the_run_and_writes_nothing(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            seeded = self.seed(d)
+            with mock.patch.object(rcb, "fetch", self.fetch):
+                with self.assertRaises(RuntimeError):
+                    rcb.update(1, d)
+            with open(os.path.join(d, "archive.json"), encoding="utf-8") as fh:
+                self.assertEqual(fh.read(), seeded)  # nothing was written over the history
+            self.assertFalse(os.path.exists(os.path.join(d, "alerts.json")))
+            self.assertFalse(os.path.exists(os.path.join(d, "meta.json")))
+
+    def test_keep_going_skips_the_page_and_keeps_the_old_entries(self):
+        import tempfile
+        broken, _ = self.records()
+        with tempfile.TemporaryDirectory() as d:
+            self.seed(d)
+            with mock.patch.object(rcb, "fetch", self.fetch):
+                rcb.update(1, d, keep_going=True)
+            with open(os.path.join(d, "archive.json"), encoding="utf-8") as fh:
+                rows = json.load(fh)["alerts"]
+        ids = [r["id"] for r in rows]
+        self.assertEqual(len(ids), 10)  # the 8 pages that loaded + the 2 old records
+        self.assertEqual(len(ids), len(set(ids)))
+        self.assertIn(broken, rows)          # the skipped page kept its own record, not re-parsed
+        self.assertIn("woda-2024", ids)      # an entry older than the fetched pages stayed
+        self.assertIn("komunikat-1811", ids)  # the pages that did load were parsed in
 
 
 class Gazetteer(unittest.TestCase):
