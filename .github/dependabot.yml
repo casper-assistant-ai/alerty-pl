@@ -1,12 +1,14 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
+# Weekly dependency checks. Only the live API server (server/requirements.txt) has pinned
+# packages; the site is plain HTML/JS with vendored libraries, and the workflow actions are
+# pinned by gh-aw's compiled .lock.yml files, which Dependabot must not edit.
+# PR titles come out as "build(deps): …", a Conventional Commit, so CI's lint and the
+# changelog accept them.
 version: 2
 updates:
-  - package-ecosystem: "" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "pip"
+    directory: "/server"
     schedule:
       interval: "weekly"
-
+    commit-message:
+      prefix: "build"
+      include: "scope"
