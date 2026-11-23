@@ -21,7 +21,9 @@ const WEEKDAY = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "
 
 // ---------- layers ----------
 const GIBS = "https://gibs.earthdata.nasa.gov";
-// fires: one WMS layer per satellite, each only from the day it has data (a missing one fails the request)
+// fires: one GIBS WMTS layer per satellite, each only from the day it has data (a missing one fails the request).
+// Not GIBS WMS (wms.cgi): on 2026-11-23 it answered every GetMap with a non-image (#73), while WMTS, the interface
+// of the true-colour layer, kept serving. 256 px tiles, levels 0–9, like that layer
 const FIRE_LAYERS = [
   ["VIIRS_SNPP_Thermal_Anomalies_375m_All", "2012-01-20"],
   ["VIIRS_NOAA20_Thermal_Anomalies_375m_All", "2020-01-01"],
@@ -434,18 +436,25 @@ function compareLink() {
 }
 
 // ---------- NASA FIRMS fires of the period's last day ----------
+// a tile that fails to load (GIBS not answering, a day not processed yet) is said in #fires-note, not dropped silently
 function fires() {
   S.fireLayers.forEach((l) => S.map.removeLayer(l));
   S.fireLayers = [];
+  const note = $("#fires-note");
+  note.textContent = "";
   if (!S.fires) return;
   for (const [layer, from] of FIRE_LAYERS) {
     if (S.to < from) continue;
-    const l = L.tileLayer.wms(`${GIBS}/wms/epsg3857/best/wms.cgi`, {
-      layers: layer, format: "image/png", transparent: true, version: "1.1.1", TIME: S.to,
-      pane: "fires", tileSize: 512, maxZoom: 19, attribution: '<a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a>',
+    const l = L.tileLayer(`${GIBS}/wmts/epsg3857/best/${layer}/default/${S.to}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`, {
+      pane: "fires", maxNativeZoom: 9, maxZoom: 19, attribution: '<a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a>',
     });
-    l.addTo(S.map);
+    // only the layers still on the map: a removed one may still be waiting for a tile that fails late
+    l.on("tileerror", () => {
+      const msg = `Nie udało się pobrać pożarów z NASA GIBS za dzień ${fmtISO(S.to)}. Pokazane punkty mogą być niepełne.`;
+      if (S.fireLayers.includes(l) && note.textContent !== msg) note.textContent = msg;
+    });
     S.fireLayers.push(l);
+    l.addTo(S.map);
   }
 }
 
