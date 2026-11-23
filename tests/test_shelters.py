@@ -28,6 +28,31 @@ class Parse(unittest.TestCase):
             shelters.parse("a,b,c\n1,2,3\n")
 
 
+class ParseEdges(unittest.TestCase):
+    HEAD = "Szerokosc geograficzna,Dlugosc geograficzna,Adres,Gmina,Dostepnosc\n"
+
+    def test_comma_decimals_bom_unknown_gmina_and_access(self):
+        text = "\ufeff" + self.HEAD + (
+            '"52,2297","21,0122",  ul.  Złota   1 ,Nieznana,całodobowa\n'
+            "50.0,19.9,ul. Długa 2,Kraków,coś innego\n")
+        rows, skipped = shelters.parse(text)
+        self.assertEqual(skipped, 0)
+        self.assertEqual(rows, [[50.0, 19.9, "ul. Długa 2", "Kraków", 2],     # unknown access = on request
+                                [52.2297, 21.0122, "ul. Złota 1", "", 0]])    # spaces squeezed, «Nieznana» dropped
+
+    def test_points_outside_poland_are_skipped(self):
+        text = self.HEAD + "48.0,21.0,za daleko na południe,,całodobowa\n52.0,30.0,za daleko na wschód,,całodobowa\n52.0,21.0,ok,,całodobowa\n"
+        rows, skipped = shelters.parse(text)
+        self.assertEqual((len(rows), skipped), (1, 2))
+
+    def test_cells_group_neighbours_and_split_across_an_edge(self):
+        a, b, c = [52.10, 21.10, "a", "", 0], [52.20, 21.20, "b", "", 0], [52.30, 21.20, "c", "", 0]
+        index, cells = shelters.build([a, b, c])
+        self.assertEqual(sorted(cells), ["208_84", "209_84"])  # 52.30 is past the 52.25 edge
+        self.assertEqual(index["208_84"], [2, 52.15, 21.15])
+        self.assertEqual(index["209_84"][0], 1)
+
+
 class Build(unittest.TestCase):
     def test_cells_and_index(self):
         rows, skipped = shelters.parse(FIXTURE.read_text(encoding="utf-8"))
