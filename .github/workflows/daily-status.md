@@ -40,7 +40,7 @@ safe-outputs:
     expires: 3d
   noop:
     report-as-issue: false
-timeout-minutes: 10
+timeout-minutes: 20
 ---
 
 # Daily status

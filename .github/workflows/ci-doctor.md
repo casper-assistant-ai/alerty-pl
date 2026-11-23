@@ -55,7 +55,7 @@ safe-outputs:
     max: 1
   noop:
     report-as-issue: false
-timeout-minutes: 10
+timeout-minutes: 20
 ---
 
 # CI doctor

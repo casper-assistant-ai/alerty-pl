@@ -35,7 +35,7 @@ safe-outputs:
     target: "*"
   noop:
     report-as-issue: false
-timeout-minutes: 10
+timeout-minutes: 20
 ---
 
 # Issue triage
