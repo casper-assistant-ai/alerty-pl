@@ -14,6 +14,10 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 - make the Dependabot config valid and map its web-editor commit ([845fd66](https://github.com/casper-assistant-ai/alerty-pl/commit/845fd66))
 - weekly Dependabot checks ([8253358](https://github.com/casper-assistant-ai/alerty-pl/commit/8253358))
 
+### chore
+
+- no AI co-author lines in commits; SHA references after the history rewrite ([d164ea9](https://github.com/casper-assistant-ai/alerty-pl/commit/d164ea9))
+
 ## 1.18.1 (2026-11-23)
 
 ### fix
