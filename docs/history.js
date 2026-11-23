@@ -1,6 +1,6 @@
 // Alerty RCB — the history page: every alert from data/archive.json, filtered and grouped by month.
 "use strict";
-const { CAT, VOIV, MONTHS, $, h, swatch, getJSON, fmtDay, fmtTime, hasTime, regionText, plural } = RCB;
+const { CAT, VOIV, MONTHS, $, h, swatch, getJSON, fmtDay, fmtTime, fmtISO, hasTime, historyPeriod, inPeriod, regionText, plural } = RCB;
 const PAGE = 150;
 
 function row(a) {
@@ -72,10 +72,21 @@ async function main() {
   }).catch(() => {});
   $("#filters").append(chip);
 
+  // a period, deep-linked from the map's «pełna historia» links: ?od=YYYY-MM-DD&do=YYYY-MM-DD, read as the
+  // map reads it. A date that is not a real day leaves the archive unfiltered, as an unknown powiat does.
+  let period = historyPeriod(location.search);
+  const periodText = (per) => !per.to ? `od ${fmtISO(per.from)}` : per.from === per.to ? fmtISO(per.from) : `${fmtISO(per.from)} – ${fmtISO(per.to)}`;
+  const periodBtn = h("button", { type: "button", "aria-label": "Usuń filtr okresu", text: "×" });
+  const periodChip = h("span", { class: "chip", hidden: true }, h("span", { text: period.from ? periodText(period) : "" }), periodBtn);
+  periodBtn.addEventListener("click", () => { period = { from: null, to: null }; periodChip.hidden = true; apply(); });
+  periodChip.hidden = !period.from;
+  $("#filters").append(periodChip);
+
   const norm = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/ł/g, "l");
   function apply() {
     const q = norm(f.q.value.trim());
     const rows = all.filter((a) =>
+      inPeriod(a, period) &&
       (!f.cat.value || a.category === f.cat.value) &&
       (!f.voiv.value || a.voivodeships.includes(f.voiv.value)) &&
       (!f.year.value || a.date.startsWith(f.year.value)) &&
@@ -84,6 +95,7 @@ async function main() {
     const p = new URLSearchParams();
     for (const [k, e] of Object.entries(f)) if (e.value) p.set(k, e.value);
     if (powiat) p.set("powiat", powiat);
+    if (period.from) { p.set("od", period.from); if (period.to) p.set("do", period.to); }
     history.replaceState(null, "", p.size ? "?" + p : location.pathname);
     render(rows, PAGE);
     if (powiat) $("#count").textContent += " · w tym alerty dla całego województwa";

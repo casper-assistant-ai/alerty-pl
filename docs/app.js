@@ -7,7 +7,7 @@
 // day, and NASA FIRMS fires (VIIRS 375 m) of that day. The view lives in the URL too (?srodek=lat,lng&zoom=z), and so
 // does a hand-picked Esri image (&zdjecie=<release date>); porownaj.html shows two images of the view side by side.
 "use strict";
-const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, plural } = RCB;
+const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, historyLink, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, plural } = RCB;
 
 // ---------- days ----------
 const DAY_MS = 86400000;
@@ -149,7 +149,11 @@ function panel() {
   $("#now-title").textContent = today ? "Teraz" : one ? `${fmtISO(S.to)}, ${WEEKDAY[toDate(S.to).getUTCDay()]}` : `${fmtISO(S.from)} – ${fmtISO(S.to)}`;
   $("#active-count").textContent = list.length;
   const rows = list.slice(0, LIST_MAX).map((a) => (a.regions ? activeRow : archiveRow)(a));
-  if (list.length > LIST_MAX) rows.push(h("li", { class: "empty" }, `i ${list.length - LIST_MAX} starszych — `, h("a", { href: "historia.html", text: "pełna historia" })));
+  // «pełna historia» keeps the day or period on the map; today and the whole archive open the plain page
+  const hist = historyLink(S.from, S.to, S.start, S.today), more = $("#more-history");
+  more.href = hist;
+  more.textContent = hist === "historia.html" ? "Pełna historia od 2021 roku" : `Pełna historia: ${S.from === S.to ? dayText(S.from) : `${dayText(S.from)} – ${dayText(S.to)}`}`;
+  if (list.length > LIST_MAX) rows.push(h("li", { class: "empty" }, `i ${list.length - LIST_MAX} starszych — `, h("a", { href: hist, text: "pełna historia" })));
   $("#active").replaceChildren(...(list.length ? rows
     : [h("li", { class: "empty", text: S.cat ? "Brak alertów w tej kategorii." : today ? "Żaden alert RCB nie jest teraz aktywny." : one ? "Tego dnia nie było alertów RCB." : "W tym okresie nie było alertów RCB." })]));
   if (!one) return summary(all);

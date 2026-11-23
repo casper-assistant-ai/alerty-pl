@@ -1,4 +1,5 @@
-// Node test of the period logic of the map page (docs/common.js: periodFromQuery, clampPeriod, span, isISO).
+// Node test of the period logic of the map and history pages (docs/common.js: periodFromQuery, clampPeriod,
+// span, isISO; historyPeriod, inPeriod, historyLink).
 // Alone: node --test tests/period.test.mjs ; CI runs every tests/*.test.mjs in its "Node tests" step.
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -46,6 +47,48 @@ test("clampPeriod swaps a backwards period and cuts it to the archive", () => {
 test("clampPeriod keeps a period that lies wholly outside the archive as a one-day period at its edge", () => {
   assert.deepEqual(RCB.clampPeriod("2030-01-01", "2030-02-01", START, TODAY), { from: TODAY, to: TODAY });
   assert.deepEqual(RCB.clampPeriod("2010-01-01", "2010-02-01", START, TODAY), { from: START, to: START });
+});
+
+// ---------- the history page: the same ?od=&do=, with the whole archive as the default (#52) ----------
+
+test("historyPeriod reads ?od=&do= as the map does; no date is the whole archive", () => {
+  assert.deepEqual(RCB.historyPeriod(""), { from: null, to: null });
+  assert.deepEqual(RCB.historyPeriod("?powiat=dolnoslaskie%2Fzgorzelecki&cat=air"), { from: null, to: null });
+  assert.deepEqual(RCB.historyPeriod("?od=2026-11-01&do=2026-11-07"), { from: "2026-11-01", to: "2026-11-07" });
+  assert.deepEqual(RCB.historyPeriod("?od=2026-11-01"), { from: "2026-11-01", to: null }); // od alone runs on
+  assert.deepEqual(RCB.historyPeriod("?do=2026-11-07"), { from: "2026-11-07", to: "2026-11-07" }); // do alone is that day
+  assert.deepEqual(RCB.historyPeriod("?dzien=2026-11-07"), { from: "2026-11-07", to: "2026-11-07" }); // the old one-day link, as on the map
+});
+
+test("historyPeriod ignores a date that is not a real day and swaps a backwards pair", () => {
+  assert.deepEqual(RCB.historyPeriod("?od=wczoraj&do=2026-02-31"), { from: null, to: null });
+  assert.deepEqual(RCB.historyPeriod("?od=%3Cscript%3E&do="), { from: null, to: null });
+  assert.deepEqual(RCB.historyPeriod("?od=bad&do=2026-11-07"), { from: "2026-11-07", to: "2026-11-07" }); // the good end still counts
+  assert.deepEqual(RCB.historyPeriod("?od=2026-11-07&do=2026-11-01"), { from: "2026-11-01", to: "2026-11-07" });
+});
+
+test("inPeriod keeps the alerts published on the period's days, both ends included; no period keeps all", () => {
+  const week = RCB.historyPeriod("?od=2026-11-01&do=2026-11-07");
+  const kept = (per, date) => RCB.inPeriod({ date }, per);
+  for (const d of ["2026-11-01", "2026-11-04", "2026-11-07"]) assert.equal(kept(week, d), true, d);
+  for (const d of ["2026-10-31", "2026-11-08"]) assert.equal(kept(week, d), false, d);
+  const whole = RCB.historyPeriod("?q=Gostyń");
+  for (const d of ["2019-01-01", "2026-11-07", "2026-11-23"]) assert.equal(kept(whole, d), true, d);
+  const open = RCB.historyPeriod("?od=2026-11-01");
+  assert.equal(kept(open, "2026-11-23"), true);
+  assert.equal(kept(open, "2026-10-31"), false);
+});
+
+test("historyLink: the map's «pełna historia» keeps a chosen day or period, and opens the plain page today and on the whole archive", () => {
+  const link = (from, to) => RCB.historyLink(from, to, START, TODAY);
+  assert.equal(link(TODAY, TODAY), "historia.html");
+  assert.equal(link(START, TODAY), "historia.html");
+  assert.equal(link("2026-11-07", "2026-11-07"), "historia.html?od=2026-11-07&do=2026-11-07");
+  assert.equal(link("2026-11-01", "2026-11-07"), "historia.html?od=2026-11-01&do=2026-11-07");
+  assert.equal(link("2026-11-17", TODAY), "historia.html?od=2026-11-17&do=2026-11-23"); // a preset that ends today is a period too
+  // what a link carries is what the archive page reads back
+  const carried = link("2026-11-01", "2026-11-07").slice("historia.html".length);
+  assert.deepEqual(RCB.historyPeriod(carried), { from: "2026-11-01", to: "2026-11-07" });
 });
 
 test("span: an ended alert covers its days; an active or planned one runs to today", () => {
