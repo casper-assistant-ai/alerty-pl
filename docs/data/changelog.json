@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.18.1",
+   "date": "2026-11-23",
+   "time": "2026-11-23T10:30:08Z",
+   "sha": "8c1aa7e",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "history",
+     "breaking": false,
+     "text": "stop the sticky month heading covering row links on touch (#54)",
+     "sha": "8c1aa7e",
+     "date": "2026-11-23",
+     "time": "2026-11-23T10:30:08Z"
+    }
+   ]
+  },
+  {
    "version": "1.18.0",
    "date": "2026-11-23",
    "time": "2026-11-23T08:31:04Z",

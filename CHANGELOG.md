@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.18.1 (2026-11-23)
+
+### fix
+
+- **history:** stop the sticky month heading covering row links on touch (#54) ([8c1aa7e](https://github.com/casper-assistant-ai/alerty-pl/commit/8c1aa7e))
+
 ## 1.18.0 (2026-11-23)
 
 ### feat
