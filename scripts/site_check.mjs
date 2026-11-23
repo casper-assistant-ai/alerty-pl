@@ -20,6 +20,9 @@ const BASE = (args.base || "https://casper-assistant-ai.github.io/alerty-pl/").r
 const STALE_MIN = Number(args["stale-min"] || 90);
 
 // What each page must show once it has loaded. Each check returns a list of problems.
+// The checks are template literals evaluated in the page, so a regex inside one writes its
+// backslashes twice: a lone \. is eaten by the template and \? turns into a quantifier
+// (tests/site_check.test.mjs).
 const COMMON = `(() => { const p = [];
   const st = document.querySelector("#strip .state");
   if (!st || /Ładowanie|Nie udało/.test(st.textContent)) p.push("status strip: " + (st ? st.textContent : "missing"));
@@ -74,21 +77,21 @@ const PAGES = [
       if (document.querySelectorAll(".leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
       if (document.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded").length < 4) p.push("NASA true colour tiles did not load");
       if (!document.querySelector(".leaflet-fires-pane img")) p.push("NASA FIRMS fire layer is missing");
-      if (!/15\.08\.2026/.test(document.querySelector("#day-label")?.textContent || "")) p.push("day slider did not open 15.08.2026");
+      if (!/15\\.08\\.2026/.test(document.querySelector("#day-label")?.textContent || "")) p.push("day slider did not open 15.08.2026");
       return p; })()` },
   { path: "?podklad=esri", name: "Mapa, Esri Wayback", check: `(() => { const p = [];
       if (document.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded").length < 4) p.push("Esri Wayback tiles did not load");
       if (!document.querySelector("#wayback option")) p.push("Esri Wayback date list is empty");
       return p; })()` },
   { path: "?podklad=esri&srodek=50.5650,17.9650&zoom=15&zdjecie=2025-04-24", name: "Mapa, link do miejsca i zdjęcia (powódź 2024)", check: `(() => { const p = [];
-      if (!/24\.04\.2025/.test(document.querySelector("#wayback option:checked")?.textContent || "")) p.push("?zdjecie=2025-04-24 did not pick the Esri release of 24.04.2025");
-      if (!/[?&]srodek=50\.56/.test(location.search) || !/[?&]zoom=15/.test(location.search)) p.push("the view is not in the URL (srodek, zoom)");
-      if (!/porownaj\.html\?srodek=/.test(document.querySelector("#compare")?.href || "")) p.push("the «Porównaj daty» link is missing");
+      if (!/24\\.04\\.2025/.test(document.querySelector("#wayback option:checked")?.textContent || "")) p.push("?zdjecie=2025-04-24 did not pick the Esri release of 24.04.2025");
+      if (!/[?&]srodek=50\\.56/.test(location.search) || !/[?&]zoom=15/.test(location.search)) p.push("the view is not in the URL (srodek, zoom)");
+      if (!/porownaj\\.html\\?srodek=/.test(document.querySelector("#compare")?.href || "")) p.push("the «Porównaj daty» link is missing");
       return p; })()` },
   { path: "porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24", name: "Porównanie zdjęć, powódź 2024", check: `(() => { const p = [];
       for (const k of ["l", "r"]) if (document.querySelectorAll("#map-" + k + " img.leaflet-tile-loaded").length < 4) p.push("compare: tiles of map " + k + " did not load");
-      if (!/27\.03\.2025/.test(document.querySelector("#sel-l option:checked")?.textContent || "")) p.push("compare: lewa=2025-03-27 not picked");
-      if (!/24\.04\.2025/.test(document.querySelector("#sel-r option:checked")?.textContent || "")) p.push("compare: prawa=2025-04-24 not picked");
+      if (!/27\\.03\\.2025/.test(document.querySelector("#sel-l option:checked")?.textContent || "")) p.push("compare: lewa=2025-03-27 not picked");
+      if (!/24\\.04\\.2025/.test(document.querySelector("#sel-r option:checked")?.textContent || "")) p.push("compare: prawa=2025-04-24 not picked");
       const t = (k) => [...document.querySelectorAll("#map-" + k + " img.leaflet-tile-loaded")].map((i) => i.src.split("/").slice(-3).join("/")).sort().join();
       if (t("l") !== t("r")) p.push("compare: the two maps do not show the same place");
       return p; })()` },
