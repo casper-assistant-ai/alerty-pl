@@ -40,6 +40,13 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   hours and when the CI doctor (which also watches pull request runs) dispatches it, takes an issue
   again when the gate closed its PR (and closes it with the reasons after two), and when nothing waits makes one improvement PR a day (tests, reliability,
   simpler upkeep) from `process/improvements.md`, which the process-retro keeps filled.
+- Security fixer: the `security-fixer` agent keeps the Security and quality tab empty. The Security
+  watch workflow (hourly, plain code) runs `scripts/security_alerts.py pending` and starts it when an
+  open CodeQL, code quality, Dependabot or secret scanning alert has no open security-fixer PR or
+  `security` issue naming it (`Alerts: code-scanning#N`). The agent fixes the cause in a PR for the
+  gate (it may also touch the vendored `dashboard/`), dismisses an alert whose code is fine with the
+  reason (`dismiss-alert`, checked by the script), or opens one issue for Casper (a leaked secret,
+  `server/`). Dependabot and secret scanning need the repository secret `SECURITY_ALERTS_TOKEN`.
 - Releases: `scripts/changelog.py` tags `vMAJOR.MINOR.PATCH` from the commits since the last tag
   and builds `CHANGELOG.md` and `docs/data/changelog.json` (the Zmiany page). Both are generated.
 

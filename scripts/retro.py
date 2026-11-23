@@ -41,7 +41,7 @@ PREFIX = re.compile(r"^\[(?P<agent>[a-z0-9-]+)\] ")
 GATE_TYPE = {"site-fixer": "fix", "site-designer": "feat", "parser-doctor": "fix",
              "region-keeper": "fix", "security-auditor": "fix", "test-improver": "test",
              "docs-keeper": "docs", "agent-coach": "chore", "process-retro": "chore",
-             "issue-worker": "fix"}
+             "issue-worker": "fix", "security-fixer": "fix"}
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 HARD_CAP = 3
 # agents that change the process itself; their PRs count as process, not as output

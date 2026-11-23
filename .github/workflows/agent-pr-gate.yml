@@ -33,6 +33,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       ALLOWED: '^(scripts/|tests/|process/[a-z0-9-]+\.(md|json)$|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$)'
+      SECURITY_ALLOWED: '^dashboard/'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -115,7 +116,10 @@ jobs:
               gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$r/approve" >/dev/null && echo "approved CI run $r"
             done
             files=$(gh pr diff "$n" --name-only)
-            bad=$(echo "$files" | grep -Ev "$ALLOWED" || true)
+            allowed="$ALLOWED"
+            # the security-fixer also fixes CodeQL alerts in the vendored gh-cao dashboard
+            case "$(gh pr view "$n" --json title --jq .title)" in "[security-fixer] "*) allowed="$ALLOWED|$SECURITY_ALLOWED";; esac
+            bad=$(echo "$files" | grep -Ev "$allowed" || true)
             if [ -n "$bad" ]; then
               request_fix "It changes files outside the allowed paths: $(echo $bad). Revert them."
               echo "::endgroup::"; continue
@@ -174,7 +178,7 @@ jobs:
               case "$agent" in
                 site-fixer) type="fix(site)";; site-designer) type="feat(site)";;
                 parser-doctor) type="fix(parser)";; region-keeper) type="fix(regions)";;
-                security-auditor) type="fix(security)";; test-improver) type="test";;
+                security-auditor|security-fixer) type="fix(security)";; test-improver) type="test";;
                 docs-keeper) type="docs";; process-retro) type="chore(process)";; issue-worker) type="fix";; *) type="chore";;
               esac
               subject="$type: $subject"

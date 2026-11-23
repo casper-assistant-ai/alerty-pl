@@ -1,0 +1,55 @@
+name: Security watch
+
+# Starts the security-fixer agent when the Security and quality tab has an open alert that no open
+# security-fixer PR or security issue covers yet (scripts/security_alerts.py pending). Plain code:
+# an empty tab costs no model call. CodeQL closes a fixed alert by itself when the fix reaches main.
+on:
+  schedule:
+    - cron: "5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  security-events: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: security-watch
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - name: Count the alerts nobody covers
+        id: count
+        env:
+          GH_TOKEN: ${{ secrets.SECURITY_ALERTS_TOKEN || github.token }}
+        run: |
+          read -r n newest < <(python3 -I scripts/security_alerts.py pending)
+          echo "pending=$n" >> "$GITHUB_OUTPUT"; echo "newest=$newest" >> "$GITHUB_OUTPUT"
+          echo "$n alert(s) nobody covers, the newest from $newest"
+      - name: Start the security-fixer
+        if: steps.count.outputs.pending != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NEWEST: ${{ steps.count.outputs.newest }}
+        run: |
+          runs=$(gh run list --workflow security-fixer.lock.yml --limit 20 --json status,createdAt)
+          if [ "$(jq '[.[] | select(.status != "completed")] | length' <<<"$runs")" != 0 ]; then
+            echo "the security-fixer is already running"; exit 0
+          fi
+          # an alert the agent left open (a code quality finding, a failed fix) is taken again after
+          # six hours; a new alert at once
+          last=$(jq -r '[.[].createdAt] | max // ""' <<<"$runs")
+          if [ -n "$last" ] && [ "$NEWEST" \< "$last" ] && \
+             [ $(( $(date +%s) - $(date -d "$last" +%s) )) -lt 21600 ]; then
+            echo "no new alert since the last run at $last; next try six hours after it"; exit 0
+          fi
+          gh workflow run security-fixer.lock.yml
+          echo "started the security-fixer for ${{ steps.count.outputs.pending }} alert(s)"

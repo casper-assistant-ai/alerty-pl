@@ -51,6 +51,8 @@ flowchart LR
   SC[site check<br/>headless Chrome] -->|issue site-error| SF[site-fixer 🤖]
   SF -->|PR| G
   SA[security-auditor 🤖] -->|issue| IW
+  SQ[Security and quality tab<br/>CodeQL · Dependabot · secrets] -->|Security watch, hourly| SF[security-fixer 🤖] -->|fix PR| G
+  SF -->|reasoned dismiss| SQ
   AC[agent-coach 🤖] -->|learned rules PR| G
   RETRO[process-retro 🤖] -->|process PR| G
   CAO[gh-cao] -.monitors.-> PD & RK & CD & DS & IT & TI & DK & SD & SA & AC
@@ -76,6 +78,7 @@ flowchart LR
 | `site-fixer` | agent | GLM-5.3 (z.ai) | on a site-check issue, daily | PR: `docs/*.html\|js\|css`, `scripts/`, `tests/` |
 | `site-designer` | agent + skills unslop, modern-web-guidance | GLM-5.3 (z.ai) | weekly | PR: `docs/*.html\|js\|css` |
 | `security-auditor` | agent + skill security-audit | GLM-5.3 (z.ai) | weekly | issue |
+| `security-fixer` | agent | GLM-5.3 (z.ai) | when Security watch (hourly, plain code) sees an alert no PR or issue covers; weekly | fix PR (`Alerts: code-scanning#N`), reasoned dismiss, or an issue for Casper (leaked secret, `server/`) |
 | `agent-coach` | agent + skill skillopt-sleep | GLM-5.3 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
 | `process-retro` | agent | GLM-5.3 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues |
 | `ci-doctor` | agent | Copilot | a failed run on main | issue |

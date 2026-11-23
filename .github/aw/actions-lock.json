@@ -1,5 +1,10 @@
 {
   "entries": {
+    "actions/checkout@v4": {
+      "repo": "actions/checkout",
+      "version": "v4",
+      "sha": "11d5960a326750d5838078e36cf38b85af677262"
+    },
     "cloudflare/security-audit-skill/skills/security-audit@main": {
       "repo": "cloudflare/security-audit-skill/skills/security-audit",
       "version": "main",
