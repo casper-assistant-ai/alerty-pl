@@ -33,7 +33,8 @@ RELEASING = {"feat": "minor", "fix": "patch", "perf": "patch", "revert": "patch"
 CC = re.compile(r"^(?P<type>[a-z]+)(?:\((?P<scope>[a-z0-9._/-]+)\))?(?P<bang>!)?: (?P<desc>\S.*)$")
 TAG = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
 
-# Commits made before the convention (21.11.2026), written the way they would be today.
+# Commits that are not Conventional (made before the convention of 21.11.2026, or in the web
+# editor), written the way they would be today.
 LEGACY = {
     "d9b56f4": "feat: alert map of Poland from gov.pl RCB, run by an agent team",
     "9022420": "fix(update): autostash meta.json before the rebase",
@@ -44,6 +45,8 @@ LEGACY = {
     "4f96f72": "feat(site): honest status signals, reduced-motion opt-in, live-region alarm announcements (#5)",
     "d20eeb2": "feat: alert history since 2021, analytics page and a redesign",
     "480d5db": "fix(regions): re-parse cached alerts after the Warsaw-area town rules (#7)",
+    # made later in GitHub's web editor, outside the lint
+    "7f096cc": "ci: weekly Dependabot checks",
 }
 # Robot commits that are not changes of the product.
 SKIP = re.compile(r"^(data: |chore\(data\)|chore\(release\))")
