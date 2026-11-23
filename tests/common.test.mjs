@@ -31,11 +31,12 @@ test("color turns a category into its CSS variable", () => {
   assert.equal(RCB.color("fire"), "var(--fire)");
 });
 
-test("fmtDay, fmtShort and fmtTime pad day, month and clock", () => {
+test("fmtDay, fmtShort, fmtTime and fmtISO pad day, month and clock", () => {
   const when = new Date(2026, 10, 5, 9, 3); // 5 November 2026, 09:03
   assert.equal(RCB.fmtDay(when), "05.11.2026");
   assert.equal(RCB.fmtShort(when), "05.11 09:03");
   assert.equal(RCB.fmtTime(when), "09:03");
+  assert.equal(RCB.fmtISO("2026-11-05"), "05.11.2026"); // a day straight from the URL or an archive row
 });
 
 test("fmtStamp shows day and clock of a full ISO stamp in Warsaw time", () => {

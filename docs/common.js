@@ -64,6 +64,8 @@ const RCB = (() => {
 
   const pad = (n) => String(n).padStart(2, "0");
   const fmtDay = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+  // "2026-11-07" -> "07.11.2026"
+  const fmtISO = (iso) => iso.split("-").reverse().join(".");
   const fmtShort = (d) => `${pad(d.getDate())}.${pad(d.getMonth() + 1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   const fmtTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   // a full ISO stamp -> "d.mm.yyyy, hh:mm" in Warsaw time, whatever the visitor's clock;
@@ -123,6 +125,26 @@ const RCB = (() => {
     if (from > today) from = today;
     if (from > to) from = to;
     return { from, to };
+  }
+
+  // ---------- the period of the history page ----------
+  // ?od=…&do=… is read as the map reads it (one end alone: od runs on, do is that day), but with no "today"
+  // to fall back on: no real date is the whole archive, and a backwards pair is swapped as the map shows it.
+  function historyPeriod(search) {
+    let { from, to } = periodFromQuery(search, null);
+    if (from > to) [from, to] = [to, from];
+    return { from, to };
+  }
+
+  // an archive row is in the period on its date, the day it was published; a missing end is open
+  const inPeriod = (a, per) => (!per.from || a.date >= per.from) && (!per.to || a.date <= per.to);
+
+  // the «pełna historia» links of the map page: a day or period the visitor chose is carried to the archive
+  // page; today (its active alerts were published on other days, and the archive starts with today's rows)
+  // and the whole archive open the plain page
+  function historyLink(from, to, start, today) {
+    const plain = (from === start && to === today) || (from === today && to === today);
+    return plain ? "historia.html" : `historia.html?od=${from}&do=${to}`;
   }
 
   // an archived alert lasts from the day it started to the day of its last update (or today, while it is on)
@@ -231,7 +253,8 @@ const RCB = (() => {
 
   if ($("#strip")) live();
 
-  return { isISO, periodFromQuery, clampPeriod, span, API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON, fmtDay, fmtShort, fmtTime, fmtStamp,
+  return { isISO, periodFromQuery, clampPeriod, span, historyPeriod, inPeriod, historyLink, API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON,
+    fmtISO, fmtDay, fmtShort, fmtTime, fmtStamp,
     hasTime, duration, regionText, names, plural, strip, live };
 })();
 
