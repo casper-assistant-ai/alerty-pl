@@ -44,7 +44,7 @@ ENV = os.environ.get
 PUBLIC_URL = ENV("PUBLIC_URL", "http://127.0.0.1:8090").rstrip("/")
 POLL = max(10, int(ENV("POLL_SECONDS", "20")))
 DETAIL_RECHECK = 90       # seconds between re-reads of a recent alert's page (updates, cancellations)
-ORIGINS = {o.strip() for o in ENV("ALLOWED_ORIGINS", "https://casper-assistant-ai.github.io").split(",") if o.strip()}
+ORIGINS = {o.strip() for o in ENV("ALLOWED_ORIGINS", "https://alerty.klioba.com,https://casper-assistant-ai.github.io").split(",") if o.strip()}
 MAX_SSE = 3000
 MAX_SUBS = 20000
 

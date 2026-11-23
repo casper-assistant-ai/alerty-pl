@@ -17,7 +17,7 @@ VOIV = {
     "slaskie": "śląskie", "swietokrzyskie": "świętokrzyskie", "warminsko-mazurskie": "warmińsko-mazurskie",
     "wielkopolskie": "wielkopolskie", "zachodniopomorskie": "zachodniopomorskie",
 }
-SITE = "https://casper-assistant-ai.github.io/alerty-pl/"
+SITE = "https://alerty.klioba.com/"
 EMAIL_RE = re.compile(r"^[^@\s<>\"']{1,64}@[A-Za-z0-9.-]{1,190}\.[A-Za-z]{2,24}$")
 
 
