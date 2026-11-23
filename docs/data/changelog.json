@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.20.2",
+   "date": "2026-11-23",
+   "time": "2026-11-23T20:41:23Z",
+   "sha": "b980f41",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "keep the regex escapes of the site check's page checks (#67)",
+     "sha": "b980f41",
+     "date": "2026-11-23",
+     "time": "2026-11-23T20:41:23Z"
+    }
+   ]
+  },
+  {
    "version": "1.20.1",
    "date": "2026-11-23",
    "time": "2026-11-23T20:46:20+01:00",

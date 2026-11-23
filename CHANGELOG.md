@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.20.2 (2026-11-23)
+
+### fix
+
+- **site:** keep the regex escapes of the site check's page checks (#67) ([b980f41](https://github.com/casper-assistant-ai/alerty-pl/commit/b980f41))
+
 ## 1.20.1 (2026-11-23)
 
 ### fix
