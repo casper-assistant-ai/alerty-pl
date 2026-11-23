@@ -36,17 +36,17 @@ TAG = re.compile(r"^v(\d+)\.(\d+)\.(\d+)$")
 # Commits that are not Conventional (made before the convention of 21.11.2026, or in the web
 # editor), written the way they would be today.
 LEGACY = {
-    "d9b56f4": "feat: alert map of Poland from gov.pl RCB, run by an agent team",
-    "9022420": "fix(update): autostash meta.json before the rebase",
-    "6735655": "feat(monitoring): agent monitoring with gh-cao, alert times in the history fixed",
-    "518003b": "fix(deploy): retry the Pages deploy when the artifact is not listed yet",
-    "9876508": "feat(agents): developer agents on z.ai (GLM-5.3) with the site-designer, security-auditor and agent-coach skills",
-    "99f7d21": "feat(regions): map Warsaw-area towns to powiaty (#4)",
-    "4f96f72": "feat(site): honest status signals, reduced-motion opt-in, live-region alarm announcements (#5)",
-    "d20eeb2": "feat: alert history since 2021, analytics page and a redesign",
-    "480d5db": "fix(regions): re-parse cached alerts after the Warsaw-area town rules (#7)",
+    "0b213ac": "feat: alert map of Poland from gov.pl RCB, run by an agent team",
+    "c2871d9": "fix(update): autostash meta.json before the rebase",
+    "ef40b0f": "feat(monitoring): agent monitoring with gh-cao, alert times in the history fixed",
+    "1d7350e": "fix(deploy): retry the Pages deploy when the artifact is not listed yet",
+    "eb8df96": "feat(agents): developer agents on z.ai (GLM-5.3) with the site-designer, security-auditor and agent-coach skills",
+    "6313095": "feat(regions): map Warsaw-area towns to powiaty (#4)",
+    "1fdd28c": "feat(site): honest status signals, reduced-motion opt-in, live-region alarm announcements (#5)",
+    "040db28": "feat: alert history since 2021, analytics page and a redesign",
+    "e9f75cb": "fix(regions): re-parse cached alerts after the Warsaw-area town rules (#7)",
     # made later in GitHub's web editor, outside the lint
-    "7f096cc": "ci: weekly Dependabot checks",
+    "8253358": "ci: weekly Dependabot checks",
 }
 # Robot commits that are not changes of the product.
 SKIP = re.compile(r"^(data: |chore\(data\)|chore\(release\))")

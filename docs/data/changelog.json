@@ -17,24 +17,24 @@
   {
    "version": null,
    "date": "2026-11-23",
-   "time": "2026-11-23T14:05:37Z",
-   "sha": "b96f240",
+   "time": "2026-11-23T14:05:37+00:00",
+   "sha": "4890bda",
    "changes": [
     {
      "type": "test",
      "scope": "changelog",
      "breaking": false,
      "text": "cover the LEGACY hand-mapping of prose commits (#59)",
-     "sha": "b96f240",
+     "sha": "4890bda",
      "date": "2026-11-23",
-     "time": "2026-11-23T14:05:37Z"
+     "time": "2026-11-23T14:05:37+00:00"
     },
     {
      "type": "ci",
      "scope": "security",
      "breaking": false,
      "text": "security-fixer agent closes Security and quality alerts",
-     "sha": "3e20972",
+     "sha": "57c284e",
      "date": "2026-11-23",
      "time": "2026-11-23T14:57:26+01:00"
     },
@@ -43,7 +43,7 @@
      "scope": null,
      "breaking": false,
      "text": "make the Dependabot config valid and map its web-editor commit",
-     "sha": "be7bc8c",
+     "sha": "845fd66",
      "date": "2026-11-23",
      "time": "2026-11-23T12:49:28+01:00"
     },
@@ -52,7 +52,7 @@
      "scope": null,
      "breaking": false,
      "text": "weekly Dependabot checks",
-     "sha": "7f096cc",
+     "sha": "8253358",
      "date": "2026-11-23",
      "time": "2026-11-23T13:43:27+02:00"
     }
@@ -61,69 +61,69 @@
   {
    "version": "1.18.1",
    "date": "2026-11-23",
-   "time": "2026-11-23T10:30:08Z",
-   "sha": "8c1aa7e",
+   "time": "2026-11-23T10:30:08+00:00",
+   "sha": "0b220b9",
    "changes": [
     {
      "type": "fix",
      "scope": "history",
      "breaking": false,
      "text": "stop the sticky month heading covering row links on touch (#54)",
-     "sha": "8c1aa7e",
+     "sha": "0b220b9",
      "date": "2026-11-23",
-     "time": "2026-11-23T10:30:08Z"
+     "time": "2026-11-23T10:30:08+00:00"
     }
    ]
   },
   {
    "version": "1.18.0",
    "date": "2026-11-23",
-   "time": "2026-11-23T08:31:04Z",
-   "sha": "793006f",
+   "time": "2026-11-23T08:31:04+00:00",
+   "sha": "9ff948d",
    "changes": [
     {
      "type": "chore",
      "scope": "process",
      "breaking": false,
      "text": "retro 2026-11-23, dev share 69% (#53)",
-     "sha": "793006f",
+     "sha": "9ff948d",
      "date": "2026-11-23",
-     "time": "2026-11-23T08:31:04Z"
+     "time": "2026-11-23T08:31:04+00:00"
     },
     {
      "type": "test",
      "scope": "parser",
      "breaking": false,
      "text": "a failing page keeps the old archive entries (#51)",
-     "sha": "c2f3e5f",
+     "sha": "4a42234",
      "date": "2026-11-23",
-     "time": "2026-11-23T08:23:27Z"
+     "time": "2026-11-23T08:23:27+00:00"
     },
     {
      "type": "feat",
      "scope": "site",
      "breaking": false,
      "text": "show the hour and minute of every release and change (#50)",
-     "sha": "c329fef",
+     "sha": "ef1dae9",
      "date": "2026-11-23",
-     "time": "2026-11-23T08:15:34Z"
+     "time": "2026-11-23T08:15:34+00:00"
     }
    ]
   },
   {
    "version": "1.17.6",
    "date": "2026-11-23",
-   "time": "2026-11-23T00:00:54Z",
-   "sha": "14c5021",
+   "time": "2026-11-23T00:00:54+00:00",
+   "sha": "21ebef8",
    "changes": [
     {
      "type": "fix",
      "scope": "map",
      "breaking": false,
      "text": "retry vendored Leaflet once when its first load is dropped (#47)",
-     "sha": "14c5021",
+     "sha": "21ebef8",
      "date": "2026-11-23",
-     "time": "2026-11-23T00:00:54Z"
+     "time": "2026-11-23T00:00:54+00:00"
     }
    ]
   },
@@ -131,14 +131,14 @@
    "version": "1.17.5",
    "date": "2026-11-23",
    "time": "2026-11-23T00:25:59+01:00",
-   "sha": "61dde92",
+   "sha": "b5dde9b",
    "changes": [
     {
      "type": "fix",
      "scope": "mobile",
      "breaking": false,
      "text": "the tab menu scrolls only sideways, not up and down",
-     "sha": "61dde92",
+     "sha": "b5dde9b",
      "date": "2026-11-23",
      "time": "2026-11-23T00:25:59+01:00"
     }
@@ -148,14 +148,14 @@
    "version": "1.17.4",
    "date": "2026-11-23",
    "time": "2026-11-23T00:07:40+01:00",
-   "sha": "8103aa7",
+   "sha": "9b1468f",
    "changes": [
     {
      "type": "fix",
      "scope": "mobile-audit",
      "breaking": false,
      "text": "stop the click round when a button leaves the page",
-     "sha": "8103aa7",
+     "sha": "9b1468f",
      "date": "2026-11-23",
      "time": "2026-11-23T00:07:40+01:00"
     }
@@ -165,14 +165,14 @@
    "version": "1.17.3",
    "date": "2026-11-23",
    "time": "2026-11-23T00:00:15+01:00",
-   "sha": "c8f4d4e",
+   "sha": "d90ad86",
    "changes": [
     {
      "type": "fix",
      "scope": "mobile",
      "breaking": false,
      "text": "phone audit fixes and a mobile audit in the site check",
-     "sha": "c8f4d4e",
+     "sha": "d90ad86",
      "date": "2026-11-23",
      "time": "2026-11-23T00:00:15+01:00"
     }
@@ -182,14 +182,14 @@
    "version": "1.17.2",
    "date": "2026-11-22",
    "time": "2026-11-22T14:50:10+01:00",
-   "sha": "74fa73a",
+   "sha": "ec944f4",
    "changes": [
     {
      "type": "fix",
      "scope": "shelters",
      "breaking": false,
      "text": "say where to unblock location when the phone does not ask",
-     "sha": "74fa73a",
+     "sha": "ec944f4",
      "date": "2026-11-22",
      "time": "2026-11-22T14:50:10+01:00"
     },
@@ -198,16 +198,16 @@
      "scope": "parser",
      "breaking": false,
      "text": "cover the chemical and other categories (#33)",
-     "sha": "9a0605e",
+     "sha": "f778424",
      "date": "2026-11-22",
-     "time": "2026-11-22T13:44:49Z"
+     "time": "2026-11-22T13:44:49+00:00"
     },
     {
      "type": "ci",
      "scope": null,
      "breaking": false,
      "text": "catch broken HTML and raw markup on the live site",
-     "sha": "b95196c",
+     "sha": "849df9c",
      "date": "2026-11-22",
      "time": "2026-11-22T10:52:25+01:00"
     }
@@ -217,14 +217,14 @@
    "version": "1.17.1",
    "date": "2026-11-22",
    "time": "2026-11-22T10:37:11+01:00",
-   "sha": "e7f8ef9",
+   "sha": "7cde305",
    "changes": [
     {
      "type": "fix",
      "scope": "map",
      "breaking": false,
      "text": "incursions start where they were launched; Ukraine only as transit",
-     "sha": "e7f8ef9",
+     "sha": "7cde305",
      "date": "2026-11-22",
      "time": "2026-11-22T10:37:11+01:00"
     }
@@ -234,14 +234,14 @@
    "version": "1.17.0",
    "date": "2026-11-22",
    "time": "2026-11-22T09:33:16+01:00",
-   "sha": "6ebac81",
+   "sha": "b23b571",
    "changes": [
     {
      "type": "feat",
      "scope": "map",
      "breaking": false,
      "text": "animate missile and drone incursions into Poland; red days on the slider",
-     "sha": "6ebac81",
+     "sha": "b23b571",
      "date": "2026-11-22",
      "time": "2026-11-22T09:33:16+01:00"
     }
@@ -251,14 +251,14 @@
    "version": "1.16.0",
    "date": "2026-11-22",
    "time": "2026-11-22T09:13:46+01:00",
-   "sha": "94a3059",
+   "sha": "8ebd096",
    "changes": [
     {
      "type": "feat",
      "scope": "shelters",
      "breaking": false,
      "text": "map of shelter points with the nearest ones and navigation",
-     "sha": "94a3059",
+     "sha": "8ebd096",
      "date": "2026-11-22",
      "time": "2026-11-22T09:13:46+01:00"
     }
@@ -268,14 +268,14 @@
    "version": "1.15.0",
    "date": "2026-11-22",
    "time": "2026-11-22T10:06:55+01:00",
-   "sha": "ca2cba3",
+   "sha": "5e29b44",
    "changes": [
     {
      "type": "feat",
      "scope": "map",
      "breaking": false,
      "text": "pick a period instead of a day; Wayback follows its end",
-     "sha": "ca2cba3",
+     "sha": "5e29b44",
      "date": "2026-11-22",
      "time": "2026-11-22T10:06:55+01:00"
     },
@@ -284,34 +284,34 @@
      "scope": null,
      "breaking": false,
      "text": "complete the team roster and the geo data notes (#27)",
-     "sha": "5ca5717",
+     "sha": "fe73822",
      "date": "2026-11-22",
-     "time": "2026-11-22T08:55:44Z"
+     "time": "2026-11-22T08:55:44+00:00"
     },
     {
      "type": "docs",
      "scope": "agents",
      "breaking": false,
      "text": "three learned rules from the first week of agent runs (#28)",
-     "sha": "712ddc4",
+     "sha": "414d6a8",
      "date": "2026-11-22",
-     "time": "2026-11-22T08:55:27Z"
+     "time": "2026-11-22T08:55:27+00:00"
     },
     {
      "type": "feat",
      "scope": "map",
      "breaking": false,
      "text": "filter the map to one category from the legend (#29)",
-     "sha": "4694989",
+     "sha": "0db5659",
      "date": "2026-11-22",
-     "time": "2026-11-22T08:55:10Z"
+     "time": "2026-11-22T08:55:10+00:00"
     },
     {
      "type": "fix",
      "scope": "live",
      "breaking": false,
      "text": "name test alerts' area as a trial",
-     "sha": "7aa1064",
+     "sha": "cbc6c15",
      "date": "2026-11-22",
      "time": "2026-11-22T09:52:35+01:00"
     }
@@ -321,14 +321,14 @@
    "version": "1.14.0",
    "date": "2026-11-22",
    "time": "2026-11-22T09:42:48+01:00",
-   "sha": "4054612",
+   "sha": "bbaedad",
    "changes": [
     {
      "type": "fix",
      "scope": "live",
      "breaking": false,
      "text": "load common.js outside a browser too",
-     "sha": "4054612",
+     "sha": "bbaedad",
      "date": "2026-11-22",
      "time": "2026-11-22T09:42:48+01:00"
     },
@@ -337,7 +337,7 @@
      "scope": null,
      "breaking": false,
      "text": "start the live service in CI; update data every 30 min",
-     "sha": "13337a4",
+     "sha": "7aac9cd",
      "date": "2026-11-22",
      "time": "2026-11-22T08:18:42+01:00"
     },
@@ -346,7 +346,7 @@
      "scope": "live",
      "breaking": false,
      "text": "alerts within seconds, with Telegram, e-mail and Web Push",
-     "sha": "0423ed9",
+     "sha": "251b5ee",
      "date": "2026-11-22",
      "time": "2026-11-22T08:18:42+01:00"
     }
@@ -355,24 +355,24 @@
   {
    "version": "1.13.1",
    "date": "2026-11-22",
-   "time": "2026-11-22T08:25:25Z",
-   "sha": "83e04d6",
+   "time": "2026-11-22T08:25:25+00:00",
+   "sha": "57589b7",
    "changes": [
     {
      "type": "chore",
      "scope": "process",
      "breaking": false,
      "text": "retro 2026-11-22, dev share 70% (#26)",
-     "sha": "83e04d6",
+     "sha": "57589b7",
      "date": "2026-11-22",
-     "time": "2026-11-22T08:25:25Z"
+     "time": "2026-11-22T08:25:25+00:00"
     },
     {
      "type": "fix",
      "scope": "agents",
      "breaking": false,
      "text": "the PR gate sends a conflicting PR to the fixer",
-     "sha": "3a4fc42",
+     "sha": "db24990",
      "date": "2026-11-22",
      "time": "2026-11-22T08:53:03+01:00"
     },
@@ -381,16 +381,16 @@
      "scope": "site",
      "breaking": false,
      "text": "cover the common.js date and category helpers with node (#22)",
-     "sha": "7bf415c",
+     "sha": "3e6de5b",
      "date": "2026-11-22",
-     "time": "2026-11-22T07:52:29Z"
+     "time": "2026-11-22T07:52:29+00:00"
     },
     {
      "type": "fix",
      "scope": "agents",
      "breaking": false,
      "text": "the PR reviewer rejects behaviour-free churn even when an issue asks for it",
-     "sha": "9ae99f9",
+     "sha": "a0c09ae",
      "date": "2026-11-22",
      "time": "2026-11-22T08:45:58+01:00"
     },
@@ -399,7 +399,7 @@
      "scope": "agents",
      "breaking": false,
      "text": "the PR gate waits for the reviewer and fixer it starts",
-     "sha": "75d0e41",
+     "sha": "b617566",
      "date": "2026-11-22",
      "time": "2026-11-22T08:44:47+01:00"
     }
@@ -409,14 +409,14 @@
    "version": "1.13.0",
    "date": "2026-11-22",
    "time": "2026-11-22T08:35:33+01:00",
-   "sha": "29d36d3",
+   "sha": "7106619",
    "changes": [
     {
      "type": "feat",
      "scope": "agents",
      "breaking": false,
      "text": "PR fixer repairs agent PRs in their own branch before the gate gives up",
-     "sha": "29d36d3",
+     "sha": "7106619",
      "date": "2026-11-22",
      "time": "2026-11-22T08:35:33+01:00"
     }
@@ -426,14 +426,14 @@
    "version": "1.12.0",
    "date": "2026-11-22",
    "time": "2026-11-22T08:29:55+01:00",
-   "sha": "967a236",
+   "sha": "4674c53",
    "changes": [
     {
      "type": "feat",
      "scope": "site",
      "breaking": false,
      "text": "show powiat and gmina names for each alert",
-     "sha": "967a236",
+     "sha": "4674c53",
      "date": "2026-11-22",
      "time": "2026-11-22T08:29:55+01:00"
     }
@@ -443,14 +443,14 @@
    "version": "1.11.0",
    "date": "2026-11-22",
    "time": "2026-11-22T08:04:05+01:00",
-   "sha": "143adb0",
+   "sha": "4a7ffeb",
    "changes": [
     {
      "type": "feat",
      "scope": "agents",
      "breaking": false,
      "text": "PR reviewer agent; gate merges or closes every agent PR itself",
-     "sha": "143adb0",
+     "sha": "4a7ffeb",
      "date": "2026-11-22",
      "time": "2026-11-22T08:04:05+01:00"
     },
@@ -459,9 +459,9 @@
      "scope": "parser",
      "breaking": false,
      "text": "cover nationwide drill, fire alert and multi-update alerts (#18)",
-     "sha": "09eeeb6",
+     "sha": "19b10dd",
      "date": "2026-11-22",
-     "time": "2026-11-22T06:36:42Z"
+     "time": "2026-11-22T06:36:42+00:00"
     }
    ]
   },
@@ -469,14 +469,14 @@
    "version": "1.10.2",
    "date": "2026-11-22",
    "time": "2026-11-22T01:39:31+01:00",
-   "sha": "05d68cc",
+   "sha": "377c6a0",
    "changes": [
     {
      "type": "fix",
      "scope": "agents",
      "breaking": false,
      "text": "CI doctor reads job logs of pull request runs",
-     "sha": "05d68cc",
+     "sha": "377c6a0",
      "date": "2026-11-22",
      "time": "2026-11-22T01:39:31+01:00"
     }
@@ -486,14 +486,14 @@
    "version": "1.10.1",
    "date": "2026-11-22",
    "time": "2026-11-22T01:32:24+01:00",
-   "sha": "c62710e",
+   "sha": "ff94c01",
    "changes": [
     {
      "type": "fix",
      "scope": "agents",
      "breaking": false,
      "text": "let workflows started by github-actions[bot] activate the agents",
-     "sha": "c62710e",
+     "sha": "ff94c01",
      "date": "2026-11-22",
      "time": "2026-11-22T01:32:24+01:00"
     }
@@ -503,14 +503,14 @@
    "version": "1.10.0",
    "date": "2026-11-22",
    "time": "2026-11-22T01:31:02+01:00",
-   "sha": "642d0ad",
+   "sha": "4c5c008",
    "changes": [
     {
      "type": "fix",
      "scope": "agents",
      "breaking": false,
      "text": "count the worker's daily improvement by a visible first line",
-     "sha": "642d0ad",
+     "sha": "4c5c008",
      "date": "2026-11-22",
      "time": "2026-11-22T01:31:02+01:00"
     },
@@ -519,25 +519,25 @@
      "scope": "changelog",
      "breaking": false,
      "text": "cover lint subjects and the next version number (#16)",
-     "sha": "561e2ad",
+     "sha": "fe3251e",
      "date": "2026-11-22",
-     "time": "2026-11-22T00:30:02Z"
+     "time": "2026-11-22T00:30:02+00:00"
     },
     {
      "type": "feat",
      "scope": "site",
      "breaking": false,
      "text": "cross-link analytics rankings to history with a powiat filter (#15)",
-     "sha": "c1d2cae",
+     "sha": "41acfba",
      "date": "2026-11-22",
-     "time": "2026-11-22T00:21:46Z"
+     "time": "2026-11-22T00:21:46+00:00"
     },
     {
      "type": "fix",
      "scope": "agents",
      "breaking": false,
      "text": "gate closes the issues a merged agent PR fixes; audit timeout 40 min",
-     "sha": "7b49a1e",
+     "sha": "87772c5",
      "date": "2026-11-22",
      "time": "2026-11-22T01:04:32+01:00"
     },
@@ -546,25 +546,25 @@
      "scope": "parser",
      "breaking": false,
      "text": "cover status TTL, drill windows and weather/ordnance/drill alerts (#13)",
-     "sha": "8d9d5d1",
+     "sha": "31b79ac",
      "date": "2026-11-22",
-     "time": "2026-11-22T00:03:53Z"
+     "time": "2026-11-22T00:03:53+00:00"
     },
     {
      "type": "chore",
      "scope": "process",
      "breaking": false,
      "text": "needs a maintainer - raise security-auditor timeout to 40 (#14)",
-     "sha": "6c97686",
+     "sha": "b873a13",
      "date": "2026-11-22",
-     "time": "2026-11-22T00:03:40Z"
+     "time": "2026-11-22T00:03:40+00:00"
     },
     {
      "type": "ci",
      "scope": "gate",
      "breaking": false,
      "text": "approve the waiting CI runs of agent PRs",
-     "sha": "5a1de20",
+     "sha": "bd29b9a",
      "date": "2026-11-22",
      "time": "2026-11-22T00:59:44+01:00"
     }
@@ -574,14 +574,14 @@
    "version": "1.9.0",
    "date": "2026-11-22",
    "time": "2026-11-22T00:48:54+01:00",
-   "sha": "7eb6301",
+   "sha": "e445301",
    "changes": [
     {
      "type": "feat",
      "scope": "agents",
      "breaking": false,
      "text": "issue-worker takes every issue to a PR or a reasoned close",
-     "sha": "7eb6301",
+     "sha": "e445301",
      "date": "2026-11-22",
      "time": "2026-11-22T00:48:54+01:00"
     },
@@ -590,16 +590,16 @@
      "scope": "process",
      "breaking": false,
      "text": "retro 2026-11-21, dev share 60% (#12)",
-     "sha": "42eaad0",
+     "sha": "51b1cc9",
      "date": "2026-11-21",
-     "time": "2026-11-21T23:41:23Z"
+     "time": "2026-11-21T23:41:23+00:00"
     },
     {
      "type": "feat",
      "scope": "process",
      "breaking": false,
      "text": "run process-retro daily over a rolling 7-day window",
-     "sha": "3d7397b",
+     "sha": "dae062f",
      "date": "2026-11-22",
      "time": "2026-11-22T00:31:18+01:00"
     }
@@ -609,14 +609,14 @@
    "version": "1.8.1",
    "date": "2026-11-21",
    "time": "2026-11-21T23:26:48+01:00",
-   "sha": "921dddd",
+   "sha": "4dffb32",
    "changes": [
     {
      "type": "fix",
      "scope": "process",
      "breaking": false,
      "text": "count agent-coach and process-retro as process agents, not builders",
-     "sha": "921dddd",
+     "sha": "4dffb32",
      "date": "2026-11-21",
      "time": "2026-11-21T23:26:48+01:00"
     },
@@ -625,9 +625,9 @@
      "scope": "process",
      "breaking": false,
      "text": "retro 2026-11-21, dev share 60% (#11)",
-     "sha": "2d5145a",
+     "sha": "5615b11",
      "date": "2026-11-21",
-     "time": "2026-11-21T22:26:24Z"
+     "time": "2026-11-21T22:26:24+00:00"
     }
    ]
   },
@@ -635,14 +635,14 @@
    "version": "1.8.0",
    "date": "2026-11-21",
    "time": "2026-11-21T23:09:26+01:00",
-   "sha": "33c96fe",
+   "sha": "e2139c1",
    "changes": [
     {
      "type": "feat",
      "scope": "process",
      "breaking": false,
      "text": "weekly process-retro agent that keeps the team developing",
-     "sha": "33c96fe",
+     "sha": "e2139c1",
      "date": "2026-11-21",
      "time": "2026-11-21T23:09:26+01:00"
     }
@@ -652,14 +652,14 @@
    "version": "1.7.0",
    "date": "2026-11-21",
    "time": "2026-11-21T19:56:05+01:00",
-   "sha": "49e5f4a",
+   "sha": "1f885b6",
    "changes": [
     {
      "type": "feat",
      "scope": "map",
      "breaking": false,
      "text": "day slider, Esri Wayback and NASA imagery, NASA FIRMS fires",
-     "sha": "49e5f4a",
+     "sha": "1f885b6",
      "date": "2026-11-21",
      "time": "2026-11-21T19:56:05+01:00"
     }
@@ -669,14 +669,14 @@
    "version": "1.6.0",
    "date": "2026-11-21",
    "time": "2026-11-21T19:42:27+01:00",
-   "sha": "ffe1c84",
+   "sha": "95da703",
    "changes": [
     {
      "type": "feat",
      "scope": "site-check",
      "breaking": false,
      "text": "hourly headless check of the live site and a site-fixer agent",
-     "sha": "ffe1c84",
+     "sha": "95da703",
      "date": "2026-11-21",
      "time": "2026-11-21T19:42:27+01:00"
     },
@@ -685,7 +685,7 @@
      "scope": "changelog",
      "breaking": false,
      "text": "Zmiany page with semver releases built from Conventional Commits",
-     "sha": "c39f61e",
+     "sha": "eb060fc",
      "date": "2026-11-21",
      "time": "2026-11-21T19:42:27+01:00"
     }
@@ -694,17 +694,17 @@
   {
    "version": "1.5.1",
    "date": "2026-11-21",
-   "time": "2026-11-21T17:24:24Z",
-   "sha": "480d5db",
+   "time": "2026-11-21T17:24:24+00:00",
+   "sha": "e9f75cb",
    "changes": [
     {
      "type": "fix",
      "scope": "regions",
      "breaking": false,
      "text": "re-parse cached alerts after the Warsaw-area town rules (#7)",
-     "sha": "480d5db",
+     "sha": "e9f75cb",
      "date": "2026-11-21",
-     "time": "2026-11-21T17:24:24Z"
+     "time": "2026-11-21T17:24:24+00:00"
     }
    ]
   },
@@ -712,14 +712,14 @@
    "version": "1.5.0",
    "date": "2026-11-21",
    "time": "2026-11-21T16:47:10+01:00",
-   "sha": "d20eeb2",
+   "sha": "040db28",
    "changes": [
     {
      "type": "feat",
      "scope": null,
      "breaking": false,
      "text": "alert history since 2021, analytics page and a redesign",
-     "sha": "d20eeb2",
+     "sha": "040db28",
      "date": "2026-11-21",
      "time": "2026-11-21T16:47:10+01:00"
     }
@@ -728,34 +728,34 @@
   {
    "version": "1.4.0",
    "date": "2026-11-21",
-   "time": "2026-11-21T15:26:24Z",
-   "sha": "4f96f72",
+   "time": "2026-11-21T15:26:24+00:00",
+   "sha": "1fdd28c",
    "changes": [
     {
      "type": "feat",
      "scope": "site",
      "breaking": false,
      "text": "honest status signals, reduced-motion opt-in, live-region alarm announcements (#5)",
-     "sha": "4f96f72",
+     "sha": "1fdd28c",
      "date": "2026-11-21",
-     "time": "2026-11-21T15:26:24Z"
+     "time": "2026-11-21T15:26:24+00:00"
     }
    ]
   },
   {
    "version": "1.3.0",
    "date": "2026-11-21",
-   "time": "2026-11-21T15:12:18Z",
-   "sha": "99f7d21",
+   "time": "2026-11-21T15:12:18+00:00",
+   "sha": "6313095",
    "changes": [
     {
      "type": "feat",
      "scope": "regions",
      "breaking": false,
      "text": "map Warsaw-area towns to powiaty (#4)",
-     "sha": "99f7d21",
+     "sha": "6313095",
      "date": "2026-11-21",
-     "time": "2026-11-21T15:12:18Z"
+     "time": "2026-11-21T15:12:18+00:00"
     }
    ]
   },
@@ -763,14 +763,14 @@
    "version": "1.2.0",
    "date": "2026-11-21",
    "time": "2026-11-21T16:11:12+01:00",
-   "sha": "9876508",
+   "sha": "eb8df96",
    "changes": [
     {
      "type": "feat",
      "scope": "agents",
      "breaking": false,
      "text": "developer agents on z.ai (GLM-5.3) with the site-designer, security-auditor and agent-coach skills",
-     "sha": "9876508",
+     "sha": "eb8df96",
      "date": "2026-11-21",
      "time": "2026-11-21T16:11:12+01:00"
     }
@@ -780,14 +780,14 @@
    "version": "1.1.1",
    "date": "2026-11-21",
    "time": "2026-11-21T15:28:22+01:00",
-   "sha": "518003b",
+   "sha": "1d7350e",
    "changes": [
     {
      "type": "fix",
      "scope": "deploy",
      "breaking": false,
      "text": "retry the Pages deploy when the artifact is not listed yet",
-     "sha": "518003b",
+     "sha": "1d7350e",
      "date": "2026-11-21",
      "time": "2026-11-21T15:28:22+01:00"
     }
@@ -797,14 +797,14 @@
    "version": "1.1.0",
    "date": "2026-11-21",
    "time": "2026-11-21T15:27:03+01:00",
-   "sha": "6735655",
+   "sha": "ef40b0f",
    "changes": [
     {
      "type": "feat",
      "scope": "monitoring",
      "breaking": false,
      "text": "agent monitoring with gh-cao, alert times in the history fixed",
-     "sha": "6735655",
+     "sha": "ef40b0f",
      "date": "2026-11-21",
      "time": "2026-11-21T15:27:03+01:00"
     }
@@ -814,14 +814,14 @@
    "version": "1.0.1",
    "date": "2026-11-21",
    "time": "2026-11-21T15:21:04+01:00",
-   "sha": "9022420",
+   "sha": "c2871d9",
    "changes": [
     {
      "type": "fix",
      "scope": "update",
      "breaking": false,
      "text": "autostash meta.json before the rebase",
-     "sha": "9022420",
+     "sha": "c2871d9",
      "date": "2026-11-21",
      "time": "2026-11-21T15:21:04+01:00"
     }
@@ -831,14 +831,14 @@
    "version": "1.0.0",
    "date": "2026-11-21",
    "time": "2026-11-21T15:20:21+01:00",
-   "sha": "d9b56f4",
+   "sha": "0b213ac",
    "changes": [
     {
      "type": "feat",
      "scope": null,
      "breaking": false,
      "text": "alert map of Poland from gov.pl RCB, run by an agent team",
-     "sha": "d9b56f4",
+     "sha": "0b213ac",
      "date": "2026-11-21",
      "time": "2026-11-21T15:20:21+01:00"
     }

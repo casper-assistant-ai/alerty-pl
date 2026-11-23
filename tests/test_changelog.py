@@ -163,9 +163,9 @@ class LegacyMap(unittest.TestCase):
                 self.assertIsNotNone(changelog.parse(subject), subject)
 
     def test_web_editor_prose_commit_becomes_ci(self):
-        # 7f096cc "Update dependabot configuration for weekly checks" reached main as prose and
+        # 8253358 "Update dependabot configuration for weekly checks" reached main as prose and
         # failed the CI lint; commits() must read it through LEGACY as a non-releasing ci change.
-        rec = ("7f096cc295156f54de1af5a33ebbb889687ed468\x1f2026-11-23T11:40:00+01:00\x1f"
+        rec = ("8253358fd0a8e80dd42d6eef944638f3bf5c807a\x1f2026-11-23T11:40:00+01:00\x1f"
                "Update dependabot configuration for weekly checks\x1f\x1e")
         with mock.patch.object(changelog, "git", return_value=rec):
             items = changelog.commits()

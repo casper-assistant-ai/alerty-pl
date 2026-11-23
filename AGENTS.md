@@ -73,6 +73,12 @@ Rules:
 - Alert categories: air, drill, water, weather, ordnance, fire, chemical, other.
   An alert is `active` until an update says it ended or its category TTL passes.
 
+## Commit messages
+
+No AI tool is named as a co-author: no `Co-Authored-By: Claude …`, no «Generated with Claude Code»
+line in commits or PR bodies (owner's rule, 2026-11-23). `.claude/settings.json` turns Claude
+Code's attribution off, and the Agent PR gate writes the squash message itself without such lines.
+
 ## Process
 
 The process-retro workflow keeps this block every day (at most two changes a run, none repeated

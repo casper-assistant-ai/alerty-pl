@@ -184,7 +184,10 @@ jobs:
               subject="$type: $subject"
             fi
             closes=$(gh pr view "$n" --json closingIssuesReferences --jq '.closingIssuesReferences[].number')
-            if gh pr merge "$n" --squash --delete-branch --subject "$subject (#$n)" --match-head-commit "$sha"; then
+            # the squash body is the PR's commit messages without AI co-author lines (owner's rule, 2026-11-23)
+            body=$(gh pr view "$n" --json commits --jq '.commits[] | "* " + .messageHeadline + (if .messageBody != "" then "\n\n" + .messageBody else "" end) + "\n"' \
+              | grep -viE '^co-authored-by:.*(claude|anthropic)|generated with .*claude' || true)
+            if gh pr merge "$n" --squash --delete-branch --subject "$subject (#$n)" --body "${body:-Merged by the Agent PR gate.}" --match-head-commit "$sha"; then
               echo "merged #$n: $subject"
               gh pr comment "$n" --body "Agent PR gate: merged. Tests passed and the PR reviewer approved $sha: ${reason:-see its comment}"
               # a merge made with GITHUB_TOKEN does not apply "Closes #N"; do it here
