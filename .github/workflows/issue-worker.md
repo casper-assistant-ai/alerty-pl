@@ -7,7 +7,7 @@ description: |
   it with a summary (the process-retro then splits or learns from it, the daily status shows it to a
   human). When nothing waits, makes one improvement PR a day (tests, reliability, simpler
   upkeep) from process/improvements.md. Runs on every new issue, every two hours, and when the
-  CI doctor dispatches it.
+  CI doctor or the process-retro dispatches it.
 on:
   # started by other workflows (CI, Site check, Update data, the CI doctor) with GITHUB_TOKEN
   bots: ["github-actions[bot]"]
@@ -109,8 +109,9 @@ Kinds in the queue, in the order you take them:
 3. `request` (issues from people): a bug or a missing alert gets a fix PR; a question gets an answer
    in the closing comment; an idea that fits the product goes into `process/improvements.md` in a
    PR and the issue closes with it linked.
-4. `dev-task`: a builder was named for it. Take it yourself when it is older than 12 hours and no
-   open PR names it.
+4. `dev-task`: the process-retro named a builder for it, but that builder may run only weekly.
+   Take it yourself at once when no open PR names it (the retro dispatches you right after it
+   opens dev-tasks); follow the issue's «how to check it», and say `Closes #<n>`.
 5. `report` (daily-status, security-audit): check each point it lists. When every point is done,
    in a PR, or a dev-task, close it with those links; otherwise leave it for the next run.
 6. `managed` (the gh-aw "No-Op Runs" tracker): close it only when no workflow source in

@@ -75,7 +75,7 @@ flowchart LR
 | `agent-dispatch.yml` | plain Actions | — | daily | nothing; starts the extra agent runs planned in `process/schedule.json` |
 | `pr-reviewer` | agent | GLM-5.4 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
 | `pr-fixer` | agent | GLM-5.4 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |
-| `issue-worker` | agent | GLM-5.4 (z.ai) | every 2 h, on each new issue, when the CI doctor or the gate dispatches it | fix PR (`Closes #N`) or closes the issue; improvement PR from `process/improvements.md` |
+| `issue-worker` | agent | GLM-5.4 (z.ai) | every 2 h, on each new issue, when the CI doctor, the gate or the process-retro dispatches it | fix PR (`Closes #N`) or closes the issue; takes a `dev-task` at once; improvement PR from `process/improvements.md` |
 | `parser-doctor` | agent | GLM-5.4 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
 | `region-keeper` | agent | GLM-5.4 (z.ai) | daily | PR: `scripts/`, `tests/` |
 | `test-improver` | agent | GLM-5.4 (z.ai) | weekly | PR: `tests/` |
@@ -85,7 +85,7 @@ flowchart LR
 | `security-auditor` | agent + skill security-audit | GLM-5.4 (z.ai) | weekly | issue |
 | `security-fixer` | agent | GLM-5.4 (z.ai) | when Security watch (hourly, plain code) sees an alert no PR or issue covers; weekly | fix PR (`Alerts: code-scanning#N`), reasoned dismiss, or an issue for Casper (leaked secret, `server/`) |
 | `agent-coach` | agent + skill skillopt-sleep | GLM-5.4 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
-| `process-retro` | agent | GLM-5.4 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues |
+| `process-retro` | agent | GLM-5.4 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues and dispatches the issue-worker for them |
 | `ci-doctor` | agent | GLM-5.4 (z.ai) | a failed run on main | issue |
 | `issue-triage` | agent | GLM-5.4 (z.ai) | every 12 h | labels, comments |
 | `daily-status` | agent | GLM-5.4 (z.ai) | daily | report issue |
