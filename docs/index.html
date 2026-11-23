@@ -59,6 +59,7 @@
         <label><input type="radio" name="base" value="nasa"><span>Satelita · NASA z dnia</span></label>
       </div>
       <label class="wb" id="wb-wrap" hidden><span class="visually-hidden">Data zdjęcia Esri Wayback</span><select id="wayback"></select></label>
+      <a class="btn compare-link" id="compare" href="porownaj.html" hidden title="Dwie mapy obok siebie: to samo miejsce na zdjęciach z różnych dat">Porównaj daty</a>
       <label class="chk"><input type="checkbox" id="fires"><span>Pożary (NASA FIRMS)</span></label>
     </div>
     <p class="base-note mono" id="base-note"></p>
@@ -87,6 +88,7 @@
 </footer>
 <script src="vendor/leaflet/leaflet.js" defer></script>
 <script src="common.js" defer></script>
+<script src="wayback.js" defer></script>
 <script src="app.js" defer></script>
 <script src="attacks.js" defer></script>
 </body>

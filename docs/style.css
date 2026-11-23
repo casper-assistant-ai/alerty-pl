@@ -236,6 +236,24 @@ main { flex: 1; width: 100%; max-width: 1480px; margin: 0 auto; padding: 24px; }
 .chk input { accent-color: #e5251b; margin: 0; }
 .base-note { color: var(--muted); margin: 8px 0 0; font-size: .75rem; min-height: 1em; }
 .base-note:empty { display: none; }
+a.btn { display: inline-flex; align-items: center; text-decoration: none; }
+.compare-link { min-height: 32px; height: auto; font-size: .8125rem; }
+
+/* porownaj.html: two Esri Wayback maps of one place side by side, moving together */
+.cmp-page { display: block; }
+.cmp-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 12px; }
+.cmp-bar h1 { font-size: 1.125rem; }
+.cmp-act { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: .8125rem; }
+.cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.cmp-side { min-width: 0; }
+.cmp-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 8px; font-size: .8125rem; min-height: 32px; }
+.cmp-head select { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 8px; padding: 5px 8px; }
+.cmp-cap { color: var(--text-2); font-size: .75rem; }
+.lmap.cmp-map { height: min(calc(100dvh - 300px), 820px); min-height: 360px; }
+.cmp-cursor { pointer-events: none; }
+.cmp-cursor::before, .cmp-cursor::after { content: ""; position: absolute; background: #fff; box-shadow: 0 0 0 1px rgb(0 0 0 / .6); }
+.cmp-cursor::before { left: 11px; top: 0; width: 2px; height: 24px; }
+.cmp-cursor::after { top: 11px; left: 0; width: 24px; height: 2px; }
 .sw.fire-dot { background: #ff2a1a; border-radius: 50%; }
 .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 12px 0 0; padding: 0; list-style: none; color: var(--text-2); font-size: .8125rem; }
 /* each legend category is a filter button: one click isolates it, the second clears it */
@@ -468,6 +486,11 @@ footer p { margin: 0; max-width: 90ch; }
   .seg label { flex: 1; text-align: center; }
   .seg span { padding: 6px 4px; }
   .wb, .wb select { width: 100%; }
+  .compare-link { width: 100%; justify-content: center; }
+  .cmp { grid-template-columns: 1fr; gap: 16px; }
+  .lmap.cmp-map { height: 42dvh; min-height: 260px; }
+  .cmp-act { width: 100%; }
+  .cmp-act .btn { flex: 1 1 auto; justify-content: center; }
   .map text { font-size: 26px; stroke-width: 6px; }
   .map .heat-n { font-size: 30px; }
   .grid-c { grid-template-columns: 1fr; }

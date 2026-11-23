@@ -17,7 +17,8 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((a, v, i, all) =>
 const BASE = (args.base || "https://casper-assistant-ai.github.io/alerty-pl/").replace(/\/?$/, "/");
 const PAGES = ["", "?dzien=2025-09-10", "?podklad=esri", "historia.html", "historia.html?cat=air&q=uwaga",
   "analityka.html", "analityka.html?okres=all", "powiadomienia.html", "schrony.html?lat=52.2297&lon=21.0122",
-  "schrony.html", "zmiany.html"];
+  "schrony.html", "zmiany.html", "?podklad=esri&srodek=50.5650,17.9650&zoom=15&zdjecie=2025-04-24",
+  "porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24"];
 const VIEWPORTS = [
   { name: "360", width: 360, height: 740 },
   { name: "390", width: 390, height: 844 },

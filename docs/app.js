@@ -4,7 +4,8 @@
 // wszystko; they end today), two dates and ◀ ▶ that shift it by its length; it lives in the URL (?od=…&do=…).
 // Under it: a street map (Esri grey canvas), Esri World Imagery Wayback (the newest image of the visible area
 // taken on or before the period's end, switched with the period) or NASA GIBS true colour of the period's last
-// day, and NASA FIRMS fires (VIIRS 375 m) of that day.
+// day, and NASA FIRMS fires (VIIRS 375 m) of that day. The view lives in the URL too (?srodek=lat,lng&zoom=z), and so
+// does a hand-picked Esri image (&zdjecie=<release date>); porownaj.html shows two images of the view side by side.
 "use strict";
 const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, plural } = RCB;
 
@@ -26,9 +27,7 @@ const FIRE_LAYERS = [
   ["VIIRS_NOAA20_Thermal_Anomalies_375m_All", "2020-01-01"],
   ["VIIRS_NOAA21_Thermal_Anomalies_375m_All", "2024-01-17"],
 ];
-const WAYBACK_CONFIG = "https://s3-us-west-2.amazonaws.com/config.maptiles.arcgis.com/waybackconfig.json";
-const WAYBACK = "https://wayback.maptiles.arcgis.com/arcgis/rest/services/World_Imagery";
-const ESRI_ATTR = '<a href="https://livingatlas.arcgis.com/wayback/">Esri World Imagery Wayback</a>: Esri, Maxar, Earthstar Geographics';
+const WB = RCBWayback; // wayback.js
 const NASA_ATTR = '<a href="https://www.earthdata.nasa.gov/gibs">NASA GIBS</a>';
 
 const dark = matchMedia("(prefers-color-scheme: dark)");
@@ -47,7 +46,7 @@ const S = {
   today: todayISO(), start: "2021-01-01", from: null, to: null, base: "mapa", fires: false, cat: null,
   archive: [], live: null, liveActive: [], geo: null,
   map: null, pow: null, baseLayer: null, fireLayers: [],
-  wayback: null, wbRelease: null, wbLocal: null, wbSeq: 0, wbManual: false,
+  wayback: null, wbRelease: null, wbLocal: null, wbSeq: 0, wbPin: null,
 };
 
 // ---------- alerts of a period ----------
@@ -269,8 +268,8 @@ function setPeriod(from, to, push = true) {
   if (!moved) return;
   if (S.base === "nasa") setBase("nasa");
   if (S.fires) fires();
-  // a new period lets Wayback follow its end again, even after a hand-picked image
-  S.wbManual = false;
+  // a new period lets Wayback follow its end again, even after a hand-picked image (one from the URL stays at the start)
+  if (push && S.wbPin) { S.wbPin = null; viewURL(); }
   clearTimeout(S.wbTimer);
   S.wbTimer = setTimeout(waybackFollow, 250);
   dispatchEvent(new CustomEvent("rcb:day", { detail: { day: S.from === S.to ? S.to : null, from: S.from, to: S.to } }));
@@ -329,7 +328,7 @@ function setBase(kind) {
   // Wayback needs its list of releases before the first tile
   if (kind === "esri" && !S.wayback) {
     S.base = kind;
-    waybackConfig().then(() => S.base === "esri" && setBase("esri"))
+    WB.config().then((rel) => { S.wayback = rel; if (!S.wbRelease) S.wbRelease = rel[0].id; if (S.base === "esri") setBase("esri"); })
       .catch((e) => { $("#base-note").textContent = "Nie udało się pobrać archiwum Esri Wayback: " + e.message; });
     return;
   }
@@ -337,6 +336,7 @@ function setBase(kind) {
   if (S.baseLayer) S.map.removeLayer(S.baseLayer);
   $("#map").classList.toggle("sat", kind !== "mapa");
   $("#wb-wrap").hidden = kind !== "esri";
+  $("#compare").hidden = kind !== "esri";
   const note = $("#base-note");
   if (kind === "mapa") {
     S.baseLayer = canvasLayer();
@@ -348,69 +348,28 @@ function setBase(kind) {
     });
     note.textContent = `Zdjęcie z satelity NOAA-20 (VIIRS) z ${fmtISO(d)}${S.to === S.today ? " (dzisiejsze jeszcze się zbiera)" : ""}. Rozdzielczość ok. 250 m, w pochmurne dni widać chmury.`;
   } else {
-    S.baseLayer = esriLayer();
+    S.baseLayer = WB.layer(S.wbRelease);
     waybackList();
   }
   S.baseLayer.addTo(S.map);
 }
 
-// ---------- Esri Wayback: the releases that changed the visible area ----------
-const esriLayer = () => L.tileLayer(`${WAYBACK}/WMTS/1.0.0/default028mm/MapServer/tile/${S.wbRelease}/{z}/{y}/{x}`, {
-  maxZoom: 19, maxNativeZoom: 19, attribution: ESRI_ATTR,
-});
-
+// ---------- Esri Wayback: the images of the visible area (wayback.js) ----------
 // a new layer rather than setUrl(): Leaflet 1.9's redraw() asks for tiles at a fractional zoom (6.25)
 function useRelease(id) {
   S.wbRelease = id;
   if (S.base !== "esri") return;
   S.map.removeLayer(S.baseLayer);
-  S.baseLayer = esriLayer().addTo(S.map);
-}
-async function waybackConfig() {
-  if (!S.wayback) {
-    const r = await fetch(WAYBACK_CONFIG);
-    const cfg = await r.json();
-    S.wayback = Object.entries(cfg).map(([k, v]) => ({ id: +k, date: (v.itemTitle.match(/\d{4}-\d\d-\d\d/) || [""])[0] }))
-      .filter((x) => x.date).sort((a, b) => b.date.localeCompare(a.date));
-    if (!S.wbRelease) S.wbRelease = S.wayback[0].id;
-  }
-  return S.wayback;
-}
-
-// the tilemap of a release says which release the tile at (z, y, x) really comes from; walking from the
-// newest release back gives every distinct image of that spot (about 5 at country zoom, 20+ in a town)
-const wbCache = new Map();
-async function waybackLocal(z, y, x) {
-  const key = `${z}/${y}/${x}`;
-  if (wbCache.has(key)) return wbCache.get(key);
-  const rel = await waybackConfig();
-  const out = [];
-  let i = 0;
-  while (i < rel.length && out.length < 40) {
-    const j = await (await fetch(`${WAYBACK}/MapServer/tilemap/${rel[i].id}/${key}`)).json();
-    if (!j.data || !j.data[0]) break;
-    const id = (j.select && j.select[0]) || rel[i].id;
-    const k = rel.findIndex((r) => r.id === id);
-    if (k < 0) break;
-    out.push(rel[k]);
-    i = k + 1;
-  }
-  wbCache.set(key, out);
-  return out;
+  S.baseLayer = WB.layer(id).addTo(S.map);
 }
 
 async function waybackList() {
   const seq = ++S.wbSeq;
   const sel = $("#wayback"), note = $("#base-note");
   try {
-    await waybackConfig();
-    const z = Math.max(4, Math.min(17, Math.round(S.map.getZoom())));
-    const c = S.map.getCenter(), n = 2 ** z;
-    const x = Math.floor((c.lng + 180) / 360 * n);
-    const lat = c.lat * Math.PI / 180;
-    const y = Math.floor((1 - Math.log(Math.tan(lat) + 1 / Math.cos(lat)) / Math.PI) / 2 * n);
+    S.wayback = await WB.config();
     note.textContent = "Szukam zdjęć tego miejsca…";
-    const local = await waybackLocal(z, y, x);
+    const local = await WB.atView(S.map);
     if (seq !== S.wbSeq || S.base !== "esri") return;
     S.wbLocal = local;
     const list = local.length ? local : S.wayback.slice(0, 1);
@@ -423,18 +382,51 @@ async function waybackList() {
 }
 
 // the image follows the period: the newest one of this spot taken on or before its end (the oldest, when
-// the period is older than all of them), unless the user picked one by hand since the period last changed
+// the period is older than all of them), unless one was picked by hand or in the URL (&zdjecie=<release date>)
 function waybackFollow() {
   if (S.base !== "esri" || !S.wayback) return;
   const list = S.wbLocal && S.wbLocal.length ? S.wbLocal : S.wayback.slice(0, 1);
-  const pick = list.find((r) => r.date <= S.to) || list[list.length - 1];
-  if (!S.wbManual || !list.some((r) => r.id === S.wbRelease)) {
-    if (pick.id !== S.wbRelease) useRelease(pick.id);
-  }
+  const pick = WB.onOrBefore(list, S.wbPin || S.to);
+  if (pick.id !== S.wbRelease) useRelease(pick.id);
   $("#wayback").value = S.wbRelease;
-  const cur = list.find((r) => r.id === S.wbRelease);
-  const why = cur && cur.id === pick.id ? (cur.date <= S.to ? `Najnowsze zdjęcie z dnia ${fmtISO(S.to)} lub wcześniej: ${fmtISO(cur.date)}. ` : `Brak zdjęcia sprzed ${fmtISO(S.to)}, pokazuję najstarsze: ${fmtISO(cur.date)}. `) : "";
-  $("#base-note").textContent = why + (S.wbNote || "");
+  const why = S.wbPin ? `Wybrane wydanie Esri Wayback: ${fmtISO(pick.date)}. `
+    : pick.date <= S.to ? `Najnowsze zdjęcie z dnia ${fmtISO(S.to)} lub wcześniej: ${fmtISO(pick.date)}. ` : `Brak zdjęcia sprzed ${fmtISO(S.to)}, pokazuję najstarsze: ${fmtISO(pick.date)}. `;
+  const note = $("#base-note");
+  note.textContent = why + (S.wbNote || "");
+  compareLink();
+  // the date on the release is when Esri published it; the metadata says when the picture was taken
+  const seq = S.wbSeq, c = S.map.getCenter();
+  WB.captured(pick, c, S.map.getZoom()).then((m) => {
+    if (!m || seq !== S.wbSeq || S.wbRelease !== pick.id || S.base !== "esri") return;
+    note.textContent = why + `Zdjęcie środka widoku wykonano ${fmtISO(m.day)} (${[m.source, m.res ? String(m.res).replace(".", ",") + " m" : ""].filter(Boolean).join(", ")}). ` + (S.wbNote || "");
+  }).catch(() => {});
+}
+
+// ---------- the view in the URL ----------
+// ?srodek=lat,lng&zoom=z, &podklad, &zdjecie: a link opens this very place and picture
+function viewURL() {
+  const u = new URL(location.href), m = S.map, c = m.getCenter();
+  u.searchParams.set("srodek", `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`);
+  u.searchParams.set("zoom", String(+m.getZoom().toFixed(2)));
+  if (S.base === "mapa") u.searchParams.delete("podklad"); else u.searchParams.set("podklad", S.base);
+  if (S.base === "esri" && S.wbPin) u.searchParams.set("zdjecie", S.wbPin); else u.searchParams.delete("zdjecie");
+  history.replaceState(null, "", u);
+}
+function readView(q) {
+  const ll = (q.get("srodek") || "").split(",").map(Number), z = Number(q.get("zoom"));
+  if (ll.length !== 2 || !ll.every(Number.isFinite) || Math.abs(ll[0]) > 85 || Math.abs(ll[1]) > 180) return null;
+  return { center: ll, zoom: Number.isFinite(z) && q.get("zoom") ? Math.max(4, Math.min(19, z)) : 13 };
+}
+
+// «Porównaj» opens the same view on porownaj.html: the shown image on the right, the one before it on the left
+function compareLink() {
+  const a = $("#compare");
+  if (!a || !S.map) return;
+  const c = S.map.getCenter(), list = S.wbLocal && S.wbLocal.length ? S.wbLocal : [];
+  const i = list.findIndex((r) => r.id === S.wbRelease);
+  const q = new URLSearchParams({ srodek: `${c.lat.toFixed(5)},${c.lng.toFixed(5)}`, zoom: String(+S.map.getZoom().toFixed(2)) });
+  if (i >= 0) { q.set("lewa", list[Math.min(i + 1, list.length - 1)].date); q.set("prawa", list[i].date); }
+  a.href = "porownaj.html?" + q;
 }
 
 // ---------- NASA FIRMS fires of the period's last day ----------
@@ -474,20 +466,26 @@ async function main() {
     onEachFeature: (f, l) => l.bindTooltip(tooltip, { sticky: true, className: "tip", direction: "top", offset: [0, -8] }),
   }).addTo(map);
   L.geoJSON(geo, { filter: (f) => f.properties.kind === "woj", interactive: false, style: () => ({ className: "woj", weight: 1.6, fill: false }) }).addTo(map);
-  const fit = () => map.fitBounds(S.pow.getBounds(), { padding: [4, 4] });
-  fit();
+  // ?srodek=lat,lng&zoom=z opens that place; otherwise the whole country
+  const q = new URLSearchParams(location.search);
+  const view = readView(q);
+  if (view) map.setView(view.center, view.zoom); else map.fitBounds(S.pow.getBounds(), { padding: [4, 4] });
   new ResizeObserver(() => map.invalidateSize()).observe($("#map"));
 
   setBase("mapa");
   dark.addEventListener("change", () => S.base === "mapa" && setBase("mapa"));
-  document.querySelectorAll('input[name="base"]').forEach((r) => r.addEventListener("change", () => setBase(r.value)));
+  document.querySelectorAll('input[name="base"]').forEach((r) => r.addEventListener("change", () => { setBase(r.value); viewURL(); }));
   $("#wayback").addEventListener("change", (e) => {
-    S.wbManual = true;
+    const r = (S.wbLocal || S.wayback || []).find((x) => x.id === +e.target.value);
+    S.wbPin = r ? r.date : null;
     useRelease(+e.target.value);
     waybackFollow();
+    viewURL();
   });
   let wbTimer;
-  map.on("moveend", () => { if (S.base === "esri") { clearTimeout(wbTimer); wbTimer = setTimeout(waybackList, 500); } });
+  map.on("moveend", () => {
+    if (S.base === "esri") { clearTimeout(wbTimer); wbTimer = setTimeout(waybackList, 500); compareLink(); }
+  });
   $("#fires").addEventListener("change", (e) => { S.fires = e.target.checked; fires(); paint(alertsOf()); });
 
   // ◀ ▶ shift the period by its length; the quick buttons end today
@@ -504,12 +502,13 @@ async function main() {
   spark();
 
   // ?od=YYYY-MM-DD&do=YYYY-MM-DD opens a period (?dzien= one day, as the old links do);
-  // &podklad=esri|nasa and &pozary=1 open the layers; &kategoria=<cat> filters the map and the lists
-  const q = new URLSearchParams(location.search);
+  // &podklad=esri|nasa and &pozary=1 open the layers; &kategoria=<cat> filters the map and the lists;
+  // &zdjecie=YYYY-MM-DD keeps the Esri image of that release (the newest one of the spot on or before it)
   const { from: wantFrom, to: wantTo } = periodFromQuery(location.search, S.today);
   if (CAT[q.get("kategoria")]) S.cat = q.get("kategoria");
   if (q.get("pozary") === "1") { S.fires = true; $("#fires").checked = true; }
   if (["esri", "nasa"].includes(q.get("podklad"))) { document.querySelector(`input[name="base"][value="${q.get("podklad")}"]`).checked = true; }
+  if (q.get("podklad") === "esri" && isISO(q.get("zdjecie"))) S.wbPin = q.get("zdjecie");
 
   async function refresh() {
     const res = await RCB.strip();
@@ -528,6 +527,9 @@ async function main() {
   dispatchEvent(new CustomEvent("rcb:ready", { detail: window.RCBMap }));
   if (q.get("podklad") && q.get("podklad") !== "mapa") setBase(q.get("podklad"));
   if (S.fires) fires();
+  // from here on the URL follows the view, so the address bar is always a link to what is on the screen
+  map.on("moveend", viewURL);
+  if (view) viewURL();
   setInterval(refresh, 60000);
   // a new alert from the live service redraws today's map at once
   document.addEventListener("rcb:alert", (e) => { if (e.detail.kind !== "test") refresh(); });

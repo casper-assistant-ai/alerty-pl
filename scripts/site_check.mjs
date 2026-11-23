@@ -80,6 +80,18 @@ const PAGES = [
       if (document.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded").length < 4) p.push("Esri Wayback tiles did not load");
       if (!document.querySelector("#wayback option")) p.push("Esri Wayback date list is empty");
       return p; })()` },
+  { path: "?podklad=esri&srodek=50.5650,17.9650&zoom=15&zdjecie=2025-04-24", name: "Mapa, link do miejsca i zdjęcia (powódź 2024)", check: `(() => { const p = [];
+      if (!/24\.04\.2025/.test(document.querySelector("#wayback option:checked")?.textContent || "")) p.push("?zdjecie=2025-04-24 did not pick the Esri release of 24.04.2025");
+      if (!/[?&]srodek=50\.56/.test(location.search) || !/[?&]zoom=15/.test(location.search)) p.push("the view is not in the URL (srodek, zoom)");
+      if (!/porownaj\.html\?srodek=/.test(document.querySelector("#compare")?.href || "")) p.push("the «Porównaj daty» link is missing");
+      return p; })()` },
+  { path: "porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24", name: "Porównanie zdjęć, powódź 2024", check: `(() => { const p = [];
+      for (const k of ["l", "r"]) if (document.querySelectorAll("#map-" + k + " img.leaflet-tile-loaded").length < 4) p.push("compare: tiles of map " + k + " did not load");
+      if (!/27\.03\.2025/.test(document.querySelector("#sel-l option:checked")?.textContent || "")) p.push("compare: lewa=2025-03-27 not picked");
+      if (!/24\.04\.2025/.test(document.querySelector("#sel-r option:checked")?.textContent || "")) p.push("compare: prawa=2025-04-24 not picked");
+      const t = (k) => [...document.querySelectorAll("#map-" + k + " img.leaflet-tile-loaded")].map((i) => i.src.split("/").slice(-3).join("/")).sort().join();
+      if (t("l") !== t("r")) p.push("compare: the two maps do not show the same place");
+      return p; })()` },
   { path: "historia.html", name: "Historia", check: `(() => { const p = [];
       if (document.querySelectorAll("#list li").length < 20) p.push("history list has fewer than 20 rows");
       if (!/alert/.test(document.querySelector("#count")?.textContent || "")) p.push("history count line is empty");

@@ -14,6 +14,11 @@ day). The map, the counts and the lists cover the whole period. Under the alerts
 map, Esri World Imagery Wayback (it switches to the newest image of the visible area taken on or
 before the period's end), or NASA's true-colour picture of its last day (`&podklad=esri|nasa`).
 NASA FIRMS fires of that day can go on top (`&pozary=1`).
+The address bar keeps the place and the zoom (`?srodek=50.565,17.965&zoom=15`) and a chosen Esri
+image (`&zdjecie=2025-04-24`), so a link opens the same view. The
+[Porównaj](https://casper-assistant-ai.github.io/alerty-pl/porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24)
+page puts two Esri images of one place side by side, for example the Odra near Opole before and
+during the September 2024 flood; moving or zooming one map moves the other.
 
 The [Schrony](https://casper-assistant-ai.github.io/alerty-pl/schrony.html) page maps about 88 000
 shelter points from the State Fire Service's open data
