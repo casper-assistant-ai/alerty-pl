@@ -526,6 +526,9 @@ footer p { margin: 0; max-width: 90ch; }
   summary { padding: 8px 0; }
   .more { padding: 8px 0; margin-top: 4px; }
   .row-meta a, .hist a.src, .changes .sha { display: inline-block; padding: 4px 0; min-height: 26px; line-height: 18px; }
+  /* the sticky month heading rides over the top rows of its month, and a tap on the covered
+     link hits the heading: on touch it scrolls away with its rows instead */
+  .month h2 { position: static; }
   .changes li { flex-wrap: wrap; } /* the time and sha drop under the text instead of squeezing it */
   .rows.compact .what { min-height: 32px; align-items: center; }
   .ranked .name a { display: inline-block; padding: 4px 0; min-height: 28px; }
