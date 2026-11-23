@@ -101,6 +101,38 @@ const RCB = (() => {
     return parts.join(" · ");
   }
 
+  // ---------- the period of the map page (shared with tests/period.test.mjs) ----------
+  // a real calendar day written YYYY-MM-DD ("2026-02-31" and "2026-13-01" are not)
+  const isISO = (v) => /^\d{4}-\d\d-\d\d$/.test(v || "") && !isNaN(Date.parse(v + "T12:00:00Z")) &&
+    new Date(v + "T12:00:00Z").toISOString().slice(0, 10) === v;
+
+  // ?od=…&do=… is a period, the old ?dzien=… one day, ?od= alone runs to today; anything else is today
+  function periodFromQuery(search, today) {
+    const q = new URLSearchParams(search);
+    const to = isISO(q.get("do")) ? q.get("do") : isISO(q.get("dzien")) ? q.get("dzien") : today;
+    const from = isISO(q.get("od")) ? q.get("od") : to;
+    return { from, to };
+  }
+
+  // a period inside the archive [start, today]: swapped when backwards, cut at both ends
+  function clampPeriod(from, to, start, today) {
+    if (from > to) [from, to] = [to, from];
+    if (from < start) from = start;
+    if (to > today) to = today;
+    if (to < start) to = start;
+    if (from > today) from = today;
+    if (from > to) from = to;
+    return { from, to };
+  }
+
+  // an archived alert lasts from the day it started to the day of its last update (or today, while it is on)
+  function span(a, today) {
+    const start = a.started_at.slice(0, 10);
+    let end = a.last_at && a.last_at.slice(0, 10) > start ? a.last_at.slice(0, 10) : start;
+    if (a.status === "active" || a.status === "planned") end = today;
+    return [start, end];
+  }
+
   function plural(n, one, few, many) {
     const t = n % 10, tt = n % 100;
     if (n === 1) return one;
@@ -199,7 +231,7 @@ const RCB = (() => {
 
   if ($("#strip")) live();
 
-  return { API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON, fmtDay, fmtShort, fmtTime, fmtStamp,
+  return { isISO, periodFromQuery, clampPeriod, span, API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON, fmtDay, fmtShort, fmtTime, fmtStamp,
     hasTime, duration, regionText, names, plural, strip, live };
 })();
 

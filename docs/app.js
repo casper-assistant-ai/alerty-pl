@@ -6,7 +6,7 @@
 // taken on or before the period's end, switched with the period) or NASA GIBS true colour of the period's last
 // day, and NASA FIRMS fires (VIIRS 375 m) of that day.
 "use strict";
-const { CAT, PRIORITY, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, plural } = RCB;
+const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, plural } = RCB;
 
 // ---------- days ----------
 const DAY_MS = 86400000;
@@ -17,14 +17,6 @@ const addDays = (iso, n) => toISO(new Date(toDate(iso).getTime() + n * DAY_MS));
 const dayDiff = (a, b) => Math.round((toDate(b) - toDate(a)) / DAY_MS);
 const fmtISO = (iso) => iso.split("-").reverse().join(".");
 const WEEKDAY = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
-
-// an archived alert lasts from the day it started to the day of its last update (or today, if still on)
-function span(a, today) {
-  const start = a.started_at.slice(0, 10);
-  let end = a.last_at && a.last_at.slice(0, 10) > start ? a.last_at.slice(0, 10) : start;
-  if (a.status === "active" || a.status === "planned") end = today;
-  return [start, end];
-}
 
 // ---------- layers ----------
 const GIBS = "https://gibs.earthdata.nasa.gov";
@@ -239,12 +231,7 @@ const PRESETS = { "1": 1, "7": 7, "30": 30, "365": 365 };
 const dayText = (iso) => (iso === S.today ? "dziś, " + fmtISO(iso) : fmtISO(iso));
 
 function setPeriod(from, to, push = true) {
-  if (from > to) [from, to] = [to, from];
-  if (from < S.start) from = S.start;
-  if (to > S.today) to = S.today;
-  if (to < S.start) to = S.start;
-  if (from > S.today) from = S.today;
-  if (from > to) from = to;
+  ({ from, to } = clampPeriod(from, to, S.start, S.today));
   const moved = from !== S.from || to !== S.to;
   S.from = from; S.to = to;
   const n = nDays(), len = dayDiff(from, to) + 1;
@@ -519,9 +506,7 @@ async function main() {
   // ?od=YYYY-MM-DD&do=YYYY-MM-DD opens a period (?dzien= one day, as the old links do);
   // &podklad=esri|nasa and &pozary=1 open the layers; &kategoria=<cat> filters the map and the lists
   const q = new URLSearchParams(location.search);
-  const isISO = (v) => /^\d{4}-\d\d-\d\d$/.test(v || "");
-  const wantTo = isISO(q.get("do")) ? q.get("do") : isISO(q.get("dzien")) ? q.get("dzien") : isISO(q.get("od")) ? S.today : S.today;
-  const wantFrom = isISO(q.get("od")) ? q.get("od") : wantTo;
+  const { from: wantFrom, to: wantTo } = periodFromQuery(location.search, S.today);
   if (CAT[q.get("kategoria")]) S.cat = q.get("kategoria");
   if (q.get("pozary") === "1") { S.fires = true; $("#fires").checked = true; }
   if (["esri", "nasa"].includes(q.get("podklad"))) { document.querySelector(`input[name="base"][value="${q.get("podklad")}"]`).checked = true; }
