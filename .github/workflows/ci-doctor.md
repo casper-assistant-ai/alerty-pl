@@ -24,6 +24,13 @@ permissions:
   issues: read
   pull-requests: read
 strict: true
+engine:
+  id: claude
+  model: glm-5.4
+  env:
+    ANTHROPIC_BASE_URL: https://api.z.ai/api/anthropic
+imports:
+  - shared/zai.md
 network: defaults
 tools:
   bash: false

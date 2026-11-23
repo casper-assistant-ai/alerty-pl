@@ -86,12 +86,12 @@ flowchart LR
 | `security-fixer` | agent | GLM-5.4 (z.ai) | when Security watch (hourly, plain code) sees an alert no PR or issue covers; weekly | fix PR (`Alerts: code-scanning#N`), reasoned dismiss, or an issue for Casper (leaked secret, `server/`) |
 | `agent-coach` | agent + skill skillopt-sleep | GLM-5.4 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
 | `process-retro` | agent | GLM-5.4 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues |
-| `ci-doctor` | agent | Copilot | a failed run on main | issue |
-| `issue-triage` | agent | Copilot | every 12 h | labels, comments |
-| `daily-status` | agent | Copilot | daily | report issue |
+| `ci-doctor` | agent | GLM-5.4 (z.ai) | a failed run on main | issue |
+| `issue-triage` | agent | GLM-5.4 (z.ai) | every 12 h | labels, comments |
+| `daily-status` | agent | GLM-5.4 (z.ai) | daily | report issue |
 
-The developer agents run Claude Code against z.ai's Anthropic-compatible API
-(`engine: claude`, `model: glm-5.3`, `ANTHROPIC_BASE_URL`, secret `ANTHROPIC_API_KEY`; shared
+All 16 agents run Claude Code against z.ai's Anthropic-compatible API
+(`engine: claude`, `model: glm-5.4`, `ANTHROPIC_BASE_URL`, secret `ANTHROPIC_API_KEY`; shared
 settings in `.github/workflows/shared/zai.md`). They load the
 [TokenEconomizer](https://github.com/microsoft/TokenEconomizer) plugin for cost control. Skills come
 pinned by commit through gh-aw `skills:`:
@@ -99,7 +99,8 @@ pinned by commit through gh-aw `skills:`:
 [modern-web-guidance](https://github.com/GoogleChrome/modern-web-guidance),
 [security-audit](https://github.com/cloudflare/security-audit-skill) and
 [skillopt-sleep](https://github.com/microsoft/skillopt).
-Watchers and reporters stay on GitHub Copilot.
+The watchers and the reporter (ci-doctor, issue-triage, daily-status) moved from GitHub Copilot
+to GLM-5.4 on 23.11.2026, so the whole team runs on one model.
 
 Guard rails: agents run read-only and write only through gh-aw safe outputs; each PR is limited to
 its `allowed-files`; `.github/` is protected; public issues never start an agent (triage runs on a
