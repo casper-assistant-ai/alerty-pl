@@ -74,16 +74,16 @@ within 7 days, each tied to a number in `process/retro-log.md`). Every agent fol
 <!-- process:start -->
 - Target: at least half of the agent output is product work (feat, fix, perf, refactor, test):
   merged PRs that change the map, history, analytics, parser, tests or site check. Data commits,
-  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-22: 70% (7 product
-  PRs, 3 docs/chore + reports). The window to 2026-11-29 has no pre-live days left: hold ≥ 50%
-  with at least 4 product PRs and no day without one.
+  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-23: 69% (11 product
+  PRs, 5 docs/chore + reports); every live day so far (11-21..11-23) merged product. Hold that:
+  ≥ 50%, at least 4 product PRs a week, no live day without a merge.
 - Builders (site-designer, site-fixer, parser-doctor, region-keeper, test-improver, docs-keeper):
   before your own plan, look for open issues labelled `dev-task` that name you or fit your paths.
   Take the oldest one, and say `Closes #<n>` in the PR body. Call `noop` only when no dev-task fits
   and your own checklist finds nothing worth a PR.
-- Dev-tasks: both 2026-11-21 ones landed (status-rules tests, analytics → history cross-links).
-  Opened 2026-11-22 for site-designer: make the map legend clickable to filter one category
-  (`&kategoria=`, like `?dzien=`/`&podklad=`). parser-doctor and site-fixer noop by design while
+- Dev-tasks: the 2026-11-22 one landed (map legend category filter, PR #29). Open for
+  site-designer: let Historia take a period `?od=&do=` (chip like the powiat one) and carry it
+  from the map's «pełna historia» links. parser-doctor and site-fixer noop by design while
   the parser and the site are green — that is a clean bill, not idleness.
 - Reporters (daily-status, ci-doctor, security-auditor): when a report finds something to build or
   fix, name the builder that should take it, so the next retro can turn it into a dev-task.
