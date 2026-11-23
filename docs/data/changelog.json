@@ -17,9 +17,18 @@
   {
    "version": null,
    "date": "2026-11-23",
-   "time": "2026-11-23T14:57:26+01:00",
-   "sha": "3e20972",
+   "time": "2026-11-23T14:05:37Z",
+   "sha": "b96f240",
    "changes": [
+    {
+     "type": "test",
+     "scope": "changelog",
+     "breaking": false,
+     "text": "cover the LEGACY hand-mapping of prose commits (#59)",
+     "sha": "b96f240",
+     "date": "2026-11-23",
+     "time": "2026-11-23T14:05:37Z"
+    },
     {
      "type": "ci",
      "scope": "security",

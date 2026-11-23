@@ -4,6 +4,10 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ## Unreleased
 
+### test
+
+- **changelog:** cover the LEGACY hand-mapping of prose commits (#59) ([b96f240](https://github.com/casper-assistant-ai/alerty-pl/commit/b96f240))
+
 ### ci
 
 - **security:** security-fixer agent closes Security and quality alerts ([3e20972](https://github.com/casper-assistant-ai/alerty-pl/commit/3e20972))
