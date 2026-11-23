@@ -468,6 +468,7 @@ function fires() {
 
 // ---------- start ----------
 async function main() {
+  await RCB.leaflet(); // a dropped request for leaflet.js gets one retry here, not "L is not defined"
   const [geo, archive] = await Promise.all([getJSON("geo/poland.geojson"), getJSON("data/archive.json"), RCB.names()]);
   S.archive = archive.alerts;
   S.start = S.archive.map((a) => a.started_at.slice(0, 10)).filter((d) => d >= "2021-01-01").sort()[0] || "2021-01-01";
