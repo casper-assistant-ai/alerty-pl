@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.19.0 (2026-11-23)
+
+### feat
+
+- **process:** give-up ladder for issues the agents cannot solve ([6c95b7b](https://github.com/casper-assistant-ai/alerty-pl/commit/6c95b7b))
+
 ## 1.18.2 (2026-11-23)
 
 ### fix
