@@ -16,7 +16,7 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   runs it daily; it refuses a file with far fewer points than the last run. `schrony.html` + `shelters.js`
   show the points, find the nearest to the phone's location, an address (Nominatim) or a tapped place,
   and offer navigation (the Android `geo:` chooser, Apple Maps, Google Maps, Waze; `?lat=&lon=` opens a place).
-- Tests: `python3 -I -m unittest discover -s tests`. Fixtures are saved gov.pl pages in `tests/fixtures/`.
+- Tests: `python3 -I -m unittest discover -s tests` and `node --test tests/*.test.mjs` (CI runs both; the period logic of the map page lives in `docs/common.js` so `tests/period.test.mjs` can reach it). Fixtures are saved gov.pl pages in `tests/fixtures/`.
 - Live check: `python3 -I scripts/rcb.py update --pages 1 --out /tmp/gh-aw/agent/live`.
 - Site check: `node scripts/site_check.mjs` opens every page of the live site in headless Chrome
   (desktop and phone) and lists JavaScript errors, failed requests, empty pages, stale data and broken
