@@ -4,6 +4,7 @@
     retro.py metrics [--days 7] [--repo OWNER/NAME] [--out FILE.json] [--md FILE.md]
     retro.py dispatch [--schedule process/schedule.json] [--dry-run]
     retro.py queue [--repo OWNER/NAME] [--out FILE.json] [--md FILE.md]
+    retro.py gave-up [--days N] [--log process/retro-log.md] [--repo OWNER/NAME] [--out FILE.json] [--md FILE.md]
 
 `metrics` reads the last N days from the GitHub REST API (GH_TOKEN or GITHUB_TOKEN) and the
 workflow sources in .github/workflows, and counts for every agent: runs, failures, PRs opened,
@@ -19,6 +20,11 @@ exist in this repository, at most `max_extra_runs_per_week` (capped at 3) per ag
 `queue` lists the work waiting for the issue-worker agent: every open issue with its kind and the
 open PRs that already name it, the agent PRs the gate refused, and whether today's improvement PR
 (tests, reliability, simplicity) is still due because the queue is empty.
+
+`gave-up` lists the issues the issue-worker gave up on: closed with the label `agent-gave-up` in the last
+N days, minus those the process-retro already handled (its log row names them after `Gave up:`).
+The process-retro turns each into smaller issues or a lesson; the daily status lists them as the only
+items that need a human look.
 Python 3 stdlib only.
 """
 import argparse
@@ -273,6 +279,7 @@ ORDER = ["ci", "site-error", "aw-notice", "request", "dev-task", "report", "mana
 
 
 GIVE_UP = 2  # closed, unmerged PRs for one issue before the worker closes the issue instead
+GAVE_UP_LABEL = "agent-gave-up"  # the worker puts it on the issue it closes after GIVE_UP rejected PRs
 
 
 def queue(issues, prs, today):
@@ -320,8 +327,43 @@ def queue_md(q):
         prs = ", ".join(f"#{n}" for n in x["open_prs"]) or "none"
         rej = ", ".join(f"#{n}" for n in x["rejected_prs"]) or "none"
         if x["number"] in q["give_up"]:
-            rej += " (close the issue)"
+            rej += f" (give up: close the issue with the label {GAVE_UP_LABEL})"
         lines.append(f"| #{x['number']} | {x['kind']} | {prs} | {rej} | {x['title']} |")
+    return "\n".join(lines) + "\n"
+
+
+# the process-retro writes «Gave up: #12 split into #20 #21; #13 lesson» in its log row once it handled them
+HANDLED = re.compile(r"Gave up:(.*)")
+
+
+def handled_numbers(log_text):
+    """Issue numbers the retro log names after «Gave up:» (the issues and the ones made from them)."""
+    out = set()
+    for line in (log_text or "").splitlines():
+        for m in HANDLED.finditer(line):
+            out |= {int(n) for n in re.findall(r"#(\d+)", m.group(1))}
+    return out
+
+
+def gave_up(issues, since, handled=()):
+    """Pure: the issues closed with GAVE_UP_LABEL at or after `since` (ISO, UTC), newest first, that the
+    retro has not handled yet. Pull requests, open issues and other labels never count."""
+    out = []
+    for i in issues:
+        if "pull_request" in i or i.get("state") != "closed" or GAVE_UP_LABEL not in (i.get("labels") or []):
+            continue
+        if (i.get("closed_at") or "") < since or i["number"] in set(handled):
+            continue
+        out.append({"number": i["number"], "title": i["title"], "closed_at": i["closed_at"],
+                    "url": i.get("html_url") or ""})
+    return sorted(out, key=lambda x: x["closed_at"], reverse=True)
+
+
+def gave_up_md(items, since):
+    if not items:
+        return f"No issue closed with the label {GAVE_UP_LABEL} since {since}.\n"
+    lines = [f"{len(items)} issue(s) the issue-worker gave up on since {since} (label {GAVE_UP_LABEL}):", ""]
+    lines += [f"- #{x['number']} {x['title']} (closed {x['closed_at']}) {x['url']}".rstrip() for x in items]
     return "\n".join(lines) + "\n"
 
 
@@ -354,8 +396,29 @@ def main(argv=None):
     q.add_argument("--repo")
     q.add_argument("--out")
     q.add_argument("--md")
+    g = sub.add_parser("gave-up")
+    g.add_argument("--days", type=int, default=1)
+    g.add_argument("--log", help="the retro log; issues it names after «Gave up:» are skipped")
+    g.add_argument("--repo")
+    g.add_argument("--out")
+    g.add_argument("--md")
     a = ap.parse_args(argv)
-    if a.cmd == "queue":
+    if a.cmd == "gave-up":
+        since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        raw = pages(f"/repos/{repo_name(a.repo)}/issues?state=closed&labels={GAVE_UP_LABEL}&per_page=100"
+                    f"&since={urllib.parse.quote(since)}", token())
+        issues = [{"number": i["number"], "title": i["title"], "state": i["state"], "closed_at": i.get("closed_at"),
+                   "html_url": i.get("html_url"), "labels": [x["name"] for x in i.get("labels", [])],
+                   **({"pull_request": True} if "pull_request" in i else {})} for i in raw]
+        log = Path(a.log).read_text(encoding="utf-8") if a.log and Path(a.log).exists() else ""
+        items = gave_up(issues, since, handled_numbers(log))
+        if a.out:
+            Path(a.out).write_text(json.dumps(items, indent=1), encoding="utf-8")
+        md = gave_up_md(items, since)
+        if a.md:
+            Path(a.md).write_text(md, encoding="utf-8")
+        print(md)
+    elif a.cmd == "queue":
         now = dt.datetime.now(dt.timezone.utc)
         since = (now - dt.timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%SZ")
         _, prs, issues, _ = fetch(repo_name(a.repo), token(), since)

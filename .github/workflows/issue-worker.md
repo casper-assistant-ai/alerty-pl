@@ -3,7 +3,9 @@ description: |
   Works every open issue to an end with no human in the loop: a fix PR for the Agent PR gate
   (with "Closes #N"), or closing the issue with the reason. Takes CI-doctor issues, site errors,
   gh-aw notices, requests, dev-tasks the builders left and old reports; takes an issue again when
-  the gate closed its PR, and closes it with the reasons after two closed PRs. When nothing waits, makes one improvement PR a day (tests, reliability, simpler
+  the gate closed its PR, and after two closed PRs gives up: it labels the issue `agent-gave-up` and closes
+  it with a summary (the process-retro then splits or learns from it, the daily status shows it to a
+  human). When nothing waits, makes one improvement PR a day (tests, reliability, simpler
   upkeep) from process/improvements.md. Runs on every new issue, every two hours, and when the
   CI doctor dispatches it.
 on:
@@ -54,6 +56,10 @@ safe-outputs:
   close-issue:
     target: "*"
     max: 5
+  add-labels:
+    allowed: [agent-gave-up]
+    max: 5
+    target: "*"
   close-pull-request:
     target: "*"
     max: 2
@@ -114,8 +120,21 @@ Kinds in the queue, in the order you take them:
 tests failed, it touched paths agents may not change, or the PR reviewer rejected it (value, size
 or risk; the reason is quoted on the issue). Make a new, smaller PR that answers that reason, or
 close the issue with the reason when it is not worth doing. When the queue marks an issue
-`(close the issue)` (two closed PRs already), do not try again: close it, quoting the reasons the
-gate gave and linking both PRs.
+`(give up: close the issue with the label agent-gave-up)` (two closed PRs already), do not try
+again: **give up**, step 1 of the ladder (the process-retro takes step 2, the daily status step 3):
+
+1. Add the label `agent-gave-up` to the issue (`add-labels`), then close it (`close-issue`, reason
+   `not planned`) with a body of this shape, short, one line per item:
+   - `Gave up after 2 closed PRs: #<a>, #<b>.`
+   - `Tried:` what each PR changed, one line each.
+   - `Why it failed:` the reason the gate or the reviewer quoted for each PR.
+   - `Needs:` what a human or a smaller task would have to do or decide (a split into pieces of one
+     file and one test each is the best answer).
+2. Never give up on an issue the queue does not mark, and never remove the label.
+
+Before you work any issue, read the section «Lessons from given-up issues» of
+`process/improvements.md`: the process-retro writes there what made earlier attempts fail. Do not
+repeat those.
 
 Every PR you open is judged by the PR reviewer agent before the gate merges it: keep it small,
 focused on one issue or item, with a test that checks behaviour, and say in the body what it fixes

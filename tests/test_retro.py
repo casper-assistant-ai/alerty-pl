@@ -138,7 +138,62 @@ class Queue(unittest.TestCase):
         self.assertEqual(by[41]["rejected_prs"], [53])
         self.assertEqual(q["give_up"], [40])
         self.assertFalse(q["improvement_due"])
-        self.assertIn("| #40 | request | none | #50, #51 (close the issue) |", retro.queue_md(q))
+        self.assertIn("| #40 | request | none | #50, #51 (give up: close the issue with the label agent-gave-up) |", retro.queue_md(q))
+
+
+class GaveUp(unittest.TestCase):
+    """The give-up ladder: the worker labels, the retro reads the label, the daily status lists it."""
+    SINCE = "2026-11-22T00:00:00Z"
+
+    def closed(self, n, closed_at, labels=("agent-gave-up",), **extra):
+        return dict({"number": n, "title": f"Issue {n}", "state": "closed", "closed_at": closed_at,
+                     "html_url": f"https://github.com/o/r/issues/{n}", "labels": list(labels)}, **extra)
+
+    def test_only_closed_labelled_issues_since_the_window_newest_first(self):
+        issues = [
+            self.closed(1, "2026-11-22T05:00:00Z"),
+            self.closed(2, "2026-11-23T05:00:00Z"),
+            self.closed(3, "2026-11-21T23:59:59Z"),                      # before the window
+            self.closed(4, "2026-11-23T01:00:00Z", labels=("bug",)),     # closed with another reason
+            self.closed(5, "2026-11-23T02:00:00Z", pull_request=True),   # a PR carrying the label
+            dict(self.closed(6, None), state="open"),                    # reopened by a human
+        ]
+        got = retro.gave_up(issues, self.SINCE)
+        self.assertEqual([x["number"] for x in got], [2, 1])
+        self.assertEqual(got[0], {"number": 2, "title": "Issue 2", "closed_at": "2026-11-23T05:00:00Z",
+                                  "url": "https://github.com/o/r/issues/2"})
+
+    def test_issues_the_retro_log_names_are_handled_once(self):
+        log = ("| 2026-11-22 | 70% | 7 | 3 | block refreshed; Gave up: #1 split into #20 #21, #7 lesson |\n"
+               "| 2026-11-23 | 69% | 11 | 5 | no change; PR #2 merged |\n")  # #2 here is not a give-up
+        self.assertEqual(retro.handled_numbers(log), {1, 20, 21, 7})
+        issues = [self.closed(1, "2026-11-22T05:00:00Z"), self.closed(2, "2026-11-23T05:00:00Z")]
+        got = retro.gave_up(issues, self.SINCE, retro.handled_numbers(log))
+        self.assertEqual([x["number"] for x in got], [2])
+        self.assertEqual(retro.handled_numbers(""), set())
+
+    def test_markdown_lists_each_issue_or_says_none(self):
+        items = retro.gave_up([self.closed(2, "2026-11-23T05:00:00Z")], self.SINCE)
+        md = retro.gave_up_md(items, self.SINCE)
+        self.assertIn("1 issue(s) the issue-worker gave up on", md)
+        self.assertIn("- #2 Issue 2 (closed 2026-11-23T05:00:00Z) https://github.com/o/r/issues/2", md)
+        self.assertIn("No issue closed with the label agent-gave-up", retro.gave_up_md([], self.SINCE))
+
+    def test_the_queue_marker_names_the_label_the_worker_must_use(self):
+        issues = [{"number": 40, "title": "Map bug", "state": "open", "labels": [], "created_at": "2026-11-21T00:00:00Z"}]
+        closed = lambda n: {"number": n, "title": "[issue-worker] fix: y", "body": "Closes #40", "state": "closed",
+                            "merged_at": None, "labels": ["agent"], "created_at": "2026-11-21T08:00:00Z"}
+        q = retro.queue(issues, [closed(50), closed(51)], "2026-11-22")
+        self.assertEqual(q["give_up"], [40])
+        self.assertIn(f"close the issue with the label {retro.GAVE_UP_LABEL}", retro.queue_md(q))
+        self.assertEqual(retro.GAVE_UP_LABEL, "agent-gave-up")
+
+    def test_workflows_use_the_same_label(self):
+        wf = Path(__file__).resolve().parent.parent / ".github" / "workflows"
+        for name in ("issue-worker.md", "process-retro.md", "daily-status.md"):
+            self.assertIn(retro.GAVE_UP_LABEL, (wf / name).read_text(encoding="utf-8"), name)
+        self.assertRegex((wf / "issue-worker.md").read_text(encoding="utf-8"),
+                         r"add-labels:\s*\n\s*allowed: \[agent-gave-up\]")
 
 
 if __name__ == "__main__":

@@ -38,8 +38,13 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
 - Issue worker: the `issue-worker` agent takes every open issue to an end with no human: a fix PR
   for the gate (`Closes #N`) or closing it with the reason. It runs on each new issue, every two
   hours and when the CI doctor (which also watches pull request runs) dispatches it, takes an issue
-  again when the gate closed its PR (and closes it with the reasons after two), and when nothing waits makes one improvement PR a day (tests, reliability,
+  again when the gate closed its PR, and when nothing waits makes one improvement PR a day (tests, reliability,
   simpler upkeep) from `process/improvements.md`, which the process-retro keeps filled.
+- Give-up ladder: after two closed PRs for one issue (the queue marks it `give up`) the issue-worker adds the label
+  `agent-gave-up` and closes the issue with a summary (tried, why it failed, what is needed); the daily
+  `process-retro` reads those issues (`scripts/retro.py gave-up`) and splits each into smaller `[dev-task]` issues or
+  writes a lesson under «Lessons from given-up issues» in `process/improvements.md`, which the issue-worker reads
+  first; the `daily-status` lists the last day's `agent-gave-up` issues as the only items that need a human look.
 - Security fixer: the `security-fixer` agent keeps the Security and quality tab empty. The Security
   watch workflow (hourly, plain code) runs `scripts/security_alerts.py pending` and starts it when an
   open CodeQL, code quality, Dependabot or secret scanning alert has no open security-fixer PR or

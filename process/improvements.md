@@ -35,3 +35,9 @@ this plan, not as an item.
 - [ ] history and analytics pages: `docs/historia.html` + `history.js`, `docs/analityka.html` + `analytics.js`.
 - [ ] shelters and notifications pages: `docs/schrony.html` + `shelters.js`, `docs/powiadomienia.html` + `notify.js`.
 - [ ] the rest and the gates: `docs/zmiany.html` + `changelog.js`, the README's language note, and `scripts/site_check.mjs` + `scripts/mobile_audit.mjs` opening every page in all three languages.
+
+## Lessons from given-up issues
+The process-retro writes one line here for each issue the issue-worker gave up on (label `agent-gave-up`)
+that it did not split into smaller issues: what failed and what the next attempt does instead. The
+issue-worker reads this before it works any issue. At most 10 lines, newest first.
+- (none yet)

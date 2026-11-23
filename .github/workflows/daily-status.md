@@ -13,6 +13,13 @@ permissions:
   pull-requests: read
 strict: true
 network: defaults
+steps:
+  - name: List the issues the agents gave up on
+    env:
+      GH_TOKEN: ${{ github.token }}
+    run: |
+      mkdir -p /tmp/gh-aw/agent
+      python3 -I scripts/retro.py gave-up --days 1 --out /tmp/gh-aw/agent/gave-up.json --md /tmp/gh-aw/agent/gave-up.md
 tools:
   bash: ["cat", "jq", "ls", "head", "wc", "date"]
   github:
@@ -42,6 +49,11 @@ Write a short status report for the last 24 hours (UTC) of this repository.
 - **Agent team:** PRs opened, merged and still open by each agent (title prefixes
   `[parser-doctor]`, `[region-keeper]`, `[test-improver]`, `[docs-keeper]`), issues by
   `[ci-doctor]` and `[triage]`, and agent PRs the gate closed without merging (with the reason).
+- **Needs a human look** (step 3 of the give-up ladder): the issues the issue-worker gave up on in the
+  last 24 hours (label `agent-gave-up`), read from `/tmp/gh-aw/agent/gave-up.md`, each as `#N title`
+  with a link and its «Needs:» line from the closing comment. These are the only items of this
+  report that ask for a human; everything else here is information. Write «Nothing needs a human
+  look» when the list is empty.
 - **Next:** at most three things the agents should do next.
 
 Plain Markdown, short bullet lists, no tables over 6 rows.
