@@ -15,6 +15,50 @@
  },
  "releases": [
   {
+   "version": "1.21.0",
+   "date": "2026-11-23",
+   "time": "2026-11-23T21:43:06Z",
+   "sha": "2d47c05",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "history",
+     "breaking": false,
+     "text": "accept a period ?od=&do= and carry it from the map's links (#71)",
+     "sha": "2d47c05",
+     "date": "2026-11-23",
+     "time": "2026-11-23T21:43:06Z"
+    },
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "count the live service apart from tile servers in the site check (#72)",
+     "sha": "305c1cd",
+     "date": "2026-11-23",
+     "time": "2026-11-23T21:42:40Z"
+    },
+    {
+     "type": "fix",
+     "scope": "server",
+     "breaking": false,
+     "text": "allow CORS from alerty.klioba.com and link the site there",
+     "sha": "19de32a",
+     "date": "2026-11-23",
+     "time": "2026-11-23T22:33:42+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "process",
+     "breaking": false,
+     "text": "take dev-tasks at once instead of after 12 hours",
+     "sha": "456a65d",
+     "date": "2026-11-23",
+     "time": "2026-11-23T22:31:22+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.20.2",
    "date": "2026-11-23",
    "time": "2026-11-23T20:41:23Z",

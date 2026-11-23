@@ -3,6 +3,68 @@
  "parser": 2,
  "alerts": [
   {
+   "title": "Alert RCB - atak z powietrza (23.11)",
+   "date": "2026-11-23",
+   "category": "air",
+   "updates": [
+    {
+     "time": "22:56",
+     "message": "UWAGA! UWAGA! UWAGA! Zagrożenie atakiem z powietrza. Znajdź bezpieczne miejsce. Stosuj się do poleceń służb. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/swidnicki",
+       "lubelskie/wlodawski"
+      ],
+      "whole": [],
+      "gminy": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski"
+    },
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [],
+      "powiaty": [],
+      "whole": [],
+      "gminy": []
+     },
+     "region_text": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”"
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/swidnicki",
+     "lubelskie/wlodawski"
+    ],
+    "whole": [],
+    "gminy": []
+   },
+   "id": "alert-rcb---atak-z-powietrza-2311",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-z-powietrza-2311",
+   "intro": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
+   "status": "active",
+   "started_at": "2026-11-23T22:56:00+01:00",
+   "last_at": "2026-11-23T22:56:00+01:00",
+   "parser": 2
+  },
+  {
    "title": "Alert RCB - pożar złomu w Porcie Gdańsk (23.11)",
    "date": "2026-11-23",
    "category": "fire",

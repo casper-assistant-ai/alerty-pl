@@ -2,6 +2,18 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.21.0 (2026-11-23)
+
+### feat
+
+- **history:** accept a period ?od=&do= and carry it from the map's links (#71) ([2d47c05](https://github.com/casper-assistant-ai/alerty-pl/commit/2d47c05))
+
+### fix
+
+- **site:** count the live service apart from tile servers in the site check (#72) ([305c1cd](https://github.com/casper-assistant-ai/alerty-pl/commit/305c1cd))
+- **server:** allow CORS from alerty.klioba.com and link the site there ([19de32a](https://github.com/casper-assistant-ai/alerty-pl/commit/19de32a))
+- **process:** take dev-tasks at once instead of after 12 hours ([456a65d](https://github.com/casper-assistant-ai/alerty-pl/commit/456a65d))
+
 ## 1.20.2 (2026-11-23)
 
 ### fix
