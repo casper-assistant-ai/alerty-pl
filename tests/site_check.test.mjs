@@ -1,10 +1,12 @@
 // tests/site_check.test.mjs — the page checks of scripts/site_check.mjs are template literals that
 // run in the browser, so a regex inside one writes its backslashes twice: \. alone is eaten by the
 // template and \? becomes a quantifier, which made the hourly site check report a missing
-// «Porównaj daty» link on a page that had it (#61).
+// «Porównaj daty» link on a page that had it (#61). The live notification service's failed requests
+// are judged apart from the tile servers (#70).
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { LIVE, judge, liveLine } from "../scripts/site_check.mjs";
 
 const src = readFileSync(new URL("../scripts/site_check.mjs", import.meta.url), "utf8");
 
@@ -54,4 +56,48 @@ test("the «Porównaj daty» check passes on the link the map page builds, and s
   assert.deepEqual(run(code, els, search), []);
   assert.deepEqual(run(code, { ...els, "#compare": { href: "porownaj.html" } }, search), ["the «Porównaj daty» link is missing"]);
   assert.deepEqual(run(code, { ...els, "#compare": null }, search), ["the «Porównaj daty» link is missing"]);
+});
+
+// a failed request as visit() records it
+const fail = (kind, url, text = "net::ERR_FAILED") => ({ kind, detail: `${text} ${url}`, url });
+const EVENTS = LIVE + "events";
+const tile = (n) => `https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/2026-08-15/GoogleMapsCompatible_Level9/${n}/3/4.jpg`;
+
+test("LIVE is the live service docs/common.js talks to", () => {
+  const common = readFileSync(new URL("../docs/common.js", import.meta.url), "utf8");
+  const api = common.match(/"(https:\/\/[^"]+\/alerty)"/)[1];
+  assert.equal(LIVE, api + "/");
+});
+
+test("the live service's failed requests are kept apart from the tiles", () => {
+  // the NASA view of 15.08 while the service is down (#70): the stream's reconnects and a few tiles
+  const p = [fail("network-3rd", EVENTS), ...Array.from({ length: 7 }, (_, i) => fail("http-3rd", tile(i), "404")),
+    fail("network-3rd", EVENTS), fail("network-3rd", EVENTS)];
+  const few = judge(p);
+  assert.deepEqual(few.problems, [], "7 tiles stay under the limit of 8, whatever the stream does");
+  assert.equal(few.live.length, 3);
+  assert.equal(few.live[0].url, EVENTS);
+  // 9 tiles are reported, by host, without the live service
+  const many = judge([...p, fail("http-3rd", tile(8), "404"),
+    fail("network-3rd", "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/1/2")]);
+  assert.deepEqual(many.problems, [{ kind: "3rd-party",
+    detail: `9 failed requests to other sites (8 × gibs.earthdata.nasa.gov, 1 × server.arcgisonline.com), e.g. 404 ${tile(0)}` }]);
+  assert.equal(many.live.length, 3);
+  // the 5xx of a proxy in front of the service is the service too; the site's own files are neither
+  assert.equal(judge([fail("http-3rd", LIVE + "alerts", "502")]).live.length, 1);
+  const own = judge([fail("network", "https://casper-assistant-ai.github.io/alerty-pl/data/alerts.json")]);
+  assert.deepEqual(own.live, []);
+  assert.equal(own.problems.length, 1);
+});
+
+test("one line for the run when the live service did not answer", () => {
+  const view = (live) => ({ page: "Mapa", viewport: "desktop", problems: [], ...(live ? { live } : {}) });
+  const views = [view([fail("network-3rd", EVENTS)]), view([fail("network-3rd", EVENTS)]), view(),
+    view([fail("network-3rd", EVENTS, "net::ERR_TIMED_OUT")])];
+  const line = liveLine(views);
+  assert.equal(line.page, "Live notification service");
+  assert.equal(line.url, LIVE);
+  assert.equal(line.viewport, "-");
+  assert.deepEqual(line.problems, [{ kind: "live", detail: `${fail("network-3rd", EVENTS).detail} on 3 of 4 page views; the pages fall back to the Pages copy of the data until it answers (server/, outside this repository)` }]);
+  assert.equal(liveLine([view(), view()]), null);
 });

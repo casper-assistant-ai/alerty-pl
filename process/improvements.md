@@ -14,6 +14,7 @@ reliability or simpler upkeep, never a report.
 ## Reliability
 - [ ] `scripts/rcb.py`: retry a gov.pl request once on a timeout or a 5xx before failing the run, with a test.
 - [ ] `scripts/site_check.mjs`: report the page and the first failing request in one line, so the site-fixer gets a clear cause.
+- [x] `scripts/site_check.mjs`: count the live notification service's failed requests apart from the tile servers, so an outage of `server/` reads as one line per run and no longer tips the NASA view over the limit (#70). — this PR
 - [ ] `scripts/retro.py`: handle an HTTP 403/429 from the GitHub API with one retry and a clear error.
 
 ## Simpler upkeep
