@@ -2,6 +2,18 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.20.1 (2026-11-23)
+
+### fix
+
+- **ci:** quote the node test step name so ci.yml is valid YAML again ([025b3be](https://github.com/casper-assistant-ai/alerty-pl/commit/025b3be))
+- **daily-status:** let the Claude engine run its shell tools with arguments ([3222448](https://github.com/casper-assistant-ai/alerty-pl/commit/3222448))
+
+### chore
+
+- **agents:** give the three watchers 20 minutes on GLM-5.4 ([aeacd71](https://github.com/casper-assistant-ai/alerty-pl/commit/aeacd71))
+- **agents:** move ci-doctor, daily-status and issue-triage from Copilot to GLM-5.4 ([f236fb9](https://github.com/casper-assistant-ai/alerty-pl/commit/f236fb9))
+
 ## 1.20.0 (2026-11-23)
 
 ### feat

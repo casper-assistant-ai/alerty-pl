@@ -15,6 +15,50 @@
  },
  "releases": [
   {
+   "version": "1.20.1",
+   "date": "2026-11-23",
+   "time": "2026-11-23T20:46:20+01:00",
+   "sha": "aeacd71",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "agents",
+     "breaking": false,
+     "text": "give the three watchers 20 minutes on GLM-5.4",
+     "sha": "aeacd71",
+     "date": "2026-11-23",
+     "time": "2026-11-23T20:46:20+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "ci",
+     "breaking": false,
+     "text": "quote the node test step name so ci.yml is valid YAML again",
+     "sha": "025b3be",
+     "date": "2026-11-23",
+     "time": "2026-11-23T20:39:04+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "daily-status",
+     "breaking": false,
+     "text": "let the Claude engine run its shell tools with arguments",
+     "sha": "3222448",
+     "date": "2026-11-23",
+     "time": "2026-11-23T20:19:10+01:00"
+    },
+    {
+     "type": "chore",
+     "scope": "agents",
+     "breaking": false,
+     "text": "move ci-doctor, daily-status and issue-triage from Copilot to GLM-5.4",
+     "sha": "f236fb9",
+     "date": "2026-11-23",
+     "time": "2026-11-23T19:44:19+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.20.0",
    "date": "2026-11-23",
    "time": "2026-11-23T19:23:47+01:00",
