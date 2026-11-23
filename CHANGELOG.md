@@ -6,6 +6,7 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### ci
 
+- **security:** security-fixer agent closes Security and quality alerts ([3e20972](https://github.com/casper-assistant-ai/alerty-pl/commit/3e20972))
 - make the Dependabot config valid and map its web-editor commit ([be7bc8c](https://github.com/casper-assistant-ai/alerty-pl/commit/be7bc8c))
 - weekly Dependabot checks ([7f096cc](https://github.com/casper-assistant-ai/alerty-pl/commit/7f096cc))
 

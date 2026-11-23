@@ -17,9 +17,18 @@
   {
    "version": null,
    "date": "2026-11-23",
-   "time": "2026-11-23T12:49:28+01:00",
-   "sha": "be7bc8c",
+   "time": "2026-11-23T14:57:26+01:00",
+   "sha": "3e20972",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "security",
+     "breaking": false,
+     "text": "security-fixer agent closes Security and quality alerts",
+     "sha": "3e20972",
+     "date": "2026-11-23",
+     "time": "2026-11-23T14:57:26+01:00"
+    },
     {
      "type": "ci",
      "scope": null,
