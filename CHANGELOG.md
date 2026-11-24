@@ -2,6 +2,13 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.22.1 (2026-11-24)
+
+### fix
+
+- **agents:** issues really close, and the process-doctor reads failed runs' logs ([364a1a9](https://github.com/casper-assistant-ai/alerty-pl/commit/364a1a9))
+- **map:** take the FIRMS fires from GIBS WMTS and say when a tile fails (#94) ([e551d88](https://github.com/casper-assistant-ai/alerty-pl/commit/e551d88))
+
 ## 1.22.0 (2026-11-24)
 
 ### feat
