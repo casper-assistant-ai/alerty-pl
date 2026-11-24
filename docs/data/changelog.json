@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.21.3",
+   "date": "2026-11-24",
+   "time": "2026-11-24T12:24:01+01:00",
+   "sha": "6816fb1",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "agent-health retires gh-aw's old failure issues and the Detection Runs tracker",
+     "sha": "6816fb1",
+     "date": "2026-11-24",
+     "time": "2026-11-24T12:24:01+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.21.2",
    "date": "2026-11-24",
    "time": "2026-11-24T12:23:12+01:00",
