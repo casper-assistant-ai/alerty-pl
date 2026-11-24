@@ -22,6 +22,7 @@
        "lubelskie/hrubieszowski",
        "lubelskie/krasnostawski",
        "lubelskie/leczynski",
+       "lubelskie/lubelski",
        "lubelskie/swidnicki",
        "lubelskie/tomaszowski",
        "lubelskie/wlodawski",
@@ -31,7 +32,7 @@
       "whole": [],
       "gminy": []
      },
-     "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski."
+     "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski. został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski"
     }
    ],
    "regions": {
@@ -45,6 +46,7 @@
      "lubelskie/hrubieszowski",
      "lubelskie/krasnostawski",
      "lubelskie/leczynski",
+     "lubelskie/lubelski",
      "lubelskie/swidnicki",
      "lubelskie/tomaszowski",
      "lubelskie/wlodawski",
