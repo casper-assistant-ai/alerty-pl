@@ -77,10 +77,15 @@ const PAGES = [
       if (!card || card.hidden || !card.querySelector(".raid-src a")) p.push("incursion card with its sources is not shown for 10.09.2025");
       if (!document.querySelector(".leaflet-raid-pane .raid-trail, .leaflet-raid-pane .raid-route")) p.push("incursion routes are not drawn on the map");
       return p; })()` },
+  // The fires layer, on GIBS WMTS (#94): a tile counts only once it has loaded. Leaflet leaves a tile that failed
+  // without the loaded class, so <img>s alone are there for a layer whose every tile fails, which showed as nothing
+  // (#73). fires() in docs/app.js says a failed tile in #fires-note, so that line is a problem too.
   { path: "?dzien=2026-08-15&podklad=nasa&pozary=1", name: "Mapa, NASA i pożary 15.08", check: `(() => { const p = [];
       if (document.querySelectorAll(".leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
       if (document.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded").length < 4) p.push("NASA true colour tiles did not load");
-      if (!document.querySelector(".leaflet-fires-pane img")) p.push("NASA FIRMS fire layer is missing");
+      if (document.querySelectorAll(".leaflet-fires-pane img.leaflet-tile-loaded").length < 1) p.push("NASA FIRMS fire tiles did not load");
+      const note = document.querySelector("#fires-note");
+      if (note && note.textContent.trim()) p.push("NASA FIRMS: some fire tiles did not load, the page says: " + note.textContent.trim());
       if (!/15\\.08\\.2026/.test(document.querySelector("#day-label")?.textContent || "")) p.push("day slider did not open 15.08.2026");
       return p; })()` },
   { path: "?podklad=esri", name: "Mapa, Esri Wayback", check: `(() => { const p = [];

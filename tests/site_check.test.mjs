@@ -18,9 +18,11 @@ const templates = [...src.matchAll(/(?:const (COMMON|MARKUP) = |check: )`((?:[^`
 });
 // the string the browser receives: the template literal evaluated
 const inPage = (t) => new Function("return (`" + t.raw + "`)")();
-// one check run against a stub page: querySelector answers from the map, location is the address
-const run = (code, els, search) => {
-  globalThis.document = { querySelector: (s) => els[s] ?? null };
+// one check run against a stub page: querySelectorAll answers from the map of lists, querySelector from the map
+// of elements or else the first of the selector's list (as in a page; a selector in neither is missing), location
+// is the address
+const run = (code, els, search, lists = {}) => {
+  globalThis.document = { querySelector: (s) => els[s] ?? lists[s]?.[0] ?? null, querySelectorAll: (s) => lists[s] ?? [] };
   globalThis.location = { search };
   return new Function("return (" + code + ")")();
 };
@@ -57,6 +59,32 @@ test("the «Porównaj daty» check passes on the link the map page builds, and s
   assert.deepEqual(run(code, els, search), []);
   assert.deepEqual(run(code, { ...els, "#compare": { href: "porownaj.html" } }, search), ["the «Porównaj daty» link is missing"]);
   assert.deepEqual(run(code, { ...els, "#compare": null }, search), ["the «Porównaj daty» link is missing"]);
+});
+
+// the fires view as a healthy page shows it (#94): the powiaty, true-colour tiles that loaded, <img>s in the fires
+// pane of which some have loaded (Leaflet marks a tile that failed with no class), and #fires-note empty
+const many = (n) => Array.from({ length: n }, () => ({}));
+const FIRES_ELS = { "#day-label": { textContent: "15.08.2026" }, "#fires-note": { textContent: "" } };
+const FIRES_LISTS = { ".leaflet-interactive": many(300), ".leaflet-tile-pane img.leaflet-tile-loaded": many(6),
+  ".leaflet-fires-pane img": many(12), ".leaflet-fires-pane img.leaflet-tile-loaded": many(2) };
+const firesCheck = (code, lists = {}, els = {}) => run(code, { ...FIRES_ELS, ...els }, "", { ...FIRES_LISTS, ...lists });
+const NOTE = "Nie udało się pobrać pożarów z NASA GIBS za dzień 15.08.2026. Pokazane punkty mogą być niepełne.";
+const NONE_LOADED = ["NASA FIRMS fire tiles did not load"];
+const SOME_FAILED = ["NASA FIRMS: some fire tiles did not load, the page says: " + NOTE];
+
+test("the fires check wants a fire tile that has loaded and an empty #fires-note, not just <img>s in the pane", () => {
+  const t = templates.find((x) => x.name.startsWith("Mapa, NASA i pożary"));
+  assert.ok(t, "the page check of the NASA view with the fires is gone");
+  const code = inPage(t);
+  assert.deepEqual(firesCheck(code), []);
+  // #73: the <img>s are in the pane but not one of them loaded, a dead layer shown as nothing. The old check
+  // (any .leaflet-fires-pane img) passed this; a pane without <img>s at all must fail the same way
+  const unloaded = { ".leaflet-fires-pane img.leaflet-tile-loaded": [] };
+  assert.deepEqual(firesCheck(code, unloaded), NONE_LOADED);
+  assert.deepEqual(firesCheck(code, { ...unloaded, ".leaflet-fires-pane img": [] }), NONE_LOADED);
+  // a tile failed while others loaded: fires() in docs/app.js says so in #fires-note, and the check passes it on
+  assert.deepEqual(firesCheck(code, {}, { "#fires-note": { textContent: NOTE } }), SOME_FAILED);
+  assert.deepEqual(firesCheck(code, unloaded, { "#fires-note": { textContent: NOTE } }), [...NONE_LOADED, ...SOME_FAILED]);
 });
 
 // a failed request as visit() records it
