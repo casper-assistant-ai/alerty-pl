@@ -135,6 +135,10 @@ async function retireLegacy({ github, owner, repo, core }) {
 const DOCTOR = "process-doctor.lock.yml";
 const DOCTOR_SAID = /process[ -]doctor/i; // its comments carry its name (and gh-aw's footer)
 const DOCTOR_COOLDOWN_MS = 2 * 3600 * 1000;
+// While its issues stay open (a health issue it already read, its own workflow-change issues) the
+// doctor looks again every few hours, so a fix that landed closes them the same day.
+const DOCTOR_RECHECK_MS = 4 * 3600 * 1000;
+const DOCTOR_OWNS = ["agent-health", "workflow-change"];
 const BUSY = new Set(["queued", "in_progress", "waiting", "requested", "pending"]);
 
 /**
@@ -143,16 +147,18 @@ const BUSY = new Set(["queued", "in_progress", "waiting", "requested", "pending"
  * GITHUB_TOKEN start no workflow by themselves; a workflow_dispatch made with it does.
  */
 async function dispatchDoctor({ github, owner, repo, core, ref = "main", now = Date.now() }) {
-  const open = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: "open", labels: LABEL, per_page: 100 });
-  const fresh = [];
+  const open = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: "open", labels: "agentic-workflows", per_page: 100 });
+  const labels = (i) => (i.labels || []).map((l) => (typeof l === "string" ? l : l.name));
+  const fresh = [], seen = [];
   for (const issue of open) {
-    if (issue.pull_request) continue;
+    if (issue.pull_request || !labels(issue).some((l) => DOCTOR_OWNS.includes(l))) continue;
+    if (!labels(issue).includes(LABEL)) { seen.push(issue.number); continue; } // its own workflow-change issue
     const comments = issue.comments
       ? await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: issue.number, per_page: 100 })
       : [];
-    if (!comments.some((c) => DOCTOR_SAID.test(c.body || ""))) fresh.push(issue.number);
+    (comments.some((c) => DOCTOR_SAID.test(c.body || "")) ? seen : fresh).push(issue.number);
   }
-  if (!fresh.length) return "doctor: nothing new";
+  if (!fresh.length && !seen.length) return "doctor: nothing new";
   let runs;
   try {
     ({ data: { workflow_runs: runs } } = await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: DOCTOR, per_page: 5 }));
@@ -162,11 +168,12 @@ async function dispatchDoctor({ github, owner, repo, core, ref = "main", now = D
   }
   if (runs.some((r) => BUSY.has(r.status))) return "doctor: already running";
   const last = runs.length ? Date.parse(runs[0].created_at) : 0;
-  if (now - last < DOCTOR_COOLDOWN_MS) return `doctor: ran at ${runs[0].created_at}, waits`;
-  const issue = Math.min(...fresh);
+  const wait = fresh.length ? DOCTOR_COOLDOWN_MS : DOCTOR_RECHECK_MS;
+  if (now - last < wait) return `doctor: ran at ${runs[0].created_at}, waits`;
+  const issue = Math.min(...(fresh.length ? fresh : seen));
   await github.rest.actions.createWorkflowDispatch({ owner, repo, workflow_id: DOCTOR, ref, inputs: { issue: String(issue) } });
-  core.info(`dispatched the process-doctor for #${issue} (new: ${fresh.join(", ")})`);
-  return `doctor: dispatched for #${issue}`;
+  core.info(`dispatched the process-doctor for #${issue} (new: ${fresh.join(", ") || "none"}; open: ${seen.join(", ") || "none"})`);
+  return fresh.length ? `doctor: dispatched for #${issue}` : `doctor: recheck of #${issue}`;
 }
 
 /** Entry point for actions/github-script. Only workflows that have a .md source (gh-aw agents) count. */

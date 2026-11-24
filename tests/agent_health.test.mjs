@@ -135,11 +135,21 @@ test("the process-doctor is dispatched once for health issues it has not seen, w
     };
     return { calls, args: { github, owner: "o", repo: "r", core: { info() {} }, now } };
   };
-  const seen = { number: 96, comments: 1 }, fresh = { number: 99, comments: 0 }, fresh2 = { number: 98, comments: 2 };
+  const health = [{ name: "agentic-workflows" }, { name: "agent-health" }];
+  const seen = { number: 96, comments: 1, labels: health }, fresh = { number: 99, comments: 0, labels: health };
+  const fresh2 = { number: 98, comments: 2, labels: health };
+  const change = { number: 97, comments: 0, labels: ["agentic-workflows", "workflow-change"] };
+  const notice = { number: 95, comments: 0, labels: ["agentic-workflows"] };
   const said = { 96: [{ body: "**Process doctor:** cause z.ai 529" }], 98: [{ body: "Recovered" }] };
 
-  let t = make({ issues: [seen], comments: said });
+  let t = make({ issues: [notice] });
   assert.equal(await H.dispatchDoctor(t.args), "doctor: nothing new");
+  // issues it already read are looked at again only after the recheck interval
+  t = make({ issues: [seen, change, notice], comments: said, runs: [{ status: "completed", created_at: "2026-11-24T09:00:00Z" }] });
+  assert.match(await H.dispatchDoctor(t.args), /waits/);
+  t = make({ issues: [seen, change], comments: said, runs: [{ status: "completed", created_at: "2026-11-24T07:30:00Z" }] });
+  assert.equal(await H.dispatchDoctor(t.args), "doctor: recheck of #96");
+  assert.equal(t.calls[0].inputs.issue, "96");
 
   t = make({ issues: [seen, fresh, fresh2], comments: said });
   assert.equal(await H.dispatchDoctor(t.args), "doctor: dispatched for #98");

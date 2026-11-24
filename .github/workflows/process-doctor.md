@@ -1,7 +1,8 @@
 ---
 description: |
   Keeps the agent team's process healthy, with no human in the loop. Runs for every new
-  agent-health issue (agent-health.yml dispatches it, at most every 2 hours) and once a day.
+  agent-health issue (agent-health.yml dispatches it, at most every 2 hours), every 4 hours while its
+  issues stay open, and once a day.
   Reads the failures of all agent workflows over the last 7 days (scripts/agent_failures.py),
   finds each cause, and fixes the process: through one PR for the Agent PR gate (the Reliability
   rules block in AGENTS.md that every agent reads, the failure ledger process/failure-patterns.md,
