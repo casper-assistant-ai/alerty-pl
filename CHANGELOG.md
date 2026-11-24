@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.23.5 (2026-11-24)
+
+### fix
+
+- **process:** name step-limit timeouts and drop the handler mirror in agent_failures (#112) ([7f814c6](https://github.com/casper-assistant-ai/alerty-pl/commit/7f814c6))
+
 ## 1.23.4 (2026-11-24)
 
 ### fix

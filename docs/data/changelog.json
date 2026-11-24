@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.23.5",
+   "date": "2026-11-24",
+   "time": "2026-11-24T16:55:18Z",
+   "sha": "7f814c6",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "process",
+     "breaking": false,
+     "text": "name step-limit timeouts and drop the handler mirror in agent_failures (#112)",
+     "sha": "7f814c6",
+     "date": "2026-11-24",
+     "time": "2026-11-24T16:55:18Z"
+    }
+   ]
+  },
+  {
    "version": "1.23.4",
    "date": "2026-11-24",
    "time": "2026-11-24T16:28:07+01:00",
