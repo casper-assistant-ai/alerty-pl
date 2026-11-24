@@ -1,0 +1,41 @@
+# Agent health: one issue per gh-aw agent workflow while its runs fail, closed by itself after a
+# successful run (scripts/agent_health.cjs). gh-aw's own issue per failure and its "[aw] Detection
+# Runs" tracker are off in the agents' frontmatter (report-failure-as-issue, threat-detection).
+# Runs started with GITHUB_TOKEN (agents dispatched by the process-retro) fire no workflow_run,
+# so the schedule reconciles every agent as well.
+name: Agent health
+
+on:
+  workflow_run:
+    workflows: ["Agent coach", "CI doctor", "Daily status", "Docs keeper", "Issue triage", "Issue worker", "PR fixer", "PR reviewer", "Parser doctor", "Process retro", "Region keeper", "Security auditor", "Security fixer", "Site designer", "Site fixer", "Test improver"]
+    types: [completed]
+  schedule:
+    - cron: "17,47 * * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+  issues: write
+
+concurrency:
+  group: agent-health
+  cancel-in-progress: false
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/agent_health.cjs
+            .github/workflows
+      - name: Reconcile agent health issues
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const { main } = require(`${process.env.GITHUB_WORKSPACE}/scripts/agent_health.cjs`);
+            await main({ github, context, core });

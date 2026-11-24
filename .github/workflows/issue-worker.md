@@ -73,7 +73,12 @@ safe-outputs:
     max: 6
   noop:
     report-as-issue: false
-timeout-minutes: 30
+  # One self-closing issue per workflow comes from agent-health.yml instead of an issue per failure.
+  report-failure-as-issue: false
+  # Detector failures stay in the run diagnostics; no ever-growing «[aw] Detection Runs» tracker.
+  threat-detection:
+    report-as-issue: false
+timeout-minutes: 50
 ---
 
 # Issue worker
@@ -107,8 +112,9 @@ Kinds in the queue, in the order you take them:
 
 1. `ci` (CI doctor issues) and `site-error`: read the failed run or the site check, fix the cause.
    A one-off network error with a later green run: close it with that run's link.
-2. `aw-notice` (gh-aw failure notices such as an engine rate limit or timeout): if a later run of
-   that workflow succeeded, close with its link. If the fix needs a change in `.github/` (you
+2. `aw-notice` (`agent-health` issues: one per agent workflow whose runs keep failing; it closes by
+   itself after the next good run, and it is rewritten after each run, so never comment on it): read
+   the failed steps of its newest run. A provider outage or a network error is not yours: skip it. If the fix needs a change in `.github/` (you
    cannot push those), close the issue with the reason and the exact change in the closing comment,
    so the record stays on the issue. Never add "needs a maintainer" items anywhere.
 3. `request` (issues from people): a bug or a missing alert gets a fix PR; a question gets an answer

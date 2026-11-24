@@ -36,6 +36,11 @@ safe-outputs:
     expires: 7d
   noop:
     report-as-issue: false
+  # One self-closing issue per workflow comes from agent-health.yml instead of an issue per failure.
+  report-failure-as-issue: false
+  # Detector failures stay in the run diagnostics; no ever-growing «[aw] Detection Runs» tracker.
+  threat-detection:
+    report-as-issue: false
 timeout-minutes: 20
 ---
 
