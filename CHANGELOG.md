@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.22.0 (2026-11-24)
+
+### feat
+
+- **agents:** process-doctor fixes the agents' process from their failures ([4c44f92](https://github.com/casper-assistant-ai/alerty-pl/commit/4c44f92))
+
 ## 1.21.3 (2026-11-24)
 
 ### fix

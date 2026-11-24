@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.22.0",
+   "date": "2026-11-24",
+   "time": "2026-11-24T12:53:54+01:00",
+   "sha": "4c44f92",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "agents",
+     "breaking": false,
+     "text": "process-doctor fixes the agents' process from their failures",
+     "sha": "4c44f92",
+     "date": "2026-11-24",
+     "time": "2026-11-24T12:53:54+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.21.3",
    "date": "2026-11-24",
    "time": "2026-11-24T12:24:01+01:00",
