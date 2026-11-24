@@ -2,7 +2,8 @@
 # successful run (scripts/agent_health.cjs). gh-aw's own issue per failure and its "[aw] Detection
 # Runs" tracker are off in the agents' frontmatter (report-failure-as-issue, threat-detection).
 # Runs started with GITHUB_TOKEN (agents dispatched by the process-retro) fire no workflow_run,
-# so the schedule reconciles every agent as well. For a health issue the process-doctor agent has
+# so the schedule reconciles every agent as well; a workflow_run event rechecks the one that finished
+# and every agent with an open issue (GitHub skips the schedule for hours at times). For a health issue the process-doctor agent has
 # not commented on yet, it dispatches that agent (at most every 2 hours; process-doctor.md), and again
 # every 4 hours while the doctor's issues (agent-health, workflow-change) stay open.
 name: Agent health

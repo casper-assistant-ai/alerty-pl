@@ -188,3 +188,11 @@ test("a streak whose issue was closed after its last failure opens no second iss
   args.closedIssues = closed;
   assert.equal(await H.reconcile(args), "opened #200");
 });
+
+test("a workflow_run event also rechecks workflows with an open issue", () => {
+  const a = { path: ".github/workflows/a.lock.yml" }, b = { path: ".github/workflows/b.lock.yml" }, c = { path: ".github/workflows/c.lock.yml" };
+  const open = [{ body: `x\n${H.marker(b.path)}` }];
+  assert.deepEqual(H.pick([a, b, c], null, open), [a, b, c]);
+  assert.deepEqual(H.pick([a, b, c], a.path, open), [a, b]);
+  assert.deepEqual(H.pick([a, b, c], c.path, []), [c]);
+});

@@ -193,14 +193,22 @@ async function dispatchDoctor({ github, owner, repo, core, ref = "main", now = D
 }
 
 /** Entry point for actions/github-script. Only workflows that have a .md source (gh-aw agents) count. */
+// Which workflows a call reconciles: all of them on the schedule or a manual run; on a workflow_run event
+// the one that finished plus every workflow with an open issue. GitHub often skips the :17/:47 schedule
+// for hours (24.11.2026: 14:29-15:30 UTC), so open issues and duplicates are rechecked on any event.
+function pick(agents, only, openIssues) {
+  if (!only) return agents;
+  return agents.filter((w) => w.path === only || openIssues.some((i) => (i.body || "").includes(marker(w.path))));
+}
+
 async function main({ github, context, core }) {
   const { owner, repo } = context.repo;
   const fs = require("fs");
   const all = await github.paginate(github.rest.actions.listRepoWorkflows, { owner, repo, per_page: 100 });
   const agents = all.filter((w) => w.path.endsWith(".lock.yml") && fs.existsSync(w.path.replace(/\.lock\.yml$/, ".md")));
   const only = context.payload.workflow_run && context.payload.workflow_run.path;
-  const todo = only ? agents.filter((w) => w.path === only) : agents;
   const openIssues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: "open", labels: LABEL, per_page: 100 });
+  const todo = pick(agents, only, openIssues);
   const { data: closedIssues } = await github.rest.issues.listForRepo({ owner, repo, state: "closed", labels: LABEL, sort: "updated", direction: "desc", per_page: 100 });
   const done = [];
   for (const workflow of todo) done.push(`${workflow.name}: ${await reconcile({ github, owner, repo, workflow, openIssues, closedIssues, core })}`);
@@ -209,4 +217,4 @@ async function main({ github, context, core }) {
   await core.summary.addList(done.length ? done : ["nothing to do"]).write();
 }
 
-module.exports = { main, reconcile, retireLegacy, dispatchDoctor, isLegacy, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };
+module.exports = { main, pick, reconcile, retireLegacy, dispatchDoctor, isLegacy, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };
