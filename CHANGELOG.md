@@ -2,6 +2,17 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.21.2 (2026-11-24)
+
+### fix
+
+- **agents:** one self-closing health issue per failing agent instead of an issue per failure ([fccf91c](https://github.com/casper-assistant-ai/alerty-pl/commit/fccf91c))
+- **process:** keep gh-aw's Detection Runs tracker out of the issue-worker queue (#91) ([ffbfd3c](https://github.com/casper-assistant-ai/alerty-pl/commit/ffbfd3c))
+
+### chore
+
+- **process:** retro 2026-11-24, dev share 64% (#93) ([80f85f6](https://github.com/casper-assistant-ai/alerty-pl/commit/80f85f6))
+
 ## 1.21.1 (2026-11-24)
 
 ### fix
