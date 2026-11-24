@@ -112,6 +112,18 @@ class Queue(unittest.TestCase):
         self.assertFalse(q["improvement_due"])
         self.assertIn("| #9 | dev-task | #20 |", retro.queue_md(q))
 
+    def test_detection_tracker_is_not_work(self):
+        # gh-aw's "[aw] Detection Runs" is a log it keeps itself: not listed, not actionable
+        tracker = {"number": 82, "title": "[aw] Detection Runs", "state": "open",
+                   "created_at": "2026-11-24T01:46:45Z", "labels": ["agentic-workflows"]}
+        q = retro.queue(self.issues() + [tracker], [], "2026-11-24")
+        self.assertEqual([x["number"] for x in q["issues"]], [11, 6, 9, 2, 8])
+        self.assertEqual(q["actionable"], [11, 6, 9, 2])
+        # only that title: a failure notice that starts with the same words is still work
+        self.assertEqual(retro.issue_kind(tracker["title"], tracker["labels"]), "aw-notice")
+        notice = dict(tracker, number=83, title="[aw] Detection Runs: engine driver crashed")
+        self.assertIn(83, retro.queue(self.issues() + [notice], [], "2026-11-24")["actionable"])
+
     def test_improvement_due_once_a_day(self):
         q = retro.queue([], [], "2026-11-22")
         self.assertTrue(q["improvement_due"])
