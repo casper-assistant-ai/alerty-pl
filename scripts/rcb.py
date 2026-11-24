@@ -81,6 +81,23 @@ def fetch(url, tries=3):
     raise RuntimeError(f"fetch failed: {url}: {last}")
 
 
+def is_alert_page(page_html, url):
+    """Is this the page of that alert? gov.pl now and then answers an alert's URL with its home page
+    (24.11.2026: «Portal Gov.pl», no article); the real page names its own slug in its links."""
+    slug = url.rstrip("/").rsplit("/", 1)[-1]
+    return bool(slug) and slug in page_html
+
+
+def fetch_detail(url, tries=3):
+    """An alert's own page, retried when gov.pl hands back another page instead."""
+    for i in range(tries):
+        page = fetch(url)
+        if is_alert_page(page, url):
+            return page
+        time.sleep(2 * (i + 1))
+    raise RuntimeError(f"not the alert page: {url}: gov.pl answered with another page {tries} times")
+
+
 def text(fragment):
     t = re.sub(r"<br\s*/?>|</p>|</li>|</h\d>", "\n", fragment, flags=re.I)
     t = html.unescape(re.sub(r"<[^>]+>", " ", t))
@@ -369,13 +386,27 @@ def update(pages, out_dir, keep_going=False):
             a["status"], a["started_at"], a["last_at"] = status(a, now)
         else:
             try:
-                a = build_alert(it, fetch(it["url"]), gaz, now)
+                a = build_alert(it, fetch_detail(it["url"]), gaz, now)
             except Exception as e:  # a backfill skips a broken old page; a normal run fails loudly
+                if prev and len(prev.get("updates") or []) and not keep_going:
+                    # gov.pl failed this page now: keep what we parsed before rather than fail the whole run
+                    print(f"::warning::kept the saved {it['slug']}: {e}", file=sys.stderr)
+                    a = prev
+                    a["status"], a["started_at"], a["last_at"] = status(a, now)
+                    alerts.append(add_gminy(a, gaz))
+                    continue
                 if not keep_going:
                     raise
                 print(f"skip {it['url']}: {e}", file=sys.stderr)
                 continue
-            a["parser"] = PARSER_VERSION
+            if prev and len(a["updates"]) < len(prev.get("updates") or []):
+                # updates on gov.pl only grow: fewer means a bad page, so keep the richer saved copy
+                print(f"::warning::{it['slug']}: {len(a['updates'])} updates now, "
+                      f"{len(prev['updates'])} before; kept the saved copy", file=sys.stderr)
+                a = prev
+                a["status"], a["started_at"], a["last_at"] = status(a, now)
+            else:
+                a["parser"] = PARSER_VERSION
         alerts.append(add_gminy(a, gaz))
         if a["category"] != "other" and not a["regions"]["voivodeships"] and "cała polska" not in json.dumps(a, ensure_ascii=False).lower():
             unmatched.append({"id": a["id"], "title": a["title"], "url": a["url"],

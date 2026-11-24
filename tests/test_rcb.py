@@ -339,6 +339,12 @@ class UpdateFailingPage(unittest.TestCase):
     broken page but still merges the pages that did load into the old archive."""
     BROKEN = "https://www.gov.pl/web/rcb/alert-rcb---atak-z-powietrza-2011"
 
+    def setUp(self):
+        # one saved page stands for every alert here, so skip the check of whose page it is
+        p = mock.patch.object(rcb, "is_alert_page", return_value=True)
+        p.start()
+        self.addCleanup(p.stop)
+
     def fetch(self, url, tries=3):
         """The saved list page for every list request, one saved detail page for the rest —
         except BROKEN, which fails to load."""
@@ -443,3 +449,41 @@ class Gminy(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WrongPage(unittest.TestCase):
+    """24.11.2026: gov.pl now and then answered an alert's URL with its home page."""
+    URL = rcb.BASE + "/web/rcb/alert-rcb---atak-z-powietrza-2011"
+
+    def test_home_page_is_not_the_alert(self):
+        self.assertTrue(rcb.is_alert_page(page("alert-rcb---atak-z-powietrza-2011.html"), self.URL))
+        self.assertFalse(rcb.is_alert_page(page("page-gov-home.html"), self.URL))
+
+    def test_fetch_detail_retries_past_the_home_page(self):
+        answers = [page("page-gov-home.html"), page("alert-rcb---atak-z-powietrza-2011.html")]
+        with mock.patch.object(rcb, "fetch", side_effect=answers), mock.patch.object(rcb.time, "sleep"):
+            self.assertIn("atak-z-powietrza-2011", rcb.fetch_detail(self.URL))
+
+    def test_fetch_detail_gives_up(self):
+        with mock.patch.object(rcb, "fetch", return_value=page("page-gov-home.html")), \
+                mock.patch.object(rcb.time, "sleep"):
+            with self.assertRaises(RuntimeError):
+                rcb.fetch_detail(self.URL)
+
+    def test_update_keeps_the_saved_alert_when_the_page_is_wrong(self):
+        import tempfile
+        slug = "alert-rcb---atak-z-powietrza-2011"
+        item = {"slug": slug, "url": self.URL, "title": "Alert RCB - atak z powietrza (20.11)",
+                "date": dt.date.today().isoformat(), "intro": ""}
+        saved = rcb.build_alert(item, page(slug + ".html"), GAZ, dt.datetime.now(rcb.TZ))
+        saved["parser"] = rcb.PARSER_VERSION
+        self.assertGreater(len(saved["updates"]), 1)
+        with tempfile.TemporaryDirectory() as out:
+            with open(os.path.join(out, "alerts.json"), "w", encoding="utf-8") as fh:
+                json.dump({"alerts": [saved]}, fh, ensure_ascii=False)
+            with mock.patch.object(rcb, "fetch", return_value=page("page-gov-home.html")), \
+                    mock.patch.object(rcb, "parse_list", return_value=[item]), \
+                    mock.patch.object(rcb.time, "sleep"), mock.patch("builtins.print"):
+                rcb.update(1, out)
+            got = {a["id"]: a for a in json.load(open(os.path.join(out, "alerts.json"), encoding="utf-8"))["alerts"]}
+        self.assertEqual(len(got[slug]["updates"]), len(saved["updates"]))

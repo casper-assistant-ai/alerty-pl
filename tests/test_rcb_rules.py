@@ -145,7 +145,9 @@ class UpdateKeeps(unittest.TestCase):
     def setUp(self):
         self.fetched = []
         self.patches = [mock.patch.object(rcb.dt, "datetime", FakeNow),
-                        mock.patch.object(rcb, "fetch", self.fetch)]
+                        mock.patch.object(rcb, "fetch", self.fetch),
+                        # one saved page stands for every alert here, so skip the check of whose page it is
+                        mock.patch.object(rcb, "is_alert_page", return_value=True)]
         for p in self.patches:
             p.start()
             self.addCleanup(p.stop)

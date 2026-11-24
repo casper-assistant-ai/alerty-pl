@@ -184,8 +184,16 @@ class Service:
                 continue
             if old and time.time() - checked.get(it["slug"], 0) < DETAIL_RECHECK:
                 continue
-            a = rcb.build_alert(it, rcb.fetch(it["url"]), self.gaz, t)
+            try:
+                a = rcb.build_alert(it, rcb.fetch_detail(it["url"]), self.gaz, t)
+            except Exception as e:  # one bad page must not stop the others; it is tried again next poll
+                log.warning("skip %s: %s", it["slug"], e)
+                continue
             a["parser"] = rcb.PARSER_VERSION
+            if core.regressed(old, a):
+                log.warning("kept %s: %d updates now, %d known", it["slug"], len(a["updates"]),
+                            len(old["updates"]))
+                continue
             kind = core.diff(old, a)
             self.remember(a)
             if kind and not first:

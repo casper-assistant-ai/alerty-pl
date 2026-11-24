@@ -57,6 +57,15 @@ class Changes(unittest.TestCase):
         self.assertEqual(core.diff(alert(), alert(status="ended")), "update")
         self.assertIsNone(core.diff(alert(status="expired"), alert(status="ended")))
 
+    def test_fewer_updates_is_a_bad_page_not_news(self):
+        # 24.11.2026: a bad page parsed to 1 update, then the good one re-sent «Odwołanie» 30 times
+        good = alert(updates=3, status="ended")
+        bad = alert(updates=1, status="expired")
+        self.assertTrue(core.regressed(good, bad))
+        self.assertFalse(core.regressed(None, bad))
+        self.assertFalse(core.regressed(bad, good))
+        self.assertIsNone(core.diff(good, bad))
+
 
 class Messages(unittest.TestCase):
     def test_message_has_category_area_text_and_link(self):

@@ -88,10 +88,18 @@ def message(alert, kind):
     return subject, text, url
 
 
+def regressed(old, new):
+    """Did a fresh parse lose updates? gov.pl only adds them, so fewer means a bad page (24.11.2026: its home
+    page came back for an alert's URL now and then, and each good page after it re-sent the alert's end)."""
+    return old is not None and len(new.get("updates") or []) < len(old.get("updates") or [])
+
+
 def diff(old, new):
     """Notification kind for a freshly parsed alert against what was known: new, update or None."""
     if old is None:
         return "new"
+    if regressed(old, new):
+        return None
     if len(new.get("updates") or []) > len(old.get("updates") or []):
         return "update"
     if new.get("status") == "ended" and old.get("status") not in ("ended", "expired"):
