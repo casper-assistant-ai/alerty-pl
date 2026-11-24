@@ -41,4 +41,4 @@ this plan, not as an item.
 The process-retro writes one line here for each issue the issue-worker gave up on (label `agent-gave-up`)
 that it did not split into smaller issues: what failed and what the next attempt does instead. The
 issue-worker reads this before it works any issue. At most 10 lines, newest first.
-- (none yet)
+- #73 FIRMS fires from GIBS WMTS: PRs #74 and #76 were closed by the gate's live parse of gov.pl (the runners had no route to it, 22:57 to 06:25 UTC on 2026-11-23/24) and never judged, and a second issue-worker run opened #76 while the first had decided to hold -> while the last Update data run fails on `fetch failed`, hold the next PR and say so on the issue; the change itself is the dev-task «Map: take the FIRMS fires from GIBS WMTS and say when a tile fails» (2026-11-24), to take from head `3f184da`.
