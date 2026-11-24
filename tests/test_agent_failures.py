@@ -1,3 +1,4 @@
+import datetime as dt
 import sys
 import unittest
 from pathlib import Path
@@ -20,7 +21,8 @@ OVERLOAD_LOG = """2026-11-24T05:06:51.1Z {"type":"result","subtype":"success","i
 
 def job(name, conclusion, steps=(), start="2026-11-24T10:00:00Z", end="2026-11-24T10:10:00Z"):
     return {"name": name, "conclusion": conclusion, "started_at": start, "completed_at": end,
-            "steps": [{"name": s, "conclusion": c} for s, c in steps]}
+            "steps": [{"name": s[0], "conclusion": s[1],
+                       **({"started_at": s[2], "completed_at": s[3]} if len(s) > 2 else {})} for s in steps]}
 
 
 def run(i, conclusion, jobs, at="2026-11-24T10:00:00Z", signals=None):
@@ -34,6 +36,18 @@ def run(i, conclusion, jobs, at="2026-11-24T10:00:00Z", signals=None):
 CRASH = [job("agent", "failure", [("Execute Claude Code CLI", "failure")])]
 PARSER_ONLY = [job("agent", "failure", [("Execute Claude Code CLI", "success"),
                                         ("Parse agent logs for step summary", "failure")])]
+MIRROR = [job("conclusion", "failure", [("Handle agent failure", "failure")])]
+# The jobs of two real runs, as GitHub's jobs API gives them (24.11.2026).
+# Site fixer 45248741714: the CLI step stopped at the step limit after 25m12s of 25 minutes, conclusion `failure`.
+STEP_LIMIT = [job("agent", "failure", [("Execute Claude Code CLI", "failure", "2026-11-23T19:36:47Z", "2026-11-23T20:01:59Z"),
+                                       ("Parse agent logs for step summary", "failure", "2026-11-23T20:02:19Z", "2026-11-23T20:02:33Z")],
+                  start="2026-11-23T19:35:54Z", end="2026-11-23T20:02:42Z"),
+              job("conclusion", "success", [])]
+# Parser doctor 45288784687: the agent job was green, only the conclusion job's handler failed.
+HANDLER_ONLY = [job("agent", "success", [("Execute Claude Code CLI", "success", "2026-11-23T23:28:08Z", "2026-11-23T23:35:14Z")],
+                    start="2026-11-23T23:27:07Z", end="2026-11-23T23:35:34Z"),
+                job("conclusion", "failure", [("Handle agent failure", "failure", "2026-11-23T23:38:11Z", "2026-11-23T23:38:15Z")],
+                    start="2026-11-23T23:38:00Z", end="2026-11-23T23:38:27Z")]
 
 
 class Signals(unittest.TestCase):
@@ -41,6 +55,12 @@ class Signals(unittest.TestCase):
         lines = af.signal_lines(TIMEOUT_LOG)
         self.assertEqual(lines, ["The action 'Execute Claude Code CLI' has timed out after 30 minutes."])
         self.assertEqual(af.classify(["agent / Execute Claude Code CLI"], lines), "timeout")
+
+    def test_every_escape_and_control_sequence_is_stripped(self):
+        # erase-line, colour, an OSC title, a charset select, NUL, bell, backspace; a tab stays
+        log = ("2026-11-24T10:00:00.1Z ##[error]\x1b[2KAgent \x1b[1;31mfailed\x1b[0m\x1b]0;title\x07\x1b(B\x00\x07\x08x\n"
+               "2026-11-24T10:00:01Z \x1b[36mplain\x1b[0m line\x7f\n")
+        self.assertEqual(af.signal_lines(log), ["Agent failedx"])
 
     def test_gh_aw_config_noise_is_not_a_signal(self):
         # the whole log names "rate_limit_error" in gh-aw's outputs; only the signal lines count
@@ -63,6 +83,29 @@ class Steps(unittest.TestCase):
     def test_parser_crash_is_not_a_failure(self):
         self.assertEqual(af.failed_steps(PARSER_ONLY), [])
         self.assertEqual(af.failed_steps(CRASH), ["agent / Execute Claude Code CLI"])
+
+    def test_handler_mirror_is_dropped_when_the_agent_job_did_not_fail(self):
+        self.assertEqual(af.failed_steps(PARSER_ONLY + MIRROR), [])
+        self.assertEqual(af.failed_steps(HANDLER_ONLY), [])
+        self.assertEqual(af.failed_steps(CRASH + MIRROR),
+                         ["agent / Execute Claude Code CLI", "conclusion / Handle agent failure"])
+        self.assertEqual(af.failed_steps(MIRROR), ["conclusion / Handle agent failure"])
+
+    def test_cli_step_at_the_step_limit_is_a_timeout(self):
+        steps = af.failed_steps(STEP_LIMIT, 25)
+        self.assertEqual(steps, ["agent / Execute Claude Code CLI (timeout)"])
+        self.assertEqual(af.classify(steps), "timeout")
+        self.assertEqual(af.failed_steps(STEP_LIMIT), ["agent / Execute Claude Code CLI"])
+        self.assertEqual(af.failed_steps(STEP_LIMIT, 60), ["agent / Execute Claude Code CLI"])
+
+        def cli(minutes, seconds, conclusion="failure"):
+            end = dt.datetime(2026, 11, 24, 10) + dt.timedelta(minutes=minutes, seconds=seconds)
+            return [job("agent", "failure", [("Execute Claude Code CLI", conclusion, "2026-11-24T10:00:00Z",
+                                              end.strftime("%Y-%m-%dT%H:%M:%SZ"))])]
+        self.assertEqual(af.failed_steps(cli(23, 45), 25), ["agent / Execute Claude Code CLI (timeout)"])   # 95% sharp
+        self.assertEqual(af.failed_steps(cli(23, 40), 25), ["agent / Execute Claude Code CLI"])
+        self.assertEqual(af.failed_steps(cli(3, 0), 25), ["agent / Execute Claude Code CLI"])
+        self.assertEqual(af.failed_steps(cli(25, 0, "timed_out"), 25), ["agent / Execute Claude Code CLI (timed_out)"])
 
     def test_timeout_of_frontmatter(self):
         self.assertEqual(af.timeout_of("---\non:\n  schedule: x\ntimeout-minutes: 50\n---"), 50)
@@ -105,6 +148,22 @@ class Summary(unittest.TestCase):
         md = af.markdown(rep)
         self.assertIn("#96", md)
         self.assertIn("timed out after 20 minutes", md)
+
+    def test_step_limit_is_a_timeout_without_a_log(self):
+        # site-fixer 45248741714: no log read, the step's 25m12s of 25 minutes name the signature
+        rep = self.rep([run(1, "failure", STEP_LIMIT, at="2026-11-23T19:35:00Z")], timeout=25)
+        f = rep["failures"][0]
+        self.assertEqual((f["signature"], f["steps"]), ("timeout", ["agent / Execute Claude Code CLI (timeout)"]))
+        self.assertEqual(rep["signatures"][0]["known"], False)
+        self.assertIn("Execute Claude Code CLI (timeout)", af.markdown(rep))
+
+    def test_handler_mirror_alone_is_not_a_failure(self):
+        runs = [run(1, "success", [job("agent", "success")]),
+                run(2, "failure", PARSER_ONLY + MIRROR),
+                run(3, "failure", HANDLER_ONLY, at="2026-11-23T23:26:00Z")]
+        rep = self.rep(runs)
+        self.assertEqual((rep["agents"][0]["ok"], rep["agents"][0]["failed"]), (3, 0))
+        self.assertEqual((rep["failures"], rep["signatures"]), ([], []))
 
 
 class Gh(unittest.TestCase):
