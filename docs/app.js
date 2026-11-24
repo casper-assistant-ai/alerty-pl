@@ -21,9 +21,11 @@ const WEEKDAY = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "
 
 // ---------- layers ----------
 const GIBS = "https://gibs.earthdata.nasa.gov";
-// fires: one GIBS WMTS layer per satellite, each only from the day it has data (a missing one fails the request).
-// Not GIBS WMS (wms.cgi): on 2026-11-23 it answered every GetMap with a non-image (#73), while WMTS, the interface
-// of the true-colour layer, kept serving. 256 px tiles, levels 0–9, like that layer
+// fires: one GIBS WMS layer per satellite, each only from the day it has data (a missing one fails the request).
+// Not GIBS WMTS, the interface of the true-colour layer: tried in #94 after a WMS outage of a few hours (#73), and
+// from its deploy on 2026-11-24 GIBS answered every FIRMS tile of the REST form with a non-image (#100), while that
+// form kept serving the true-colour layer. Do not switch again on a URL nobody has fetched from an ordinary
+// connection: the agent sandbox has no route to GIBS, so a new form cannot be tried there. 512 px tiles
 const FIRE_LAYERS = [
   ["VIIRS_SNPP_Thermal_Anomalies_375m_All", "2012-01-20"],
   ["VIIRS_NOAA20_Thermal_Anomalies_375m_All", "2020-01-01"],
@@ -445,8 +447,9 @@ function fires() {
   if (!S.fires) return;
   for (const [layer, from] of FIRE_LAYERS) {
     if (S.to < from) continue;
-    const l = L.tileLayer(`${GIBS}/wmts/epsg3857/best/${layer}/default/${S.to}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png`, {
-      pane: "fires", maxNativeZoom: 9, maxZoom: 19, attribution: '<a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a>',
+    const l = L.tileLayer.wms(`${GIBS}/wms/epsg3857/best/wms.cgi`, {
+      layers: layer, format: "image/png", transparent: true, version: "1.1.1", TIME: S.to,
+      pane: "fires", tileSize: 512, maxZoom: 19, attribution: '<a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a>',
     });
     // only the layers still on the map: a removed one may still be waiting for a tile that fails late
     l.on("tileerror", () => {

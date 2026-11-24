@@ -77,7 +77,7 @@ const PAGES = [
       if (!card || card.hidden || !card.querySelector(".raid-src a")) p.push("incursion card with its sources is not shown for 10.09.2025");
       if (!document.querySelector(".leaflet-raid-pane .raid-trail, .leaflet-raid-pane .raid-route")) p.push("incursion routes are not drawn on the map");
       return p; })()` },
-  // The fires layer, on GIBS WMTS (#94): a tile counts only once it has loaded. Leaflet leaves a tile that failed
+  // The fires layer, on GIBS WMS (WMTS served no FIRMS tile, #94 and #100): a tile counts only once it has loaded. Leaflet leaves a tile that failed
   // without the loaded class, so <img>s alone are there for a layer whose every tile fails, which showed as nothing
   // (#73). fires() in docs/app.js says a failed tile in #fires-note, so that line is a problem too.
   { path: "?dzien=2026-08-15&podklad=nasa&pozary=1", name: "Mapa, NASA i pożary 15.08", check: `(() => { const p = [];
@@ -190,9 +190,9 @@ function tally(items) {
 
 // One page view's problems sorted out: what the view reports, and the live service's failed requests
 // (for liveLine). A few failed 3rd-party tiles are normal; many are not. GIBS's empty tile (blank) is
-// no failure and is left out of the count: the fires view asks three layers of 256 px tiles, 36 and
-// more on the desktop view (#94). Every network failure (the ERR_BLOCKED_BY_ORB of #73), every 404
-// with another body and every other status counts.
+// no failure and is left out of the count: the NASA view asks the true-colour WMTS layer tile by
+// tile (#94). Every network failure (the ERR_BLOCKED_BY_ORB of #73 and of #100), every 404 with
+// another body and every other status counts.
 // The stream's reconnects are not tiles: counted with them, they tipped the NASA view over the
 // limit on every run of a service outage (#61, #70).
 export function judge(problems) {

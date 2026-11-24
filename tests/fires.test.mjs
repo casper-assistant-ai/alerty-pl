@@ -15,7 +15,7 @@ const start = app.indexOf("function fires() {");
 assert.notEqual(start, -1, "no fires() in docs/app.js");
 const source = app.slice(start, app.indexOf("\n}\n", start) + 3);
 
-// a stub of what fires() touches: L.tileLayer, the #fires-note element, the map and the state.
+// a stub of what fires() touches: L.tileLayer.wms, the #fires-note element, the map and the state.
 // The note counts the messages written to it: it is a status line, so one failure is announced once.
 function load(to, fires = true) {
   const made = [], removed = [];
@@ -27,32 +27,34 @@ function load(to, fires = true) {
     on(ev, fn) { this.handlers[ev] = fn; },
     addTo() { this.added = true; },
   });
-  const L = { tileLayer: (url, opts) => { const l = layer(url, opts); made.push(l); return l; } };
-  L.tileLayer.wms = () => assert.fail("fires() must not use GIBS WMS (wms.cgi): it answered a non-image on 2026-11-23 (#73)");
+  const L = {
+    // a plain tile layer is the WMTS REST form: GIBS answered a non-image to every FIRMS tile of it (#100)
+    tileLayer: (url) => assert.fail(`fires() must not use GIBS WMTS (${url}): it served no FIRMS tile on 2026-11-24 (#100)`),
+  };
+  L.tileLayer.wms = (url, opts) => { const l = layer(url, opts); made.push(l); return l; };
   const S = { to, fires, fireLayers: [], map: { removeLayer: (l) => removed.push(l) } };
   const $ = (sel) => { assert.equal(sel, "#fires-note"); return note; };
   const fires_ = new Function("S", "L", "$", "GIBS", "FIRE_LAYERS", "fmtISO", `${source}\n;return fires;`)(S, L, $, GIBS, FIRE_LAYERS, fmtISO);
   return { run: fires_, S, note, made, removed };
 }
-// the GIBS layer identifier in a tile URL
-const names = (made) => made.map((l) => l.url.split("/best/")[1].split("/")[0]);
+// the GIBS layer identifier asked of a WMS layer
+const names = (made) => made.map((l) => l.opts.layers);
 const MESSAGE = (day) => `Nie udało się pobrać pożarów z NASA GIBS za dzień ${day}. Pokazane punkty mogą być niepełne.`;
 
-test("the fires come from GIBS WMTS, one layer per satellite, on the fires pane up to level 9", () => {
+test("the fires come from GIBS WMS, one layer per satellite, on the fires pane in 512 px tiles", () => {
   assert.equal(GIBS, "https://gibs.earthdata.nasa.gov");
   const { run, made, S } = load("2026-08-15");
   run();
   assert.equal(made.length, 3);
-  assert.deepEqual(made.map((l) => l.url), [
-    "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_Thermal_Anomalies_375m_All/default/2026-08-15/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
-    "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA20_Thermal_Anomalies_375m_All/default/2026-08-15/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
-    "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_NOAA21_Thermal_Anomalies_375m_All/default/2026-08-15/GoogleMapsCompatible_Level9/{z}/{y}/{x}.png",
-  ]);
   for (const l of made) {
+    assert.equal(l.url, "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi");
+    assert.equal(l.opts.format, "image/png");
+    assert.equal(l.opts.transparent, true);
+    assert.equal(l.opts.version, "1.1.1");
+    assert.equal(l.opts.TIME, "2026-08-15", "the period's last day");
     assert.equal(l.opts.pane, "fires");
-    assert.equal(l.opts.maxNativeZoom, 9, "the GoogleMapsCompatible_Level9 matrix set ends at level 9");
+    assert.equal(l.opts.tileSize, 512);
     assert.equal(l.opts.maxZoom, 19);
-    assert.equal(l.opts.tileSize, undefined, "256 px tiles, like the true-colour layer");
     assert.match(l.opts.attribution, /firms\.modaps\.eosdis\.nasa\.gov/);
     assert.ok(l.added, "added to the map");
   }
@@ -68,7 +70,7 @@ test("each satellite only from the day it has data", () => {
     const { run, made } = load(day);
     run();
     assert.deepEqual(names(made), layers, day);
-    assert.ok(made.every((l) => l.url.includes(`/default/${day}/`)), `${day}: each layer is asked for that day`);
+    assert.ok(made.every((l) => l.opts.TIME === day), `${day}: each layer is asked for that day`);
   }
 });
 
@@ -97,7 +99,7 @@ test("a rebuild removes the old layers, clears the note and ignores a late failu
   assert.deepEqual(first.removed, first.made.slice(0, 3));
   assert.equal(first.made.length, 6);
   assert.deepEqual(names(first.made.slice(3)), names(first.made.slice(0, 3)));
-  assert.ok(first.made.slice(3).every((l) => l.url.includes("/default/2026-09-01/")));
+  assert.ok(first.made.slice(3).every((l) => l.opts.TIME === "2026-09-01"));
   assert.equal(first.note.textContent, "");
   first.made[0].handlers.tileerror();
   assert.equal(first.note.textContent, "", "a removed layer's late failure is not shown");
