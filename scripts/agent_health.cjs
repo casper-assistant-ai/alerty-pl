@@ -103,6 +103,34 @@ async function reconcile({ github, owner, repo, workflow, openIssues, core }) {
   return `updated #${issue.number}`;
 }
 
+/** gh-aw's own failure notices, which agent-health replaces: an issue per failure and the detection tracker. */
+function isLegacy(issue) {
+  if (issue.state !== "open" || issue.pull_request) return false;
+  const body = issue.body || "";
+  if (body.includes("<!-- agent-health:")) return false;
+  return body.includes("<!-- gh-aw-failure-issue: true") || issue.title === "[aw] Detection Runs";
+}
+
+/** Close gh-aw's old failure issues with a pointer to the health issue of that agent, if any is open. */
+async function retireLegacy({ github, owner, repo, core }) {
+  const open = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: "open", labels: "agentic-workflows", per_page: 100 });
+  const health = open.filter((i) => (i.body || "").includes("<!-- agent-health:"));
+  const done = [];
+  for (const issue of open.filter(isLegacy)) {
+    const wf = ((issue.body || "").match(/gh-aw-failure-issue: true, workflow_id: ([\w.-]+)/) || [])[1];
+    const now = wf && health.find((h) => h.body.includes(`/${wf}.lock.yml -->`));
+    const where = now ? `Its runs still fail: see #${now.number}.` : wf ? "Its runs pass again." : "";
+    const text = issue.title === "[aw] Detection Runs"
+      ? "Closing: detector failures stay in each run's diagnostics now (threat-detection.report-as-issue: false), so this tracker no longer grows."
+      : `Closing: gh-aw no longer opens an issue per failure. agent-health.yml keeps one self-closing issue per failing agent instead. ${where}`;
+    await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: text.trim() });
+    await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: "closed", state_reason: "not_planned" });
+    core.info(`closed legacy #${issue.number}`);
+    done.push(`closed legacy #${issue.number}`);
+  }
+  return done;
+}
+
 /** Entry point for actions/github-script. Only workflows that have a .md source (gh-aw agents) count. */
 async function main({ github, context, core }) {
   const { owner, repo } = context.repo;
@@ -114,7 +142,8 @@ async function main({ github, context, core }) {
   const openIssues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: "open", labels: LABEL, per_page: 100 });
   const done = [];
   for (const workflow of todo) done.push(`${workflow.name}: ${await reconcile({ github, owner, repo, workflow, openIssues, core })}`);
-  await core.summary.addList(done).write();
+  done.push(...(await retireLegacy({ github, owner, repo, core })));
+  await core.summary.addList(done.length ? done : ["nothing to do"]).write();
 }
 
-module.exports = { main, reconcile, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };
+module.exports = { main, reconcile, retireLegacy, isLegacy, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };

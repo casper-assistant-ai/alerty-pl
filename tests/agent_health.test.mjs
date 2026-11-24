@@ -93,3 +93,28 @@ test("issues of other workflows are not touched", async () => {
   assert.equal(await H.reconcile(args), "ok");
   assert.equal(calls.length, 0);
 });
+
+test("gh-aw's old failure issues and the detection tracker are retired, other notices stay", async () => {
+  const issues = [
+    { number: 84, state: "open", title: "[aw] Issue worker: engine driver crashed", body: "<!-- gh-aw-failure-issue: true, workflow_id: issue-worker, branch: main -->" },
+    { number: 88, state: "open", title: "[aw] PR fixer: engine driver crashed", body: "<!-- gh-aw-failure-issue: true, workflow_id: pr-fixer, branch: main -->" },
+    { number: 82, state: "open", title: "[aw] Detection Runs", body: "tracker" },
+    { number: 8, state: "open", title: "[aw] No-Op Runs", body: "noop" },
+    { number: 200, state: "open", title: "[aw] Issue worker: 1 failed run in a row", body: H.marker(".github/workflows/issue-worker.lock.yml") },
+  ];
+  const calls = [];
+  const github = {
+    paginate: async () => issues,
+    rest: { issues: {
+      listForRepo: () => {},
+      createComment: async (a) => { calls.push(["comment", a]); },
+      update: async (a) => { calls.push(["update", a]); },
+    } },
+  };
+  const done = await H.retireLegacy({ github, owner: "o", repo: "r", core: { info() {} } });
+  assert.deepEqual(done, ["closed legacy #84", "closed legacy #88", "closed legacy #82"]);
+  const comment = (num) => calls.find((c) => c[0] === "comment" && c[1].issue_number === num)[1].body;
+  assert.match(comment(84), /see #200/);
+  assert.match(comment(88), /pass again/);
+  assert.match(comment(82), /no longer grows/);
+});
