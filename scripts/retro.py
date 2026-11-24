@@ -19,7 +19,9 @@ exist in this repository, at most `max_extra_runs_per_week` (capped at 3) per ag
 
 `queue` lists the work waiting for the issue-worker agent: every open issue with its kind and the
 open PRs that already name it, the agent PRs the gate refused, and whether today's improvement PR
-(tests, reliability, simplicity) is still due because the queue is empty.
+(tests, reliability, simplicity) is still due because the queue is empty. gh-aw's detection
+tracker (`[aw] Detection Runs`, a comment per run whose threat detection failed) is left out: it
+is a log that gh-aw keeps, not work.
 
 `gave-up` lists the issues the issue-worker gave up on: closed with the label `agent-gave-up` in the last
 N days, minus those the process-retro already handled (its log row names them after `Gave up:`).
@@ -251,6 +253,10 @@ def repo_name(arg):
 
 # gh-aw keeps these issues itself (no-op tracker); they are closed by fixing the cause
 MANAGED = re.compile(r"^\[aw\] No-Op Runs")
+# gh-aw's log of detection problems: one comment per run whose threat detection failed. Never
+# work for the issue-worker: closing it only makes gh-aw file a new one and start another run.
+# The whole title: a failure notice ("[aw] <workflow>: <reason>") must still be listed.
+TRACKER = re.compile(r"^\[aw\] Detection Runs$")
 WORKER = "issue-worker"
 # the issue-worker starts an improvement PR body with "Improvement: ..." (gh-aw strips HTML comments)
 IMPROVEMENT = re.compile(r"^\s*Improvement\b", re.I)
@@ -301,7 +307,7 @@ def queue(issues, prs, today):
             target.setdefault(int(n), []).append(p["number"])
     items = []
     for i in issues:
-        if i.get("state") != "open":
+        if i.get("state") != "open" or TRACKER.match(i.get("title") or ""):
             continue
         k = issue_kind(i.get("title"), i.get("labels"))
         items.append({"number": i["number"], "title": i["title"], "kind": k,
