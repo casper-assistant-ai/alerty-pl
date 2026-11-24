@@ -77,10 +77,15 @@ const PAGES = [
       if (!card || card.hidden || !card.querySelector(".raid-src a")) p.push("incursion card with its sources is not shown for 10.09.2025");
       if (!document.querySelector(".leaflet-raid-pane .raid-trail, .leaflet-raid-pane .raid-route")) p.push("incursion routes are not drawn on the map");
       return p; })()` },
+  // The fires layer, on GIBS WMTS (#94): a tile counts only once it has loaded. Leaflet leaves a tile that failed
+  // without the loaded class, so <img>s alone are there for a layer whose every tile fails, which showed as nothing
+  // (#73). fires() in docs/app.js says a failed tile in #fires-note, so that line is a problem too.
   { path: "?dzien=2026-08-15&podklad=nasa&pozary=1", name: "Mapa, NASA i pożary 15.08", check: `(() => { const p = [];
       if (document.querySelectorAll(".leaflet-interactive").length < 300) p.push("map: powiaty not drawn");
       if (document.querySelectorAll(".leaflet-tile-pane img.leaflet-tile-loaded").length < 4) p.push("NASA true colour tiles did not load");
-      if (!document.querySelector(".leaflet-fires-pane img")) p.push("NASA FIRMS fire layer is missing");
+      if (document.querySelectorAll(".leaflet-fires-pane img.leaflet-tile-loaded").length < 1) p.push("NASA FIRMS fire tiles did not load");
+      const note = document.querySelector("#fires-note");
+      if (note && note.textContent.trim()) p.push("NASA FIRMS: some fire tiles did not load, the page says: " + note.textContent.trim());
       if (!/15\\.08\\.2026/.test(document.querySelector("#day-label")?.textContent || "")) p.push("day slider did not open 15.08.2026");
       return p; })()` },
   { path: "?podklad=esri", name: "Mapa, Esri Wayback", check: `(() => { const p = [];
@@ -172,6 +177,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const third = (p) => p.kind.endsWith("-3rd");
 const isLive = (p) => third(p) && String(p.url || "").startsWith(LIVE);
+// GIBS answers a WMTS tile it has no data for with 404 and a transparent image: an empty tile, which the map
+// shows blank, not a failed request (visit() keeps the response's mimeType on the problem for this)
+const blank = (p) => p.kind === "http-3rd" && /^404 /.test(p.detail) && /^image\//.test(p.mimeType || "");
 const host = (url) => { try { return new URL(url).host; } catch { return url; } };
 // the items with their counts, the most frequent first
 function tally(items) {
@@ -181,12 +189,15 @@ function tally(items) {
 }
 
 // One page view's problems sorted out: what the view reports, and the live service's failed requests
-// (for liveLine). A few failed 3rd-party tiles (a satellite day with no image) are normal; many are
-// not. The stream's reconnects are not tiles: counted with them, they tipped the NASA view over the
+// (for liveLine). A few failed 3rd-party tiles are normal; many are not. GIBS's empty tile (blank) is
+// no failure and is left out of the count: the fires view asks three layers of 256 px tiles, 36 and
+// more on the desktop view (#94). Every network failure (the ERR_BLOCKED_BY_ORB of #73), every 404
+// with another body and every other status counts.
+// The stream's reconnects are not tiles: counted with them, they tipped the NASA view over the
 // limit on every run of a service outage (#61, #70).
 export function judge(problems) {
   const live = problems.filter(isLive);
-  const tiles = problems.filter((p) => third(p) && !isLive(p));
+  const tiles = problems.filter((p) => third(p) && !isLive(p) && !blank(p));
   const rest = problems.filter((p) => !third(p));
   if (tiles.length > 8) {
     const hosts = tally(tiles.map((p) => host(p.url))).map(([h, n]) => `${n} × ${h}`);
@@ -226,7 +237,8 @@ async function visit(cdp, sid, page, vp) {
         if (p.response.status >= 400) {
           const own = p.response.url.startsWith(origin);
           const url = p.response.url.slice(0, 200);
-          problems.push({ kind: own ? "http" : "http-3rd", detail: `${p.response.status} ${url}`, url });
+          // mimeType stays on the problem: a 404 whose body is an image is GIBS's empty tile, which judge() leaves out
+          problems.push({ kind: own ? "http" : "http-3rd", detail: `${p.response.status} ${url}`, url, mimeType: p.response.mimeType });
         }
         break;
       case "Network.loadingFailed": {
