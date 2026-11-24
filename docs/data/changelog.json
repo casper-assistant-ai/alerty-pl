@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.23.1",
+   "date": "2026-11-24",
+   "time": "2026-11-24T09:00:58+01:00",
+   "sha": "a8d9532",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "rcb",
+     "breaking": false,
+     "text": "skip gov.pl's home page served for an alert, so the live service stops re-sending its end",
+     "sha": "a8d9532",
+     "date": "2026-11-24",
+     "time": "2026-11-24T09:00:58+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.23.0",
    "date": "2026-11-24",
    "time": "2026-11-24T13:27:13+01:00",

@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.23.1 (2026-11-24)
+
+### fix
+
+- **rcb:** skip gov.pl's home page served for an alert, so the live service stops re-sending its end ([a8d9532](https://github.com/casper-assistant-ai/alerty-pl/commit/a8d9532))
+
 ## 1.23.0 (2026-11-24)
 
 ### feat
