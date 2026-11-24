@@ -141,4 +141,8 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   on them, close them or open a PR for them [agent-health issues are rewritten after every run, #96].
 - issue-worker: one issue per run. Past minute 35 of the agent job, open the PR with what is done
   and the rest as a follow-up, or stop; the step limit is 50 minutes [timeout, run 45371361840].
+- every agent: the step limit (`timeout-minutes`) ends the CLI step as a failure and the whole
+  session is lost, so by 80% of the limit send what is done — the PR, the issue or `noop` — and
+  stop; the issue-worker's minute 35 is this rule at 50 [timeout, site-fixer runs 45248741714 and
+  45244945359 stopped at 25 min, region-keeper 45227118220 at 20].
 <!-- reliability:end -->
