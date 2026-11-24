@@ -6,9 +6,11 @@
 
 Reads, through the `gh` CLI (GH_TOKEN): every gh-aw agent workflow (a .lock.yml with its .md
 source), its completed runs of the last N days, the failed steps of each failed run (gh-aw's
-step-summary parser crash after the agent's work is left out, as in scripts/agent_health.cjs),
-and the error lines of the failed job's log. Each failed run gets one signature (provider
-overload, timeout, turn limit, network, permission, safe outputs, auth, engine crash, unknown).
+step-summary parser crash after the agent's work is left out, as in scripts/agent_health.cjs, and
+so is the conclusion job's mirror of it; a CLI step that ran to the step limit is a timeout), and
+the error lines of the failed job's log, without its escape sequences. Each failed run gets one
+signature (provider overload, timeout, turn limit, network, permission, safe outputs, auth, engine
+crash, unknown).
 A signature that failed at least RECUR_RUNS runs on RECUR_DAYS days is recurring: the doctor
 turns it into a rule. It also lists the open agent-tooling issues (label `agentic-workflows`)
 and whether the doctor already commented on them, and each workflow's timeout against its
@@ -31,6 +33,9 @@ from pathlib import Path
 WORKFLOWS = Path(".github/workflows")
 # gh-aw v1.2.2's step-summary parser throws on long sessions after the agent finished (agent_health.cjs)
 IGNORED_STEPS = {"Parse agent logs for step summary"}
+CLI_STEP = "Execute Claude Code CLI"      # the agent job's step that carries the workflow's timeout-minutes
+HANDLER_STEP = "Handle agent failure"     # the conclusion job's copy of the agent job's result
+STEP_LIMIT = 0.95                         # of timeout-minutes: a failed CLI step that ran this long stopped at its limit
 NEUTRAL = {"cancelled", "skipped", "action_required", "neutral", "stale"}
 BAD = {"failure", "timed_out", "cancelled"}
 RECUR_RUNS, RECUR_DAYS = 3, 2
@@ -41,7 +46,7 @@ DOCTOR = re.compile(r"process[ -]doctor", re.I)
 # Order matters: the first match names the run. They are matched against signal_lines() only:
 # a whole gh-aw job log names every error type in its own config ("rate_limit_error" and so on).
 SIGNATURES = [
-    ("timeout", r"timed out after|has exceeded the maximum execution time|\(timed_out\)|\(cancelled\)"),
+    ("timeout", r"timed out after|has exceeded the maximum execution time|\(timed_out\)|\(timeout\)|\(cancelled\)"),
     ("provider-overload", r"API Error: (529|429|5\d\d)|overloaded|\[1305\]|rate limit reached|too many requests"),
     ("turn-limit", r"error_max_turns|max(imum)?[ _-]turns"),
     ("network", r"firewall|blocked (by|domain)|ENOTFOUND|ECONNREFUSED|ECONNRESET|ETIMEDOUT|EAI_AGAIN|socket hang up"),
@@ -51,7 +56,9 @@ SIGNATURES = [
     ("engine-crash", r"exited with code|process completed with exit code|engine driver crashed|segmentation fault"),
 ]
 STAMP = re.compile(r"^\d{4}-\d\d-\d\dT[\d:.]+Z ")
-ANSI = re.compile(r"\x1b\[[0-9;]*m")
+# Every terminal escape sequence a job log can hold (CSI, OSC, the other ESC sequences) and the control
+# characters that remain in a line after splitlines() (NUL, backspace, bell, DEL...); tabs stay.
+ANSI = re.compile(r"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07\x1b]*(?:\x07|\x1b\\)?|[ -/]*[0-~])|[\x00-\x08\x0b-\x1f\x7f]")
 API_ERROR = re.compile(r"API Error: [^\"\\]{0,160}")
 REQUEST_ID = re.compile(r"\[\d{14}[0-9a-f]{8,}\]")
 PARSER_CRASH = re.compile(r"Maximum call stack size exceeded")
@@ -94,19 +101,54 @@ def signal_lines(log_text, limit=LOG_LINES):
     return out[-limit:]
 
 
-def failed_steps(jobs):
-    """Failed steps that count, as "job / step" strings; a failed job with no failed step counts as itself."""
-    out = []
+def _time(s):
+    return dt.datetime.fromisoformat(s.replace("Z", "+00:00"))
+
+
+def counting(steps):
+    """The failed steps that are not the ignored parser crash."""
+    return [s for s in steps or [] if s.get("conclusion") in BAD and s["name"] not in IGNORED_STEPS]
+
+
+def agent_failed(jobs):
+    """Whether the agent job failed by itself: False when it is there and none of its failed steps counts
+    (it succeeded, or only the ignored parser step failed)."""
     for job in jobs or []:
+        if job.get("name") == "agent":
+            bad = [s for s in job.get("steps") or [] if s.get("conclusion") in BAD]
+            return job.get("conclusion") in BAD and not (bad and not counting(bad))
+    return True
+
+
+def at_step_limit(step, timeout):
+    """A CLI step that failed after running at least 95% of the workflow's timeout-minutes stopped at the step
+    limit: GitHub gives it conclusion `failure`, not `timed_out`, and the job runs on (site-fixer 45248741714:
+    25m12s of 25)."""
+    if not step.get("started_at") or not step.get("completed_at"):
+        return False
+    return (_time(step["completed_at"]) - _time(step["started_at"])).total_seconds() >= STEP_LIMIT * timeout * 60
+
+
+def failed_steps(jobs, timeout=None):
+    """Failed steps that count, as "job / step" strings; a failed job with no failed step counts as itself.
+    The conclusion job's "Handle agent failure" fails whenever the agent job does: it is left out when the
+    agent job failed only in the ignored parser step. A failed CLI step that ran to the step limit is
+    named a timeout."""
+    jobs = jobs or []
+    real = agent_failed(jobs)
+    out = []
+    for job in jobs:
         if job.get("conclusion") not in BAD:
             continue
         bad = [s for s in job.get("steps") or [] if s.get("conclusion") in BAD]
         if not bad:
             out.append(f"{job['name']} ({job['conclusion']})")
-        for s in bad:
-            if s["name"] in IGNORED_STEPS:
+        for s in counting(bad):
+            if s["name"] == HANDLER_STEP and not real:
                 continue
             tail = "" if s["conclusion"] == "failure" else f" ({s['conclusion']})"
+            if timeout and s["conclusion"] == "failure" and s["name"] == CLI_STEP and at_step_limit(s, timeout):
+                tail = " (timeout)"
             out.append(f"{job['name']} / {s['name']}{tail}")
     return out
 
@@ -114,8 +156,7 @@ def failed_steps(jobs):
 def minutes(a, b):
     if not a or not b:
         return None
-    f = lambda s: dt.datetime.fromisoformat(s.replace("Z", "+00:00"))
-    return round((f(b) - f(a)).total_seconds() / 60)
+    return round((_time(b) - _time(a)).total_seconds() / 60)
 
 
 def timeout_of(md_text):
@@ -147,7 +188,7 @@ def summarize(workflows, issues, patterns, now, days):
             m = minutes(agent.get("started_at"), agent.get("completed_at")) if agent else None
             if m is not None:
                 mins.append(m)
-            steps = failed_steps(r.get("jobs")) if r.get("conclusion") != "success" else []
+            steps = failed_steps(r.get("jobs"), wf["timeout"]) if r.get("conclusion") != "success" else []
             if not steps:
                 ok += 1
                 continue
@@ -252,7 +293,7 @@ def fetch(repo, days, now):
         r["jobs"] = j
     to_read = []
     for w in workflows:
-        failed = [r for r in w["runs"] if r.get("conclusion") != "success" and failed_steps(r["jobs"])]
+        failed = [r for r in w["runs"] if r.get("conclusion") != "success" and failed_steps(r["jobs"], w["timeout"])]
         for r in failed[:LOG_RUNS]:
             job = next((j for j in r["jobs"] if j.get("conclusion") in BAD and j["name"] == "agent"), None) \
                 or next((j for j in r["jobs"] if j.get("conclusion") in BAD), None)
