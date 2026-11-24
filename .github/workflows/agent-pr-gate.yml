@@ -179,7 +179,7 @@ jobs:
                 site-fixer) type="fix(site)";; site-designer) type="feat(site)";;
                 parser-doctor) type="fix(parser)";; region-keeper) type="fix(regions)";;
                 security-auditor|security-fixer) type="fix(security)";; test-improver) type="test";;
-                docs-keeper) type="docs";; process-retro) type="chore(process)";; issue-worker) type="fix";; *) type="chore";;
+                docs-keeper) type="docs";; process-retro|process-doctor) type="chore(process)";; issue-worker) type="fix";; *) type="chore";;
               esac
               subject="$type: $subject"
             fi

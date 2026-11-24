@@ -118,3 +118,40 @@ test("gh-aw's old failure issues and the detection tracker are retired, other no
   assert.match(comment(88), /pass again/);
   assert.match(comment(82), /no longer grows/);
 });
+
+test("the process-doctor is dispatched once for health issues it has not seen, with a cooldown", async () => {
+  const now = Date.parse("2026-11-24T12:00:00Z");
+  const make = ({ issues, comments = {}, runs = [], missing = false }) => {
+    const calls = [];
+    const github = {
+      paginate: async (fn, args) => (args.issue_number ? comments[args.issue_number] || [] : issues),
+      rest: {
+        issues: { listForRepo: () => {}, listComments: () => {} },
+        actions: {
+          listWorkflowRuns: async () => { if (missing) throw Object.assign(new Error("nf"), { status: 404 }); return { data: { workflow_runs: runs } }; },
+          createWorkflowDispatch: async (a) => { calls.push(a); },
+        },
+      },
+    };
+    return { calls, args: { github, owner: "o", repo: "r", core: { info() {} }, now } };
+  };
+  const seen = { number: 96, comments: 1 }, fresh = { number: 99, comments: 0 }, fresh2 = { number: 98, comments: 2 };
+  const said = { 96: [{ body: "**Process doctor:** cause z.ai 529" }], 98: [{ body: "Recovered" }] };
+
+  let t = make({ issues: [seen], comments: said });
+  assert.equal(await H.dispatchDoctor(t.args), "doctor: nothing new");
+
+  t = make({ issues: [seen, fresh, fresh2], comments: said });
+  assert.equal(await H.dispatchDoctor(t.args), "doctor: dispatched for #98");
+  assert.deepEqual(t.calls, [{ owner: "o", repo: "r", workflow_id: "process-doctor.lock.yml", ref: "main", inputs: { issue: "98" } }]);
+
+  t = make({ issues: [fresh], runs: [{ status: "in_progress", created_at: "2026-11-24T08:00:00Z" }] });
+  assert.equal(await H.dispatchDoctor(t.args), "doctor: already running");
+  t = make({ issues: [fresh], runs: [{ status: "completed", created_at: "2026-11-24T11:00:00Z" }] });
+  assert.match(await H.dispatchDoctor(t.args), /waits/);
+  t = make({ issues: [fresh], runs: [{ status: "completed", created_at: "2026-11-24T09:00:00Z" }] });
+  assert.equal(await H.dispatchDoctor(t.args), "doctor: dispatched for #99");
+  t = make({ issues: [fresh], missing: true });
+  assert.equal(await H.dispatchDoctor(t.args), "doctor: not installed");
+  assert.equal(t.calls.length, 0);
+});

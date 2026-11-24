@@ -60,6 +60,7 @@ flowchart LR
   SF -->|reasoned dismiss| SQ
   AC[agent-coach 🤖] -->|learned rules PR| G
   RETRO[process-retro 🤖] -->|process PR| G
+  AH[agent-health] -->|health issue, dispatch| PDOC[process-doctor 🤖] -->|reliability PR| G
   CAO[gh-cao] -.monitors.-> PD & RK & CD & DS & IT & TI & DK & SD & SA & AC
 ```
 
@@ -73,6 +74,7 @@ flowchart LR
 | `ci.yml` | plain Actions | — | push, PR | nothing |
 | `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent PRs that pass, sends broken ones to `pr-fixer` |
 | `agent-dispatch.yml` | plain Actions | — | daily | nothing; starts the extra agent runs planned in `process/schedule.json` |
+| `agent-health.yml` | plain Actions | — | after every agent run, twice an hour | one self-closing `[aw] <agent>: N failed runs in a row` issue per failing agent; dispatches `process-doctor` for a new one |
 | `pr-reviewer` | agent | GLM-5.4 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
 | `pr-fixer` | agent | GLM-5.4 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |
 | `issue-worker` | agent | GLM-5.4 (z.ai) | every 2 h, on each new issue, when the CI doctor, the gate or the process-retro dispatches it | fix PR (`Closes #N`) or closes the issue; takes a `dev-task` at once; improvement PR from `process/improvements.md` |
@@ -86,11 +88,12 @@ flowchart LR
 | `security-fixer` | agent | GLM-5.4 (z.ai) | when Security watch (hourly, plain code) sees an alert no PR or issue covers; weekly | fix PR (`Alerts: code-scanning#N`), reasoned dismiss, or an issue for Casper (leaked secret, `server/`) |
 | `agent-coach` | agent + skill skillopt-sleep | GLM-5.4 (z.ai) | weekly | PR: learned rules in `AGENTS.md` |
 | `process-retro` | agent | GLM-5.4 (z.ai) | daily | PR: the Process block in `AGENTS.md`, `process/**`; opens `dev-task` issues and dispatches the issue-worker for them |
+| `process-doctor` | agent | GLM-5.4 (z.ai) | on each new agent-health issue (at most every 2 h), daily | PR: the Reliability rules block in `AGENTS.md`, `process/failure-patterns.md`, `process/improvements.md`; `workflow-change` issues with the patch for `.github/workflows`; comments on and closes agent-tooling issues |
 | `ci-doctor` | agent | GLM-5.4 (z.ai) | a failed run on main | issue |
 | `issue-triage` | agent | GLM-5.4 (z.ai) | every 12 h | labels, comments |
 | `daily-status` | agent | GLM-5.4 (z.ai) | daily | report issue |
 
-All 16 agents run Claude Code against z.ai's Anthropic-compatible API
+All 17 agents run Claude Code against z.ai's Anthropic-compatible API
 (`engine: claude`, `model: glm-5.4`, `ANTHROPIC_BASE_URL`, secret `ANTHROPIC_API_KEY`; shared
 settings in `.github/workflows/shared/zai.md`). They load the
 [TokenEconomizer](https://github.com/microsoft/TokenEconomizer) plugin for cost control. Skills come

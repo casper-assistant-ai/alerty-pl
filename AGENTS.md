@@ -40,6 +40,12 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   hours and when the CI doctor (which also watches pull request runs) dispatches it, takes an issue
   again when the gate closed its PR, and when nothing waits makes one improvement PR a day (tests, reliability,
   simpler upkeep) from `process/improvements.md`, which the process-retro keeps filled.
+- Process doctor: `agent-health.yml` keeps one self-closing issue per failing agent and dispatches
+  the `process-doctor` agent for each new one (and it runs daily). `scripts/agent_failures.py` gives
+  it the failed runs of 7 days with a signature each (provider overload, timeout, turn limit, ...);
+  it fixes the process through the Reliability rules block below and `process/failure-patterns.md`
+  (a failure that comes back becomes a rule), and asks for workflow-file changes (timeouts, retries,
+  models) in `workflow-change` issues with the patch, since agent tokens cannot change `.github/`.
 - Give-up ladder: after two closed PRs for one issue (the queue marks it `give up`) the issue-worker adds the label
   `agent-gave-up` and closes the issue with a summary (tried, why it failed, what is needed); the daily
   `process-retro` reads those issues (`scripts/retro.py gave-up`) and splits each into smaller `[dev-task]` issues or
@@ -124,3 +130,15 @@ The agent-coach workflow keeps this block (bounded edits, each with its evidence
   and CI lints it, and a prose title that slips through must be hand-mapped into the changelog
   [PR #5, PR #7].
 <!-- learned:end -->
+
+## Reliability rules
+
+The process-doctor workflow keeps this block: rules against agent failures that came back, each
+with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. Every agent follows it.
+
+<!-- reliability:start -->
+- Issues labelled `agent-health` or `workflow-change` belong to the process-doctor: do not comment
+  on them, close them or open a PR for them [agent-health issues are rewritten after every run, #96].
+- issue-worker: one issue per run. Past minute 35 of the agent job, open the PR with what is done
+  and the rest as a follow-up, or stop; the step limit is 50 minutes [timeout, run 45371361840].
+<!-- reliability:end -->

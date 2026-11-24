@@ -124,6 +124,18 @@ class Queue(unittest.TestCase):
         notice = dict(tracker, number=83, title="[aw] Detection Runs: engine driver crashed")
         self.assertIn(83, retro.queue(self.issues() + [notice], [], "2026-11-24")["actionable"])
 
+    def test_process_doctor_issues_are_not_work(self):
+        # agent-health's failure issues and the doctor's workflow-change issues belong to the process-doctor
+        health = {"number": 96, "title": "[aw] CI doctor: 4 failed runs in a row", "state": "open",
+                  "created_at": "2026-11-24T11:24:21Z", "labels": ["agentic-workflows", "agent-health"]}
+        patch = {"number": 98, "title": "[process-doctor] workflow change: issue-worker timeout", "state": "open",
+                 "created_at": "2026-11-24T12:00:00Z", "labels": ["agentic-workflows", "workflow-change"]}
+        self.assertEqual(retro.issue_kind(health["title"], health["labels"]), "managed")
+        self.assertEqual(retro.issue_kind(patch["title"], patch["labels"]), "managed")
+        q = retro.queue(self.issues() + [health, patch], [], "2026-11-24")
+        self.assertNotIn(96, q["actionable"])
+        self.assertNotIn(98, q["actionable"])
+
     def test_improvement_due_once_a_day(self):
         q = retro.queue([], [], "2026-11-22")
         self.assertTrue(q["improvement_due"])

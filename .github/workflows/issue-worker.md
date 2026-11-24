@@ -112,11 +112,9 @@ Kinds in the queue, in the order you take them:
 
 1. `ci` (CI doctor issues) and `site-error`: read the failed run or the site check, fix the cause.
    A one-off network error with a later green run: close it with that run's link.
-2. `aw-notice` (`agent-health` issues: one per agent workflow whose runs keep failing; it closes by
-   itself after the next good run, and it is rewritten after each run, so never comment on it): read
-   the failed steps of its newest run. A provider outage or a network error is not yours: skip it. If the fix needs a change in `.github/` (you
-   cannot push those), close the issue with the reason and the exact change in the closing comment,
-   so the record stays on the issue. Never add "needs a maintainer" items anywhere.
+2. `aw-notice` (other gh-aw notices, such as «produced no safe outputs»): read the run it names; a
+   one-off with good runs after it: close it with their links. Issues labelled `agent-health` or
+   `workflow-change` are not in your queue (kind `managed`): the process-doctor owns them.
 3. `request` (issues from people): a bug or a missing alert gets a fix PR; a question gets an answer
    in the closing comment; an idea that fits the product goes into `process/improvements.md` in a
    PR and the issue closes with it linked.
@@ -125,7 +123,8 @@ Kinds in the queue, in the order you take them:
    opens dev-tasks); follow the issue's «how to check it», and say `Closes #<n>`.
 5. `report` (daily-status, security-audit): check each point it lists. When every point is done,
    in a PR, or a dev-task, close it with those links; otherwise leave it for the next run.
-6. `managed` (the gh-aw "No-Op Runs" tracker): close it only when no workflow source in
+6. `managed` (the gh-aw "No-Op Runs" tracker; `agent-health` and `workflow-change` issues belong to the
+   process-doctor, leave them): close the tracker only when no workflow source in
    `.github/workflows/*.md` still lacks `report-as-issue: false` under `noop:`, saying so.
 
 **Issues the gate returned** (a closed PR in `rejected PRs`): the gate closed that PR because its

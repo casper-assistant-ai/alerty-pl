@@ -2,19 +2,21 @@
 # successful run (scripts/agent_health.cjs). gh-aw's own issue per failure and its "[aw] Detection
 # Runs" tracker are off in the agents' frontmatter (report-failure-as-issue, threat-detection).
 # Runs started with GITHUB_TOKEN (agents dispatched by the process-retro) fire no workflow_run,
-# so the schedule reconciles every agent as well.
+# so the schedule reconciles every agent as well. For a health issue the process-doctor agent has
+# not commented on yet, it dispatches that agent (at most every 2 hours; process-doctor.md).
 name: Agent health
 
 on:
   workflow_run:
-    workflows: ["Agent coach", "CI doctor", "Daily status", "Docs keeper", "Issue triage", "Issue worker", "PR fixer", "PR reviewer", "Parser doctor", "Process retro", "Region keeper", "Security auditor", "Security fixer", "Site designer", "Site fixer", "Test improver"]
+    workflows: ["Agent coach", "CI doctor", "Daily status", "Docs keeper", "Issue triage", "Issue worker", "PR fixer", "PR reviewer", "Parser doctor", "Process doctor", "Process retro", "Region keeper", "Security auditor", "Security fixer", "Site designer", "Site fixer", "Test improver"]
     types: [completed]
   schedule:
     - cron: "17,47 * * * *"
   workflow_dispatch:
 
 permissions:
-  actions: read
+  # write: it dispatches the process-doctor for new health issues (scripts/agent_health.cjs)
+  actions: write
   contents: read
   issues: write
 

@@ -48,12 +48,12 @@ PREFIX = re.compile(r"^\[(?P<agent>[a-z0-9-]+)\] ")
 # the type the Agent PR gate gives a PR whose title is not a Conventional Commit
 GATE_TYPE = {"site-fixer": "fix", "site-designer": "feat", "parser-doctor": "fix",
              "region-keeper": "fix", "security-auditor": "fix", "test-improver": "test",
-             "docs-keeper": "docs", "agent-coach": "chore", "process-retro": "chore",
+             "docs-keeper": "docs", "agent-coach": "chore", "process-retro": "chore", "process-doctor": "chore",
              "issue-worker": "fix", "security-fixer": "fix"}
 DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 HARD_CAP = 3
 # agents that change the process itself; their PRs count as process, not as output
-PROCESS_AGENTS = {"agent-coach", "process-retro"}
+PROCESS_AGENTS = {"agent-coach", "process-retro", "process-doctor"}
 
 
 def agent_of(title):
@@ -258,6 +258,9 @@ MANAGED = re.compile(r"^\[aw\] No-Op Runs")
 # The whole title: a failure notice ("[aw] <workflow>: <reason>") must still be listed.
 TRACKER = re.compile(r"^\[aw\] Detection Runs$")
 WORKER = "issue-worker"
+# The process-doctor owns these: agent-health's self-closing failure issues, and its own
+# workflow-change issues (frontmatter patches that GITHUB_TOKEN cannot push, applied by a maintainer).
+DOCTOR_LABELS = {"agent-health", "workflow-change"}
 # the issue-worker starts an improvement PR body with "Improvement: ..." (gh-aw strips HTML comments)
 IMPROVEMENT = re.compile(r"^\s*Improvement\b", re.I)
 
@@ -266,7 +269,7 @@ def issue_kind(title, labels):
     """What an open issue asks for: managed, report, dev-task, ci, site-error, aw-notice or request."""
     labels = set(labels or [])
     a = agent_of(title)
-    if MANAGED.match(title or ""):
+    if MANAGED.match(title or "") or labels & DOCTOR_LABELS:
         return "managed"
     if "dev-task" in labels:
         return "dev-task"

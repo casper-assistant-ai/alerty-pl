@@ -131,6 +131,44 @@ async function retireLegacy({ github, owner, repo, core }) {
   return done;
 }
 
+// The process-doctor agent reads the failures behind every health issue and fixes the process.
+const DOCTOR = "process-doctor.lock.yml";
+const DOCTOR_SAID = /process[ -]doctor/i; // its comments carry its name (and gh-aw's footer)
+const DOCTOR_COOLDOWN_MS = 2 * 3600 * 1000;
+const BUSY = new Set(["queued", "in_progress", "waiting", "requested", "pending"]);
+
+/**
+ * Start the process-doctor for the open health issues it has not commented on yet, at most once per
+ * DOCTOR_COOLDOWN_MS and never while a doctor run is waiting or running. Issues opened with
+ * GITHUB_TOKEN start no workflow by themselves; a workflow_dispatch made with it does.
+ */
+async function dispatchDoctor({ github, owner, repo, core, ref = "main", now = Date.now() }) {
+  const open = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: "open", labels: LABEL, per_page: 100 });
+  const fresh = [];
+  for (const issue of open) {
+    if (issue.pull_request) continue;
+    const comments = issue.comments
+      ? await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: issue.number, per_page: 100 })
+      : [];
+    if (!comments.some((c) => DOCTOR_SAID.test(c.body || ""))) fresh.push(issue.number);
+  }
+  if (!fresh.length) return "doctor: nothing new";
+  let runs;
+  try {
+    ({ data: { workflow_runs: runs } } = await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: DOCTOR, per_page: 5 }));
+  } catch (e) {
+    if (e.status === 404) return "doctor: not installed";
+    throw e;
+  }
+  if (runs.some((r) => BUSY.has(r.status))) return "doctor: already running";
+  const last = runs.length ? Date.parse(runs[0].created_at) : 0;
+  if (now - last < DOCTOR_COOLDOWN_MS) return `doctor: ran at ${runs[0].created_at}, waits`;
+  const issue = Math.min(...fresh);
+  await github.rest.actions.createWorkflowDispatch({ owner, repo, workflow_id: DOCTOR, ref, inputs: { issue: String(issue) } });
+  core.info(`dispatched the process-doctor for #${issue} (new: ${fresh.join(", ")})`);
+  return `doctor: dispatched for #${issue}`;
+}
+
 /** Entry point for actions/github-script. Only workflows that have a .md source (gh-aw agents) count. */
 async function main({ github, context, core }) {
   const { owner, repo } = context.repo;
@@ -143,7 +181,8 @@ async function main({ github, context, core }) {
   const done = [];
   for (const workflow of todo) done.push(`${workflow.name}: ${await reconcile({ github, owner, repo, workflow, openIssues, core })}`);
   done.push(...(await retireLegacy({ github, owner, repo, core })));
+  done.push(await dispatchDoctor({ github, owner, repo, core, ref: (context.payload.repository || {}).default_branch || "main" }));
   await core.summary.addList(done.length ? done : ["nothing to do"]).write();
 }
 
-module.exports = { main, reconcile, retireLegacy, isLegacy, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };
+module.exports = { main, reconcile, retireLegacy, dispatchDoctor, isLegacy, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };
