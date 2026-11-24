@@ -8,6 +8,24 @@
    "category": "air",
    "updates": [
     {
+     "time": "23:54",
+     "message": "UWAGA! Odwołano zagrożenie atakiem z powietrza. Brak zagrożenia na terenie Polski.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/biala-podlaska",
+       "lubelskie/chelm",
+       "lubelskie/zamosc"
+      ],
+      "whole": [],
+      "gminy": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa: - lubelskiego - włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski, łukowski, Biała Podlaska, bialski, rycki, radzyński, parczewski, lubartowski."
+    },
+    {
      "time": "22:56",
      "message": "UWAGA! UWAGA! UWAGA! Zagrożenie atakiem z powietrza. Znajdź bezpieczne miejsce. Stosuj się do poleceń służb. Oczekuj dalszych komunikatów.",
      "ended": false,
@@ -46,12 +64,14 @@
      "lubelskie"
     ],
     "powiaty": [
+     "lubelskie/biala-podlaska",
      "lubelskie/chelm",
      "lubelskie/chelmski",
      "lubelskie/krasnostawski",
      "lubelskie/leczynski",
      "lubelskie/swidnicki",
-     "lubelskie/wlodawski"
+     "lubelskie/wlodawski",
+     "lubelskie/zamosc"
     ],
     "whole": [],
     "gminy": []
@@ -59,9 +79,9 @@
    "id": "alert-rcb---atak-z-powietrza-2311",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---atak-z-powietrza-2311",
    "intro": "„UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.”",
-   "status": "active",
+   "status": "ended",
    "started_at": "2026-11-23T22:56:00+01:00",
-   "last_at": "2026-11-23T22:56:00+01:00",
+   "last_at": "2026-11-23T23:54:00+01:00",
    "parser": 2
   },
   {
@@ -99,7 +119,7 @@
    "id": "alert-rcb---pozar-zlomu-w-porcie-gdansk-2311",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---pozar-zlomu-w-porcie-gdansk-2311",
    "intro": "„KOMUNIKAT: Trwa akcja gaszenia złomu na terenie portu Gdańsk. Zamknij okna i drzwi. Jeżeli możesz zostań w domu. Nie zbliżaj się do miejsca akcji.”",
-   "status": "active",
+   "status": "expired",
    "started_at": "2026-11-23T00:00:00+01:00",
    "last_at": "2026-11-23T00:00:00+01:00",
    "parser": 2
