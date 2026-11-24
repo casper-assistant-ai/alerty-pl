@@ -61,6 +61,8 @@ safe-outputs:
   close-issue:
     target: "*"
     max: 5
+    # gh-aw v1.2.2's default «issue intent» close is answered 200 and leaves the issue open (#96).
+    issue-intent: false
   add-labels:
     allowed: [agent-gave-up]
     max: 5

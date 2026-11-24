@@ -107,5 +107,38 @@ class Summary(unittest.TestCase):
         self.assertIn("timed out after 20 minutes", md)
 
 
+class Gh(unittest.TestCase):
+    class Done:
+        def __init__(self, code, out="", err=""):
+            self.returncode, self.stdout, self.stderr = code, out, err
+
+    def test_logs_are_read_with_escape_sequences_allowed(self):
+        calls = []
+        def run(cmd, **kw):
+            calls.append(cmd)
+            return self.Done(0, "\x1b[36mlog\x1b[0m")
+        self.assertIn("log", af.gh("repos/o/r/actions/jobs/1/logs", raw=True, run=run))
+        self.assertIn(af.ESCAPES, calls[0])
+
+    def test_old_gh_without_the_flag_retries_plain(self):
+        calls = []
+        def run(cmd, **kw):
+            calls.append(cmd)
+            if af.ESCAPES in cmd:
+                return self.Done(1, err="unknown flag: --allow-escape-sequences")
+            return self.Done(0, "log")
+        self.assertEqual(af.gh("x/logs", raw=True, run=run), "log")
+        self.assertEqual(len(calls), 2)
+        self.assertNotIn(af.ESCAPES, calls[1])
+
+    def test_json_calls_do_not_take_the_flag(self):
+        calls = []
+        def run(cmd, **kw):
+            calls.append(cmd)
+            return self.Done(0, '{"a": 1}')
+        self.assertEqual(af.gh("x", run=run), {"a": 1})
+        self.assertNotIn(af.ESCAPES, calls[0])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -72,6 +72,9 @@ safe-outputs:
     max: 6
     # only agent-tooling issues: agent-health's, gh-aw's notices and its own workflow-change issues
     required-labels: [agentic-workflows]
+    # gh-aw v1.2.2 closes through an «issue intent» PATCH by default; GitHub answers it 200 and
+    # leaves the issue open (#96, 24.11.2026). The plain close works.
+    issue-intent: false
   noop:
     report-as-issue: false
   # One self-closing issue per workflow comes from agent-health.yml instead of an issue per failure.

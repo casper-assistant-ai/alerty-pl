@@ -219,9 +219,16 @@ def markdown(rep):
 
 # ---- GitHub through the gh CLI ----
 
-def gh(path, raw=False):
-    out = subprocess.run(["gh", "api", "-H", "Accept: application/vnd.github+json", path],
-                         capture_output=True, text=True, timeout=120)
+# Job logs hold terminal escape sequences, and newer gh (the runners') refuses to print them without
+# this flag; older gh (2.45) has no such flag and prints them anyway.
+ESCAPES = "--allow-escape-sequences"
+
+
+def gh(path, raw=False, run=subprocess.run):
+    cmd = ["gh", "api", "-H", "Accept: application/vnd.github+json", path]
+    out = run(cmd + ([ESCAPES] if raw else []), capture_output=True, text=True, timeout=120)
+    if raw and out.returncode != 0 and "unknown flag" in out.stderr:
+        out = run(cmd, capture_output=True, text=True, timeout=120)
     if out.returncode != 0:
         raise RuntimeError(f"gh api {path}: {out.stderr.strip()[:200]}")
     return out.stdout if raw else json.loads(out.stdout)
