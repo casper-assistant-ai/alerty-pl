@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.21.1",
+   "date": "2026-11-24",
+   "time": "2026-11-24T10:51:58+01:00",
+   "sha": "acb72e9",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "fall back to glm-5.3/glm-5.1 and let Claude Code retry when z.ai answers 529",
+     "sha": "acb72e9",
+     "date": "2026-11-24",
+     "time": "2026-11-24T10:51:58+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.21.0",
    "date": "2026-11-23",
    "time": "2026-11-23T21:43:06Z",

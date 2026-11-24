@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.21.1 (2026-11-24)
+
+### fix
+
+- **agents:** fall back to glm-5.3/glm-5.1 and let Claude Code retry when z.ai answers 529 ([acb72e9](https://github.com/casper-assistant-ai/alerty-pl/commit/acb72e9))
+
 ## 1.21.0 (2026-11-23)
 
 ### feat
