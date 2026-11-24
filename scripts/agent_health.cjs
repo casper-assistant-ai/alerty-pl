@@ -78,7 +78,7 @@ function body(name, path, streak) {
 }
 
 /** Reconcile one workflow ({id, name, path}) with its issue. Returns what was done. */
-async function reconcile({ github, owner, repo, workflow, openIssues, core }) {
+async function reconcile({ github, owner, repo, workflow, openIssues, closedIssues = [], core }) {
   const { data } = await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: workflow.id, status: "completed", per_page: 40 });
   const jobsOf = async (run) => (await github.rest.actions.listJobsForWorkflowRunAttempt({ owner, repo, run_id: run.id, attempt_number: run.run_attempt || 1, per_page: 100 })).data.jobs;
   const { streak, recovered } = await streakOf(data.workflow_runs, jobsOf);
@@ -90,6 +90,22 @@ async function reconcile({ github, owner, repo, workflow, openIssues, core }) {
     await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: "closed", state_reason: "completed" });
     core.info(`${workflow.name}: closed #${issue.number}`);
     return `closed #${issue.number}`;
+  }
+  // A streak whose issue was closed after its newest failure was handled (the process-doctor closes an
+  // issue when its cause is fixed, before the agent runs again): no second issue for the same runs.
+  const newest = Date.parse(streak[0].run.updated_at || streak[0].run.created_at);
+  const prev = closedIssues
+    .filter((i) => i.closed_at && (i.body || "").includes(marker(workflow.path)))
+    .sort((a, b) => Date.parse(b.closed_at) - Date.parse(a.closed_at))[0];
+  if (prev && Date.parse(prev.closed_at) > newest) {
+    if (!issue) return `handled in #${prev.number}`;
+    if (issue.number > prev.number) {
+      await github.rest.issues.createComment({ owner, repo, issue_number: issue.number,
+        body: `Closing: the same failed runs as #${prev.number}, which was closed after them. A new failure opens a new issue.` });
+      await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: "closed", state_reason: "not_planned" });
+      core.info(`${workflow.name}: closed duplicate #${issue.number} of #${prev.number}`);
+      return `closed duplicate #${issue.number}`;
+    }
   }
   const t = title(workflow.name, streak), b = body(workflow.name, workflow.path, streak);
   if (!issue) {
@@ -185,8 +201,9 @@ async function main({ github, context, core }) {
   const only = context.payload.workflow_run && context.payload.workflow_run.path;
   const todo = only ? agents.filter((w) => w.path === only) : agents;
   const openIssues = await github.paginate(github.rest.issues.listForRepo, { owner, repo, state: "open", labels: LABEL, per_page: 100 });
+  const { data: closedIssues } = await github.rest.issues.listForRepo({ owner, repo, state: "closed", labels: LABEL, sort: "updated", direction: "desc", per_page: 100 });
   const done = [];
-  for (const workflow of todo) done.push(`${workflow.name}: ${await reconcile({ github, owner, repo, workflow, openIssues, core })}`);
+  for (const workflow of todo) done.push(`${workflow.name}: ${await reconcile({ github, owner, repo, workflow, openIssues, closedIssues, core })}`);
   done.push(...(await retireLegacy({ github, owner, repo, core })));
   done.push(await dispatchDoctor({ github, owner, repo, core, ref: (context.payload.repository || {}).default_branch || "main" }));
   await core.summary.addList(done.length ? done : ["nothing to do"]).write();

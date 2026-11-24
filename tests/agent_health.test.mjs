@@ -165,3 +165,26 @@ test("the process-doctor is dispatched once for health issues it has not seen, w
   assert.equal(await H.dispatchDoctor(t.args), "doctor: not installed");
   assert.equal(t.calls.length, 0);
 });
+
+test("a streak whose issue was closed after its last failure opens no second issue", async () => {
+  const bad = run("failure", "2026-11-24T06:43:00Z");
+  const closed = [{ number: 101, closed_at: "2026-11-24T14:17:00Z", body: H.marker(WF.path) },
+                  { number: 50, closed_at: "2026-11-20T10:00:00Z", body: H.marker(WF.path) }];
+  let { calls, args } = fakeGithub([bad], { [bad.id]: crashed });
+  args.closedIssues = closed;
+  assert.equal(await H.reconcile(args), "handled in #101");
+  assert.equal(calls.length, 0);
+
+  // the duplicate opened before this rule closes as not planned
+  ({ calls, args } = fakeGithub([bad], { [bad.id]: crashed }, [{ number: 109, title: "x", body: H.marker(WF.path) }]));
+  args.closedIssues = closed;
+  assert.equal(await H.reconcile(args), "closed duplicate #109");
+  assert.deepEqual(calls.map((c) => c[0]), ["comment", "update"]);
+  assert.equal(calls[1][1].state_reason, "not_planned");
+
+  // a failure after the close is news: a new issue
+  const later = run("failure", "2026-11-24T15:00:00Z");
+  ({ calls, args } = fakeGithub([later, bad], { [later.id]: crashed, [bad.id]: crashed }));
+  args.closedIssues = closed;
+  assert.equal(await H.reconcile(args), "opened #200");
+});

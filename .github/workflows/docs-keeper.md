@@ -40,7 +40,8 @@ safe-outputs:
   # Detector failures stay in the run diagnostics; no ever-growing «[aw] Detection Runs» tracker.
   threat-detection:
     report-as-issue: false
-timeout-minutes: 10
+# its one good run of the week took 9 of 10 minutes (#107, process-doctor)
+timeout-minutes: 20
 ---
 
 # Docs keeper
