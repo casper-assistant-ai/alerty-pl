@@ -15,11 +15,20 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.23.2",
    "date": "2026-11-24",
-   "time": "2026-11-24T13:34:24Z",
-   "sha": "f185f5d",
+   "time": "2026-11-24T15:31:12+01:00",
+   "sha": "f5ea7cc",
    "changes": [
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "agent-health keeps the process-doctor's closures; docs-keeper gets 20 minutes (#107)",
+     "sha": "f5ea7cc",
+     "date": "2026-11-24",
+     "time": "2026-11-24T15:31:12+01:00"
+    },
     {
      "type": "chore",
      "scope": "process",

@@ -2,7 +2,11 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.23.2 (2026-11-24)
+
+### fix
+
+- **agents:** agent-health keeps the process-doctor's closures; docs-keeper gets 20 minutes (#107) ([f5ea7cc](https://github.com/casper-assistant-ai/alerty-pl/commit/f5ea7cc))
 
 ### chore
 
