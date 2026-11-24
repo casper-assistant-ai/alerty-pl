@@ -14,8 +14,13 @@ strict: true
 engine:
   id: claude
   model: glm-5.4
+  # z.ai answers 529 (1305 «temporarily overloaded») for one model at a time at peak hours;
+  # the api-proxy then retries the same request on the next model.
+  fallback-models: [glm-5.3, glm-5.1]
   env:
     ANTHROPIC_BASE_URL: https://api.z.ai/api/anthropic
+    # gh-aw sets 0 so its harness retries; the harness does not count 1305 as overloaded.
+    CLAUDE_CODE_MAX_RETRIES: "6"
 imports:
   - shared/zai.md
 network:
