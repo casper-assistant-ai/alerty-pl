@@ -172,6 +172,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const third = (p) => p.kind.endsWith("-3rd");
 const isLive = (p) => third(p) && String(p.url || "").startsWith(LIVE);
+// GIBS answers a WMTS tile it has no data for with 404 and a transparent image: an empty tile, which the map
+// shows blank, not a failed request (visit() keeps the response's mimeType on the problem for this)
+const blank = (p) => p.kind === "http-3rd" && /^404 /.test(p.detail) && /^image\//.test(p.mimeType || "");
 const host = (url) => { try { return new URL(url).host; } catch { return url; } };
 // the items with their counts, the most frequent first
 function tally(items) {
@@ -181,12 +184,15 @@ function tally(items) {
 }
 
 // One page view's problems sorted out: what the view reports, and the live service's failed requests
-// (for liveLine). A few failed 3rd-party tiles (a satellite day with no image) are normal; many are
-// not. The stream's reconnects are not tiles: counted with them, they tipped the NASA view over the
+// (for liveLine). A few failed 3rd-party tiles are normal; many are not. GIBS's empty tile (blank) is
+// no failure and is left out of the count: the fires view asks three layers of 256 px tiles, 36 and
+// more on the desktop view (#94). Every network failure (the ERR_BLOCKED_BY_ORB of #73), every 404
+// with another body and every other status counts.
+// The stream's reconnects are not tiles: counted with them, they tipped the NASA view over the
 // limit on every run of a service outage (#61, #70).
 export function judge(problems) {
   const live = problems.filter(isLive);
-  const tiles = problems.filter((p) => third(p) && !isLive(p));
+  const tiles = problems.filter((p) => third(p) && !isLive(p) && !blank(p));
   const rest = problems.filter((p) => !third(p));
   if (tiles.length > 8) {
     const hosts = tally(tiles.map((p) => host(p.url))).map(([h, n]) => `${n} × ${h}`);
@@ -226,7 +232,8 @@ async function visit(cdp, sid, page, vp) {
         if (p.response.status >= 400) {
           const own = p.response.url.startsWith(origin);
           const url = p.response.url.slice(0, 200);
-          problems.push({ kind: own ? "http" : "http-3rd", detail: `${p.response.status} ${url}`, url });
+          // mimeType stays on the problem: a 404 whose body is an image is GIBS's empty tile, which judge() leaves out
+          problems.push({ kind: own ? "http" : "http-3rd", detail: `${p.response.status} ${url}`, url, mimeType: p.response.mimeType });
         }
         break;
       case "Network.loadingFailed": {
