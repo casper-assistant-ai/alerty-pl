@@ -92,17 +92,19 @@ within 7 days, each tied to a number in `process/retro-log.md`). Every agent fol
 <!-- process:start -->
 - Target: at least half of the agent output is product work (feat, fix, perf, refactor, test):
   merged PRs that change the map, history, analytics, parser, tests or site check. Data commits,
-  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-23: 69% (11 product
-  PRs, 5 docs/chore + reports); every live day so far (11-21..11-23) merged product. Hold that:
+  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-24: 64% (18 product
+  PRs, 10 docs/chore + reports); 11-21..11-23 merged product, 11-24 had none by the retro. Hold that:
   ≥ 50%, at least 4 product PRs a week, no live day without a merge.
 - Builders (site-designer, site-fixer, parser-doctor, region-keeper, test-improver, docs-keeper):
   before your own plan, look for open issues labelled `dev-task` that name you or fit your paths.
   Take the oldest one, and say `Closes #<n>` in the PR body. Call `noop` only when no dev-task fits
   and your own checklist finds nothing worth a PR.
-- Dev-tasks: the 2026-11-22 one landed (map legend category filter, PR #29). Open for
-  site-designer: let Historia take a period `?od=&do=` (chip like the powiat one) and carry it
-  from the map's «pełna historia» links. parser-doctor and site-fixer noop by design while
-  the parser and the site are green — that is a clean bill, not idleness.
+- The gate's live parse needs gov.pl. While the last Update data run fails on `fetch failed`, hold
+  the PR and say so on the issue: the gate closes it unjudged and two closed PRs are a give-up (#73).
+  A parser-doctor run started by such a red run has nothing to parse: `noop`, no issue.
+- Dev-tasks: the 11-23 one landed (Historia period, PR #71). Open for site-designer: the FIRMS fires
+  from GIBS WMTS with a note when a tile fails (the change of #73). site-fixer and parser-doctor
+  noop by design while the site and the parser are green — that is a clean bill, not idleness.
 - Reporters (daily-status, ci-doctor, security-auditor): when a report finds something to build or
   fix, name the builder that should take it, so the next retro can turn it into a dev-task.
 <!-- process:end -->
