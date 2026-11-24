@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### chore
+
+- **process:** ledger, step-limit rule and log-reading item (#99) ([f185f5d](https://github.com/casper-assistant-ai/alerty-pl/commit/f185f5d))
+
 ## 1.23.1 (2026-11-24)
 
 ### fix

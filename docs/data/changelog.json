@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-24",
+   "time": "2026-11-24T13:34:24Z",
+   "sha": "f185f5d",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "ledger, step-limit rule and log-reading item (#99)",
+     "sha": "f185f5d",
+     "date": "2026-11-24",
+     "time": "2026-11-24T13:34:24Z"
+    }
+   ]
+  },
+  {
    "version": "1.23.1",
    "date": "2026-11-24",
    "time": "2026-11-24T09:00:58+01:00",
