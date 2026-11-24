@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": "1.23.3",
+   "date": "2026-11-24",
+   "time": "2026-11-24T14:55:55Z",
+   "sha": "7627b70",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "map",
+     "breaking": false,
+     "text": "take the FIRMS fires from GIBS WMS again; WMTS served no FIRMS tile (#100) (#106)",
+     "sha": "7627b70",
+     "date": "2026-11-24",
+     "time": "2026-11-24T14:55:55Z"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "rules for the site-fixer timeouts and the pr-fixer patch size, ledger of 7 days (#108)",
+     "sha": "88ce945",
+     "date": "2026-11-24",
+     "time": "2026-11-24T14:55:34Z"
+    }
+   ]
+  },
+  {
    "version": "1.23.2",
    "date": "2026-11-24",
    "time": "2026-11-24T15:31:12+01:00",

@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.23.3 (2026-11-24)
+
+### fix
+
+- **map:** take the FIRMS fires from GIBS WMS again; WMTS served no FIRMS tile (#100) (#106) ([7627b70](https://github.com/casper-assistant-ai/alerty-pl/commit/7627b70))
+
+### chore
+
+- **process:** rules for the site-fixer timeouts and the pr-fixer patch size, ledger of 7 days (#108) ([88ce945](https://github.com/casper-assistant-ai/alerty-pl/commit/88ce945))
+
 ## 1.23.2 (2026-11-24)
 
 ### fix
