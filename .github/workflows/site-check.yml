@@ -69,9 +69,10 @@ jobs:
           else
             echo "same problems as already reported in #$n"
           fi
-          # one fixer at a time: skip when a fixer PR is open
+          # one fixer at a time: skip when a fixer PR is open or a fixer run is still going (#98)
           open=$(gh pr list --state open --search 'in:title "[site-fixer]"' --json number --jq length)
-          if [ "$open" = "0" ]; then gh workflow run site-fixer.lock.yml || true; fi
+          running=$(gh run list --workflow site-fixer.lock.yml --limit 5 --json status --jq '[.[] | select(.status != "completed")] | length')
+          if [ "$open" = "0" ] && [ "$running" = "0" ]; then gh workflow run site-fixer.lock.yml || true; fi
       - name: Close the issue when the site is clean
         if: steps.visit.outputs.rc == '0'
         run: |
