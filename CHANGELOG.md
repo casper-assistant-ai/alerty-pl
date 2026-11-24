@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.23.0 (2026-11-24)
+
+### feat
+
+- **agents:** the process-doctor looks again every 4 h while its issues stay open ([80e7bfe](https://github.com/casper-assistant-ai/alerty-pl/commit/80e7bfe))
+
+### fix
+
+- **site-check:** no second site-fixer while one still runs (#98) ([bfbac04](https://github.com/casper-assistant-ai/alerty-pl/commit/bfbac04))
+
 ## 1.22.1 (2026-11-24)
 
 ### fix
