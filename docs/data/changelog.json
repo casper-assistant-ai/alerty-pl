@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.23.4",
+   "date": "2026-11-24",
+   "time": "2026-11-24T16:28:07+01:00",
+   "sha": "6be9149",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "agent-health",
+     "breaking": false,
+     "text": "recheck agents with open issues on every workflow_run event; the :17/:47 schedule is often skipped for hours",
+     "sha": "6be9149",
+     "date": "2026-11-24",
+     "time": "2026-11-24T16:28:07+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.23.3",
    "date": "2026-11-24",
    "time": "2026-11-24T14:55:55Z",

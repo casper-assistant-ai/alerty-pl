@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.23.4 (2026-11-24)
+
+### fix
+
+- **agent-health:** recheck agents with open issues on every workflow_run event; the :17/:47 schedule is often skipped for hours ([6be9149](https://github.com/casper-assistant-ai/alerty-pl/commit/6be9149))
+
 ## 1.23.3 (2026-11-24)
 
 ### fix

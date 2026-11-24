@@ -3,6 +3,66 @@
  "parser": 2,
  "alerts": [
   {
+   "title": "Alert RCB - zagrożenie atakiem z powietrza (24.11)",
+   "date": "2026-11-24",
+   "category": "air",
+   "updates": [
+    {
+     "time": null,
+     "message": "UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.",
+     "ended": true,
+     "regions": {
+      "voivodeships": [
+       "lubelskie"
+      ],
+      "powiaty": [
+       "lubelskie/bilgorajski",
+       "lubelskie/chelm",
+       "lubelskie/chelmski",
+       "lubelskie/hrubieszowski",
+       "lubelskie/krasnostawski",
+       "lubelskie/leczynski",
+       "lubelskie/swidnicki",
+       "lubelskie/tomaszowski",
+       "lubelskie/wlodawski",
+       "lubelskie/zamojski",
+       "lubelskie/zamosc"
+      ],
+      "whole": [],
+      "gminy": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie części województwa lubelskiego - powiaty: włodawski, łęczyński, świdnicki, Chełm, chełmski, krasnostawski, hrubieszowski, Zamość, zamojski, tomaszowski, biłgorajski."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "lubelskie"
+    ],
+    "powiaty": [
+     "lubelskie/bilgorajski",
+     "lubelskie/chelm",
+     "lubelskie/chelmski",
+     "lubelskie/hrubieszowski",
+     "lubelskie/krasnostawski",
+     "lubelskie/leczynski",
+     "lubelskie/swidnicki",
+     "lubelskie/tomaszowski",
+     "lubelskie/wlodawski",
+     "lubelskie/zamojski",
+     "lubelskie/zamosc"
+    ],
+    "whole": [],
+    "gminy": []
+   },
+   "id": "alert-rcb---zagrozenie-atakiem-z-powietrza-2411",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---zagrozenie-atakiem-z-powietrza-2411",
+   "intro": "\"UWAGA! Rosyjski atak powietrzny na Ukrainie. Sytuacja jest monitorowana. Podniesiono gotowość Systemu Obrony Powietrznej RP. Oczekuj dalszych komunikatów.\"",
+   "status": "ended",
+   "started_at": "2026-11-24T00:00:00+01:00",
+   "last_at": "2026-11-24T00:00:00+01:00",
+   "parser": 2
+  },
+  {
    "title": "Alert RCB - atak z powietrza (23.11)",
    "date": "2026-11-23",
    "category": "air",
