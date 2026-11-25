@@ -4,7 +4,8 @@
 It catches markup that a browser repairs silently but that shows to a visitor: a quote inside an
 attribute value that ends it early (22.11.2026: a link inside <meta name="description"> printed
 'powiadomienia.">' at the top of every page), stray text in <head>, tags that close the wrong
-element or stay open, duplicate ids, and a page without lang, title, description or viewport.
+element or stay open, duplicate ids, a page without lang, title, description or viewport, and one
+without a Content-Security-Policy in <head>.
 
     python3 -I scripts/html_check.py [FILE ...]   (default: docs/*.html)
 
@@ -35,6 +36,7 @@ class Checker(HTMLParser):
         self.head_seen = False
         self.raw: str | None = None
         self.has = {"lang": False, "title": False, "description": False, "viewport": False}
+        self.csp: str | None = None  # the content of the page's Content-Security-Policy, in <head>
 
     def bad(self, msg: str) -> None:
         self.problems.append((self.getpos()[0], msg))
@@ -72,6 +74,10 @@ class Checker(HTMLParser):
             self.has["description"] = True
         if tag == "meta" and a.get("name") == "viewport":
             self.has["viewport"] = True
+        # only in <head>: a policy further down lets everything above it load unchecked
+        if (tag == "meta" and self.in_head and (a.get("http-equiv") or "").lower() == "content-security-policy"
+                and (a.get("content") or "").strip()):
+            self.csp = self.csp or a["content"]
 
     def handle_endtag(self, tag: str) -> None:
         if self.raw == tag:
@@ -103,6 +109,8 @@ class Checker(HTMLParser):
                        ("description", 'no <meta name="description">'), ("viewport", 'no <meta name="viewport">')):
             if not self.has[k]:
                 self.problems.append((1, msg))
+        if self.csp is None:
+            self.problems.append((1, 'no <meta http-equiv="Content-Security-Policy"> in <head>'))
 
 
 def check(text: str) -> list[tuple[int, str]]:
@@ -110,6 +118,19 @@ def check(text: str) -> list[tuple[int, str]]:
     c.feed(text)
     c.close()
     return sorted(c.problems)
+
+
+def policy(text: str) -> dict[str, set[str]]:
+    """The Content-Security-Policy of a page as {directive: sources}; {} without one."""
+    c = Checker()
+    c.feed(text)
+    c.close()
+    out: dict[str, set[str]] = {}
+    for part in (c.csp or "").split(";"):
+        name, *sources = part.split()
+        if name:
+            out[name] = set(sources)
+    return out
 
 
 def main(argv: list[str]) -> int:
