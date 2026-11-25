@@ -15,11 +15,38 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.24.0",
    "date": "2026-11-25",
-   "time": "2026-11-25T11:28:23+01:00",
-   "sha": "5c71f12",
+   "time": "2026-11-25T11:20:59Z",
+   "sha": "cd04f0d",
    "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "the 429 quota outage of 11-25: a rule, a ledger row for the gate's loop, a classifier item (#137)",
+     "sha": "cd04f0d",
+     "date": "2026-11-25",
+     "time": "2026-11-25T11:20:59Z"
+    },
+    {
+     "type": "feat",
+     "scope": "site",
+     "breaking": false,
+     "text": "PL/EN/UK base — dictionaries, t() in common.js, language switcher, shared chrome (#128)",
+     "sha": "8172103",
+     "date": "2026-11-25",
+     "time": "2026-11-25T11:09:47Z"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "retro 2026-11-25, dev share 66% (#126)",
+     "sha": "a7cbc4e",
+     "date": "2026-11-25",
+     "time": "2026-11-25T10:34:22Z"
+    },
     {
      "type": "chore",
      "scope": "deps",

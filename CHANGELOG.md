@@ -2,10 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.24.0 (2026-11-25)
+
+### feat
+
+- **site:** PL/EN/UK base — dictionaries, t() in common.js, language switcher, shared chrome (#128) ([8172103](https://github.com/casper-assistant-ai/alerty-pl/commit/8172103))
 
 ### chore
 
+- **process:** the 429 quota outage of 11-25: a rule, a ledger row for the gate's loop, a classifier item (#137) ([cd04f0d](https://github.com/casper-assistant-ai/alerty-pl/commit/cd04f0d))
+- **process:** retro 2026-11-25, dev share 66% (#126) ([a7cbc4e](https://github.com/casper-assistant-ai/alerty-pl/commit/a7cbc4e))
 - **deps:** drop the temporary Dependabot entry for the dependabot-test branch ([5c71f12](https://github.com/casper-assistant-ai/alerty-pl/commit/5c71f12))
 
 ## 1.23.7 (2026-11-25)
