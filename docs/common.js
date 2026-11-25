@@ -276,8 +276,16 @@ const RCB = (() => {
     const parts = (search || "").replace(/^\?/, "").split("&").filter((p) => p && p.split("=")[0] !== "lang");
     return "?" + parts.concat("lang=" + code).join("&");
   }
-  // on DOM ready: the links of the switcher (the current one aria-current); in another language also <html lang>,
-  // <title> and the text or aria-label of every [data-i18n] element. A page that chose no language stays as it is.
+  // the pages rewrite their URL after load (the period, the view, the place: history.replaceState fires no event), so
+  // the href set on DOM ready goes stale: when a switcher link is followed, point it at the URL of the moment again
+  function langClick(e) {
+    const el = e && e.target;
+    const a = el && typeof el.closest === "function" ? el.closest("a[data-lang]") : null;
+    if (a) a.setAttribute("href", langUrl(typeof location !== "undefined" ? location.search : "", a.dataset.lang));
+  }
+  // on DOM ready: the links of the switcher (the current one aria-current) and the click handler that keeps them
+  // current; in another language also <html lang>, <title> and the text or aria-label of every [data-i18n] element.
+  // A page that chose no language stays as it is.
   function applyI18n(doc = document) {
     if (typeof doc.querySelectorAll !== "function") return "pl";
     const search = typeof location !== "undefined" ? location.search : "";
@@ -288,6 +296,10 @@ const RCB = (() => {
     for (const a of doc.querySelectorAll("nav.langs a[data-lang]")) {
       a.setAttribute("href", langUrl(search, a.dataset.lang));
       if (a.dataset.lang === code) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+    }
+    // click (also Enter and Ctrl+click) and auxclick (the middle button): the same listener twice is added once
+    for (const nav of doc.querySelectorAll("nav.langs")) {
+      if (typeof nav.addEventListener === "function") for (const type of ["click", "auxclick"]) nav.addEventListener(type, langClick);
     }
     if (code === "pl") return code;
     doc.documentElement.lang = code;

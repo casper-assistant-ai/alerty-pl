@@ -10,10 +10,15 @@ const i18n = new Function(`${read("docs/i18n.js")}\n;return I18N;`)();
 const CODES = ["pl", "en", "uk"];
 
 // common.js with the dictionaries: a document stub whose querySelectorAll answers per selector, as a page's
-// marked elements; `loc` is { search }, `store` a localStorage stub
+// marked elements; `loc` is the { search } of the page's location (a test may rewrite it, as the pages do), `store`
+// a localStorage stub. The nav records its listeners as a browser does: the same callback for one type is added once.
 function load({ search = "", store = {}, doc } = {}) {
+  const link = (l) => ({ dataset: { lang: l }, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, removeAttribute(k) { delete this.attrs[k]; },
+    closest(s) { return s === "a[data-lang]" ? this : null; } });
+  const nav = { listeners: {}, addEventListener(type, fn) { (this.listeners[type] ||= new Set()).add(fn); } };
   const els = {
-    "nav.langs a[data-lang]": ["pl", "en", "uk"].map((l) => ({ dataset: { lang: l }, attrs: {}, setAttribute(k, v) { this.attrs[k] = v; }, removeAttribute(k) { delete this.attrs[k]; } })),
+    "nav.langs": [nav],
+    "nav.langs a[data-lang]": ["pl", "en", "uk"].map(link),
     "[data-i18n]": [{ dataset: { i18n: "src", i18nParamName: "src.psp" } }, { dataset: { i18n: "tab.map" } }],
     "[data-i18n-aria]": [{ dataset: { i18nAria: "nav.tabs" }, setAttribute(k, v) { this.attrs = { [k]: v }; } }],
   };
@@ -22,10 +27,13 @@ function load({ search = "", store = {}, doc } = {}) {
     querySelector: (s) => (s === "title[data-i18n-title]" ? title : null),
     querySelectorAll: (s) => els[s] || [] };
   const store0 = { getItem: (k) => store[k] ?? null, setItem: (k, v) => { store[k] = v; } };
-  const RCB = new Function("document", "location", "localStorage", `${read("docs/i18n.js")}\n${read("docs/common.js")}\n;return RCB;`)(d, { search }, store0);
-  return { RCB, d, els, store };
+  const loc = { search };
+  const RCB = new Function("document", "location", "localStorage", `${read("docs/i18n.js")}\n${read("docs/common.js")}\n;return RCB;`)(d, loc, store0);
+  return { RCB, d, els, store, loc, nav };
 }
 const text = (html, re) => [...html.matchAll(re)];
+// the browser dispatches `type` on `target` inside the switcher
+const fire = (nav, type, target) => { for (const fn of nav.listeners[type] || []) fn({ target }); };
 
 test("the three dictionaries have the same keys and no empty text", () => {
   assert.deepEqual(Object.keys(i18n), CODES);
@@ -48,10 +56,17 @@ test("every marked element of every page names a key of all three dictionaries",
   }
 });
 
-test("the Polish dictionary says what each page says", () => {
+// a marked element: data-i18n is its first attribute or a later one; its text is its own, with no child element
+const MARKED = /<([a-z0-9]+)\s([^<>]*?)data-i18n="([^"]+)"([^<>]*)>([^<]+)<\/\1>/g;
+
+test("the Polish dictionary says what each page says: every data-i18n mark is compared", () => {
   for (const f of PAGES) {
     const html = read("docs/" + f);
-    for (const [, , before, key, after, txt] of text(html, /<([a-z0-9]+)\s([^<>]*?)\sdata-i18n="([^"]+)"([^<>]*)>([^<]+)<\/\1>/g)) {
+    const marks = text(html, /\sdata-i18n="([^"]+)"/g).map((m) => m[1]);
+    const compared = text(html, MARKED).map((m) => m[3]);
+    const missed = marks.filter((k) => !compared.includes(k));
+    assert.equal(compared.length, marks.length, `${f}: ${marks.length} data-i18n marks, ${compared.length} compared; not compared: ${missed.join(", ") || "none"}`);
+    for (const [, , before, key, after, txt] of text(html, MARKED)) {
       const params = {};
       for (const [, n, k] of text(before + after, /data-i18n-param-(\w+)="([^"]+)"/g)) params[n] = i18n.pl[k];
       assert.equal(i18n.pl[key].replace("{name}", params.name ?? "{name}"), txt, `${f}: ${key}`);
@@ -64,7 +79,10 @@ test("the Polish dictionary says what each page says", () => {
 test("every page loads i18n.js before common.js and has the switcher", () => {
   for (const f of PAGES) {
     const html = read("docs/" + f);
-    assert.ok(html.indexOf('src="i18n.js" defer') < html.indexOf('src="common.js" defer'), f);
+    const i18nAt = html.indexOf('src="i18n.js" defer'), commonAt = html.indexOf('src="common.js" defer');
+    assert.ok(i18nAt >= 0, `${f}: i18n.js is not loaded`);
+    assert.ok(commonAt >= 0, `${f}: common.js is not loaded`);
+    assert.ok(i18nAt < commonAt, `${f}: i18n.js must load before common.js`);
     assert.match(html, /<nav class="langs" aria-label="[^"]+" data-i18n-aria="nav\.langs">/);
     assert.deepEqual(text(html, /<a href="\?lang=(\w+)" hreflang="\w+" lang="\w+" data-lang="\w+" aria-label="[^"]+" data-i18n-aria="lang\.\w+"( aria-current="true")?>[A-Z]{2}<\/a>/g).map((m) => m[1]), ["pl", "en", "uk"], f);
     assert.match(html, /<nav class="tabs" aria-label="Strony" data-i18n-aria="nav\.tabs">/);
@@ -128,6 +146,27 @@ test("applyI18n(): ?lang=uk translates the chrome, sets <html lang> and <title>,
   assert.equal(els["nav.langs a[data-lang]"][2].attrs["aria-current"], "true");
   assert.equal(els["nav.langs a[data-lang]"][2].attrs.href, "?srodek=52,21&lang=uk");
   assert.equal(store["alerty-lang"], "uk");
+});
+
+test("a switcher link followed after the page rewrote location.search carries the new parameters", () => {
+  const { RCB, d, els, loc, nav } = load({ search: "?lang=uk&zoom=7" });
+  RCB.applyI18n(d);
+  assert.deepEqual(Object.keys(nav.listeners).sort(), ["auxclick", "click"]); // once at load and once here: added once
+  assert.equal(nav.listeners.click.size, 1);
+  const [pl, en, uk] = els["nav.langs a[data-lang]"];
+  assert.equal(en.attrs.href, "?zoom=7&lang=en");
+  // the visitor picks a period and moves the map (app.js: setPeriod, viewURL), so the URL is no longer the one at load
+  const now = "?lang=uk&srodek=52.2297,21.0122&zoom=9&od=2026-11-01&do=2026-11-20&podklad=esri&zdjecie=2026-10-01";
+  loc.search = now;
+  const kept = "?srodek=52.2297,21.0122&zoom=9&od=2026-11-01&do=2026-11-20&podklad=esri&zdjecie=2026-10-01";
+  fire(nav, "click", en); // the browser dispatches click, then follows the href
+  assert.equal(en.attrs.href, kept + "&lang=en");
+  fire(nav, "click", pl);
+  assert.equal(pl.attrs.href, kept + "&lang=pl");
+  fire(nav, "auxclick", uk); // the middle button
+  assert.equal(uk.attrs.href, kept + "&lang=uk");
+  fire(nav, "click", nav); // beside the links: nothing is followed and nothing changes
+  assert.deepEqual([pl, en, uk].map((a) => a.attrs.href), [kept + "&lang=pl", kept + "&lang=en", kept + "&lang=uk"]);
 });
 
 test("without docs/i18n.js common.js still loads and t() gives the key back", () => {
