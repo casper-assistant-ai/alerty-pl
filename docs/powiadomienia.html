@@ -25,44 +25,44 @@
   <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="src" data-i18n-param-name="src.gov">źródło: gov.pl/web/rcb</a>
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
-<div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
+<div class="strip" id="strip"><span class="state" role="status" data-i18n="strip.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main>
   <div class="page-head">
     <div>
-      <h1>Powiadomienia</h1>
-      <p>Nowy Alert RCB przychodzi w ciągu minuty od komunikatu na gov.pl: serwer sprawdza go co 20 sekund. Wybierz obszar, a potem kanał. Strona jest nieoficjalna; prawdziwe Alerty RCB nadal przychodzą SMS-em.</p>
+      <h1 data-i18n="notif.h1">Powiadomienia</h1>
+      <p data-i18n="notif.lead">Nowy Alert RCB przychodzi w ciągu minuty od komunikatu na gov.pl: serwer sprawdza go co 20 sekund. Wybierz obszar, a potem kanał. Strona jest nieoficjalna; prawdziwe Alerty RCB nadal przychodzą SMS-em.</p>
     </div>
   </div>
   <div class="notify">
     <section class="card" aria-labelledby="h-area">
-      <h2 id="h-area">Obszar</h2>
-      <p class="sub">Bez zaznaczenia: cała Polska. Alerty dla całego kraju przychodzą zawsze.</p>
+      <h2 id="h-area" data-i18n="notif.area.h">Obszar</h2>
+      <p class="sub" data-i18n="notif.area.sub">Bez zaznaczenia: cała Polska. Alerty dla całego kraju przychodzą zawsze.</p>
       <div class="areas" id="areas"></div>
-      <label class="chk"><input type="checkbox" id="drills"> <span>Także ćwiczenia i testy syren</span></label>
+      <label class="chk"><input type="checkbox" id="drills"> <span data-i18n="notif.drills">Także ćwiczenia i testy syren</span></label>
     </section>
     <div class="channels">
       <section class="card" id="c-tg" aria-labelledby="h-tg">
         <h2 id="h-tg">Telegram</h2>
-        <p>Bot wyśle każdy alert z wybranego obszaru. Wyłączysz go komendą /stop.</p>
-        <button type="button" class="btn" id="tg-go">Otwórz bota</button>
+        <p data-i18n="notif.tg.p">Bot wyśle każdy alert z wybranego obszaru. Wyłączysz go komendą /stop.</p>
+        <button type="button" class="btn" id="tg-go" data-i18n="notif.tg.go">Otwórz bota</button>
         <div class="out" id="tg-out" role="status"></div>
       </section>
       <section class="card" id="c-mail" aria-labelledby="h-mail">
-        <h2 id="h-mail">E-mail</h2>
-        <p>Najpierw przyjdzie list z linkiem potwierdzenia. Każdy list ma link do wypisania.</p>
+        <h2 id="h-mail" data-i18n="notif.mail.h">E-mail</h2>
+        <p data-i18n="notif.mail.p">Najpierw przyjdzie list z linkiem potwierdzenia. Każdy list ma link do wypisania.</p>
         <form id="mail-form">
-          <label class="visually-hidden" for="mail">Adres e-mail</label>
+          <label class="visually-hidden" for="mail" data-i18n="notif.mail.label">Adres e-mail</label>
           <input type="email" id="mail" required autocomplete="email" placeholder="adres@przyklad.pl">
           <p></p>
-          <button type="submit" class="btn">Zapisz</button>
+          <button type="submit" class="btn" data-i18n="notif.mail.save">Zapisz</button>
         </form>
         <div class="out" id="mail-out" role="status"></div>
       </section>
       <section class="card" id="c-push" aria-labelledby="h-push">
-        <h2 id="h-push">Przeglądarka</h2>
-        <p>Powiadomienie systemowe w tej przeglądarce, także przy zamkniętej karcie. Na iPhonie: najpierw „Do ekranu początkowego”.</p>
-        <button type="button" class="btn" id="push-go">Włącz</button>
-        <button type="button" class="btn" id="push-off" hidden>Wyłącz</button>
+        <h2 id="h-push" data-i18n="notif.push.h">Przeglądarka</h2>
+        <p data-i18n="notif.push.p">Powiadomienie systemowe w tej przeglądarce, także przy zamkniętej karcie. Na iPhonie: najpierw „Do ekranu początkowego”.</p>
+        <button type="button" class="btn" id="push-go" data-i18n="notif.push.on">Włącz</button>
+        <button type="button" class="btn" id="push-off" data-i18n="notif.push.off" hidden>Wyłącz</button>
         <div class="out" id="push-out" role="status"></div>
       </section>
     </div>
@@ -76,6 +76,7 @@
   </div>
 </footer>
 <script src="i18n.js" defer></script>
+<script src="i18n-notify.js" defer></script>
 <script src="common.js" defer></script>
 <script src="notify.js" defer></script>
 </body>

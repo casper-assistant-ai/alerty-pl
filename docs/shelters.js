@@ -4,14 +4,16 @@
 // points in view. The user gives a location (the phone's GPS, an address via Nominatim, or a tap
 // on the map); the nearest points get a distance and a «Nawiguj» button that offers the map apps
 // of the phone (geo: chooser on Android, Apple Maps, Google Maps, Waze).
+// The interface texts are in docs/i18n-shelters.js (PL / EN / UK); the shelters' own data stays as published.
 "use strict";
 
 const { $, h } = RCB;
+const T = (key, params) => RCB.t(key, params);
 RCB.strip();
 setInterval(RCB.strip, 60000);
 
 const DATA = "data/shelters/";
-const ACCESS = ["dostępne całodobowo", "w określonych godzinach", "na żądanie"];
+const ACCESS = [0, 1, 2].map((i) => T("shel.acc." + i));
 const DETAIL_ZOOM = 12;   // from this zoom on the points themselves are drawn
 const NEAREST = 10;
 const WALK_KM = 2.5;      // up to this distance the navigation asks for a walking route
@@ -35,14 +37,16 @@ function km(a, b, c, d) {
   const x = Math.sin(rad(c - a) / 2) ** 2 + Math.cos(rad(a)) * Math.cos(rad(c)) * Math.sin(rad(d - b) / 2) ** 2;
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
 }
-const fmtKm = (d) => d < 1 ? `${Math.max(10, Math.round(d * 1000 / 10) * 10)} m` : `${d.toFixed(d < 10 ? 1 : 0).replace(".", ",")} km`;
+// a distance: metres under a kilometre, then km with one decimal under ten; the decimal mark of the language
+const fmtKm = (d) => d < 1 ? T("shel.m", { n: Math.max(10, Math.round(d * 1000 / 10) * 10) })
+  : T("shel.km", { n: d.toFixed(d < 10 ? 1 : 0).replace(".", RCB.lang() === "en" ? "." : ",") });
 const cellKey = (r, c) => `${r}_${c}`;
 const cellOf = (lat, lon) => [Math.floor(lat / S.index.cell), Math.floor(lon / S.index.cell)];
 
 // ---------- data ----------
 async function loadIndex() {
   const r = await fetch(DATA + "index.json?t=" + Math.floor(Date.now() / 3600000));
-  if (!r.ok) throw new Error("schrony: " + r.status);
+  if (!r.ok) throw new Error(T("shel.err.index", { status: r.status }));
   return r.json();
 }
 function loadCell(key) {
@@ -50,7 +54,7 @@ function loadCell(key) {
   if (!S.cells.has(key)) {
     const v = encodeURIComponent(S.index.updated_at);
     S.cells.set(key, fetch(`${DATA}t/${key}.json?v=${v}`).then((r) => {
-      if (!r.ok) throw new Error(`schrony ${key}: ${r.status}`);
+      if (!r.ok) throw new Error(T("shel.err.cell", { key, status: r.status }));
       return r.json();
     }).then((rows) => rows.map((p) => ({ lat: p[0], lon: p[1], addr: p[2], gmina: p[3], access: p[4], key }))
     ).catch((e) => { S.cells.delete(key); throw e; }));
@@ -108,7 +112,7 @@ function drawOverview() {
       renderer: S.renderer, radius: 2.5 + 12 * Math.sqrt(n / max), weight: 1,
       className: "cell", color: accColor("cell"), fillColor: accColor("cell"), fillOpacity: 0.28, opacity: 0.6,
     });
-    m.bindTooltip(`${n.toLocaleString("pl-PL")} ${RCB.plural(n, "punkt", "punkty", "punktów")} schronienia`, { className: "tip", direction: "top" });
+    m.bindTooltip(RCB.tn(n, "shel.places", { n: n.toLocaleString(RCB.loc()) }), { className: "tip", direction: "top" });
     m.on("click", () => S.map.setView([lat, lon], DETAIL_ZOOM));
     m.cellKey = key;
     S.overview.addLayer(m);
@@ -150,11 +154,11 @@ function pointMarker(p) {
 
 function popupBody(p) {
   const d = S.me ? km(S.me.lat, S.me.lon, p.lat, p.lon) : null;
-  const nav = h("button", { type: "button", class: "btn primary" }, "Nawiguj");
+  const nav = h("button", { type: "button", class: "btn primary" }, T("shel.navigate"));
   nav.addEventListener("click", () => navigate(p));
   return h("div", { class: "pop" },
-    h("b", { text: p.addr || "Punkt schronienia" }),
-    h("span", { class: "muted", text: [p.gmina && "gm. " + p.gmina, ACCESS[p.access], d != null && fmtKm(d) + " od Ciebie"].filter(Boolean).join(" · ") }),
+    h("b", { text: p.addr || T("shel.point") }),
+    h("span", { class: "muted", text: [p.gmina && T("shel.gm", { name: p.gmina }), ACCESS[p.access], d != null && T("shel.fromyou", { d: fmtKm(d) })].filter(Boolean).join(" · ") }),
     nav);
 }
 function openPopup(p, ll) {
@@ -173,21 +177,21 @@ async function setMe(lat, lon, label, accuracy) {
   if (S.meLayer) S.map.removeLayer(S.meLayer);
   const parts = [];
   if (accuracy && accuracy > 30) parts.push(L.circle([lat, lon], { radius: accuracy, className: "me-acc", interactive: false, weight: 1 }));
-  parts.push(L.circleMarker([lat, lon], { radius: 8, className: "me", weight: 3, fillOpacity: 1 }).bindTooltip(label || "Twoja lokalizacja", { className: "tip", direction: "top" }));
+  parts.push(L.circleMarker([lat, lon], { radius: 8, className: "me", weight: 3, fillOpacity: 1 }).bindTooltip(label || T("shel.me"), { className: "tip", direction: "top" }));
   S.meLayer = L.layerGroup(parts).addTo(S.map);
   const q = new URLSearchParams(location.search);
   q.set("lat", lat.toFixed(5)); q.set("lon", lon.toFixed(5));
   history.replaceState(null, "", "?" + q.toString());
-  note("Szukam najbliższych punktów…");
+  note(T("shel.note.searching"));
   try {
     S.near = await nearest(lat, lon);
   } catch (e) {
-    note("Nie udało się wczytać punktów schronienia: " + e.message, true);
+    note(T("shel.err.load", { msg: e.message }), true);
     return;
   }
   renderNear();
-  if (!S.near.length) { note("W promieniu 200 km nie ma punktów schronienia w danych PSP.", true); return; }
-  note((label ? label + ": " : "") + `najbliższe schronienie ${fmtKm(S.near[0].d)} stąd.`);
+  if (!S.near.length) { note(T("shel.err.none"), true); return; }
+  note((label ? label + ": " : "") + T("shel.note.nearest", { d: fmtKm(S.near[0].d) }));
   const pts = [[lat, lon], ...S.near.slice(0, 5).map((p) => [p.lat, p.lon])];
   S.map.fitBounds(L.latLngBounds(pts), { padding: [56, 56], maxZoom: 16 });
 }
@@ -197,22 +201,22 @@ function renderNear() {
   ol.replaceChildren();
   $("#near-count").textContent = S.near.length ? String(S.near.length) : "";
   S.near.forEach((p, i) => {
-    const show = h("button", { type: "button", class: "btn" }, "Pokaż");
+    const show = h("button", { type: "button", class: "btn" }, T("shel.show"));
     show.addEventListener("click", () => {
       S.map.setView([p.lat, p.lon], Math.max(S.map.getZoom(), 16));
       openPopup(p);
       if (matchMedia("(max-width: 1080px)").matches) $("#map").scrollIntoView({ behavior: "smooth", block: "center" });
     });
-    const nav = h("button", { type: "button", class: "btn primary" }, "Nawiguj");
+    const nav = h("button", { type: "button", class: "btn primary" }, T("shel.navigate"));
     nav.addEventListener("click", () => navigate(p));
     ol.append(h("li", {},
       h("div", { class: "sh-head" },
         h("span", { class: "sh-n mono", text: String(i + 1) }),
-        h("span", { class: "sh-addr", text: p.addr || "Punkt schronienia" }),
+        h("span", { class: "sh-addr", text: p.addr || T("shel.point") }),
         h("span", { class: "sh-d mono", text: fmtKm(p.d) })),
       h("div", { class: "sh-meta" },
         h("i", { class: `sw acc-${p.access}`, "aria-hidden": "true" }),
-        h("span", { text: [ACCESS[p.access], p.gmina && "gm. " + p.gmina].filter(Boolean).join(" · ") })),
+        h("span", { text: [ACCESS[p.access], p.gmina && T("shel.gm", { name: p.gmina })].filter(Boolean).join(" · ") })),
       h("div", { class: "sh-act" }, show, nav)));
   });
 }
@@ -222,23 +226,23 @@ function renderNear() {
 function deniedHint(silent) {
   const ua = navigator.userAgent;
   const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-  const head = silent ? "Telefon nie pyta o zgodę, bo lokalizacja jest zablokowana w ustawieniach. " : "Brak zgody na lokalizację. ";
-  if (ios) return head + "iPhone: Ustawienia → Prywatność i ochrona → Usługi lokalizacji → Witryny Safari → „Podczas używania aplikacji”; w Safari też aA → Ustawienia witryny → Lokalizacja → Pytaj. Potem odśwież stronę albo wpisz adres.";
-  if (/Android/.test(ua)) return head + "Android: ikona przy adresie strony → Uprawnienia → Lokalizacja → Zezwól; w telefonie włącz też Lokalizację. Potem odśwież stronę albo wpisz adres.";
-  return head + "Zezwól na nią w ustawieniach witryny (ikona przy adresie strony), odśwież stronę albo wpisz adres.";
+  const head = T(silent ? "shel.deny.silent" : "shel.deny.plain") + " ";
+  if (ios) return head + T("shel.deny.ios");
+  if (/Android/.test(ua)) return head + T("shel.deny.android");
+  return head + T("shel.deny.other");
 }
 
 function locate() {
-  if (!("geolocation" in navigator)) { note("Ta przeglądarka nie podaje lokalizacji. Wpisz adres.", true); return; }
-  note("Pytam telefon o lokalizację…");
+  if (!("geolocation" in navigator)) { note(T("shel.err.nogeo"), true); return; }
+  note(T("shel.note.asking"));
   $("#locate").disabled = true;
   const asked = Date.now();
   navigator.geolocation.getCurrentPosition(
-    (pos) => { $("#locate").disabled = false; setMe(pos.coords.latitude, pos.coords.longitude, "Twoja lokalizacja", pos.coords.accuracy); },
+    (pos) => { $("#locate").disabled = false; setMe(pos.coords.latitude, pos.coords.longitude, T("shel.me"), pos.coords.accuracy); },
     (err) => {
       $("#locate").disabled = false;
       note(err.code === 1 ? deniedHint(Date.now() - asked < 1500)
-        : "Nie udało się ustalić lokalizacji. Wpisz adres albo wskaż miejsce na mapie.", true);
+        : T("shel.err.nopos"), true);
     },
     { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 });
 }
@@ -248,7 +252,7 @@ async function geocode(q) {
     q, format: "jsonv2", countrycodes: "pl", limit: "5", "accept-language": "pl", addressdetails: "0",
   });
   const r = await fetch(url, { headers: { Accept: "application/json" } });
-  if (!r.ok) throw new Error("wyszukiwarka adresów: " + r.status);
+  if (!r.ok) throw new Error(T("shel.err.geosvc", { status: r.status }));
   return (await r.json()).map((x) => ({ lat: +x.lat, lon: +x.lon, name: x.display_name.split(", ").filter((t) => !/^(Polska|województwo |\d\d-\d{3}$)/.test(t)).slice(0, 3).join(", ") }));
 }
 
@@ -257,15 +261,15 @@ async function onSearch(e) {
   const q = $("#addr").value.trim();
   const list = $("#addr-results");
   list.hidden = true;
-  if (q.length < 3) { note("Wpisz co najmniej 3 znaki adresu.", true); return; }
-  note("Szukam adresu…");
+  if (q.length < 3) { note(T("shel.err.short"), true); return; }
+  note(T("shel.note.address"));
   let res;
-  try { res = await geocode(q); } catch (err) { note("Nie udało się wyszukać adresu: " + err.message, true); return; }
-  if (!res.length) { note("Nie znalazłem tego adresu w Polsce. Spróbuj z nazwą miejscowości.", true); return; }
+  try { res = await geocode(q); } catch (err) { note(T("shel.err.geocode", { msg: err.message }), true); return; }
+  if (!res.length) { note(T("shel.err.notfound"), true); return; }
   $("#addr").blur();
   setMe(res[0].lat, res[0].lon, res[0].name);
   if (res.length > 1) {
-    list.replaceChildren(h("li", { class: "muted", text: "Inne wyniki:" }), ...res.slice(1).map((x) => {
+    list.replaceChildren(h("li", { class: "muted", text: T("shel.others") }), ...res.slice(1).map((x) => {
       const b = h("button", { type: "button", class: "link" }, x.name);
       b.addEventListener("click", () => { list.hidden = true; setMe(x.lat, x.lon, x.name); });
       return h("li", {}, b);
@@ -278,7 +282,7 @@ function togglePick(on = !S.picking) {
   S.picking = on;
   $("#pick").setAttribute("aria-pressed", String(on));
   $("#map").classList.toggle("picking", on);
-  if (on) note("Dotknij mapy w miejscu, w którym jesteś.");
+  if (on) note(T("shel.note.tap"));
 }
 
 // ---------- navigation ----------
@@ -288,14 +292,14 @@ function navApps(p) {
   const ll = `${p.lat},${p.lon}`;
   const d = S.me ? km(S.me.lat, S.me.lon, p.lat, p.lon) : null;
   const walk = d != null && d <= WALK_KM;
-  const name = p.addr || "Punkt schronienia";
+  const name = p.addr || T("shel.point");
   const apple = { name: "Apple Maps", href: `https://maps.apple.com/?daddr=${ll}&dirflg=${walk ? "w" : "d"}&q=${encodeURIComponent(name)}` };
   const google = { name: "Google Maps", href: `https://www.google.com/maps/dir/?api=1&destination=${ll}&travelmode=${walk ? "walking" : "driving"}` };
   const waze = { name: "Waze", href: `https://waze.com/ul?ll=${ll}&navigate=yes` };
   const osm = { name: "OpenStreetMap", href: S.me
     ? `https://www.openstreetmap.org/directions?engine=${walk ? "fossgis_osrm_foot" : "fossgis_osrm_car"}&route=${S.me.lat.toFixed(5)},${S.me.lon.toFixed(5)};${ll}`
     : `https://www.openstreetmap.org/?mlat=${p.lat}&mlon=${p.lon}#map=18/${p.lat}/${p.lon}` };
-  if (ANDROID) return [{ name: "Aplikacja z telefonu…", sub: "system zapyta: Google Maps, Waze, Mapy.com i inne", href: `geo:${ll}?q=${ll}(${encodeURIComponent(name)})`, main: true }, google, waze, osm];
+  if (ANDROID) return [{ name: T("shel.nav.phone"), sub: T("shel.nav.phoneSub"), href: `geo:${ll}?q=${ll}(${encodeURIComponent(name)})`, main: true }, google, waze, osm];
   if (IOS) return [{ ...apple, main: true }, google, waze];
   return [{ ...google, main: true }, osm, apple];
 }
@@ -303,7 +307,7 @@ function navApps(p) {
 function navigate(p) {
   const dlg = $("#nav-sheet");
   const d = S.me ? km(S.me.lat, S.me.lon, p.lat, p.lon) : null;
-  $("#nav-to").textContent = (p.addr || "Punkt schronienia") + (d != null ? ` · ${fmtKm(d)}` : "") + (d != null ? (d <= WALK_KM ? " · trasa piesza" : " · trasa samochodem") : "");
+  $("#nav-to").textContent = (p.addr || T("shel.point")) + (d != null ? ` · ${fmtKm(d)}` : "") + (d != null ? " · " + T(d <= WALK_KM ? "shel.route.walk" : "shel.route.drive") : "");
   const ul = $("#nav-apps");
   ul.replaceChildren(...navApps(p).map((a) => {
     const link = h("a", { href: a.href, class: "app" + (a.main ? " main" : ""), target: a.href.startsWith("http") ? "_blank" : "_self", rel: "noopener" },
@@ -311,9 +315,9 @@ function navigate(p) {
     link.addEventListener("click", () => setTimeout(() => dlg.close(), 300));
     return h("li", {}, link);
   }), (() => {
-    const copy = h("button", { type: "button", class: "app" }, h("span", { text: "Kopiuj współrzędne" }), h("small", { class: "mono", text: `${p.lat}, ${p.lon}` }));
+    const copy = h("button", { type: "button", class: "app" }, h("span", { text: T("shel.nav.copy") }), h("small", { class: "mono", text: `${p.lat}, ${p.lon}` }));
     copy.addEventListener("click", async () => {
-      try { await navigator.clipboard.writeText(`${p.lat}, ${p.lon}`); copy.querySelector("span").textContent = "Skopiowano"; } catch { /* no clipboard */ }
+      try { await navigator.clipboard.writeText(`${p.lat}, ${p.lon}`); copy.querySelector("span").textContent = T("shel.nav.copied"); } catch { /* no clipboard */ }
     });
     return h("li", {}, copy);
   })());
@@ -325,11 +329,16 @@ async function main() {
   await RCB.leaflet(); // a dropped request for leaflet.js gets one retry here, not "L is not defined"
   S.index = await loadIndex();
   const upd = new Date(S.index.updated_at);
-  $("#about-data").textContent = `${S.index.count.toLocaleString("pl-PL")} punktów, dane z ${RCB.fmtDay(upd)}: ${S.index.source} (dane.gov.pl, ${S.index.license}).`;
+  // the dataset's title is a Polish name: in another language the footer's rendering of it stands in
+  const source = RCB.lang() === "pl" ? S.index.source : T("foot.psp");
+  $("#about-data").textContent = T("shel.data", { n: S.index.count.toLocaleString(RCB.loc()), date: RCB.fmtDay(upd), source, license: S.index.license });
+  $("#addr").placeholder = T("shel.addr.ph");
+  const meta = document.querySelector('meta[name="description"]');
+  if (meta) meta.content = T("shel.meta");
 
   const map = S.map = L.map("map", { zoomSnap: 0.5, minZoom: 5, maxZoom: 19, attributionControl: true });
   map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
-  map.attributionControl.addAttribution('<a href="https://dane.gov.pl/pl/dataset/28058">KG PSP</a>');
+  map.attributionControl.addAttribution('<a href="https://dane.gov.pl/pl/dataset/28058">' + T("shel.attr") + "</a>");
   map.createPane("labels").style.zIndex = 420;
   map.getPane("labels").style.pointerEvents = "none";
   S.renderer = L.canvas({ padding: 0.3, tolerance: 6 });
@@ -344,7 +353,7 @@ async function main() {
   new ResizeObserver(() => map.invalidateSize()).observe($("#map"));
   drawOverview();
   map.on("zoomend moveend", drawPoints);
-  map.on("click", (e) => { if (S.picking) { togglePick(false); setMe(e.latlng.lat, e.latlng.lng, "Wskazane miejsce"); } });
+  map.on("click", (e) => { if (S.picking) { togglePick(false); setMe(e.latlng.lat, e.latlng.lng, T("shel.picked")); } });
   drawPoints();
 
   $("#locate").addEventListener("click", locate);
@@ -355,10 +364,10 @@ async function main() {
   // ?lat=..&lon=.. opens a place (a shared link, the site check)
   const q = new URLSearchParams(location.search);
   const lat = parseFloat(q.get("lat")), lon = parseFloat(q.get("lon"));
-  if (lat > 48 && lat < 56 && lon > 13 && lon < 25) setMe(lat, lon, "Wskazane miejsce");
+  if (lat > 48 && lat < 56 && lon > 13 && lon < 25) setMe(lat, lon, T("shel.picked"));
 }
 
 main().catch((e) => {
-  note("Nie udało się wczytać mapy schronień: " + e.message, true);
+  note(T("shel.err.map", { msg: e.message }), true);
   console.error(e);
 });

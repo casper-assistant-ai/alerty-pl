@@ -1,7 +1,9 @@
 // Alerty RCB — the notifications page: choose voivodeships, then Telegram, e-mail or Web Push.
 // Everything goes to the live service (RCB.API, casper-infra deploy/alerty-api).
+// The page texts are in docs/i18n-notify.js (PL / EN / UK); the notifications themselves come from the server.
 "use strict";
 const { API, VOIV, $, h, strip } = RCB;
+const T = (key, params) => RCB.t(key, params);
 
 const KEY = "alerty-prefs";
 const saved = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } })();
@@ -36,19 +38,22 @@ async function pushState(cfg) {
   if (!ok) {
     $("#c-push").setAttribute("aria-disabled", "true");
     $("#push-go").disabled = true;
-    say("#push-out", "Ta przeglądarka nie obsługuje powiadomień push (na iPhonie dodaj stronę do ekranu początkowego).");
+    say("#push-out", T("notif.push.unsupported"));
     return null;
   }
   const reg = await navigator.serviceWorker.register("sw.js");
   const sub = await reg.pushManager.getSubscription();
   $("#push-off").hidden = !sub;
-  $("#push-go").textContent = sub ? "Zapisz obszar" : "Włącz";
-  if (sub) say("#push-out", "Powiadomienia w tej przeglądarce są włączone.");
+  $("#push-go").textContent = T(sub ? "notif.push.save" : "notif.push.on");
+  if (sub) say("#push-out", T("notif.push.enabled"));
   return reg;
 }
 
 async function main() {
   strip();
+  $("#mail").placeholder = T("notif.mail.ph");
+  const meta = document.querySelector('meta[name="description"]');
+  if (meta) meta.content = T("notif.meta");
   const want = new Set(saved.voivodeships || []);
   const areas = $("#areas");
   for (const [id, name] of Object.entries(VOIV)) {
@@ -62,7 +67,7 @@ async function main() {
   try {
     cfg = await (await fetch(API + "/config", { cache: "no-store" })).json();
   } catch (e) {
-    for (const id of ["#tg-out", "#mail-out", "#push-out"]) say(id, "Serwer powiadomień nie odpowiada. Spróbuj za chwilę.", true);
+    for (const id of ["#tg-out", "#mail-out", "#push-out"]) say(id, T("notif.down"), true);
     return;
   }
 
@@ -70,25 +75,25 @@ async function main() {
   if (!cfg.telegram_bot) {
     $("#c-tg").setAttribute("aria-disabled", "true");
     $("#tg-go").disabled = true;
-    say("#tg-out", "Bot Telegram jeszcze nie działa.");
+    say("#tg-out", T("notif.tg.off"));
   }
   $("#tg-go").addEventListener("click", async () => {
     const w = window.open("about:blank", "_blank");
     try {
       const { url } = await post("/telegram/link", { prefs: prefs() });
       if (w) w.location = url; else location.href = url;
-      say("#tg-out", "W Telegramie naciśnij „Start”.");
-    } catch (e) { if (w) w.close(); say("#tg-out", "Nie udało się: " + e.message, true); }
+      say("#tg-out", T("notif.tg.start"));
+    } catch (e) { if (w) w.close(); say("#tg-out", T("notif.fail", { msg: e.message }), true); }
   });
 
   // e-mail: double opt-in
-  if (!cfg.email) { $("#c-mail").setAttribute("aria-disabled", "true"); say("#mail-out", "E-mail jeszcze nie działa."); }
+  if (!cfg.email) { $("#c-mail").setAttribute("aria-disabled", "true"); say("#mail-out", T("notif.mail.off")); }
   $("#mail-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
       const r = await post("/email/subscribe", { email: $("#mail").value, prefs: prefs() });
-      say("#mail-out", r.confirmed ? "Zapisano nowy obszar." : "Wysłaliśmy list z linkiem. Kliknij go, aby włączyć powiadomienia (sprawdź też spam).");
-    } catch (err) { say("#mail-out", "Nie udało się: " + err.message, true); }
+      say("#mail-out", T(r.confirmed ? "notif.mail.saved" : "notif.mail.sent"));
+    } catch (err) { say("#mail-out", T("notif.fail", { msg: err.message }), true); }
   });
 
   // Web Push
@@ -96,12 +101,12 @@ async function main() {
   navigator.serviceWorker && navigator.serviceWorker.addEventListener("message", (e) => {
     if (e.data && e.data.type === "push") {
       window.alertyLastPush = e.data;
-      say("#push-out", "Ostatnie powiadomienie: " + e.data.payload.title);
+      say("#push-out", T("notif.push.last", { title: e.data.payload.title }));
     }
   });
   $("#push-go").addEventListener("click", async () => {
     try {
-      if ((await Notification.requestPermission()) !== "granted") { say("#push-out", "Przeglądarka nie pozwoliła na powiadomienia.", true); return; }
+      if ((await Notification.requestPermission()) !== "granted") { say("#push-out", T("notif.push.denied"), true); return; }
       const r = reg || (await navigator.serviceWorker.register("sw.js"));
       await navigator.serviceWorker.ready;
       const sub = (await r.pushManager.getSubscription()) ||
@@ -109,12 +114,12 @@ async function main() {
       await post("/push/subscribe", { subscription: sub.toJSON(), prefs: prefs() });
       window.alertyPushEndpoint = sub.endpoint;
       await pushState(cfg);
-    } catch (e) { say("#push-out", "Nie udało się: " + e.message, true); }
+    } catch (e) { say("#push-out", T("notif.fail", { msg: e.message }), true); }
   });
   $("#push-off").addEventListener("click", async () => {
     const sub = reg && (await reg.pushManager.getSubscription());
     if (sub) { await post("/push/unsubscribe", { endpoint: sub.endpoint }).catch(() => {}); await sub.unsubscribe(); }
-    say("#push-out", "Wyłączono.");
+    say("#push-out", T("notif.push.disabled"));
     await pushState(cfg);
   });
 }
