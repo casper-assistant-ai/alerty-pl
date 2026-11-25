@@ -2,7 +2,9 @@
 // Leaflet writes string content through innerHTML (DivOverlay._updateContent), so the "you are here" dot of
 // the shelter map ran markup as the name of an OpenStreetMap object (security audit #146). Content is an
 // element of h() (its text goes through textContent), a function that returns one, a helper of the same file
-// that does, or a text of the interface dictionaries — never a string built from data.
+// that does, or a text of the interface dictionaries — never a string built from data. A dictionary text
+// with a value put in is such a string: t() replaces {area} with the value as it is (common.js), so the
+// launch area of events/incursions.json ran as markup in the tooltip of a raid's start (security audit #173).
 // Run by tests/test_leaflet_js.py inside the Python suite, and by `node --test tests/*.test.mjs`.
 import { readFileSync, readdirSync } from "node:fs";
 import { test } from "node:test";
@@ -15,10 +17,11 @@ const SOURCES = Object.fromEntries(readdirSync(DOCS).filter((f) => f.endsWith(".
 // Leaflet's content sinks: the content is the first argument of each
 const SINK = /\.(bindTooltip|bindPopup|setTooltipContent|setPopupContent|setContent)\(/g;
 
-// The first argument of the call whose "(" is at `open - 1`: up to the comma or the ")" at depth 0, with
-// strings and brackets stepped over.
-function firstArg(src, open) {
-  let depth = 0, quote = null;
+// The arguments of the call whose first argument starts at `open`: each up to the comma or the ")" at
+// depth 0, with strings and brackets stepped over.
+function callArgs(src, open) {
+  const args = [];
+  let depth = 0, quote = null, start = open;
   for (let i = open; i < src.length; i++) {
     const c = src[i];
     if (quote) {
@@ -26,19 +29,27 @@ function firstArg(src, open) {
       else if (c === quote) quote = null;
     } else if (c === '"' || c === "'" || c === "`") quote = c;
     else if ("([{".includes(c)) depth++;
-    else if (c === ")" && depth === 0) return src.slice(open, i).trim();
-    else if (")]}".includes(c)) depth--;
-    else if (c === "," && depth === 0) return src.slice(open, i).trim();
+    else if (c === ")" && depth === 0) {
+      if (src.slice(start, i).trim()) args.push(src.slice(start, i).trim());
+      return args;
+    } else if (")]}".includes(c)) depth--;
+    else if (c === "," && depth === 0) {
+      args.push(src.slice(start, i).trim());
+      start = i + 1;
+    }
   }
-  return "";
+  return args;
 }
+const firstArg = (src, open) => callArgs(src, open)[0] || "";
 
 // the forms content may take, and what each one is
+const TEXT = /^(?:RCB\.t|tr|T)\(/;
 const FORMS = [
   [/^h\(/, "an element of h()"],
   [/^(?:\([^()]*\)|[\w$]+)\s*=>/, "a function"],
   [/^function\b/, "a function"],
-  [/^(?:RCB\.tn?|tr|T)\(/, "a text of the interface dictionaries"],
+  [/^RCB\.tn\(/, "a count in words of the interface dictionaries"],
+  [TEXT, "a text of the interface dictionaries"],
 ];
 // a name the file itself defines as a function: its result is what that function built
 const isFunctionOf = (src, name) => RegExp(`^(?:async\\s+)?function\\s+${name}\\s*\\(`, "m").test(src)
@@ -46,7 +57,13 @@ const isFunctionOf = (src, name) => RegExp(`^(?:async\\s+)?function\\s+${name}\\
 
 // what makes `arg` safe as content in `src`, or null when it is a string of data
 function kind(arg, src) {
-  for (const [re, what] of FORMS) if (re.test(arg)) return what;
+  for (const [re, what] of FORMS) {
+    if (!re.test(arg)) continue;
+    // a text of the dictionaries is content only while nothing is put into it: tr("key") is the
+    // dictionary's own text, tr("key", { area: data }) is a string of data. A count is a number.
+    if (re === TEXT && callArgs(arg, arg.indexOf("(") + 1).length > 1) return null;
+    return what;
+  }
   const name = /^([\w$]+)/.exec(arg);
   if (name && isFunctionOf(src, name[1])) return "a function of the file";
   return null;
@@ -60,11 +77,16 @@ test("the pin refuses the forms of the audit and admits the forms the pages use"
   assert.equal(kind('h("span", { text: label })', src), "an element of h()");
   assert.equal(kind("() => tipFor(p, ev)", src), "a function");
   assert.equal(kind("tooltip", src), "a function of the file");
-  assert.equal(kind('RCB.tn(n, "shel.places", { n })', src), "a text of the interface dictionaries");
+  assert.equal(kind('RCB.tn(n, "shel.places", { n: n.toLocaleString(RCB.loc()) })', src), "a count in words of the interface dictionaries");
+  // a dictionary text is content only while nothing is put into it (#173)
+  assert.equal(kind('T("shel.me")', src), "a text of the interface dictionaries");
+  assert.equal(kind('tr(w.launch.certain ? "map.raid.start" : "map.raid.startApprox", { area: w.launch.area_pl })', src), null,
+    "a text with a value of the data put in");
   // the argument ends at the comma outside its own strings and brackets
   const call = 'bindTooltip(h("span", { text: a || T("x, y") }), { direction: "top" })';
   assert.equal(firstArg(call, call.indexOf("(") + 1), 'h("span", { text: a || T("x, y") })');
   assert.equal(firstArg("bindPopup('a', 'b')", 10), "'a'");
+  assert.deepEqual(callArgs("tr('a', { b: c }, d)", 3), ["'a'", "{ b: c }", "d"]);
 });
 
 test("every Leaflet tooltip and popup of every page is built, never a string of data", () => {

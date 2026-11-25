@@ -123,8 +123,10 @@
         const t = track(path);
         flights.push({ w, path, t, delay: slot * 450 + c * 250, dur: Math.min(8000, Math.max(3000, t.len * 5)), done: false,
           route: c ? null : L.polyline(w.path, { pane: "raid", className: "raid-route k-" + w.kind, interactive: false }).addTo(layer),
+          // the start's place is a text of events/incursions.json: an element of h(), never a string Leaflet would write as HTML
           start: c || !w.launch ? null : L.circleMarker(w.path[0], { pane: "raid", radius: 5, weight: 2, color: "#b3122e", fillColor: "#fff", fillOpacity: 1, className: "raid-start" })
-            .bindTooltip(tr(w.launch.certain ? "map.raid.start" : "map.raid.startApprox", { area: w.launch.area_pl }), { className: "tip", direction: "top" }).addTo(layer),
+            .bindTooltip(h("span", { text: tr(w.launch.certain ? "map.raid.start" : "map.raid.startApprox", { area: w.launch.area_pl }) }),
+              { className: "tip", direction: "top" }).addTo(layer),
           trail: L.polyline([], { pane: "raid", className: "raid-trail k-" + w.kind, interactive: false }).addTo(layer),
           m: null, label: copies > 1 && c === copies - 1 && w.count > copies ? w.count : 0 });
       }
