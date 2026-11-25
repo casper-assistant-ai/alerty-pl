@@ -58,6 +58,15 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           MAX_FIX=3
           busy() { gh run list --workflow "$1" --limit 10 --json status --jq '[.[] | select(.status != "completed")] | length'; }
+          # A provider outage (z.ai 529, or 429 [1308] «Usage limit reached») ends a run at its first turns: on
+          # 2026-11-25 one gate run started 6 PR fixers and 5 PR reviewers in 48 minutes, each dead in 3 minutes.
+          # When the last two runs of a workflow failed in under 8 minutes each, the provider refused them: the
+          # gate starts no other, and its next run (17 and 47 past the hour, or the next event) tries again.
+          refused() {  # $1: a workflow file; prints 1 when its last two runs each failed in under 8 minutes
+            gh run list --workflow "$1" --limit 2 --json conclusion,createdAt,updatedAt --jq '
+              if length == 2 and all(.[]; .conclusion == "failure"
+                and ((.updatedAt | fromdateiso8601) - (.createdAt | fromdateiso8601)) < 480) then 1 else 0 end' 2>/dev/null || echo 0
+          }
           bot='.user.login=="github-actions[bot]"'
           stop_pr() {  # an owner PR is never closed: hand it back with the reason
             gh pr comment "$n" --body "Agent PR gate: stopped. $1 Over to you: push a change to this branch, then remove the label gate-stopped and the gate takes the PR again." \
@@ -266,14 +275,20 @@ jobs:
           done
           if [ "$need_review" = 1 ]; then
             busy=$(gh run list --workflow pr-reviewer.lock.yml --limit 10 --json status --jq '[.[] | select(.status != "completed")] | length')
-            if [ "${busy:-0}" = 0 ]; then
+            if [ "$(refused pr-reviewer.lock.yml)" = 1 ]; then
+              echo "the last two PR reviewer runs failed in under 8 minutes (the provider refused them?): not starting another"
+              need_review=0
+            elif [ "${busy:-0}" = 0 ]; then
               gh workflow run pr-reviewer.lock.yml && echo "started the PR reviewer"
             else
               echo "the PR reviewer is already running"
             fi
           fi
           if [ "$need_fix" = 1 ]; then
-            if [ "${fixer_busy:-0}" = 0 ]; then
+            if [ "$(refused pr-fixer.lock.yml)" = 1 ]; then
+              echo "the last two PR fixer runs failed in under 8 minutes (the provider refused them?): not starting another"
+              need_fix=0
+            elif [ "${fixer_busy:-0}" = 0 ]; then
               gh workflow run pr-fixer.lock.yml && echo "started the PR fixer"
             else
               echo "the PR fixer is already running"
