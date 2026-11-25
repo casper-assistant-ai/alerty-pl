@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **pipeline:** put the owner's PRs and Dependabot's PRs through the agents' pipeline ([b7c73ac](https://github.com/casper-assistant-ai/alerty-pl/commit/b7c73ac))
+
 ## 1.23.6 (2026-11-25)
 
 ### fix
