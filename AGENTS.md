@@ -98,19 +98,23 @@ within 7 days, each tied to a number in `process/retro-log.md`). Every agent fol
 <!-- process:start -->
 - Target: at least half of the agent output is product work (feat, fix, perf, refactor, test):
   merged PRs that change the map, history, analytics, parser, tests or site check. Data commits,
-  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-24: 64% (18 product
-  PRs, 10 docs/chore + reports); 11-21..11-23 merged product, 11-24 had none by the retro. Hold that:
-  ≥ 50%, at least 4 product PRs a week, no live day without a merge.
+  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-25: 66% (21 product
+  PRs, 1 docs PR + 10 reports; every live day 11-21..11-25 merged, but 11-24 was one repair pair,
+  #94 and #106, and 11-25 a script fix, #120). Hold that: ≥ 50%, at least 4 product PRs a week,
+  no live day without a merge.
 - Builders (site-designer, site-fixer, parser-doctor, region-keeper, test-improver, docs-keeper):
   before your own plan, look for open issues labelled `dev-task` that name you or fit your paths.
   Take the oldest one, and say `Closes #<n>` in the PR body. Call `noop` only when no dev-task fits
-  and your own checklist finds nothing worth a PR.
+  and your own checklist finds nothing worth a PR (site-fixer and parser-doctor while all is green:
+  a clean bill, not idleness).
 - The gate's live parse needs gov.pl. While the last Update data run fails on `fetch failed`, hold
   the PR and say so on the issue: the gate closes it unjudged and two closed PRs are a give-up (#73).
   A parser-doctor run started by such a red run has nothing to parse: `noop`, no issue.
-- Dev-tasks: the 11-23 one landed (Historia period, PR #71). Open for site-designer: the FIRMS fires
-  from GIBS WMTS with a note when a tile fails (the change of #73). site-fixer and parser-doctor
-  noop by design while the site and the parser are green — that is a clean bill, not idleness.
+- Dev-tasks (both opened 2026-11-25, labelled `dev-task`): parser, one record per alert in
+  `alerts.json` when the list repeats it → parser-doctor; site, the PL/EN/UK base, slice 1 of
+  #58 → site-designer. The next site ones are the following slices of `process/improvements.md`
+  § «Site languages», one at a time; their dictionaries live in `docs/i18n.js`, because the gate
+  allows `docs/*.html|js|css` and `tests/**`, no new folder.
 - Reporters (daily-status, ci-doctor, security-auditor): when a report finds something to build or
   fix, name the builder that should take it, so the next retro can turn it into a dev-task.
 <!-- process:end -->
