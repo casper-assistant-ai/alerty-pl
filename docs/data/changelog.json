@@ -17,9 +17,63 @@
   {
    "version": null,
    "date": "2026-11-25",
-   "time": "2026-11-25T16:02:05+01:00",
-   "sha": "98c4525",
+   "time": "2026-11-25T16:05:23+01:00",
+   "sha": "f6ab25d",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "the maintainer approves CI on its own review PRs",
+     "sha": "f6ab25d",
+     "date": "2026-11-25",
+     "time": "2026-11-25T16:05:23+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "site-designer: name the allowed files and the pinned tests, run the node suite before the  (#142)",
+     "sha": "54e5087",
+     "date": "2026-11-25",
+     "time": "2026-11-25T15:02:58Z"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "process-retro: timeout-minutes 25 -> 35 (#132)",
+     "sha": "780e973",
+     "date": "2026-11-25",
+     "time": "2026-11-25T15:02:50Z"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "daily-status, parser-doctor, process-retro, process-doctor, test-improver, agent-coach, se (#131)",
+     "sha": "263c53c",
+     "date": "2026-11-25",
+     "time": "2026-11-25T15:02:47Z"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "security-auditor: weekly run at 12:08 UTC, outside the hours z.ai answers 529 (#119)",
+     "sha": "ca87653",
+     "date": "2026-11-25",
+     "time": "2026-11-25T15:02:43Z"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "region-keeper: bound the run, noop on an empty list, 30 minutes (#113)",
+     "sha": "a704ac9",
+     "date": "2026-11-25",
+     "time": "2026-11-25T15:02:40Z"
+    },
     {
      "type": "ci",
      "scope": "workflows",

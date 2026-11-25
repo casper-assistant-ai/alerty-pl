@@ -6,6 +6,12 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### ci
 
+- **workflows:** the maintainer approves CI on its own review PRs ([f6ab25d](https://github.com/casper-assistant-ai/alerty-pl/commit/f6ab25d))
+- **workflows:** site-designer: name the allowed files and the pinned tests, run the node suite before the  (#142) ([54e5087](https://github.com/casper-assistant-ai/alerty-pl/commit/54e5087))
+- **workflows:** process-retro: timeout-minutes 25 -> 35 (#132) ([780e973](https://github.com/casper-assistant-ai/alerty-pl/commit/780e973))
+- **workflows:** daily-status, parser-doctor, process-retro, process-doctor, test-improver, agent-coach, se (#131) ([263c53c](https://github.com/casper-assistant-ai/alerty-pl/commit/263c53c))
+- **workflows:** security-auditor: weekly run at 12:08 UTC, outside the hours z.ai answers 529 (#119) ([ca87653](https://github.com/casper-assistant-ai/alerty-pl/commit/ca87653))
+- **workflows:** region-keeper: bound the run, noop on an empty list, 30 minutes (#113) ([a704ac9](https://github.com/casper-assistant-ai/alerty-pl/commit/a704ac9))
 - **workflows:** land workflow-change issues with no human (Workflow maintainer) ([98c4525](https://github.com/casper-assistant-ai/alerty-pl/commit/98c4525))
 
 ## 1.27.0 (2026-11-25)
