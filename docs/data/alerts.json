@@ -700,7 +700,7 @@
    "id": "alert-rcb---woda-niezdatna-do-picia-pow-zgorzelecki-1911",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---woda-niezdatna-do-picia-pow-zgorzelecki-1911",
    "intro": "„KOMUNIKAT: woda niezdatna do spożycia w miejscowościach na terenie gm. Pieńsk oraz w Żarskiej Wsi i Osiedle Nowa Żarska Wieś (pow. zgorzelecki). Śledź komunikaty.\"",
-   "status": "active",
+   "status": "expired",
    "started_at": "2026-11-19T00:00:00+01:00",
    "last_at": "2026-11-19T00:00:00+01:00",
    "parser": 2
@@ -744,7 +744,7 @@
    "id": "alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
    "url": "https://www.gov.pl/web/rcb/alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
    "intro": "„KOMUNIKAT: Woda z wodociągu Złoty Stok nie nadaje się do celów spożywczych w miejscowościach: Złoty Stok, Płonica i Błotnica (pow. ząbkowicki). Śledź komunikaty.”",
-   "status": "active",
+   "status": "expired",
    "started_at": "2026-11-19T00:00:00+01:00",
    "last_at": "2026-11-19T00:00:00+01:00",
    "parser": 2
