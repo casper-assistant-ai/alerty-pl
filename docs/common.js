@@ -1,6 +1,13 @@
 // Alerty RCB — shared by the map, the history and the analytics pages.
 "use strict";
 
+// The site is served over HTTPS only: the API's CORS allows only https origins, and push
+// notifications need a secure context. Move plain-http visitors to https at once.
+if (typeof location !== "undefined" && location.protocol === "http:" &&
+    !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+  location.replace("https://" + location.host + location.pathname + location.search + location.hash);
+}
+
 const RCB = (() => {
   const CAT = {
     air: "Zagrożenie z powietrza", drill: "Ćwiczenia i testy syren", water: "Woda niezdatna do picia",
