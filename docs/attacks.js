@@ -162,7 +162,7 @@
         const a = at(f.t, k), ll = R.map.unproject(a.p, Z);
         if (!f.m) {
           f.m = L.marker(ll, { pane: "raid", icon: icon(f.w.kind), interactive: false, keyboard: false }).addTo(layer);
-          if (f.label) f.m.bindTooltip("×" + f.label, { permanent: true, direction: "right", className: "raid-n", offset: [10, 0] });
+          if (f.label) f.m.bindTooltip(h("span", { text: "×" + f.label }), { permanent: true, direction: "right", className: "raid-n", offset: [10, 0] });
         } else f.m.setLatLng(ll);
         const s = f.m.getElement()?.firstChild;
         if (s) s.style.transform = `rotate(${a.deg.toFixed(1)}deg)`;
