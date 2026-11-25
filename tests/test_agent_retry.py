@@ -112,10 +112,15 @@ class Decide(unittest.TestCase):
         manual = run(2, "2026-11-25T19:57:04Z", conclusion=None, status="in_progress", event="workflow_dispatch")
         v, why, _ = ar.decide(self.failed, [manual, self.failed], AGENT_FAILED, QUOTA_LOG, now)
         self.assertEqual((v, why), ("skip", "run 2 came after it"))
-        # a newer failed run, or one for another issue, does not
-        other = run(3, "2026-11-25T19:50:00Z", event="issues", title="Fix #150", conclusion="success")
+        # a newer failed run is the one to re-run: re-running both put two workers on #146 (25.11.2026)
         again = run(4, "2026-11-25T19:55:00Z")
-        self.assertEqual(ar.decide(self.failed, [again, other, self.failed], AGENT_FAILED, QUOTA_LOG, now)[0], "retry")
+        self.assertEqual(ar.decide(self.failed, [again, self.failed], AGENT_FAILED, QUOTA_LOG, now)[:2],
+                         ("skip", "run 4 came after it"))
+        self.assertEqual(ar.decide(again, [again, self.failed], AGENT_FAILED, QUOTA_LOG, now)[0], "retry")
+        # a run for another issue, or a cancelled one, does not
+        other = run(3, "2026-11-25T19:50:00Z", event="issues", title="Fix #150", conclusion="success")
+        stopped = run(5, "2026-11-25T19:52:00Z", conclusion="cancelled")
+        self.assertEqual(ar.decide(self.failed, [stopped, other, self.failed], AGENT_FAILED, QUOTA_LOG, now)[0], "retry")
 
 
 class Candidates(unittest.TestCase):

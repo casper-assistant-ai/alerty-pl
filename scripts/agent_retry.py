@@ -116,7 +116,8 @@ def due_at(run, err):
 
 def superseded(run, runs):
     """A newer run of the same workflow for the same event (schedule and dispatch count as one) and title
-    that is running or succeeded makes the retry pointless."""
+    makes the retry pointless: it is running, it succeeded, or it failed too and is the one to re-run
+    (two re-runs of one queue agent would take the same issue)."""
     group = lambda r: "queue" if r.get("event") in ("schedule", "workflow_dispatch") else r.get("event")
     start = _time(run["created_at"])
     for r in runs:
@@ -124,7 +125,7 @@ def superseded(run, runs):
             continue
         if group(r) != group(run) or r.get("display_title") != run.get("display_title"):
             continue
-        if r.get("status") in BUSY or r.get("conclusion") == "success":
+        if r.get("status") in BUSY or r.get("conclusion") in ("success", "failure", "timed_out"):
             return r
     return None
 
