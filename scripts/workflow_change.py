@@ -778,6 +778,7 @@ def land(d):
         git("fetch", "-q", str(d / "changes.bundle"), "+refs/heads/*:refs/remotes/wc/*")
     health = health_issues()
     started = set()
+    doctor = False  # a doctor's patch was refused, failed or applied in part: it should answer soon
     # 1. direct changes: onto main at once
     direct = [i for i in plan if i.get("cls") == "direct"]
     if direct:
@@ -805,6 +806,7 @@ def land(d):
             body += f"Run: {run_url()}\n\n{marker(item['issue'], item['digest'], item['result'])}"
             if item["result"] == "partial":
                 comment(item["issue"], body)
+                doctor = doctor or item.get("source") == "process-doctor"
             else:
                 close(item["issue"], body)
             print(f"#{item['issue']}: landed {sha[:7]}")
@@ -852,6 +854,7 @@ def land(d):
             sh("gh", "pr", "close", str(num), "-R", repo(), "--delete-branch", "--comment", text, check=False)
             issue = gh_api(f"repos/{repo()}/issues/{n}") or {}
             comment(n, f"{text}\n\nPR: #{num}\n\n{marker(n, digest(issue.get('body')), 'refused')}")
+            doctor = doctor or source_of(issue) == "process-doctor"
             print(f"#{n}: PR #{num} closed, the reviewer said {verdict}")
             continue
         try:
@@ -880,7 +883,13 @@ def land(d):
     # 4. what did not apply: one comment each (the marker keeps it to one per patch)
     for item in [i for i in plan if i.get("result") in ("failed", "already")]:
         report(item)
+        doctor = doctor or (item["result"] == "failed" and item.get("source") == "process-doctor")
         print(f"#{item['issue']}: {item['result']}")
+    # 5. the process-doctor answers a refused or partial patch with a corrected issue; start it rather
+    # than wait up to 4 hours for agent-health, at most once in 2 hours
+    if doctor and not busy("process-doctor.lock.yml") and not started_within("process-doctor.lock.yml", 120):
+        sh("gh", "workflow", "run", "process-doctor.lock.yml", "-R", repo(), check=False)
+        print("started the process-doctor for the corrected patches")
 
 
 def main(argv=None):

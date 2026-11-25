@@ -180,7 +180,9 @@ dates of every row you saw this run. Rows unchanged for 30 days go to the `## Ar
   yourself when its patch is on `main` (the workflow source shows it). When the maintainer commented
   that a patch was not applied or was refused (its comment starts with `Workflow maintainer:`), it
   will not try that issue again: close it, and open a corrected issue when the change is still
-  needed (fix what its comment names; a part left in prose goes into its own ```diff block).
+  needed (fix what its comment names, such as the PR reviewer's reason; a part left in prose goes
+  into its own ```diff block; end the new title with «(corrected)», since an open issue with the
+  same title blocks a new one). The maintainer starts you after such a comment.
 - Never close other issues.
 
 ## 7. Output
