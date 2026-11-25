@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **gate:** bind dashboard/ to the PR footer and the verdict to a PR review; pr-fixer pushes only ALLOWED ([c004808](https://github.com/casper-assistant-ai/alerty-pl/commit/c004808))
+
+### chore
+
+- **process:** count a failed run that is being re-run (#162) ([1ed2fdc](https://github.com/casper-assistant-ai/alerty-pl/commit/1ed2fdc))
+
 ## 1.29.1 (2026-11-25)
 
 ### fix

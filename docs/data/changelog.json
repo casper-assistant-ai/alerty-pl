@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-25",
+   "time": "2026-11-25T21:48:40+01:00",
+   "sha": "c004808",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "gate",
+     "breaking": false,
+     "text": "bind dashboard/ to the PR footer and the verdict to a PR review; pr-fixer pushes only ALLOWED",
+     "sha": "c004808",
+     "date": "2026-11-25",
+     "time": "2026-11-25T21:48:40+01:00"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "count a failed run that is being re-run (#162)",
+     "sha": "1ed2fdc",
+     "date": "2026-11-25",
+     "time": "2026-11-25T20:48:26Z"
+    }
+   ]
+  },
+  {
    "version": "1.29.1",
    "date": "2026-11-25",
    "time": "2026-11-25T21:34:17+01:00",
