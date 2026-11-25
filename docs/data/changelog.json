@@ -17,9 +17,18 @@
   {
    "version": null,
    "date": "2026-11-25",
-   "time": "2026-11-25T17:13:08+01:00",
-   "sha": "e3c7b86",
+   "time": "2026-11-25T17:21:24+01:00",
+   "sha": "5ed2835",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "the maintainer closes review PRs through the API and labels before it needs to",
+     "sha": "5ed2835",
+     "date": "2026-11-25",
+     "time": "2026-11-25T17:21:24+01:00"
+    },
     {
      "type": "ci",
      "scope": "workflows",

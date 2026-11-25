@@ -6,6 +6,7 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### ci
 
+- **workflows:** the maintainer closes review PRs through the API and labels before it needs to ([5ed2835](https://github.com/casper-assistant-ai/alerty-pl/commit/5ed2835))
 - **workflows:** the maintainer retries GitHub writes and takes up a review left without a result ([e3c7b86](https://github.com/casper-assistant-ai/alerty-pl/commit/e3c7b86))
 - **workflows:** the maintainer lands prompts only after review and never scripts (#146) ([8e31ed8](https://github.com/casper-assistant-ai/alerty-pl/commit/8e31ed8))
 - **workflows:** the maintainer starts the process-doctor after a refused patch ([5d57a2e](https://github.com/casper-assistant-ai/alerty-pl/commit/5d57a2e))
