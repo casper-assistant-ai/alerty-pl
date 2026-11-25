@@ -177,7 +177,8 @@ async function setMe(lat, lon, label, accuracy) {
   if (S.meLayer) S.map.removeLayer(S.meLayer);
   const parts = [];
   if (accuracy && accuracy > 30) parts.push(L.circle([lat, lon], { radius: accuracy, className: "me-acc", interactive: false, weight: 1 }));
-  parts.push(L.circleMarker([lat, lon], { radius: 8, className: "me", weight: 3, fillOpacity: 1 }).bindTooltip(label || T("shel.me"), { className: "tip", direction: "top" }));
+  // the label is a name of OpenStreetMap (Nominatim): Leaflet writes string content through innerHTML, so it goes in as an element
+  parts.push(L.circleMarker([lat, lon], { radius: 8, className: "me", weight: 3, fillOpacity: 1 }).bindTooltip(h("span", { text: label || T("shel.me") }), { className: "tip", direction: "top" }));
   S.meLayer = L.layerGroup(parts).addTo(S.map);
   const q = new URLSearchParams(location.search);
   q.set("lat", lat.toFixed(5)); q.set("lon", lon.toFixed(5));
