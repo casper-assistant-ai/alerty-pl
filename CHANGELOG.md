@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.24.1 (2026-11-25)
+
+### fix
+
+- **site:** header source link is a 26 px tap target on phones (#141) ([1e374a0](https://github.com/casper-assistant-ai/alerty-pl/commit/1e374a0))
+
 ## 1.24.0 (2026-11-25)
 
 ### feat
