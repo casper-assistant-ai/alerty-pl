@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **issue-worker:** let its PR change README.md, as allowed-files says ([f3fdfdd](https://github.com/casper-assistant-ai/alerty-pl/commit/f3fdfdd))
+
 ## 1.30.0 (2026-11-25)
 
 ### feat

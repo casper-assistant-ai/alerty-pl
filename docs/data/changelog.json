@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-25",
+   "time": "2026-11-25T22:14:48+01:00",
+   "sha": "f3fdfdd",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "issue-worker",
+     "breaking": false,
+     "text": "let its PR change README.md, as allowed-files says",
+     "sha": "f3fdfdd",
+     "date": "2026-11-25",
+     "time": "2026-11-25T22:14:48+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.30.0",
    "date": "2026-11-25",
    "time": "2026-11-25T22:03:07+01:00",
