@@ -85,6 +85,11 @@ nav.langs a { display: flex; align-items: center; justify-content: center; min-w
   text-decoration: none; font-size: .8125rem; font-weight: 500; border-radius: 6px; }
 nav.langs a:hover { color: var(--text); background: var(--bg); }
 nav.langs a[aria-current] { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+/* the skip link (every page): first in the tab order, out of sight until the keyboard reaches it; it lands on <main> */
+.skip { position: absolute; top: 8px; left: 8px; z-index: 10; display: inline-flex; align-items: center; min-height: 40px; padding: 0 12px;
+  border-radius: 8px; background: var(--text); color: var(--surface); font-size: .875rem; text-decoration: none;
+  transform: scale(0); transform-origin: top left; }
+.skip:focus-visible { transform: none; }
 
 /* the status strip: the one place that turns red when there is an air threat */
 .strip { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 10px 24px;
@@ -208,7 +213,8 @@ main { flex: 1; width: 100%; max-width: 1480px; margin: 0 auto; padding: 24px; }
   padding: 4px 10px; min-height: 32px; cursor: pointer; transition: background .15s var(--ease); }
 .btn:hover:not(:disabled) { background: var(--land-hover); }
 .btn:disabled { color: var(--muted); cursor: default; opacity: .6; }
-.btn.icon { width: 32px; padding: 0; font-size: .625rem; }
+.btn.icon { width: 32px; padding: 0; }
+.btn.icon svg { display: block; margin: 0 auto; }
 .lmap { height: min(calc(100dvh - 330px), 760px); min-height: 380px; border-radius: 8px; background: var(--land); z-index: 0; }
 .lmap.leaflet-container { font: .75rem var(--sans); background: var(--land); }
 .lmap path.pow { fill: transparent; fill-opacity: 1; stroke: var(--muted); stroke-opacity: .45; transition: fill .2s var(--ease); }

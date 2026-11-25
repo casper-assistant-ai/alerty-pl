@@ -6,6 +6,8 @@
 <title data-i18n-title="title.shelters">Schrony — najbliższe miejsca schronienia | Alerty RCB</title>
 <meta name="description" content="Mapa ponad 88 tysięcy punktów schronienia w Polsce z oficjalnych danych Państwowej Straży Pożarnej. Podaj swoją lokalizację lub adres, zobacz najbliższe schronienia z odległością i włącz nawigację w Google Maps, Apple Maps lub Waze.">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111213" media="(prefers-color-scheme: dark)">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="style.css">
@@ -13,6 +15,7 @@
 </head>
 <body>
 <header class="top">
+  <a class="skip" href="#main" data-i18n="nav.skip">Przejdź do treści</a>
   <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
   <nav class="tabs" aria-label="Strony" data-i18n-aria="nav.tabs">
     <a href="./" data-i18n="tab.map">Mapa</a>
@@ -26,7 +29,7 @@
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
 <div class="strip" id="strip"><span class="state" role="status" data-i18n="strip.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
-<main class="map-page shelter-page">
+<main id="main" class="map-page shelter-page" tabindex="-1">
   <section class="map-wrap" aria-label="Mapa schronień" data-i18n-aria="shel.aria.wrap">
     <div class="finder">
       <button type="button" class="btn primary" id="locate" data-i18n="shel.locate">Znajdź najbliższe schronienie</button>
