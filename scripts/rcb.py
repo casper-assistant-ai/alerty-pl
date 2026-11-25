@@ -367,14 +367,21 @@ def update(pages, out_dir, keep_going=False):
     if os.path.exists(path):
         old = {a["id"]: a for a in json.load(open(path, encoding="utf-8")).get("alerts", [])}
     now = dt.datetime.now(TZ)
-    items = []
+    items, listed = [], set()
     for page in range(1, pages + 1):
         got = parse_list(fetch(LIST_URL.format(page=page)))
         if not got:
             if page == 1:
                 raise RuntimeError("list page 1 has no items: the gov.pl layout may have changed")
             break
-        items += got
+        for it in got:
+            # gov.pl's list now and then carries an alert twice (25.11.2026: the 19.11 water alert):
+            # one record per alert, or the map shows it twice and meta.json counts it twice
+            if it["slug"] in listed:
+                print(f"::warning::listed twice on gov.pl, kept once: {it['slug']}", file=sys.stderr)
+                continue
+            listed.add(it["slug"])
+            items.append(it)
     alerts, unmatched = [], []
     for it in items:
         if not it["title"].lower().startswith(("alert rcb", "komunikat")):
