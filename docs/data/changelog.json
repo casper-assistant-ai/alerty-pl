@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.29.1",
+   "date": "2026-11-25",
+   "time": "2026-11-25T21:34:17+01:00",
+   "sha": "3150a49",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "map",
+     "breaking": false,
+     "text": "a found address reads «Grunwaldzka 1, Stare Miasto, Kłodzko», with its town",
+     "sha": "3150a49",
+     "date": "2026-11-25",
+     "time": "2026-11-25T21:34:17+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.29.0",
    "date": "2026-11-25",
    "time": "2026-11-25T21:32:42+01:00",

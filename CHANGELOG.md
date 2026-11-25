@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.29.1 (2026-11-25)
+
+### fix
+
+- **map:** a found address reads «Grunwaldzka 1, Stare Miasto, Kłodzko», with its town ([3150a49](https://github.com/casper-assistant-ai/alerty-pl/commit/3150a49))
+
 ## 1.29.0 (2026-11-25)
 
 ### feat
