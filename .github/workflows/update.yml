@@ -9,7 +9,8 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ["docs/**", "scripts/**", "tests/**", ".github/workflows/update.yml"]
+    # its own data commits (pushed with a deploy key, so they do start workflows) do not start it again
+    paths: ["docs/**", "!docs/data/**", "scripts/**", "tests/**", ".github/workflows/update.yml"]
 
 permissions:
   contents: write
@@ -33,6 +34,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0   # the changelog reads the whole history and the version tags
+          # the ruleset "CodeQL: no new alerts" refuses direct pushes to main except by admins and deploy
+          # keys: the data commit goes with the deploy key UPDATE_DEPLOY_KEY (write, used only here)
+          ssh-key: ${{ secrets.UPDATE_DEPLOY_KEY }}
       - name: Tests
         run: python3 -I -m unittest discover -s tests -v
       - name: Scrape RCB
