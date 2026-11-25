@@ -172,4 +172,11 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   The safe output refuses a patch over 4096 KB: keep generated data, fixtures and screenshots under
   /tmp/gh-aw/agent/ and push only the fix [safe-outputs, pr-fixer runs 45011310218 and
   45013053478: the same 6124 KB patch refused twice in 20 minutes].
+- site-designer: the PR may change `docs/*.html`, `docs/*.js` and `docs/*.css` only, and the node
+  tests pin the front end (`tests/style.test.mjs` the phone rules of `docs/style.css`, `.month h2`
+  and `.top .src`; `tests/i18n.test.mjs` the marked chrome of every page; `tests/common.test.mjs`
+  its helpers): run `node --test tests/*.test.mjs` before the PR and never edit a test to make a
+  change pass — drop or reshape the change and name it in the PR body — because the safe output
+  refuses the whole patch for one file outside the list [safe-outputs, site-designer run
+  45606766890: 9 minutes lost on tests/style.test.mjs, #139].
 <!-- reliability:end -->
