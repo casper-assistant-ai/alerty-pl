@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-25",
+   "time": "2026-11-25T16:02:05+01:00",
+   "sha": "98c4525",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "land workflow-change issues with no human (Workflow maintainer)",
+     "sha": "98c4525",
+     "date": "2026-11-25",
+     "time": "2026-11-25T16:02:05+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.27.0",
    "date": "2026-11-25",
    "time": "2026-11-25T15:21:25+01:00",
