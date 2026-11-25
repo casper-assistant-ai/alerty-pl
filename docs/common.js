@@ -38,11 +38,16 @@ const RCB = (() => {
     return r.json();
   }
 
+  // A URL that the browser would run as code: never written into an attribute, whatever the source.
+  // (Relative links and other schemes, like the shelters' geo:, pass.)
+  const UNSAFE_URL = /^\s*(javascript|data|vbscript):/i;
+
   function h(tag, attrs = {}, ...kids) {
     const e = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) {
       if (k === "text") e.textContent = v;
       else if (k === "style") e.style.cssText = v;
+      else if ((k === "href" || k === "src") && UNSAFE_URL.test(v)) continue;
       else e.setAttribute(k, v);
     }
     for (const k of kids) if (k != null) e.append(k);

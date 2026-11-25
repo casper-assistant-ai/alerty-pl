@@ -99,3 +99,28 @@ test("leaflet() fails with a Polish message when the retry is refused too", asyn
   scripts[0].onerror();
   await assert.rejects(p, /biblioteka mapy/);
 });
+
+// a document stub for h(): every element records the attributes set on it
+const attrDoc = () => ({
+  querySelector: () => null,
+  createElement: () => {
+    const attrs = {};
+    return { attrs, style: {}, textContent: "", setAttribute: (k, v) => { attrs[k] = v; }, append() {} };
+  },
+});
+
+test("h() never writes a URL the browser would run as code into href or src", () => {
+  const { h } = load(attrDoc());
+  for (const bad of ["javascript:alert(1)", " JAVASCRIPT:alert(1)", "data:text/html,<script>alert(1)</script>", "vbscript:msgbox(1)"]) {
+    assert.equal(h("a", { href: bad }).attrs.href, undefined, bad);
+    assert.equal(h("script", { src: bad }).attrs.src, undefined, bad);
+  }
+});
+
+test("h() keeps https links, relative links and other schemes such as the shelters' geo:", () => {
+  const { h } = load(attrDoc());
+  for (const good of ["https://t.me/alerty_pl_bot?start=abc", "historia.html?od=2026-11-01&do=2026-11-25", "geo:52.23,21.01?q=52.23,21.01(Schron)", "mailto:a@b.pl", "#top"]) {
+    assert.equal(h("a", { href: good }).attrs.href, good, good);
+  }
+  assert.equal(h("script", { src: "vendor/leaflet/leaflet.js" }).attrs.src, "vendor/leaflet/leaflet.js");
+});

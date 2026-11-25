@@ -81,6 +81,8 @@ async function main() {
     const w = window.open("about:blank", "_blank");
     try {
       const { url } = await post("/telegram/link", { prefs: prefs() });
+      // the service names the link; only an https page is followed, never a script or a data URL
+      if (new URL(url).protocol !== "https:") throw new Error("telegram link: not https");
       if (w) w.location = url; else location.href = url;
       say("#tg-out", T("notif.tg.start"));
     } catch (e) { if (w) w.close(); say("#tg-out", T("notif.fail", { msg: e.message }), true); }
