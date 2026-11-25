@@ -772,16 +772,31 @@ def approve_ci(sha):
         print(f"approved CI run {r['id']} for {sha[:7]}")
 
 
-def verdict_of(pr, sha):
-    """(verdict, reason) of the PR reviewer's comment on this exact head, or (None, '')."""
-    for c in reversed(gh_items(f"repos/{repo()}/issues/{pr}/comments?per_page=100")):
-        body = (c.get("body") or "").replace("\r", "")
-        if (c.get("user") or {}).get("login") == BOT and "workflow_id: pr-reviewer" in body \
-                and re.search(rf"(?m)^Head: *{sha}", body):
-            v = re.search(r"(?m)^Verdict: *(approve|changes|reject)", body)
-            r = re.search(r"(?m)^Reason: *(.*)$", body)
-            return (v.group(1) if v else None), (r.group(1).strip() if r else "")
+REVIEWED = {"COMMENTED", "APPROVED", "CHANGES_REQUESTED"}
+
+
+def verdict_in(reviews, sha):
+    """(verdict, reason) of the PR reviewer's review of commit sha, or (None, '').
+
+    Read from the PR's reviews, never from comments: every agent comments as github-actions[bot],
+    but only the pr-reviewer workflow has the submit-pull-request-review safe output (#165). The
+    same rule as scripts/gate_rules.py verdict; tests/test_gate_rules.py runs both on one set."""
+    for r in reversed(reviews or []):
+        body = (r.get("body") or "").replace("\r", "")
+        if (r.get("user") or {}).get("login") != BOT or r.get("state") not in REVIEWED or r.get("commit_id") != sha:
+            continue
+        if not re.search(rf"(?m)^Head: *{re.escape(sha)}\s*$", body):
+            continue
+        v = re.search(r"(?m)^Verdict: *(approve|changes|reject)\b", body)
+        if v:
+            m = re.search(r"(?m)^Reason: *(.*)$", body)
+            return v.group(1), (m.group(1).strip() if m else "")
     return None, ""
+
+
+def verdict_of(pr, sha):
+    """(verdict, reason) of the PR reviewer's review of this exact head, or (None, '')."""
+    return verdict_in(gh_items(f"repos/{repo()}/pulls/{pr}/reviews?per_page=100"), sha)
 
 
 def refuse_note():

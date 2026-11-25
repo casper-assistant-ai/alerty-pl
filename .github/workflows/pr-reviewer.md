@@ -1,7 +1,7 @@
 ---
 description: |
   Reviews every open agent PR with no human in the loop: judges its value, size and risk and
-  writes one verdict comment, "Verdict: approve", "Verdict: changes" (a fixable defect) or
+  submits one verdict review, "Verdict: approve", "Verdict: changes" (a fixable defect) or
   "Verdict: reject" (wrong on substance), with the reason and the head commit it read. The Agent
   PR gate merges a PR only when its tests pass and this verdict approves its current head; for
   "changes" it sends the PR to the PR fixer, which fixes it in the same branch (three attempts);
@@ -46,9 +46,11 @@ steps:
       prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label pipeline --json number --jq '.[].number')
       for n in $prs; do
         sha=$(gh pr view "$n" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq .headRefOid)
-        # skip a PR whose current head already has a verdict
-        if gh api "repos/$GITHUB_REPOSITORY/issues/$n/comments" --paginate \
-             --jq '.[] | select(.body | contains("workflow_id: pr-reviewer")) | .body' | tr -d '\r' | grep -q "^Head: $sha"; then
+        # skip a PR whose current head already has a verdict: a review of that commit by this workflow
+        # (the only one with the submit-pull-request-review output; the gate reads only reviews, #165)
+        if gh api "repos/$GITHUB_REPOSITORY/pulls/$n/reviews?per_page=100" --paginate \
+             --jq ".[] | select(.user.login == \"github-actions[bot]\" and .commit_id == \"$sha\") | .body" \
+             | tr -d '\r' | grep -q "^Head: $sha"; then
           continue
         fi
         gh pr view "$n" --repo "$GITHUB_REPOSITORY" --json number,title,author,body,headRefOid,baseRefName,closingIssuesReferences,additions,deletions,changedFiles > "$d/$n.json"
@@ -66,9 +68,16 @@ tools:
     lockdown: false
     min-integrity: none
 safe-outputs:
-  add-comment:
+  # The verdict is a PR review, not a comment: every agent comments as github-actions[bot], but only
+  # this workflow may submit a review, so the gate and the Workflow maintainer trust only reviews
+  # (#165; tests/test_gate_rules.py keeps the review outputs to this workflow). COMMENT only: the
+  # verdict is in the text, and a bot cannot approve its own PRs anyway.
+  submit-pull-request-review:
     target: "*"
     max: 5
+    allowed-events: [COMMENT]
+    required-labels: [pipeline]
+    footer: always
   noop:
     report-as-issue: false
   # One self-closing issue per workflow comes from agent-health.yml instead of an issue per failure.
@@ -144,8 +153,9 @@ choose changes when a concrete fix exists. Do not judge whether the tests pass: 
 them itself. A PR that already had fix attempts (read the gate's and the PR fixer's comments on
 it) is judged on its current head like any other.
 
-For each PR, write one comment on it (`add-comment` with that PR's number) in exactly this form,
-the first two lines verbatim with your values:
+For each PR, submit one review of it (`submit_pull_request_review` with that PR's number as
+`pull_request_number`, event `COMMENT`) whose body has exactly this form, the first two lines
+verbatim with your values:
 
 ```
 Verdict: approve
@@ -157,5 +167,6 @@ Risk: <what could break, or "low: ...">
 Reason: <one sentence the gate quotes when it merges or closes the PR>
 ```
 
-Use `Verdict: changes` and `Verdict: reject` the same way. The gate reads only a comment from this workflow whose `Head:`
-equals the PR's current head, so copy the sha exactly.
+Use `Verdict: changes` and `Verdict: reject` the same way. The gate reads only a review from this
+workflow on the PR's current head whose `Head:` equals that head, so copy the sha exactly. A
+comment is not a verdict: the gate ignores comments.

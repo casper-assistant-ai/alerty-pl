@@ -84,10 +84,13 @@ Rules:
   change them. A change to `scripts/rcb.py` reaches the live service within minutes, so keep
   `parse_list`, `build_alert`, `fetch`, `LIST_URL`, `Gazetteer` and `PARSER_VERSION` working.
 - Agent PRs carry the `agent` label. No human reviews them: the `pr-reviewer` agent judges each
-  head (value, size, risk) and writes `Verdict: approve|changes|reject` with a reason; the Agent PR
-  gate merges a PR only when tests, a live parse, a clean merge and that approve hold. A failing
-  check, a stray path, a conflict or `changes` goes to the `pr-fixer` agent, which fixes the PR in
-  its own branch (three attempts). The gate closes a PR only after `reject` (wrong on substance),
+  head (value, size, risk) and submits a PR review `Verdict: approve|changes|reject` with a reason
+  (only a review counts, never a comment); the Agent PR gate merges a PR only when tests, a live
+  parse, a clean merge and that approve hold. A failing check, a stray path, a conflict or
+  `changes` goes to the `pr-fixer` agent, which fixes the PR in its own branch (three attempts;
+  its push may touch only the agents' paths, so a stray path outside them ends in `no fix`).
+  `dashboard/` is open only to a PR whose gh-aw body footer names `security-fixer`, never by its
+  title. `scripts/gate_rules.py` holds these rules; agents may not change it. The gate closes a PR only after `reject` (wrong on substance),
   the fixer's `no fix`, or three failed attempts, and sends its issue back to the issue-worker.
   Keep PRs small and focused, with a test.
   Touch only the paths your workflow allows.

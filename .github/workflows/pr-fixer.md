@@ -67,9 +67,10 @@ steps:
         printf '%s\n' "$req" | tr -d '\r' > "$d/request.md"
         gh pr view "$n" --repo "$GITHUB_REPOSITORY" --json number,title,author,body,headRefName,headRefOid,baseRefName,closingIssuesReferences > "$d/pr.json"
         gh pr diff "$n" --repo "$GITHUB_REPOSITORY" > "$d/pr.diff"
-        # the PR reviewer's newest verdict, when it asked for changes
-        jq -rs 'add // [] | map(select(.user.login=="github-actions[bot]" and (.body | contains("workflow_id: pr-reviewer")))) | last | .body // ""' \
-          "$d/comments-$n.json" > "$d/verdict.md"
+        # the PR reviewer's newest verdict, when it asked for changes: a PR review, never a comment (#165)
+        gh api "repos/$GITHUB_REPOSITORY/pulls/$n/reviews?per_page=100" --paginate \
+          --jq '[.[] | select(.user.login == "github-actions[bot]" and (.body | test("(?m)^Verdict:")))] | last | .body // ""' \
+          > "$d/verdict.md"
         git fetch -q origin main "+refs/heads/$(jq -r .headRefName "$d/pr.json"):refs/remotes/origin/pr-head"
         git checkout -q -B "$(jq -r .headRefName "$d/pr.json")" origin/pr-head
         case "$(jq -r .author.login "$d/pr.json")" in
@@ -90,6 +91,19 @@ safe-outputs:
   push-to-pull-request-branch:
     target: "*"
     required-labels: [pipeline]
+    # The paths an agent PR may change, the same as ALLOWED in agent-pr-gate.yml (#166;
+    # tests/test_gate_rules.py compares them). gh-aw globs have no character classes, so `*` here
+    # also takes names that ALLOWED's [a-z0-9-]+ refuses; the gate then refuses those.
+    allowed-files:
+      - "scripts/**"
+      - "tests/**"
+      - "process/*.md"
+      - "process/*.json"
+      - "docs/*.html"
+      - "docs/*.js"
+      - "docs/*.css"
+      - "README.md"
+      - "AGENTS.md"
     if-no-changes: warn
     fallback-as-pull-request: false
     exclude-lock-yml: true
@@ -126,11 +140,16 @@ branch is already checked out, and the same folder holds:
 - `pr.json` and `pr.diff`: the PR's title, author, body, base branch, linked issues and its
   current change.
 
+Your push may change only the agents' paths: `scripts/`, `tests/`, `docs/*.html|js|css`,
+`process/*.md|json`, `README.md` and `AGENTS.md` (the same list as the gate's `ALLOWED`). The push
+refuses a commit that touches any other file, a revert included (#166). When the fix needs a file
+outside them, push nothing and answer `no fix` with that as the cause.
+
 `todo.md` gives the PR's kind. **agent**: one of the repository's agents opened it; all steps
-below apply. **dependabot**: a version bump in `server/requirements*.txt`; never change the
-requirements file (the push refuses it): adapt the code in `server/` or `tests/` to the new
-version, or answer `no fix`. **owner**: the owner's own PR; keep what he meant, change as little
-of his work as you can, and do not revert his files outside the agents' paths.
+below apply. **dependabot**: a version bump in `server/requirements*.txt`; you cannot change
+`server/`: adapt `tests/` to the new version when that is enough, or answer `no fix`. **owner**:
+the owner's own PR; keep what he meant, change as little of his work as you can, and leave his
+files outside the agents' paths as they are (answer `no fix` when the fix is there).
 
 Do this:
 
@@ -139,8 +158,9 @@ Do this:
    `for f in docs/*.js; do node --check "$f"; done`. The gate also starts the live service for a
    change in `server/`; when that failed, read its error in the request's log.
 2. Make the smallest change in this branch that removes the cause and keeps the PR's purpose:
-   fix the code or the test, revert files outside `scripts/`, `tests/`, `docs/*.html|js|css`,
-   `README.md`, `AGENTS.md` and `process/*.md` (agent PRs only), or do what the reviewer asked. Never make the
+   fix the code or the test, or do what the reviewer asked. An agent PR that changes files outside
+   the agents' paths cannot be fixed here (the revert would touch them): answer `no fix`, and the
+   gate closes it and the issue-worker takes its issue again. Never make the
    problem go away by weakening a check: no deleted or loosened asserts, no new `skip` or
    `expectedFailure`, no removed test. For a merge conflict, `git merge origin/main` and resolve it.
 3. Run the three checks again; all must pass. Commit with a Conventional Commit subject

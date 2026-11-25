@@ -3,7 +3,8 @@ name: Agent PR gate
 # No humans in the loop: agent PRs are merged or closed by this gate, never left for a person.
 # A PR is merged only when (1) a gh-aw agent opened it, (2) it touches allowed paths only,
 # (3) unit tests, a live parse of gov.pl, node --check and html-validate pass on its head, (4) it merges into main
-# cleanly, and (5) the PR reviewer agent approved that same head. When (2), (3) or (4) fails, or the
+# cleanly, and (5) the PR reviewer agent approved that same head in a PR review (never a comment;
+# scripts/gate_rules.py). When (2), (3) or (4) fails, or the
 # reviewer says "Verdict: changes", the gate asks the PR fixer agent to fix the PR in its own branch
 # ("Agent PR gate: fix attempt k of 3", with the reason and the test log) and tests the new head
 # again. It closes a PR only when the reviewer rejects it on substance, the fixer finds it cannot be
@@ -174,10 +175,11 @@ jobs:
             files=$(gh pr diff "$n" --name-only)
             case "$kind" in
               agent)
-                allowed="$ALLOWED"
-                # the security-fixer also fixes CodeQL alerts in the vendored gh-cao dashboard
-                case "$(gh pr view "$n" --json title --jq .title)" in "[security-fixer] "*) allowed="$ALLOWED|$SECURITY_ALLOWED";; esac
-                bad=$(echo "$files" | grep -Ev "$allowed" || true)
+                # the security-fixer also fixes CodeQL alerts in the vendored gh-cao dashboard: known by
+                # the footer gh-aw appends to the PR body, never by the title the agent writes (#164)
+                gh pr view "$n" --json body --jq .body > "/tmp/body-$n.md"
+                bad=$(echo "$files" | python3 -I scripts/gate_rules.py bad-files --body-file "/tmp/body-$n.md" \
+                      --allowed "$ALLOWED" --security "$SECURITY_ALLOWED") || bad="(the path check failed)"
                 if [ -n "$bad" ]; then
                   request_fix "It changes files outside the allowed paths: $(echo $bad). Revert them."
                   echo "::endgroup::"; continue
@@ -185,6 +187,11 @@ jobs:
                 # the Workflow maintainer's script runs with the deploy key: only Casper or the owner changes it
                 if echo "$files" | grep -qx 'scripts/workflow_change\.py'; then
                   request_fix "It changes scripts/workflow_change.py, the Workflow maintainer's script, which runs with the deploy key and is pinned by hash in workflow-maintainer.yml; only Casper or the owner changes it. Revert it."
+                  echo "::endgroup::"; continue
+                fi
+                # the gate's own rules (paths by footer, the reviewer's verdict): only Casper or the owner changes them
+                if echo "$files" | grep -qx 'scripts/gate_rules\.py'; then
+                  request_fix "It changes scripts/gate_rules.py, the rules this gate merges by; only Casper or the owner changes it. Revert it."
                   echo "::endgroup::"; continue
                 fi;;
               dependabot)
@@ -230,13 +237,12 @@ jobs:
               request_fix "It conflicts with main: merge origin/main into the branch and resolve the conflict."
               echo "::endgroup::"; continue
             fi
-            # the PR reviewer's verdict on this exact head (its comments carry gh-aw's workflow_id footer)
-            jq -rs --arg sha "$sha" 'add // [] | map(select(.user.login=="github-actions[bot]"
-                  and (.body | contains("workflow_id: pr-reviewer"))
-                  and (.body | test("(?m)^Head: *" + $sha)))) | last | .body // ""' "/tmp/comments-$n.json" \
-              | tr -d '\r' > "/tmp/verdict-$n.txt"
-            verdict=$(sed -nE 's/^Verdict: *(approve|changes|reject).*/\1/p' "/tmp/verdict-$n.txt" | head -1)
-            reason=$(sed -nE 's/^Reason: *//p' "/tmp/verdict-$n.txt" | head -1)
+            # the PR reviewer's verdict on this exact head: a PR review (only the pr-reviewer workflow can
+            # submit one), never a comment, which any agent can write with the reviewer's footer (#165)
+            gh api "repos/$GITHUB_REPOSITORY/pulls/$n/reviews?per_page=100" --paginate > "/tmp/reviews-$n.json"
+            python3 -I scripts/gate_rules.py verdict --reviews-file "/tmp/reviews-$n.json" --sha "$sha" > "/tmp/verdict-$n.txt" || : > "/tmp/verdict-$n.txt"
+            verdict=$(cut -f1 "/tmp/verdict-$n.txt")
+            reason=$(cut -f2- "/tmp/verdict-$n.txt")
             if [ -z "$verdict" ]; then
               echo "tests pass; no reviewer verdict for $sha yet"
               need_review=1

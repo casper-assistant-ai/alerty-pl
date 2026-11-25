@@ -1,5 +1,5 @@
-# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"6bdb1e130f30fbfd37ff4f768a3a2835219fb88a25eb8b30b4f00f3b53647d18","body_hash":"7c48e3e48eb0b166a21cfb488e1a890e04e2d0f4ca4bcd1fd564358604fd548e","compiler_version":"v1.2.2","strict":true,"agent_id":"claude","agent_model":"glm-5.4","engine_versions":{"claude":"2.1.317"}}
-# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_DEFAULT_OTLP_ENDPOINT","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN"],"actions":[{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"9000827ccba6bdab643e8b6fd33ac0654aef8333","version":"v8.0.2"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"949feb2413d6458794dcd2491c4babbbce0c15c1","version":"v7.1.0"},{"repo":"actions/upload-artifact","sha":"cf430e030ddbb5b0abf93d22962f4752f3646cd9","version":"v7.0.2"},{"repo":"github/gh-aw-actions/setup","sha":"53d0749e19424a918acd82b4d140264ce48f2f14","version":"v1.2.2"}],"plugins":["microsoft/TokenEconomizer/plugin@1bfeccdcecf48333b22762ad1dd9e36c6dc065df"],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.29.11","digest":"sha256:8774a73c351395b41d2ad0af4ddb4689007c67de3cd08bd9f43bb8a0e300690e","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.29.11@sha256:8774a73c351395b41d2ad0af4ddb4689007c67de3cd08bd9f43bb8a0e300690e"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.29.11","digest":"sha256:88d2d0e315a504d93fd4fb8847fd0f6b7f4469f41a6fc6047b3dc9654c56ab2c","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.29.11@sha256:88d2d0e315a504d93fd4fb8847fd0f6b7f4469f41a6fc6047b3dc9654c56ab2c"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.29.11","digest":"sha256:861739ecf924dd2db5e5fb652db2ad82aaafd1615623297ddabc8f41a36b2847","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.29.11@sha256:861739ecf924dd2db5e5fb652db2ad82aaafd1615623297ddabc8f41a36b2847"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.5.6","digest":"sha256:342cd624e1f179d91be2de7a146fc4f387092e62e6c8a47506d7932e113d2311","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.5.6@sha256:342cd624e1f179d91be2de7a146fc4f387092e62e6c8a47506d7932e113d2311"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:8735428c2d4e602f90781ba0c571c400e8ff93c7ee1508a75d71f87e34e415cc","pinned_image":"ghcr.io/github/gh-aw-node@sha256:8735428c2d4e602f90781ba0c571c400e8ff93c7ee1508a75d71f87e34e415cc"},{"image":"ghcr.io/github/github-mcp-server:v2.1.0","digest":"sha256:f6056fc10bfffcc8c81a6417a2e9ca12808647e8dd6049642a4feaadee0e0f8a","pinned_image":"ghcr.io/github/github-mcp-server:v2.1.0@sha256:f6056fc10bfffcc8c81a6417a2e9ca12808647e8dd6049642a4feaadee0e0f8a"}],"mcp_servers":[{"name":"github","tools":["get_commit","get_file_contents","get_latest_release","get_me","get_pull_request","get_pull_request_comments","get_pull_request_diff","get_pull_request_files","get_pull_request_review_comments","get_pull_request_reviews","get_pull_request_status","get_release_by_tag","get_tag","issue_read","list_branches","list_commits","list_issue_types","list_issues","list_pull_requests","list_releases","list_starred_repositories","list_tags","pull_request_read","search_code","search_issues","search_pull_requests","search_repositories"]},{"name":"safeoutputs","tools":["add_comment","noop","report_incomplete","report_missing_data","report_missing_tool"]}],"threat_detection":{"mode":"enabled"},"admission":false,"agent_metadata":{"fbd10cd783979952bdc7":{"name":"Agentic Workflows"}}}
+# gh-aw-metadata: {"schema_version":"v4","frontmatter_hash":"a40f1f8f82103f19e965f08de2b6f39b5a0c3d2032fc5a10c1c954a29c8aa783","body_hash":"436e05d5ebe4afd3810915b1de474cd6db3b60950f991ccbba80a4946ccc76eb","compiler_version":"v1.2.2","strict":true,"agent_id":"claude","agent_model":"glm-5.4","engine_versions":{"claude":"2.1.317"}}
+# gh-aw-manifest: {"version":1,"secrets":["ANTHROPIC_API_KEY","COPILOT_GITHUB_TOKEN","GH_AW_DEFAULT_OTLP_ENDPOINT","GH_AW_DEFAULT_OTLP_HEADERS","GH_AW_GITHUB_MCP_SERVER_TOKEN","GH_AW_GITHUB_TOKEN","GITHUB_TOKEN"],"actions":[{"repo":"actions/checkout","sha":"3d3c42e5aac5ba805825da76410c181273ba90b1","version":"v7.0.1"},{"repo":"actions/download-artifact","sha":"9000827ccba6bdab643e8b6fd33ac0654aef8333","version":"v8.0.2"},{"repo":"actions/github-script","sha":"3a2844b7e9c422d3c10d287c895573f7108da1b3","version":"v9.0.0"},{"repo":"actions/setup-node","sha":"949feb2413d6458794dcd2491c4babbbce0c15c1","version":"v7.1.0"},{"repo":"actions/upload-artifact","sha":"cf430e030ddbb5b0abf93d22962f4752f3646cd9","version":"v7.0.2"},{"repo":"github/gh-aw-actions/setup","sha":"53d0749e19424a918acd82b4d140264ce48f2f14","version":"v1.2.2"}],"plugins":["microsoft/TokenEconomizer/plugin@1bfeccdcecf48333b22762ad1dd9e36c6dc065df"],"containers":[{"image":"ghcr.io/github/gh-aw-firewall/agent:0.29.11","digest":"sha256:8774a73c351395b41d2ad0af4ddb4689007c67de3cd08bd9f43bb8a0e300690e","pinned_image":"ghcr.io/github/gh-aw-firewall/agent:0.29.11@sha256:8774a73c351395b41d2ad0af4ddb4689007c67de3cd08bd9f43bb8a0e300690e"},{"image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.29.11","digest":"sha256:88d2d0e315a504d93fd4fb8847fd0f6b7f4469f41a6fc6047b3dc9654c56ab2c","pinned_image":"ghcr.io/github/gh-aw-firewall/api-proxy:0.29.11@sha256:88d2d0e315a504d93fd4fb8847fd0f6b7f4469f41a6fc6047b3dc9654c56ab2c"},{"image":"ghcr.io/github/gh-aw-firewall/squid:0.29.11","digest":"sha256:861739ecf924dd2db5e5fb652db2ad82aaafd1615623297ddabc8f41a36b2847","pinned_image":"ghcr.io/github/gh-aw-firewall/squid:0.29.11@sha256:861739ecf924dd2db5e5fb652db2ad82aaafd1615623297ddabc8f41a36b2847"},{"image":"ghcr.io/github/gh-aw-mcpg:v0.5.6","digest":"sha256:342cd624e1f179d91be2de7a146fc4f387092e62e6c8a47506d7932e113d2311","pinned_image":"ghcr.io/github/gh-aw-mcpg:v0.5.6@sha256:342cd624e1f179d91be2de7a146fc4f387092e62e6c8a47506d7932e113d2311"},{"image":"ghcr.io/github/gh-aw-node","digest":"sha256:8735428c2d4e602f90781ba0c571c400e8ff93c7ee1508a75d71f87e34e415cc","pinned_image":"ghcr.io/github/gh-aw-node@sha256:8735428c2d4e602f90781ba0c571c400e8ff93c7ee1508a75d71f87e34e415cc"},{"image":"ghcr.io/github/github-mcp-server:v2.1.0","digest":"sha256:f6056fc10bfffcc8c81a6417a2e9ca12808647e8dd6049642a4feaadee0e0f8a","pinned_image":"ghcr.io/github/github-mcp-server:v2.1.0@sha256:f6056fc10bfffcc8c81a6417a2e9ca12808647e8dd6049642a4feaadee0e0f8a"}],"mcp_servers":[{"name":"github","tools":["get_commit","get_file_contents","get_latest_release","get_me","get_pull_request","get_pull_request_comments","get_pull_request_diff","get_pull_request_files","get_pull_request_review_comments","get_pull_request_reviews","get_pull_request_status","get_release_by_tag","get_tag","issue_read","list_branches","list_commits","list_issue_types","list_issues","list_pull_requests","list_releases","list_starred_repositories","list_tags","pull_request_read","search_code","search_issues","search_pull_requests","search_repositories"]},{"name":"safeoutputs","tools":["noop","report_incomplete","report_missing_data","report_missing_tool","submit_pull_request_review"]}],"threat_detection":{"mode":"enabled"},"admission":false,"agent_metadata":{"fbd10cd783979952bdc7":{"name":"Agentic Workflows"}}}
 # This file was automatically generated by gh-aw (v1.2.2). DO NOT EDIT. To debug this workflow, load the skill at https://github.com/github/gh-aw/blob/main/debug.md
 #
 #    ___                   _   _
@@ -24,7 +24,7 @@
 # For more information: https://github.github.com/gh-aw/introduction/overview/
 #
 # Reviews every open agent PR with no human in the loop: judges its value, size and risk and
-# writes one verdict comment, "Verdict: approve", "Verdict: changes" (a fixable defect) or
+# submits one verdict review, "Verdict: approve", "Verdict: changes" (a fixable defect) or
 # "Verdict: reject" (wrong on substance), with the reason and the head commit it read. The Agent
 # PR gate merges a PR only when its tests pass and this verdict approves its current head; for
 # "changes" it sends the PR to the PR fixer, which fixes it in the same branch (three attempts);
@@ -319,7 +319,7 @@ jobs:
             <system>
           GH_AW_PROMPT_CONTENT_0001: |
             <safe-output-tools>
-            Tools: add_comment(max:5), report_missing_tool, report_missing_data, noop(max:2)
+            Tools: submit_pull_request_review(max:5), report_missing_tool, report_missing_data, noop(max:2)
           GH_AW_PROMPT_CONTENT_0002: |
             </safe-output-tools>
           GH_AW_PROMPT_CONTENT_0003: |+
@@ -664,9 +664,11 @@ jobs:
           prs=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label pipeline --json number --jq '.[].number')
           for n in $prs; do
             sha=$(gh pr view "$n" --repo "$GITHUB_REPOSITORY" --json headRefOid --jq .headRefOid)
-            # skip a PR whose current head already has a verdict
-            if gh api "repos/$GITHUB_REPOSITORY/issues/$n/comments" --paginate \
-                 --jq '.[] | select(.body | contains("workflow_id: pr-reviewer")) | .body' | tr -d '\r' | grep -q "^Head: $sha"; then
+            # skip a PR whose current head already has a verdict: a review of that commit by this workflow
+            # (the only one with the submit-pull-request-review output; the gate reads only reviews, #165)
+            if gh api "repos/$GITHUB_REPOSITORY/pulls/$n/reviews?per_page=100" --paginate \
+                 --jq ".[] | select(.user.login == \"github-actions[bot]\" and .commit_id == \"$sha\") | .body" \
+                 | tr -d '\r' | grep -q "^Head: $sha"; then
               continue
             fi
             gh pr view "$n" --repo "$GITHUB_REPOSITORY" --json number,title,author,body,headRefOid,baseRefName,closingIssuesReferences,additions,deletions,changedFiles > "$d/$n.json"
@@ -784,7 +786,7 @@ jobs:
         env:
           GH_AW_FILE_ROOT: "${{ runner.temp }}/gh-aw"
           GH_AW_FILE_CONFIG: "{\"files\":[{\"path\":\"safeoutputs/config.json\",\"content_env\":\"GH_AW_SAFE_OUTPUTS_CONFIG\"}]}"
-          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"add_comment\":{\"max\":5,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"noop\":{\"max\":2,\"report-as-issue\":\"false\"},\"report_incomplete\":{},\"report_missing_data\":{},\"report_missing_tool\":{}}"
+          GH_AW_SAFE_OUTPUTS_CONFIG: "{\"create_report_incomplete_issue\":{},\"noop\":{\"max\":2,\"report-as-issue\":\"false\"},\"report_incomplete\":{},\"report_missing_data\":{},\"report_missing_tool\":{},\"submit_pull_request_review\":{\"allowed_events\":[\"COMMENT\"],\"footer\":\"always\",\"max\":5,\"target\":\"*\"}}"
         with:
           script: |
             const path = require('path');
@@ -798,54 +800,27 @@ jobs:
           GH_AW_TOOLS_META_JSON: |
             {
               "description_suffixes": {
-                "add_comment": " CONSTRAINTS: Maximum 5 comment(s) can be added. Target: *. Supports reply_to_id for discussion threading."
+                "submit_pull_request_review": " CONSTRAINTS: Maximum 5 review(s) can be submitted. Target: *."
               },
               "repo_params": {},
-              "dynamic_tools": []
+              "dynamic_tools": [],
+              "property_injections": {
+                "submit_pull_request_review": {
+                  "event": {
+                    "description": "Review decision. Restricted by allowed-events configuration to: COMMENT.",
+                    "enum": [
+                      "COMMENT"
+                    ],
+                    "type": "string",
+                    "x-synonyms": [
+                      "action"
+                    ]
+                  }
+                }
+              }
             }
           GH_AW_VALIDATION_JSON: |
             {
-              "add_comment": {
-                "defaultMax": 1,
-                "fields": {
-                  "body": {
-                    "required": true,
-                    "type": "string",
-                    "sanitize": true,
-                    "maxLength": 65000
-                  },
-                  "comment_id": {
-                    "optionalPositiveInteger": true
-                  },
-                  "item_number": {
-                    "issueOrPRNumber": true
-                  },
-                  "pr": {
-                    "issueOrPRNumber": true
-                  },
-                  "pr_number": {
-                    "issueOrPRNumber": true
-                  },
-                  "reply_to_id": {
-                    "type": "string",
-                    "maxLength": 256
-                  },
-                  "repo": {
-                    "type": "string",
-                    "maxLength": 256
-                  },
-                  "target": {
-                    "type": "string",
-                    "enum": [
-                      "status"
-                    ]
-                  },
-                  "temporary_id": {
-                    "type": "string",
-                    "pattern": "^#?aw_[A-Za-z0-9_]{3,12}$"
-                  }
-                }
-              },
               "noop": {
                 "defaultMax": 2,
                 "fields": {
@@ -916,6 +891,31 @@ jobs:
                     "type": "string",
                     "sanitize": true,
                     "maxLength": 128
+                  }
+                }
+              },
+              "submit_pull_request_review": {
+                "defaultMax": 1,
+                "fields": {
+                  "body": {
+                    "type": "string",
+                    "sanitize": true,
+                    "maxLength": 65000
+                  },
+                  "event": {
+                    "type": "string",
+                    "enum": [
+                      "APPROVE",
+                      "REQUEST_CHANGES",
+                      "COMMENT"
+                    ]
+                  },
+                  "pull_request_number": {
+                    "issueOrPRNumber": true
+                  },
+                  "repo": {
+                    "type": "string",
+                    "maxLength": 256
                   }
                 }
               }
@@ -1993,7 +1993,7 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           WORKFLOW_NAME: "PR reviewer"
-          WORKFLOW_DESCRIPTION: "Reviews every open agent PR with no human in the loop: judges its value, size and risk and\nwrites one verdict comment, \"Verdict: approve\", \"Verdict: changes\" (a fixable defect) or\n\"Verdict: reject\" (wrong on substance), with the reason and the head commit it read. The Agent\nPR gate merges a PR only when its tests pass and this verdict approves its current head; for\n\"changes\" it sends the PR to the PR fixer, which fixes it in the same branch (three attempts);\na rejected PR is closed and its issue goes back to the issue-worker. Started by the gate; a\nschedule catches anything the gate missed."
+          WORKFLOW_DESCRIPTION: "Reviews every open agent PR with no human in the loop: judges its value, size and risk and\nsubmits one verdict review, \"Verdict: approve\", \"Verdict: changes\" (a fixable defect) or\n\"Verdict: reject\" (wrong on substance), with the reason and the head commit it read. The Agent\nPR gate merges a PR only when its tests pass and this verdict approves its current head; for\n\"changes\" it sends the PR to the PR fixer, which fixes it in the same branch (three attempts);\na rejected PR is closed and its issue goes back to the issue-worker. Started by the gate; a\nschedule catches anything the gate missed."
           HAS_PATCH: ${{ needs.agent.outputs.has_patch }}
           GH_AW_DETECTION_CONTINUE_ON_ERROR: "true"
           GH_AW_DETECTION_SKIP_PROMPT_SUMMARY: "true"
@@ -2065,7 +2065,7 @@ jobs:
           RUNNER_TEMP: ${{ runner.temp }}
           TRACEPARENT: ${{ env.GITHUB_AW_OTEL_TRACE_ID != '' && env.GITHUB_AW_OTEL_PARENT_SPAN_ID != '' && format('00-{0}-{1}-01', env.GITHUB_AW_OTEL_TRACE_ID, env.GITHUB_AW_OTEL_PARENT_SPAN_ID) || '' }}
           WORKFLOW_NAME: "PR reviewer"
-          WORKFLOW_DESCRIPTION: "Reviews every open agent PR with no human in the loop: judges its value, size and risk and\nwrites one verdict comment, \"Verdict: approve\", \"Verdict: changes\" (a fixable defect) or\n\"Verdict: reject\" (wrong on substance), with the reason and the head commit it read. The Agent\nPR gate merges a PR only when its tests pass and this verdict approves its current head; for\n\"changes\" it sends the PR to the PR fixer, which fixes it in the same branch (three attempts);\na rejected PR is closed and its issue goes back to the issue-worker. Started by the gate; a\nschedule catches anything the gate missed."
+          WORKFLOW_DESCRIPTION: "Reviews every open agent PR with no human in the loop: judges its value, size and risk and\nsubmits one verdict review, \"Verdict: approve\", \"Verdict: changes\" (a fixable defect) or\n\"Verdict: reject\" (wrong on substance), with the reason and the head commit it read. The Agent\nPR gate merges a PR only when its tests pass and this verdict approves its current head; for\n\"changes\" it sends the PR to the PR fixer, which fixes it in the same branch (three attempts);\na rejected PR is closed and its issue goes back to the issue-worker. Started by the gate; a\nschedule catches anything the gate missed."
           HAS_PATCH: ${{ needs.agent.outputs.has_patch }}
           GH_AW_DETECTION_CONTINUE_ON_ERROR: "true"
         run: |
@@ -2260,8 +2260,6 @@ jobs:
     outputs:
       code_push_failure_count: ${{ steps.process_safe_outputs.outputs.code_push_failure_count }}
       code_push_failure_errors: ${{ steps.process_safe_outputs.outputs.code_push_failure_errors }}
-      comment_id: ${{ steps.process_safe_outputs.outputs.comment_id }}
-      comment_url: ${{ steps.process_safe_outputs.outputs.comment_url }}
       create_discussion_error_count: ${{ steps.process_safe_outputs.outputs.create_discussion_error_count }}
       create_discussion_errors: ${{ steps.process_safe_outputs.outputs.create_discussion_errors }}
       process_safe_outputs_items_applied: ${{ steps.process_safe_outputs.outputs.items_applied }}
@@ -2328,7 +2326,7 @@ jobs:
           GH_AW_ALLOWED_DOMAINS: "*.pythonhosted.org,anaconda.org,api.z.ai,archive.ubuntu.com,azure.archive.ubuntu.com,binstar.org,bootstrap.pypa.io,conda.anaconda.org,conda.binstar.org,crl.geotrust.com,crl.globalsign.com,crl.identrust.com,crl.sectigo.com,crl.thawte.com,crl.usertrust.com,crl.verisign.com,crl3.digicert.com,crl4.digicert.com,crls.ssl.com,files.pythonhosted.org,json-schema.org,json.schemastore.org,keyserver.ubuntu.com,ocsp.digicert.com,ocsp.geotrust.com,ocsp.globalsign.com,ocsp.identrust.com,ocsp.sectigo.com,ocsp.ssl.com,ocsp.thawte.com,ocsp.usertrust.com,ocsp.verisign.com,pip.pypa.io,pypi.org,pypi.python.org,repo.anaconda.com,repo.continuum.io,s.symcb.com,s.symcd.com,security.ubuntu.com,ts-crl.ws.symantec.com,ts-ocsp.ws.symantec.com"
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_API_URL: ${{ github.api_url }}
-          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"add_comment\":{\"max\":5,\"target\":\"*\"},\"create_report_incomplete_issue\":{},\"noop\":{\"max\":2,\"report-as-issue\":\"false\"},\"report_incomplete\":{},\"report_missing_data\":{},\"report_missing_tool\":{}}"
+          GH_AW_SAFE_OUTPUTS_HANDLER_CONFIG: "{\"create_report_incomplete_issue\":{},\"noop\":{\"max\":2,\"report-as-issue\":\"false\"},\"report_incomplete\":{},\"report_missing_data\":{},\"report_missing_tool\":{},\"submit_pull_request_review\":{\"allowed_events\":[\"COMMENT\"],\"footer\":\"always\",\"max\":5,\"target\":\"*\"}}"
           GH_AW_GITHUB_TOKEN_SOURCE: ${{ secrets.GH_AW_GITHUB_TOKEN != '' && 'pat' || 'github_actions' }}
         with:
           github-token: ${{ secrets.GH_AW_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}

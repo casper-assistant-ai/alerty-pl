@@ -84,7 +84,7 @@ flowchart LR
 | `agent-dispatch.yml` | plain Actions | — | daily | nothing; starts the extra agent runs planned in `process/schedule.json` |
 | `workflow-maintainer.yml` | plain Actions | — | every 30 min, after the process-doctor | lands `workflow-change` issues: applies the patch, compiles, guards permissions, network, tools, steps, scripts and secrets, tests, pushes with the deploy key (prompt text after the PR reviewer approves it; a `run:` script goes to Casper, label `needs-casper`), closes the issue |
 | `agent-health.yml` | plain Actions | — | after every agent run, twice an hour | one self-closing `[aw] <agent>: N failed runs in a row` issue per failing agent; dispatches `process-doctor` for a new one |
-| `pr-reviewer` | agent | GLM-5.4 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
+| `pr-reviewer` | agent | GLM-5.4 (z.ai) | when the gate asks | verdict PR review: approve, changes or reject |
 | `pr-fixer` | agent | GLM-5.4 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |
 | `issue-worker` | agent | GLM-5.4 (z.ai) | every 2 h, on each new issue, when the CI doctor, the gate or the process-retro dispatches it | fix PR (`Closes #N`) or closes the issue; takes a `dev-task` at once; improvement PR from `process/improvements.md` |
 | `parser-doctor` | agent | GLM-5.4 (z.ai) | daily + when Update fails | PR: `scripts/`, `tests/` |
