@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-25",
+   "time": "2026-11-25T21:06:52+01:00",
+   "sha": "e6be563",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "issue-worker",
+     "breaking": false,
+     "text": "reports end in the run that reads them; start the worker when new work waits",
+     "sha": "e6be563",
+     "date": "2026-11-25",
+     "time": "2026-11-25T21:06:52+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "agents",
+     "breaking": false,
+     "text": "re-run agent runs that a z.ai 429 or 529 ended with nothing sent",
+     "sha": "acdc42a",
+     "date": "2026-11-25",
+     "time": "2026-11-25T21:06:52+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.28.0",
    "date": "2026-11-25",
    "time": "2026-11-25T18:41:35Z",

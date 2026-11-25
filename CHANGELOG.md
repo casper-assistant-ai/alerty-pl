@@ -2,6 +2,13 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **issue-worker:** reports end in the run that reads them; start the worker when new work waits ([e6be563](https://github.com/casper-assistant-ai/alerty-pl/commit/e6be563))
+- **agents:** re-run agent runs that a z.ai 429 or 529 ended with nothing sent ([acdc42a](https://github.com/casper-assistant-ai/alerty-pl/commit/acdc42a))
+
 ## 1.28.0 (2026-11-25)
 
 ### feat
