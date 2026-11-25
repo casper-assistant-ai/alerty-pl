@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.25.0 (2026-11-25)
+
+### feat
+
+- **site:** per-page dictionaries (i18nAdd), tn() plural forms and loc() for PL/EN/UK (#58) ([427df49](https://github.com/casper-assistant-ai/alerty-pl/commit/427df49))
+
+### chore
+
+- **process:** rule for the site-designer's refused patch, ledger of 7 days (#143) ([111a2da](https://github.com/casper-assistant-ai/alerty-pl/commit/111a2da))
+
 ## 1.24.1 (2026-11-25)
 
 ### fix
