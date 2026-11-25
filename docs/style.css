@@ -557,6 +557,11 @@ footer p { margin: 0; max-width: 90ch; }
   summary { padding: 8px 0; }
   .more { padding: 8px 0; margin-top: 4px; }
   .row-meta a, .hist a.src, .changes .sha { display: inline-block; padding: 4px 0; min-height: 26px; line-height: 18px; }
+  /* the header's source link is one line of 13 px text (20 px): up to 640 px wide it is hidden, but on a
+     phone held sideways it shows and the audit listed it at 172x20 on every page (#140). It is a flex item,
+     so padding and min-height apply without display, which here would undo the hiding above (same
+     specificity, later in the sheet) */
+  .top .src { padding: 4px 0; min-height: 26px; line-height: 18px; }
   /* the sticky month heading rides over the top rows of its month, and a tap on the covered
      link hits the heading: on touch it scrolls away with its rows instead */
   .month h2 { position: static; }
