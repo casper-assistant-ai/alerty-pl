@@ -32,14 +32,27 @@ jobs:
             # a forced push (history rewrite): the old tip is gone, lint the last commit only
             python3 -I scripts/changelog.py lint "HEAD~1..HEAD"
           fi
+      - name: Repository rules (scripts/pr_rules.py; AGENTS.md lists them)
+        env:
+          BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            printf '%s' "$BODY" > /tmp/pr-body.md
+            python3 -I scripts/pr_rules.py check --base "origin/$BASE" --head HEAD --body-file /tmp/pr-body.md
+          elif [ -n "$BEFORE" ] && [ "$BEFORE" != "0000000000000000000000000000000000000000" ] \
+              && git merge-base --is-ancestor "$BEFORE" HEAD 2>/dev/null; then
+            python3 -I scripts/pr_rules.py commits "$BEFORE..${{ github.sha }}"
+          fi
       - name: Unit tests on saved RCB pages
         run: python3 -I -m unittest discover -s tests -v
       - name: Live smoke test (gov.pl list page parses)
         run: python3 -I scripts/rcb.py update --pages 1 --out /tmp/smoke && python3 -I -c "import json;d=json.load(open('/tmp/smoke/alerts.json'));assert d['alerts'],'no alerts';print(len(d['alerts']),'alerts')"
       - name: JavaScript syntax
         run: for f in docs/*.js; do node --check "$f"; done
-      - name: Python lint (ruff, rules in ruff.toml)
-        run: pipx run ruff==0.17.6 check --output-format=github .
+      - name: Python lint (ruff, rules in ruff.toml; noqa comments do not count)
+        run: pipx run ruff==0.17.6 check --ignore-noqa --output-format=github .
       - name: JavaScript lint (ESLint, rules in eslint.config.mjs)
         run: |
           npm install --no-save --no-package-lock --no-audit --no-fund eslint@10.15.0 @eslint/js@10.0.1 globals@17.14.0

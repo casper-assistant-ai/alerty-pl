@@ -16,8 +16,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
-import gate_rules as gr  # noqa: E402
-import workflow_change as wc  # noqa: E402
+import gate_rules as gr
+import workflow_change as wc
 
 WF = ROOT / ".github" / "workflows"
 GATE = (WF / "agent-pr-gate.yml").read_text(encoding="utf-8")
@@ -101,7 +101,11 @@ class DashboardByFooter(unittest.TestCase):
         self.assertIn("scripts/gate_rules.py bad-files", GATE)
         self.assertNotIn('"[security-fixer] "*)', GATE)
         # and an agent PR may not change the rules themselves
-        self.assertIn("grep -qx 'scripts/gate_rules\\.py'", GATE)
+        prot = re.search(r"^ +PROTECTED: '([^']+)'", GATE, re.M).group(1)
+        for path in ("scripts/gate_rules.py", "scripts/workflow_change.py", "scripts/pr_rules.py"):
+            self.assertRegex(path, f"^(?:{prot})$")
+        self.assertNotRegex("scripts/rcb.py", f"^(?:{prot})$")
+        self.assertIn('grep -xE "$PROTECTED"', GATE)
 
 
 SHA = "0123456789abcdef0123456789abcdef01234567"

@@ -35,8 +35,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 sys.path.insert(0, HERE)
-import core  # noqa: E402
-import rcb  # noqa: E402  the site's own parser
+import core
+import rcb  # the site's own parser
 
 log = logging.getLogger("alerty")
 TZ = ZoneInfo("Europe/Warsaw")

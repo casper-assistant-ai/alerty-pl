@@ -9,7 +9,7 @@ from unittest import mock
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
-import rcb  # noqa: E402
+import rcb
 
 FIX = os.path.join(ROOT, "tests", "fixtures")
 GEO = json.load(open(os.path.join(ROOT, "docs/geo/poland.json"), encoding="utf-8"))

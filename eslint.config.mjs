@@ -8,6 +8,8 @@ import globals from "globals";
 export default [
   // codeql/*/test holds the cases a query must find, bad on purpose
   { ignores: ["dashboard/**", "docs/vendor/**", ".github/**", "node_modules/**", "codeql/**"] },
+  // eslint-disable and other inline comments do not count: a finding is fixed, never silenced
+  { linterOptions: { noInlineConfig: true, reportUnusedInlineConfigs: "error" } },
   js.configs.recommended,
   {
     files: ["docs/**/*.js"],

@@ -6,7 +6,7 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "server"))
-import core  # noqa: E402
+import core
 
 
 def alert(cat="air", vs=("lubelskie",), whole=(), updates=1, status="active"):

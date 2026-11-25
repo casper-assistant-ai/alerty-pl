@@ -2,7 +2,8 @@ name: Agent PR gate
 
 # No humans in the loop: agent PRs are merged or closed by this gate, never left for a person.
 # A PR is merged only when (1) a gh-aw agent opened it, (2) it touches allowed paths only,
-# (3) unit tests, a live parse of gov.pl, node --check, html-validate, ruff and ESLint pass on its head, and CodeQL
+# (3) the repository rules of scripts/pr_rules.py hold, unit tests, a live parse of gov.pl, node --check,
+# html-validate, ruff and ESLint pass on its head, and CodeQL
 # found no new alert on it, (4) it merges into main
 # cleanly, and (5) the PR reviewer agent approved that same head in a PR review (never a comment;
 # scripts/gate_rules.py). When (2), (3) or (4) fails, or the
@@ -52,6 +53,8 @@ jobs:
       SECURITY_ALLOWED: '^dashboard/'
       DEPENDABOT_ALLOWED: '^server/requirements[a-z0-9-]*\.txt$'
       OWNER_FORBIDDEN: '^\.github/workflows/'
+      # scripts only Casper or the owner changes; the gate runs its own copies from main
+      PROTECTED: 'scripts/(workflow_change|gate_rules|pr_rules)\.py'
       # GitHub logins whose PRs the pipeline takes: the owner (kloba) and Casper (casper-assistant-ai)
       OWNERS: 'kloba casper-assistant-ai'
     steps:
@@ -193,14 +196,11 @@ jobs:
                   request_fix "It changes files outside the allowed paths: $(echo $bad). Revert them."
                   echo "::endgroup::"; continue
                 fi
-                # the Workflow maintainer's script runs with the deploy key: only Casper or the owner changes it
-                if echo "$files" | grep -qx 'scripts/workflow_change\.py'; then
-                  request_fix "It changes scripts/workflow_change.py, the Workflow maintainer's script, which runs with the deploy key and is pinned by hash in workflow-maintainer.yml; only Casper or the owner changes it. Revert it."
-                  echo "::endgroup::"; continue
-                fi
-                # the gate's own rules (paths by footer, the reviewer's verdict): only Casper or the owner changes them
-                if echo "$files" | grep -qx 'scripts/gate_rules\.py'; then
-                  request_fix "It changes scripts/gate_rules.py, the rules this gate merges by; only Casper or the owner changes it. Revert it."
+                # the Workflow maintainer's script (runs with the deploy key, pinned by hash in
+                # workflow-maintainer.yml) and the rules this gate merges by: only Casper or the owner changes them
+                prot=$(echo "$files" | grep -xE "$PROTECTED" || true)
+                if [ -n "$prot" ]; then
+                  request_fix "It changes $(echo $prot), which only Casper or the owner changes (the gate's own rules, or the Workflow maintainer's script that runs with the deploy key). Revert it."
                   echo "::endgroup::"; continue
                 fi;;
               dependabot)
@@ -216,6 +216,24 @@ jobs:
                   echo "::endgroup::"; continue
                 fi;;
             esac
+            # the rules code checks (scripts/pr_rules.py, AGENTS.md): main's copy, on the PR's diff, body and
+            # closed issues, before the PR's own code is checked out
+            gh pr view "$n" --json body --jq .body > "/tmp/body-$n.md"
+            gh pr view "$n" --json closingIssuesReferences --jq '[.closingIssuesReferences[] | {number}]' > "/tmp/closes-$n.json"
+            jq -c '.[].number' "/tmp/closes-$n.json" | while read -r i; do
+              gh issue view "$i" --json number,labels --jq '{number, labels: [.labels[].name]}'
+            done | jq -s . > "/tmp/closes-labels-$n.json"
+            git fetch -q origin main && git fetch -q origin "refs/pull/$n/head" && prhead=$(git rev-parse FETCH_HEAD) || prhead=""
+            if [ "$prhead" != "$sha" ]; then
+              echo "the PR head moved while the gate read it: the next round looks again"
+              echo "::endgroup::"; continue
+            fi
+            if ! python3 -I scripts/pr_rules.py check --base origin/main --head "$sha" --body-file "/tmp/body-$n.md" \
+                 --workflow "$(python3 -I scripts/gate_rules.py workflow --body-file "/tmp/body-$n.md")" \
+                 --closes-file "/tmp/closes-labels-$n.json" > "/tmp/rules-$n.txt" 2>&1; then
+              request_fix "It breaks repository rules: $(paste -sd';' "/tmp/rules-$n.txt" | sed 's/;/; /g')" "/tmp/rules-$n.txt"
+              echo "::endgroup::"; continue
+            fi
             git checkout -q --detach
             gh pr checkout "$n" --force
             # from here to the export below the tree is the PR's code and it runs without the gate's write
@@ -226,7 +244,7 @@ jobs:
             { python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n 2>&1 || { ok=0; echo "FAILED: live parse of gov.pl"; }; } | tee -a "$log"
             for js in docs/*.js; do { node --check "$js" 2>&1 || { ok=0; echo "FAILED: node --check $js"; }; } | tee -a "$log"; done
             { npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html 2>&1 || { ok=0; echo "FAILED: html-validate docs/*.html"; }; } | tee -a "$log"
-            { pipx run "$RUFF" check . 2>&1 || { ok=0; echo "FAILED: ruff check ."; }; } | tee -a "$log"
+            { pipx run "$RUFF" check --ignore-noqa . 2>&1 || { ok=0; echo "FAILED: ruff check --ignore-noqa ."; }; } | tee -a "$log"
             { { npm install --no-save --no-package-lock --no-audit --no-fund --silent $ESLINT && npx --no-install eslint .; } 2>&1 || { ok=0; echo "FAILED: eslint ."; }; } | tee -a "$log"
             if echo "$files" | grep -q '^server/'; then
               # the live service (server/) is deployed from main by casper-infra: it must install and start
@@ -311,7 +329,7 @@ jobs:
             closes=$(gh pr view "$n" --json closingIssuesReferences --jq '.closingIssuesReferences[].number')
             # the squash body is the PR's commit messages without AI co-author lines (owner's rule, 2026-11-23)
             body=$(gh pr view "$n" --json commits --jq '.commits[] | "* " + .messageHeadline + (if .messageBody != "" then "\n\n" + .messageBody else "" end) + "\n"' \
-              | grep -viE '^co-authored-by:.*(claude|anthropic)|generated with .*claude' || true)
+              | python3 -I scripts/pr_rules.py squash-body || true)
             if gh pr merge "$n" --squash --delete-branch --subject "$subject (#$n)" --body "${body:-Merged by the Agent PR gate.}" --match-head-commit "$sha"; then
               echo "merged #$n: $subject"
               gh pr comment "$n" --body "Agent PR gate: merged. Tests passed and the PR reviewer approved $sha: ${reason:-see its comment}"

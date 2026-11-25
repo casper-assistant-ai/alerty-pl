@@ -17,3 +17,9 @@ ignore = [
   "E731",            # a named lambda is fine for a one-line key or fake
   "E741",            # `l` for a line is the house style
 ]
+# noqa comments do not count: CI and the gate run `ruff check --ignore-noqa .` (AGENTS.md)
+
+[lint.per-file-ignores]
+# these put scripts/ (or server/) on sys.path before they import from it
+"tests/*.py" = ["E402"]
+"server/app.py" = ["E402"]
