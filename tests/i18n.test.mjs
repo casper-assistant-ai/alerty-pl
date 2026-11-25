@@ -214,3 +214,13 @@ test("the shared helpers speak the page's language: categories, months, regions,
   assert.equal(uk.duration(ago(5 * 24 * 60)), "5 днів");
   assert.equal(pl.duration(ago(2 * 24 * 60)), "2 dni");
 });
+
+test("lang(): with no choice in the URL or kept, the first of the browser's languages the site has", () => {
+  const { RCB } = load();
+  assert.equal(RCB.lang("", null, ["uk-UA", "en-US"]), "uk");
+  assert.equal(RCB.lang("", null, ["de-DE", "en-GB", "pl"]), "en");
+  assert.equal(RCB.lang("", null, ["de-DE", "fr"]), "pl");
+  assert.equal(RCB.lang("", "pl", ["uk-UA"]), "pl"); // a kept choice wins
+  assert.equal(RCB.lang("?lang=en", null, ["uk-UA"]), "en");
+  assert.equal(RCB.lang("", null, []), "pl");
+});

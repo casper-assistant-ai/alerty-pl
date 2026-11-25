@@ -1,9 +1,9 @@
 // Alerty RCB — the changelog page: data/changelog.json, built by scripts/changelog.py from Conventional Commits.
 "use strict";
-const { $, h, getJSON, fmtStamp } = RCB;
-// the order of groups inside a release; the rest go under "Inne"
+const { $, h, getJSON, fmtStamp, t } = RCB;
+// the order of groups inside a release; the rest go under "Inne zmiany" (chg.group.* in docs/i18n-changes.js)
 const ORDER = ["breaking", "feat", "fix", "perf", "revert"];
-const LABEL = { breaking: "Zmiany łamiące", feat: "Nowe funkcje", fix: "Poprawki", perf: "Wydajność", revert: "Wycofane", other: "Inne zmiany" };
+const LABEL = Object.fromEntries([...ORDER, "other"].map((g) => [g, t("chg.group." + g)]));
 
 // "21.11.2026, 21:32" in Warsaw time; the day only while the JSON predates the full stamp
 function when(x) {
@@ -27,8 +27,8 @@ function release(rel, prev, repo) {
   }
   const kind = bumpOf(rel, prev);
   const head = h("h2", { id: rel.version ? "v" + rel.version : "niewydane" },
-    rel.version ? h("span", { class: "ver mono", text: rel.version }) : h("span", { class: "ver", text: "Jeszcze niewydane" }),
-    kind ? h("span", { class: "bump " + kind, text: kind }) : null,
+    rel.version ? h("span", { class: "ver mono", text: rel.version }) : h("span", { class: "ver", text: t("chg.unreleased") }),
+    kind ? h("span", { class: "bump " + kind, text: t("chg.bump." + kind) }) : null,
     h("time", { class: "n mono", datetime: rel.time || rel.date, text: when(rel) }));
   const parts = [head];
   for (const g of [...ORDER, "other"]) {
@@ -36,7 +36,7 @@ function release(rel, prev, repo) {
     parts.push(h("h3", { text: LABEL[g] }),
       h("ul", { class: "changes" }, ...groups[g].map((c) => h("li", {},
         c.scope ? h("span", { class: "scope mono", text: c.scope }) : null,
-        h("span", { text: c.text }),
+        h("span", { lang: "en", text: c.text }),
         h("time", { class: "when mono", datetime: c.time || c.date, text: when(c) }),
         h("a", { class: "sha mono", href: `${repo}/commit/${c.sha}`, text: c.sha })))));
   }
@@ -51,4 +51,4 @@ async function main() {
   $("#list").replaceChildren(...rels.map((r) => release(r, versions[versions.indexOf(r.version) + 1], data.repo)));
 }
 
-main().catch((e) => { $("#list").replaceChildren(h("p", { class: "month", text: "Nie udało się wczytać historii zmian: " + e.message })); });
+main().catch((e) => { $("#list").replaceChildren(h("p", { class: "month", text: t("chg.error", { msg: e.message }) })); });

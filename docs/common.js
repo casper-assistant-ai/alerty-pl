@@ -189,7 +189,7 @@ const RCB = (() => {
     const close = h("button", { type: "button", class: "x", "aria-label": t("toast.close") }, "×");
     const card = h("div", { class: "toast", role: "alert", "data-alert": a.id },
       swatch(a.category), h("div", {}, h("strong", { text: head + ": " + (CAT[a.category] || CAT.other) }),
-        h("p", { text: msg.slice(0, 280) }), h("a", { href: a.url, text: a.title })), close);
+        h("p", { lang: "pl", text: msg.slice(0, 280) }), h("a", { href: a.url, lang: "pl", text: a.title })), close);
     close.addEventListener("click", () => card.remove());
     box.prepend(card);
   }
@@ -261,15 +261,20 @@ const RCB = (() => {
   if ($("#strip")) live();
 
   // ---------- interface language (docs/i18n.js: the shared chrome in PL / EN / UK) ----------
-  // ?lang=pl|en|uk wins, then the choice kept in localStorage (one key on every page), then pl; an unknown code is ignored
+  // ?lang=pl|en|uk wins, then the choice kept in localStorage (one key on every page), then the first of the
+  // browser's languages (navigator.languages: "uk-UA", "en-US", …) that the site has, then pl; an unknown code is ignored
   const LANGS = ["pl", "en", "uk"], LANG_KEY = "alerty-lang";
   const storedLang = () => { try { return typeof localStorage === "undefined" ? null : localStorage.getItem(LANG_KEY); } catch (e) { return null; } };
-  function lang(search, stored) {
+  const browserLangs = () => (typeof window !== "undefined" && window.navigator && window.navigator.languages) || [];
+  function lang(search, stored, prefs) {
     if (search === undefined) search = typeof location !== "undefined" ? location.search : "";
     const q = new URLSearchParams(search).get("lang");
     if (LANGS.includes(q)) return q;
     if (stored === undefined) stored = storedLang();
-    return LANGS.includes(stored) ? stored : "pl";
+    if (LANGS.includes(stored)) return stored;
+    if (prefs === undefined) prefs = browserLangs();
+    for (const p of prefs) { const c = String(p).toLowerCase().split("-")[0]; if (LANGS.includes(c)) return c; }
+    return "pl";
   }
   // t("src", { name: "gov.pl" }) -> "źródło: gov.pl"; a text missing in the chosen language comes from Polish
   function t(key, params, code = lang()) {

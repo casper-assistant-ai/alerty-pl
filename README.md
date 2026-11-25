@@ -7,6 +7,13 @@ A live map of Poland with the current alerts of the Government Centre for Securi
 Source: [gov.pl/web/rcb/komunikaty](https://www.gov.pl/web/rcb/komunikaty). Unofficial;
 the official channel is the RCB alert SMS.
 
+**Languages.** Every page speaks Polish, English and Ukrainian: the PL / EN / UK switcher in the
+header, or `?lang=pl|en|uk` in any address. The choice is kept for the next visit; a first visit
+follows the browser's languages and falls back to Polish. The texts live in `docs/i18n.js` (shared)
+and `docs/i18n-<page>.js`, the same keys in all three (`tests/i18n.test.mjs`). Alert messages from
+RCB, the shelter records and place names stay as published, in Polish; the changelog shows the
+commit messages as written, in English. Site check and the mobile audit open every page in all three.
+
 The map zooms down to a street. It shows any day or period since 2021: two handles over the
 histogram of alerts, quick buttons (24 h, 7 dni, 30 dni, rok, wszystko), two dates and ◀ ▶ that
 shift the period by its length (`?od=2026-10-24&do=2026-11-22`; the old `?dzien=` still opens one

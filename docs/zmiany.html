@@ -24,12 +24,13 @@
   <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="src" data-i18n-param-name="src.gov">źródło: gov.pl/web/rcb</a>
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
-<div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
+<div class="strip" id="strip"><span class="state" role="status" data-i18n="strip.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main>
   <div class="page-head">
     <div>
-      <h1>Historia zmian</h1>
-      <p>Każda wersja strony. Numer rośnie według <a href="https://semver.org/lang/pl/">semver</a>: nowa funkcja podnosi drugą cyfrę, poprawka trzecią, zmiana łamiąca pierwszą. Listę składa automat z opisów commitów (<a href="https://www.conventionalcommits.org/pl/">Conventional Commits</a>).</p>
+      <h1 data-i18n="chg.h1">Historia zmian</h1>
+      <p><span data-i18n="chg.lead1">Każda wersja strony. Numer rośnie według</span> <a href="https://semver.org/lang/pl/">semver</a><span data-i18n="chg.lead2">: nowa funkcja podnosi drugą cyfrę, poprawka trzecią, zmiana łamiąca pierwszą. Listę składa automat z opisów commitów (</span><a href="https://www.conventionalcommits.org/pl/">Conventional Commits</a>).</p>
+      <p data-i18n="chg.original">Opisy zmian są w oryginale, po angielsku, tak jak w commitach.</p>
     </div>
   </div>
   <div class="sheet" id="list"></div>
@@ -42,6 +43,7 @@
   </div>
 </footer>
 <script src="i18n.js" defer></script>
+<script src="i18n-changes.js" defer></script>
 <script src="common.js" defer></script>
 <script src="changelog.js" defer></script>
 </body>

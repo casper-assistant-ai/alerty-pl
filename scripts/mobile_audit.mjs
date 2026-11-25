@@ -19,6 +19,11 @@ const PAGES = ["", "?dzien=2025-09-10", "?podklad=esri", "historia.html", "histo
   "analityka.html", "analityka.html?okres=all", "powiadomienia.html", "schrony.html?lat=52.2297&lon=21.0122",
   "schrony.html", "zmiany.html", "?podklad=esri&srodek=50.5650,17.9650&zoom=15&zdjecie=2025-04-24",
   "porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24"];
+// the English and Ukrainian texts are longer or shorter than the Polish: every page again in both (docs/i18n*.js)
+for (const code of ["en", "uk"]) for (const path of ["", "historia.html", "analityka.html", "powiadomienia.html",
+  "schrony.html?lat=52.2297&lon=21.0122", "zmiany.html", "porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24"]) {
+  PAGES.push(path + (path.includes("?") ? "&" : "?") + "lang=" + code);
+}
 const VIEWPORTS = [
   { name: "360", width: 360, height: 740 },
   { name: "390", width: 390, height: 844 },
@@ -34,7 +39,8 @@ function findChrome() {
 
 async function launch() {
   const dir = mkdtempSync(join(tmpdir(), "site-check-"));
-  const proc = spawn(findChrome(), ["--headless=new", "--no-sandbox", "--disable-gpu", "--no-first-run",
+  // --accept-lang: the pages without ?lang read navigator.languages; these stay Polish
+  const proc = spawn(findChrome(), ["--headless=new", "--no-sandbox", "--disable-gpu", "--no-first-run", "--accept-lang=pl-PL,pl",
     "--remote-debugging-port=0", `--user-data-dir=${dir}`, "about:blank"], { stdio: ["ignore", "ignore", "pipe"] });
   const ws = await new Promise((ok, bad) => {
     let buf = "";
@@ -196,6 +202,9 @@ async function main() {
     const { targetId } = await cdp.send("Target.createTarget", { url: "about:blank" });
     const { sessionId: sid } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
     for (const d of ["Page", "Runtime", "Network"]) await cdp.send(d + ".enable", {}, sid);
+    // a ?lang= visit keeps its choice in localStorage ("alerty-lang"); forget it before every page's own scripts run,
+    // so each page opens in the language of its URL (no ?lang: the browser's, Polish here)
+    await cdp.send("Page.addScriptToEvaluateOnNewDocument", { source: 'try { localStorage.removeItem("alerty-lang"); } catch (e) {}' }, sid);
     await cdp.send("Network.setCacheDisabled", { cacheDisabled: true }, sid);
     if (args.shots) mkdirSync(args.shots, { recursive: true });
     for (const vp of VIEWPORTS) for (const path of PAGES) {

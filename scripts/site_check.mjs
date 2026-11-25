@@ -123,6 +123,32 @@ const PAGES = [
       if (!document.querySelector("#list .release")) p.push("changelog shows no releases");
       return p; })()` },
 ];
+// Every page again in English and Ukrainian (?lang=en|uk, docs/i18n*.js): <html lang> follows the choice and no
+// Polish interface word is left on screen. Texts kept as published (RCB messages, shelter records, place names)
+// sit in elements marked lang="pl" (commit messages lang="en") and are skipped. The words are common interface words, not place names.
+export const POLISH_UI = "(?<![\\p{L}])(Ładowanie|Brak|brak|sprawdzono|Pokaż|pokaż|Szukaj|Zamknij|Nie udało|alertów|alerty|alertu|powiadomie\\p{L}*|Powiadomie\\p{L}*|komunikat\\p{L}*|Wszystkie|wszystkie|dzisiaj|dziś|Dziś|źródło|Najbliższe|najbliższe|Nawiguj|Włącz|Wyłącz|trwa|tydzień|miesiąc|Okres|okres|punktów|schronienia|wersja|historia zmian|Inne|Zagrożenie|zagrożenia|Wczytaj|Pobierz|Wybierz|wybierz|Zapisz|Ostatnie|ostatnie|godzin|minut|Ćwiczenia|Pożary|Niewybuchy|Skażenia|Pogoda)(?![\\p{L}-])";
+export const langCheck = (code) => `(() => { const p = [];
+      if (document.documentElement.lang !== "${code}") p.push("lang=${code}: <html lang> is " + JSON.stringify(document.documentElement.lang));
+      const re = new RegExp(${JSON.stringify(POLISH_UI)}, "u"), left = new Set();
+      const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n; (n = w.nextNode());) {
+        const el = n.parentElement;
+        if (!el || el.closest("script, style, noscript, template") || !el.getClientRects().length) continue;
+        if (el.closest("[lang]") !== document.documentElement) continue; // a text kept as published names its own language
+        const m = n.textContent.match(re);
+        if (m) left.add(m[0]);
+      }
+      for (const el of document.querySelectorAll("[aria-label], [placeholder], [title]")) {
+        if (el.closest('[lang="pl"]')) continue;
+        for (const a of ["aria-label", "placeholder", "title"]) { const m = (el.getAttribute(a) || "").match(re); if (m) left.add(m[0]); }
+      }
+      if (left.size) p.push("lang=${code}: Polish interface text left: " + [...left].slice(0, 10).join(", "));
+      return p; })()`;
+const LANG_PAGES = ["", "historia.html", "analityka.html", "schrony.html?lat=52.2297&lon=21.0122", "powiadomienia.html", "zmiany.html",
+  "porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24"];
+for (const code of ["en", "uk"]) for (const path of LANG_PAGES) {
+  PAGES.push({ path: path + (path.includes("?") ? "&" : "?") + "lang=" + code, name: (path.split(/[.?]/)[0] || "index") + " · " + code.toUpperCase(), check: langCheck(code) });
+}
 const VIEWPORTS = [
   { name: "desktop", width: 1440, height: 900, mobile: false, scale: 1 },
   { name: "phone", width: 390, height: 844, mobile: true, scale: 2 },
@@ -138,7 +164,8 @@ function findChrome() {
 
 async function launch() {
   const dir = mkdtempSync(join(tmpdir(), "site-check-"));
-  const proc = spawn(findChrome(), ["--headless=new", "--no-sandbox", "--disable-gpu", "--no-first-run",
+  // --accept-lang: the pages without ?lang read navigator.languages, and the checks above read Polish
+  const proc = spawn(findChrome(), ["--headless=new", "--no-sandbox", "--disable-gpu", "--no-first-run", "--accept-lang=pl-PL,pl",
     "--remote-debugging-port=0", `--user-data-dir=${dir}`, "about:blank"], { stdio: ["ignore", "ignore", "pipe"] });
   const ws = await new Promise((ok, bad) => {
     let buf = "";
@@ -324,6 +351,9 @@ async function main() {
     const { targetId } = await cdp.send("Target.createTarget", { url: "about:blank" });
     const { sessionId: sid } = await cdp.send("Target.attachToTarget", { targetId, flatten: true });
     for (const d of ["Page", "Runtime", "Network"]) await cdp.send(d + ".enable", {}, sid);
+    // a ?lang= visit keeps its choice in localStorage ("alerty-lang"); forget it before every page's own scripts run,
+    // so each page opens in the language of its URL (no ?lang: the browser's, Polish here)
+    await cdp.send("Page.addScriptToEvaluateOnNewDocument", { source: 'try { localStorage.removeItem("alerty-lang"); } catch (e) {}' }, sid);
     await cdp.send("Network.setCacheDisabled", { cacheDisabled: true }, sid);
     if (args.shots) mkdirSync(args.shots, { recursive: true });
     for (const vp of VIEWPORTS) for (const page of PAGES) results.push(await visit(cdp, sid, page, vp));
