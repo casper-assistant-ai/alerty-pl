@@ -133,6 +133,16 @@ const RCB = (() => {
     return { from, to };
   }
 
+  // ---------- the base layer of the map page ----------
+  // ?podklad=mapa|esri|nasa|sentinel names one of the radio boxes of index.html (BASES, in their order). No
+  // parameter (or an empty value) is the grey canvas, "mapa"; a value that names no base is null, so the page
+  // keeps its default base and never hands such a value to setBase, whose last branch is the Wayback imagery (#178)
+  const BASES = ["mapa", "esri", "sentinel", "nasa"];
+  function baseFromQuery(search) {
+    const v = new URLSearchParams(search).get("podklad");
+    return v === null || v === "" ? "mapa" : BASES.includes(v) ? v : null;
+  }
+
   // ---------- the period of the history page ----------
   // ?od=…&do=… is read as the map reads it (one end alone: od runs on, do is that day), but with no "today"
   // to fall back on: no real date is the whole archive, and a backwards pair is swapped as the map shows it.
@@ -341,7 +351,7 @@ const RCB = (() => {
     return code;
   }
 
-  return { isISO, periodFromQuery, clampPeriod, span, historyPeriod, inPeriod, historyLink, API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON,
+  return { isISO, periodFromQuery, clampPeriod, baseFromQuery, BASES, span, historyPeriod, inPeriod, historyLink, API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON,
     fmtISO, fmtDay, fmtShort, fmtTime, fmtStamp,
     hasTime, duration, regionText, names, plural, strip, live, LANGS, lang, t, tn, loc, langUrl, applyI18n };
 })();

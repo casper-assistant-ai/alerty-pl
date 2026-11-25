@@ -1,5 +1,5 @@
 // Node test of the period logic of the map and history pages (docs/common.js: periodFromQuery, clampPeriod,
-// span, isISO; historyPeriod, inPeriod, historyLink).
+// span, isISO; historyPeriod, inPeriod, historyLink) and of the map page's ?podklad= (baseFromQuery).
 // Alone: node --test tests/period.test.mjs ; CI runs every tests/*.test.mjs in its "Node tests" step.
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -47,6 +47,40 @@ test("clampPeriod swaps a backwards period and cuts it to the archive", () => {
 test("clampPeriod keeps a period that lies wholly outside the archive as a one-day period at its edge", () => {
   assert.deepEqual(RCB.clampPeriod("2030-01-01", "2030-02-01", START, TODAY), { from: TODAY, to: TODAY });
   assert.deepEqual(RCB.clampPeriod("2010-01-01", "2010-02-01", START, TODAY), { from: START, to: START });
+});
+
+// ---------- the base layer of the map page: ?podklad= (#178) ----------
+
+test("baseFromQuery: no ?podklad=, an empty one or mapa is the grey canvas; a known value is that base", () => {
+  assert.equal(RCB.baseFromQuery(""), "mapa");
+  assert.equal(RCB.baseFromQuery("?srodek=50.06140,19.93808&zoom=6&pozary=1"), "mapa");
+  assert.equal(RCB.baseFromQuery("?podklad="), "mapa");
+  assert.equal(RCB.baseFromQuery("?podklad=mapa"), "mapa");
+  for (const b of ["esri", "nasa", "sentinel"]) assert.equal(RCB.baseFromQuery(`?podklad=${b}&srodek=50.06140,19.93808`), b, b);
+});
+
+test("baseFromQuery: a value that names no base is null, so the page keeps its default base instead of a layer", () => {
+  for (const bad of ["xyz", "ESRI", "esri%20", "map", "wayback", "sentinel-2", "%3Cscript%3E"]) {
+    assert.equal(RCB.baseFromQuery(`?podklad=${bad}`), null, bad);
+  }
+  assert.equal(RCB.baseFromQuery("?podklad=esri&podklad=xyz"), "esri"); // a repeated parameter: the first one counts, as URLSearchParams.get reads it
+  assert.equal(RCB.baseFromQuery("?podklad=xyz&podklad=nasa"), null);
+});
+
+test("BASES is the list of the page's radio boxes, in their order: a new base is known to ?podklad= or fails here", () => {
+  const html = readFileSync(new URL("../docs/index.html", import.meta.url), "utf8");
+  const radios = [...html.matchAll(/<input type="radio" name="base" value="([^"]+)"/g)].map((m) => m[1]);
+  assert.deepEqual(RCB.BASES, radios);
+  assert.equal(RCB.BASES[0], "mapa"); // the default, the one viewURL leaves out of the URL
+});
+
+test("the map page gives setBase only a base that baseFromQuery named, never the raw ?podklad= value", () => {
+  const app = readFileSync(new URL("../docs/app.js", import.meta.url), "utf8");
+  // an unknown value once reached setBase and fell through to its last branch, the Wayback imagery, while the
+  // radio still said «Mapa» (#178)
+  assert.doesNotMatch(app, /setBase\([^)]*q\.get\(/);
+  assert.match(app, /const wantBase = baseFromQuery\(location\.search\);/);
+  assert.match(app, /if \(wantBase && wantBase !== "mapa"\) setBase\(wantBase\);/);
 });
 
 // ---------- the history page: the same ?od=&do=, with the whole archive as the default (#52) ----------
