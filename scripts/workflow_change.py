@@ -482,8 +482,15 @@ def guard(base, head=None):
 
 # ---------------------------------------------------------------- git and GitHub
 
-def sh(*cmd, check=True, env=None):
-    r = subprocess.run(list(cmd), text=True, capture_output=True, env=env)
+def sh(*cmd, check=True, env=None, tries=1):
+    """Run a command; a gh write is tried up to `tries` times (GitHub answers 500 and 502 at times)."""
+    import time
+    for k in range(tries):
+        r = subprocess.run(list(cmd), text=True, capture_output=True, env=env)
+        if r.returncode == 0:
+            break
+        if k + 1 < tries:
+            time.sleep(15 * (k + 1))
     if check and r.returncode != 0:
         raise RuntimeError(f"`{' '.join(cmd[:3])}` exited {r.returncode}: {(r.stderr or r.stdout).strip()[-600:]}")
     return r.stdout
@@ -530,8 +537,10 @@ def marker(n, h, result):
 
 
 def handled(comments, h):
+    """True when the maintainer already ended this exact patch. «In review» ends nothing: while its PR is
+    open the caller skips the issue, and when the PR is gone without a result the patch is tried again."""
     return any((c.get("user") or {}).get("login") == BOT and MARK in (c.get("body") or "")
-               and f" body={h} " in c.get("body") for c in comments)
+               and f" body={h} " in c.get("body") and " result=review " not in c.get("body") for c in comments)
 
 
 def identity():
@@ -663,11 +672,11 @@ def prepare(out):
 # ---------------------------------------------------------------- landing
 
 def comment(n, text):
-    sh("gh", "issue", "comment", str(n), "-R", repo(), "--body", text)
+    sh("gh", "issue", "comment", str(n), "-R", repo(), "--body", text, tries=4)
 
 
 def close(n, text):
-    sh("gh", "issue", "close", str(n), "-R", repo(), "--reason", "completed", "--comment", text)
+    sh("gh", "issue", "close", str(n), "-R", repo(), "--reason", "completed", "--comment", text, tries=4)
 
 
 def commit_url(sha):
@@ -778,7 +787,7 @@ def report(item, extra=""):
     body = head + "\n\n" + (f"Reason: {item.get('reason', '')}\n\n" if item.get("reason") else "")
     if res == "refused":
         body += refuse_note()
-        sh("gh", "issue", "edit", str(n), "-R", repo(), "--add-label", NEEDS, check=False)
+        sh("gh", "issue", "edit", str(n), "-R", repo(), "--add-label", NEEDS, check=False, tries=4)
     if res == "failed":
         body += ("The issue stays open. The process-doctor closes it and opens a corrected one: each change as a "
                  "```diff block with `--- a/<path>` and `+++ b/<path>` lines and unchanged context lines copied "
@@ -870,9 +879,9 @@ def land(d):
         cls, problems = guard(base, sha)
         if cls == "refuse":
             text = "Workflow maintainer: closed without landing, the guard refuses it: " + "; ".join(problems)
-            sh("gh", "pr", "close", str(num), "-R", repo(), "--delete-branch", "--comment", text, check=False)
+            sh("gh", "pr", "close", str(num), "-R", repo(), "--delete-branch", "--comment", text, check=False, tries=4)
             issue = gh_api(f"repos/{repo()}/issues/{n}") or {}
-            sh("gh", "issue", "edit", str(n), "-R", repo(), "--add-label", NEEDS, check=False)
+            sh("gh", "issue", "edit", str(n), "-R", repo(), "--add-label", NEEDS, check=False, tries=4)
             comment(n, f"{text}\n\nPR: #{num}\n\n{refuse_note()}{marker(n, digest(issue.get('body')), 'refused')}")
             print(f"#{n}: PR #{num} closed, refused by the guard")
             continue

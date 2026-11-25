@@ -39,7 +39,7 @@ concurrency:
 
 env:
   # sha256sum scripts/workflow_change.py of the reviewed version
-  SCRIPT_SHA256: a3399a8876d9e645b5ff5ab8174ee561afb5c211c3439b50b082c103fdde1e57
+  SCRIPT_SHA256: 582cc0d9c0b00283ca4b4d4ed03ff11499673ed3a1c80bea1df0422125a3ba6b
 
 jobs:
   prepare:

@@ -220,6 +220,14 @@ class Patches(unittest.TestCase):
                 self.assertTrue(wc.apply_issue(body, d)["errors"], path)
             self.assertTrue(wc.apply_issue("no patch at all", d)["errors"])
 
+    def test_handled_ends_with_a_result_not_with_a_review(self):
+        bot = {"login": "github-actions[bot]"}
+        review = {"user": bot, "body": wc.marker(7, "abc", "review")}
+        self.assertFalse(wc.handled([review], "abc"))  # its PR closed without a result: try again
+        self.assertTrue(wc.handled([review, {"user": bot, "body": wc.marker(7, "abc", "refused")}], "abc"))
+        self.assertFalse(wc.handled([{"user": bot, "body": wc.marker(7, "abc", "applied")}], "abd"))
+        self.assertFalse(wc.handled([{"user": {"login": "someone"}, "body": wc.marker(7, "abc", "applied")}], "abc"))
+
     def test_source_of(self):
         issue = {"user": {"login": "github-actions[bot]"}, "title": "[process-doctor] workflow change: x",
                  "body": "text\n<!-- gh-aw-workflow-id: process-doctor -->"}
