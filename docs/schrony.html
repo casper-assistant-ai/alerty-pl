@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Schrony — najbliższe miejsca schronienia | Alerty RCB</title>
+<title data-i18n-title="title.shelters">Schrony — najbliższe miejsca schronienia | Alerty RCB</title>
 <meta name="description" content="Mapa ponad 88 tysięcy punktów schronienia w Polsce z oficjalnych danych Państwowej Straży Pożarnej. Podaj swoją lokalizację lub adres, zobacz najbliższe schronienia z odległością i włącz nawigację w Google Maps, Apple Maps lub Waze.">
 <meta name="color-scheme" content="light dark">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -14,15 +14,16 @@
 <body>
 <header class="top">
   <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
-  <nav class="tabs" aria-label="Strony">
-    <a href="./">Mapa</a>
-    <a href="schrony.html" aria-current="page">Schrony</a>
-    <a href="historia.html">Historia</a>
-    <a href="analityka.html">Analityka</a>
-    <a href="powiadomienia.html">Powiadomienia</a>
-    <a href="zmiany.html">Zmiany</a>
+  <nav class="tabs" aria-label="Strony" data-i18n-aria="nav.tabs">
+    <a href="./" data-i18n="tab.map">Mapa</a>
+    <a href="schrony.html" aria-current="page" data-i18n="tab.shelters">Schrony</a>
+    <a href="historia.html" data-i18n="tab.history">Historia</a>
+    <a href="analityka.html" data-i18n="tab.analytics">Analityka</a>
+    <a href="powiadomienia.html" data-i18n="tab.notify">Powiadomienia</a>
+    <a href="zmiany.html" data-i18n="tab.changes">Zmiany</a>
   </nav>
-  <a class="src mono" href="https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce">źródło: KG PSP, dane.gov.pl</a>
+  <a class="src mono" href="https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce" data-i18n="src" data-i18n-param-name="src.psp">źródło: KG PSP, dane.gov.pl</a>
+  <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
 <div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main class="map-page shelter-page">
@@ -69,14 +70,13 @@
 </dialog>
 <footer>
   <div class="in">
-    <p>Strona nieoficjalna. Punkty schronienia: <a href="https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce">Komenda Główna Państwowej Straży Pożarnej, «Punkty schronienia w Polsce»</a> (dane.gov.pl, CC BY 4.0, aktualizowane co tydzień; oficjalna mapa: <a href="https://gdziesieukryc.pl">gdziesieukryc.pl</a>).
-    Wyszukiwanie adresów: <a href="https://nominatim.openstreetmap.org">Nominatim</a> (© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>); mapa <a href="https://leafletjs.com">Leaflet</a>, podkład Esri Light/Dark Gray Canvas.</p>
-    <p>Stronę rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>:
-    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>.
+    <p><span data-i18n="foot.unofficial">Strona nieoficjalna.</span> <span data-i18n="foot.shelters">Punkty schronienia:</span> <a href="https://dane.gov.pl/pl/dataset/28058,punkty-schronienia-w-polsce" data-i18n="foot.psp">Komenda Główna Państwowej Straży Pożarnej, «Punkty schronienia w Polsce»</a> <span data-i18n="foot.sheltersMeta">(dane.gov.pl, CC BY 4.0, aktualizowane co tydzień; oficjalna mapa:</span> <a href="https://gdziesieukryc.pl">gdziesieukryc.pl</a>. <span data-i18n="foot.geocoding">Wyszukiwanie adresów:</span> <a href="https://nominatim.openstreetmap.org">Nominatim</a> (© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a><span data-i18n="foot.map">; mapa</span> <a href="https://leafletjs.com">Leaflet</a><span data-i18n="foot.esriCanvasDot">, podkład Esri Light/Dark Gray Canvas.</span></p>
+    <span data-i18n="foot.builtBy">Stronę rozwijają i utrzymują agenci</span> <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>: <a href="https://github.com/casper-assistant-ai/alerty-pl" data-i18n="foot.codeHistory">kod i historia ich pracy</a>.
     <a class="mono" id="ver" href="zmiany.html"></a></p>
   </div>
 </footer>
 <script src="vendor/leaflet/leaflet.js" defer></script>
+<script src="i18n.js" defer></script>
 <script src="common.js" defer></script>
 <script src="shelters.js" defer></script>
 </body>

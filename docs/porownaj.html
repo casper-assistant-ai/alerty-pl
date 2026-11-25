@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Porównaj zdjęcia satelitarne — to samo miejsce w dwóch datach | Alerty RCB</title>
+<title data-i18n-title="title.compare">Porównaj zdjęcia satelitarne — to samo miejsce w dwóch datach | Alerty RCB</title>
 <meta name="description" content="Dwie mapy obok siebie: to samo miejsce na zdjęciach satelitarnych Esri World Imagery Wayback z dwóch różnych dat. Przesuwanie i przybliżanie jednej mapy przesuwa drugą, np. przed i po powodzi w 2024 roku.">
 <meta name="color-scheme" content="light dark">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -14,15 +14,16 @@
 <body>
 <header class="top">
   <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
-  <nav class="tabs" aria-label="Strony">
-    <a href="./">Mapa</a>
-    <a href="schrony.html">Schrony</a>
-    <a href="historia.html">Historia</a>
-    <a href="analityka.html">Analityka</a>
-    <a href="powiadomienia.html">Powiadomienia</a>
-    <a href="zmiany.html">Zmiany</a>
+  <nav class="tabs" aria-label="Strony" data-i18n-aria="nav.tabs">
+    <a href="./" data-i18n="tab.map">Mapa</a>
+    <a href="schrony.html" data-i18n="tab.shelters">Schrony</a>
+    <a href="historia.html" data-i18n="tab.history">Historia</a>
+    <a href="analityka.html" data-i18n="tab.analytics">Analityka</a>
+    <a href="powiadomienia.html" data-i18n="tab.notify">Powiadomienia</a>
+    <a href="zmiany.html" data-i18n="tab.changes">Zmiany</a>
   </nav>
-  <a class="src mono" href="https://livingatlas.arcgis.com/wayback/">źródło: Esri World Imagery Wayback</a>
+  <a class="src mono" href="https://livingatlas.arcgis.com/wayback/" data-i18n="src" data-i18n-param-name="src.esri">źródło: Esri World Imagery Wayback</a>
+  <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
 <div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main class="cmp-page">
@@ -56,14 +57,13 @@
 </main>
 <footer>
   <div class="in">
-    <p>Strona nieoficjalna. Zdjęcia satelitarne i lotnicze: <a href="https://livingatlas.arcgis.com/wayback/">Esri World Imagery Wayback</a> (Esri, Maxar/Vantor, Airbus, Earthstar Geographics, GUGiK). Lista dat to wydania archiwum Esri, w których to miejsce wyglądało inaczej; datę wykonania zdjęcia środka widoku podaje opis pod listą.
-    Mapa <a href="https://leafletjs.com">Leaflet</a>. Adres strony zawiera środek, przybliżenie i obie daty, więc można go wysłać jako link do tego samego porównania.</p>
-    <p>Stronę rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>:
-    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>.
+    <p><span data-i18n="foot.unofficial">Strona nieoficjalna.</span> <span data-i18n="foot.imagery">Zdjęcia satelitarne i lotnicze:</span> <a href="https://livingatlas.arcgis.com/wayback/">Esri World Imagery Wayback</a> <span data-i18n="foot.imageryMeta">(Esri, Maxar/Vantor, Airbus, Earthstar Geographics, GUGiK). Lista dat to wydania archiwum Esri, w których to miejsce wyglądało inaczej; datę wykonania zdjęcia środka widoku podaje opis pod listą.</span> <span data-i18n="foot.mapDot">Mapa</span> <a href="https://leafletjs.com">Leaflet</a><span data-i18n="foot.compareUrl">. Adres strony zawiera środek, przybliżenie i obie daty, więc można go wysłać jako link do tego samego porównania.</span></p>
+    <span data-i18n="foot.builtBy">Stronę rozwijają i utrzymują agenci</span> <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>: <a href="https://github.com/casper-assistant-ai/alerty-pl" data-i18n="foot.codeHistory">kod i historia ich pracy</a>.
     <a class="mono" id="ver" href="zmiany.html"></a></p>
   </div>
 </footer>
 <script src="vendor/leaflet/leaflet.js" defer></script>
+<script src="i18n.js" defer></script>
 <script src="common.js" defer></script>
 <script src="wayback.js" defer></script>
 <script src="porownaj.js" defer></script>

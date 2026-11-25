@@ -253,9 +253,66 @@ const RCB = (() => {
 
   if ($("#strip")) live();
 
+  // ---------- interface language (docs/i18n.js: the shared chrome in PL / EN / UK) ----------
+  // ?lang=pl|en|uk wins, then the choice kept in localStorage (one key on every page), then pl; an unknown code is ignored
+  const LANGS = ["pl", "en", "uk"], LANG_KEY = "alerty-lang";
+  const storedLang = () => { try { return typeof localStorage === "undefined" ? null : localStorage.getItem(LANG_KEY); } catch (e) { return null; } };
+  function lang(search, stored) {
+    if (search === undefined) search = typeof location !== "undefined" ? location.search : "";
+    const q = new URLSearchParams(search).get("lang");
+    if (LANGS.includes(q)) return q;
+    if (stored === undefined) stored = storedLang();
+    return LANGS.includes(stored) ? stored : "pl";
+  }
+  // t("src", { name: "gov.pl" }) -> "źródło: gov.pl"; a text missing in the chosen language comes from Polish
+  function t(key, params, code = lang()) {
+    const dict = (typeof I18N === "undefined" ? null : I18N) || {};
+    let s = (dict[code] && dict[code][key]) || (dict.pl && dict.pl[key]) || key;
+    for (const [k, v] of Object.entries(params || {})) s = s.split("{" + k + "}").join(v);
+    return s;
+  }
+  // the link of a switcher entry: every other URL parameter byte for byte, and lang set to that language
+  function langUrl(search, code) {
+    const parts = (search || "").replace(/^\?/, "").split("&").filter((p) => p && p.split("=")[0] !== "lang");
+    return "?" + parts.concat("lang=" + code).join("&");
+  }
+  // on DOM ready: the links of the switcher (the current one aria-current); in another language also <html lang>,
+  // <title> and the text or aria-label of every [data-i18n] element. A page that chose no language stays as it is.
+  function applyI18n(doc = document) {
+    if (typeof doc.querySelectorAll !== "function") return "pl";
+    const search = typeof location !== "undefined" ? location.search : "";
+    const code = lang(search);
+    if (new URLSearchParams(search).get("lang") === code) { // the URL's choice becomes the kept one
+      try { if (typeof localStorage !== "undefined") localStorage.setItem(LANG_KEY, code); } catch (e) { /* private mode */ }
+    }
+    for (const a of doc.querySelectorAll("nav.langs a[data-lang]")) {
+      a.setAttribute("href", langUrl(search, a.dataset.lang));
+      if (a.dataset.lang === code) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+    }
+    if (code === "pl") return code;
+    doc.documentElement.lang = code;
+    const title = doc.querySelector("title[data-i18n-title]");
+    if (title) doc.title = t(title.dataset.i18nTitle, null, code);
+    for (const el of doc.querySelectorAll("[data-i18n]")) {
+      const params = {};
+      // data-i18n-param-name="src.gov" fills {name} with that key's text
+      for (const [k, v] of Object.entries(el.dataset)) if (k.startsWith("i18nParam")) params[k.slice(9, 10).toLowerCase() + k.slice(10)] = t(v, null, code);
+      el.textContent = t(el.dataset.i18n, params, code);
+    }
+    for (const el of doc.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria, null, code));
+    return code;
+  }
+
   return { isISO, periodFromQuery, clampPeriod, span, historyPeriod, inPeriod, historyLink, API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON,
     fmtISO, fmtDay, fmtShort, fmtTime, fmtStamp,
-    hasTime, duration, regionText, names, plural, strip, live };
+    hasTime, duration, regionText, names, plural, strip, live, LANGS, lang, t, langUrl, applyI18n };
+})();
+
+// docs/i18n.js (loaded before this file) brings the dictionaries; without them nothing is translated.
+(() => {
+  if (typeof document === "undefined" || typeof I18N === "undefined" || typeof document.querySelectorAll !== "function") return;
+  const go = () => RCB.applyI18n();
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", go); else go();
 })();
 
 // The tab row scrolls sideways on a narrow phone (six tabs): show the current tab and fade the side with more tabs.
