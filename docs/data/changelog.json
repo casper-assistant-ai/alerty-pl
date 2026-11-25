@@ -15,11 +15,20 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.29.0",
    "date": "2026-11-25",
-   "time": "2026-11-25T20:20:19Z",
-   "sha": "a70a0cb",
+   "time": "2026-11-25T21:32:42+01:00",
+   "sha": "5439492",
    "changes": [
+    {
+     "type": "feat",
+     "scope": "map",
+     "breaking": false,
+     "text": "find a place by address, postal code or coordinates (OpenStreetMap Nominatim)",
+     "sha": "5439492",
+     "date": "2026-11-25",
+     "time": "2026-11-25T21:32:42+01:00"
+    },
     {
      "type": "ci",
      "scope": "workflows",

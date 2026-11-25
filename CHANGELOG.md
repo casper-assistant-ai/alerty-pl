@@ -2,7 +2,11 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.29.0 (2026-11-25)
+
+### feat
+
+- **map:** find a place by address, postal code or coordinates (OpenStreetMap Nominatim) ([5439492](https://github.com/casper-assistant-ai/alerty-pl/commit/5439492))
 
 ### ci
 
