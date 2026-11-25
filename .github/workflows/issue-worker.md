@@ -22,6 +22,12 @@ permissions:
   issues: read
   pull-requests: read
 strict: true
+# Every run works the whole queue, so runs must not overlap: on 25.11.2026 a dispatched run beside
+# the kick's run split report #173 a second time (#183-#186). One group for all events; a later
+# run waits and builds its queue after the earlier one has published.
+concurrency:
+  group: "gh-aw-${{ github.workflow }}"
+  queue: max
 engine:
   id: claude
   model: glm-5.4
@@ -117,7 +123,7 @@ Every issue you touch ends in exactly one of two ways, and you say which in one 
   `process/improvements.md`), with a test when code changes, then run
   `python3 -I -m unittest discover -s tests` and `for f in docs/*.js; do node --check "$f"; done`.
   Title: `[issue-worker] <Conventional Commit subject>`; body: the cause, the change, how it was
-  checked, and `Closes #<n>`. The Agent PR gate merges it and the issue closes.
+  checked, `Closes #<n>`, and `From #<report>` when it covers a point of a report. The Agent PR gate merges it and the issue closes.
 - **Closing with the reason** (`close-issue`, its body is the reason): a report whose points are
   done or already turned into dev-tasks or PRs (link them); a duplicate (name the original); a
   one-off failure when a later run of the same workflow succeeded (link that run); a request that
@@ -150,7 +156,9 @@ worth doing (say why in one line). Every other point becomes one dev-task now: `
 the label `dev-task`, titled `dev-task: <file>: <change>`, the body the point's text, the file and
 line, the fix it proposes, «How to check it» (the test to add) and `From #<report>`; group points
 only when they change the same file. Then close the report (`close-issue`) with one line per point
-and its link; the Issue worker kick starts your next run on those dev-tasks within half an hour. A
+and its link: a number that already existed (`#163`, a commit), or for an issue or PR you create in
+this run its title, never `#aw_…`, because `close-issue` posts temporary IDs as they are (#173 on
+25.11.2026); each of those says `From #<report>`, so GitHub lists them on the report; the Issue worker kick starts your next run on those dev-tasks within half an hour. A
 point fixed by your PR in this run counts as covered by it.
 Label every issue you create: `dev-task` for these, `workflow-change` for workflow patches.
 
