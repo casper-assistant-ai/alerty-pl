@@ -10,6 +10,8 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### ci
 
+- **gate:** the PR's own code runs without the gate's write token ([847d34d](https://github.com/casper-assistant-ai/alerty-pl/commit/847d34d))
+- **issue-worker:** one queue for all runs, and report links without temporary IDs ([2922803](https://github.com/casper-assistant-ai/alerty-pl/commit/2922803))
 - **update:** push the data commit with its own deploy key, which the CodeQL ruleset lets through ([6ba4c74](https://github.com/casper-assistant-ai/alerty-pl/commit/6ba4c74))
 - **gate:** wait for every CodeQL run on the head before trusting the check ([df9eecc](https://github.com/casper-assistant-ai/alerty-pl/commit/df9eecc))
 - **codeql:** the Leaflet query is high severity, like CodeQL's own js/xss, so its alert fails the check ([f2242af](https://github.com/casper-assistant-ai/alerty-pl/commit/f2242af))

@@ -17,9 +17,27 @@
   {
    "version": null,
    "date": "2026-11-25",
-   "time": "2026-11-25T22:52:37+01:00",
-   "sha": "6ba4c74",
+   "time": "2026-11-25T23:42:51+01:00",
+   "sha": "847d34d",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "gate",
+     "breaking": false,
+     "text": "the PR's own code runs without the gate's write token",
+     "sha": "847d34d",
+     "date": "2026-11-25",
+     "time": "2026-11-25T23:42:51+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "issue-worker",
+     "breaking": false,
+     "text": "one queue for all runs, and report links without temporary IDs",
+     "sha": "2922803",
+     "date": "2026-11-25",
+     "time": "2026-11-25T23:40:59+01:00"
+    },
     {
      "type": "ci",
      "scope": "update",
