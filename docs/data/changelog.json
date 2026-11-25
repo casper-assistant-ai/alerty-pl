@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.26.0",
+   "date": "2026-11-25",
+   "time": "2026-11-25T14:57:20+01:00",
+   "sha": "5678315",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "site",
+     "breaking": false,
+     "text": "shared texts in PL/EN/UK: categories, months, regions, durations, status strip, toasts (#58)",
+     "sha": "5678315",
+     "date": "2026-11-25",
+     "time": "2026-11-25T14:57:20+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.25.0",
    "date": "2026-11-25",
    "time": "2026-11-25T14:54:39+01:00",

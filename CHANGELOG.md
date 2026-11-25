@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.26.0 (2026-11-25)
+
+### feat
+
+- **site:** shared texts in PL/EN/UK: categories, months, regions, durations, status strip, toasts (#58) ([5678315](https://github.com/casper-assistant-ai/alerty-pl/commit/5678315))
+
 ## 1.25.0 (2026-11-25)
 
 ### feat
