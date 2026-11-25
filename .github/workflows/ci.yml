@@ -52,7 +52,8 @@ jobs:
     # a failed pull request run of this repository starts the CI doctor (fork PRs have a
     # read-only token and cannot; main is watched by the doctor's own workflow_run trigger)
     needs: test
-    if: failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    # Dependabot's runs get a read-only token and could not dispatch the doctor
+    if: failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 2
     permissions:

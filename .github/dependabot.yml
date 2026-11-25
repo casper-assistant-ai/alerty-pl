@@ -2,11 +2,22 @@
 # packages; the site is plain HTML/JS with vendored libraries, and the workflow actions are
 # pinned by gh-aw's compiled .lock.yml files, which Dependabot must not edit.
 # PR titles come out as "build(deps): …", a Conventional Commit, so CI's lint and the
-# changelog accept them.
+# changelog accept them. Dependabot's PRs go through the agents' pipeline (PR reviewer, PR fixer,
+# Agent PR gate), which merges them when the tests, the live service start and the review pass.
 version: 2
 updates:
   - package-ecosystem: "pip"
     directory: "/server"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "build"
+      include: "scope"
+  # Temporary (2026-11-25): proves the pipeline on a real Dependabot PR into the test branch
+  # dependabot-test, which pins aiohttp one patch back; removed after the test.
+  - package-ecosystem: "pip"
+    directory: "/server"
+    target-branch: "dependabot-test"
     schedule:
       interval: "weekly"
     commit-message:

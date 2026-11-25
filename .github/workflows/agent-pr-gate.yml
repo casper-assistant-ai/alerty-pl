@@ -9,6 +9,15 @@ name: Agent PR gate
 # again. It closes a PR only when the reviewer rejects it on substance, the fixer finds it cannot be
 # fixed, or three fix attempts did not help; then it tells the linked issues and starts the
 # issue-worker, which takes them again (and gives up after two closed PRs).
+#
+# The owner's own PRs (authors in OWNERS, not drafts) and Dependabot's PRs go through the same
+# pipeline (owner's wish, 2026-11-25): the gate puts the label "pipeline" on every PR it takes, and
+# the reviewer and the fixer work only on PRs with that label. Differences: a Dependabot PR may
+# change only server/requirements*.txt; an owner PR may change anything except .github/workflows/
+# (GITHUB_TOKEN cannot merge those); a PR that changes server/ must also start the live service.
+# The gate never closes an owner PR: where it would close one, it comments "Agent PR gate: stopped"
+# with the reason and adds the label "gate-stopped"; removing the label hands the PR back to the
+# gate with three new fix attempts.
 on:
   schedule:
     - cron: "17,47 * * * *"
@@ -34,6 +43,10 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       ALLOWED: '^(scripts/|tests/|process/[a-z0-9-]+\.(md|json)$|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$)'
       SECURITY_ALLOWED: '^dashboard/'
+      DEPENDABOT_ALLOWED: '^server/requirements[a-z0-9-]*\.txt$'
+      OWNER_FORBIDDEN: '^\.github/workflows/'
+      # GitHub logins whose PRs the pipeline takes: the owner (kloba) and Casper (casper-assistant-ai)
+      OWNERS: 'kloba casper-assistant-ai'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,14 +59,20 @@ jobs:
           MAX_FIX=3
           busy() { gh run list --workflow "$1" --limit 10 --json status --jq '[.[] | select(.status != "completed")] | length'; }
           bot='.user.login=="github-actions[bot]"'
+          stop_pr() {  # an owner PR is never closed: hand it back with the reason
+            gh pr comment "$n" --body "Agent PR gate: stopped. $1 Over to you: push a change to this branch, then remove the label gate-stopped and the gate takes the PR again." \
+              && gh pr edit "$n" --add-label gate-stopped >/dev/null && echo "stopped #$n: $1"
+          }
           close_pr() {  # $1: the reason, quoted on the PR and on its linked issues
             local closes
+            if [ "$kind" = owner ]; then stop_pr "$1"; return; fi
             closes=$(gh pr view "$n" --json closingIssuesReferences --jq '.closingIssuesReferences[].number')
             gh pr close "$n" --delete-branch --comment "Agent PR gate: closed without merging. $1" && echo "closed #$n: $1"
             for i in $closes; do
               gh issue comment "$i" --body "Agent PR gate: #$n was closed without merging. $1 The issue-worker takes this issue again."
             done
-            requeue=1
+            [ "$kind" = agent ] && requeue=1
+            return 0
           }
           request_fix() {  # $1: the reason; $2: a log file whose end goes into the request
             local k body
@@ -79,23 +98,48 @@ jobs:
             gh pr comment "$n" --body-file "$body" && echo "fix attempt $k requested for #$n: $1"
             need_fix=1
           }
+          live_check() {  # install server/requirements.txt in a fresh venv, start the service, ask it twice
+            local pid rc=1
+            python3 -m venv "/tmp/venv-$n" && "/tmp/venv-$n/bin/pip" install -q -r server/requirements.txt || return 1
+            STATE_DIR="/tmp/live-$n" PORT=8099 POLL_SECONDS=600 "/tmp/venv-$n/bin/python" -I server/app.py & pid=$!
+            for _ in $(seq 1 30); do
+              sleep 1
+              curl -fsS -o /dev/null http://127.0.0.1:8099/config && curl -fsS -o /dev/null http://127.0.0.1:8099/alerts && { rc=0; break; }
+            done
+            kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
+            [ "$rc" = 0 ] && echo "live service answered /config and /alerts"
+            return "$rc"
+          }
           # Runs started with GITHUB_TOKEN fire no workflow_run event, so the gate itself waits for
           # the reviewer and the fixer it starts, then looks at the PRs again: one gate run carries a
           # PR from failing tests through fix attempts and review to the merge.
+          gh label create pipeline --color 5319e7 --description "Taken by the Agent PR gate: reviewer, fixer, gate" 2>/dev/null || true
+          gh label create gate-stopped --color d93f0b --description "The Agent PR gate handed this PR back to its author" 2>/dev/null || true
           for round in 1 2 3 4 5 6 7 8; do
           echo "::notice::round $round"
           need_review=0; requeue=0; need_fix=0
           fixer_busy=$(busy pr-fixer.lock.yml)
-          prs=$(gh pr list --state open --label agent --json number,author,isDraft \
-                --jq '.[] | select(.author.login=="app/github-actions" or .author.login=="github-actions") | .number')
-          for n in $prs; do
-            echo "::group::PR #$n"
-            gh pr ready "$n" 2>/dev/null || true
+          # "<number>:<kind>" for agent PRs, Dependabot PRs from this repo and the owners' ready PRs;
+          # a PR with the label gate-stopped waits for its owner
+          prs=$(gh pr list --state open --limit 100 --json number,author,isDraft,isCrossRepository,labels --jq '
+                .[] | (.labels | map(.name)) as $l | select($l | index("gate-stopped") | not)
+                | if (.author.login == "app/github-actions" or .author.login == "github-actions") and ($l | index("agent")) then "\(.number):agent"
+                  elif (.author.login == "app/dependabot" or .author.login == "dependabot") and (.isCrossRepository | not) then "\(.number):dependabot"
+                  elif (.author.login as $a | $ENV.OWNERS | split(" ") | index($a)) and (.isDraft | not) then "\(.number):owner"
+                  else empty end')
+          for entry in $prs; do
+            n=${entry%%:*}; kind=${entry#*:}
+            echo "::group::PR #$n ($kind)"
+            # the label tells the reviewer and the fixer that the gate took this PR
+            gh pr edit "$n" --add-label pipeline >/dev/null 2>&1 || true
+            [ "$kind" = agent ] && { gh pr ready "$n" 2>/dev/null || true; }
             # CI on a PR by github-actions[bot] waits for an approval; nobody else gives it
             sha=$(gh pr view "$n" --json headRefOid --jq .headRefOid)
             gh api "repos/$GITHUB_REPOSITORY/issues/$n/comments" --paginate > "/tmp/comments-$n.json"
-            # fix attempts so far, and the requests and fixer answers for this exact head
-            attempts=$(jq -s "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: fix attempt\")))) | length" "/tmp/comments-$n.json")
+            # fix attempts so far (after the last stop, when an owner handed the PR back), and the
+            # requests and fixer answers for this exact head
+            since=$(jq -rs "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: stopped\")))) | last | .created_at // \"\"" "/tmp/comments-$n.json")
+            attempts=$(jq -s --arg since "$since" "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: fix attempt\")) and (.created_at > \$since))) | length" "/tmp/comments-$n.json")
             asked=$(jq -s --arg sha "$sha" "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: fix attempt\")) and (.body | test(\"(?m)^Fix-Head: *\" + \$sha)))) | length" "/tmp/comments-$n.json")
             asked_at=$(jq -rs --arg sha "$sha" "add // [] | map(select($bot and (.body | startswith(\"Agent PR gate: fix attempt\")) and (.body | test(\"(?m)^Fix-Head: *\" + \$sha)))) | last | .created_at // \"\"" "/tmp/comments-$n.json")
             answers=$(jq -s --arg sha "$sha" "add // [] | map(select($bot and (.body | contains(\"workflow_id: pr-fixer\")) and (.body | test(\"(?m)^Head: *\" + \$sha)))) | length" "/tmp/comments-$n.json")
@@ -116,14 +160,29 @@ jobs:
               gh api -X POST "repos/$GITHUB_REPOSITORY/actions/runs/$r/approve" >/dev/null && echo "approved CI run $r"
             done
             files=$(gh pr diff "$n" --name-only)
-            allowed="$ALLOWED"
-            # the security-fixer also fixes CodeQL alerts in the vendored gh-cao dashboard
-            case "$(gh pr view "$n" --json title --jq .title)" in "[security-fixer] "*) allowed="$ALLOWED|$SECURITY_ALLOWED";; esac
-            bad=$(echo "$files" | grep -Ev "$allowed" || true)
-            if [ -n "$bad" ]; then
-              request_fix "It changes files outside the allowed paths: $(echo $bad). Revert them."
-              echo "::endgroup::"; continue
-            fi
+            case "$kind" in
+              agent)
+                allowed="$ALLOWED"
+                # the security-fixer also fixes CodeQL alerts in the vendored gh-cao dashboard
+                case "$(gh pr view "$n" --json title --jq .title)" in "[security-fixer] "*) allowed="$ALLOWED|$SECURITY_ALLOWED";; esac
+                bad=$(echo "$files" | grep -Ev "$allowed" || true)
+                if [ -n "$bad" ]; then
+                  request_fix "It changes files outside the allowed paths: $(echo $bad). Revert them."
+                  echo "::endgroup::"; continue
+                fi;;
+              dependabot)
+                bad=$(echo "$files" | grep -Ev "$DEPENDABOT_ALLOWED" || true)
+                if [ -n "$bad" ]; then
+                  close_pr "A Dependabot PR may change only server/requirements*.txt; this one changes $(echo $bad)."
+                  echo "::endgroup::"; continue
+                fi;;
+              owner)
+                bad=$(echo "$files" | grep -E "$OWNER_FORBIDDEN" || true)
+                if [ -n "$bad" ]; then
+                  stop_pr "It changes $(echo $bad); the gate's GITHUB_TOKEN cannot merge workflow files, so merge it yourself."
+                  echo "::endgroup::"; continue
+                fi;;
+            esac
             git checkout -q --detach
             gh pr checkout "$n" --force
             ok=1; log="/tmp/gate-log-$n.txt"; : > "$log"
@@ -131,6 +190,10 @@ jobs:
             { python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n 2>&1 || { ok=0; echo "FAILED: live parse of gov.pl"; }; } | tee -a "$log"
             for js in docs/*.js; do { node --check "$js" 2>&1 || { ok=0; echo "FAILED: node --check $js"; }; } | tee -a "$log"; done
             { npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html 2>&1 || { ok=0; echo "FAILED: html-validate docs/*.html"; }; } | tee -a "$log"
+            if echo "$files" | grep -q '^server/'; then
+              # the live service (server/) is deployed from main by casper-infra: it must install and start
+              { live_check 2>&1 || { ok=0; echo "FAILED: live service start (server/)"; }; } | tee -a "$log"
+            fi
             grep -q '^FAILED: ' "$log" && ok=0
             git checkout -q main
             if [ "$ok" != 1 ]; then
