@@ -2,6 +2,15 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.27.0 (2026-11-25)
+
+### feat
+
+- **site:** changes page in PL/EN/UK, first visit follows the browser's language, site check in all three languages (#58) ([7efe1ae](https://github.com/casper-assistant-ai/alerty-pl/commit/7efe1ae))
+- **site:** shelters and notifications pages in PL/EN/UK (#58) ([0bc27cf](https://github.com/casper-assistant-ai/alerty-pl/commit/0bc27cf))
+- **site:** history and analytics pages in PL/EN/UK (#58) ([a52984c](https://github.com/casper-assistant-ai/alerty-pl/commit/a52984c))
+- **site:** map and compare pages in PL/EN/UK, RCB rows marked as the original Polish message (#58) ([23ea054](https://github.com/casper-assistant-ai/alerty-pl/commit/23ea054))
+
 ## 1.26.0 (2026-11-25)
 
 ### feat
