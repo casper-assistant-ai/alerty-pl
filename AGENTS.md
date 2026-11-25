@@ -161,10 +161,14 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   first green check run, a workflow-change issue after the PR) and never hold one back to send it
   with another; a 429 [1308] «Usage limit reached for 5 hour» is the account's quota, not an
   overloaded model, and its reset time is Beijing time (UTC+8): nothing to retry, the next run
-  takes the work [provider-overload, issue-worker run 45528108383 lost 73 turns and 17 minutes;
-  process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites never
-  pushed; the quota of 2026-11-25, 09:06 to 09:57 UTC: 14 runs, pr-reviewer 45581138284 at turn 16
-  and ci-doctor 45580981955 at turn 23 lost 10 minutes each].
+  takes the work; on a busy day the quota runs out about 4 h 20 m into every 5-hour window (on
+  2026-11-25 at 09:06 and 14:29 UTC), and a 429 [1302] «Rate limit reached for requests» right
+  after a reset is the same [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
+  minutes; process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites
+  never pushed; the quota of 2026-11-25, 09:06 to 09:57 UTC: 14 runs, pr-reviewer 45581138284 at
+  turn 16 and ci-doctor 45580981955 at turn 23 lost 10 minutes each, then site-fixer 45634707189
+  at 14:29; 429 [1302] from 15:11 to 15:38 UTC: site-fixer 45645531386 lost 31 turns and
+  site-designer 45640863668 61].
 - region-keeper: take at most 5 items of `unmatched.json` a run (the first five; the rest wait for
   the next day), never audit `alerts.json`, and call `noop` at once when the file is empty
   [timeout, region-keeper runs 45227118220 and 45447715342: 22 minutes on the 20-minute limit,
@@ -185,5 +189,9 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   its helpers): run `node --test tests/*.test.mjs` before the PR and never edit a test to make a
   change pass — drop or reshape the change and name it in the PR body — because the safe output
   refuses the whole patch for one file outside the list [safe-outputs, site-designer run
-  45606766890: 9 minutes lost on tests/style.test.mjs, #139].
+  45606766890: 9 minutes lost on tests/style.test.mjs, #139]. The run has 25 minutes and no
+  clock (`date` is not among its tools), so read only the files of your change: never
+  `process/*.md` or `scripts/` (the process-doctor's), and open the PR or call `noop` by turn 40
+  [timeout, site-designer run 45640863668: 61 turns over the ledger and the improvements list,
+  nothing sent, #139].
 <!-- reliability:end -->
