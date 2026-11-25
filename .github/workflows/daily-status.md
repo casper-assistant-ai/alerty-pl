@@ -4,7 +4,8 @@ description: |
   alerts parsed, regions unmatched, agent PRs merged or stuck, failures. One issue,
   replacing yesterday's.
 on:
-  schedule: daily
+  schedule:
+    - cron: "50 9 * * *"
   workflow_dispatch:
 permissions:
   contents: read

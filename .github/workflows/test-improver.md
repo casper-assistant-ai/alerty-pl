@@ -3,7 +3,8 @@ description: |
   Weekly: adds tests for parser cases that are not covered yet, using real RCB pages
   saved as fixtures. Opens one PR for the Agent PR gate.
 on:
-  schedule: weekly
+  schedule:
+    - cron: "22 10 * * 0"
   workflow_dispatch:
 permissions:
   contents: read

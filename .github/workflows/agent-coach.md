@@ -5,7 +5,8 @@ description: |
   recurring failures and turns the validated lessons into bounded edits of the
   "Learned rules" block in AGENTS.md, which every agent reads. One PR for the gate.
 on:
-  schedule: weekly
+  schedule:
+    - cron: "5 12 * * 0"
   workflow_dispatch:
 permissions:
   contents: read

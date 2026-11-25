@@ -13,7 +13,7 @@ description: |
   The agent-coach owns the "Learned rules" block; this agent never touches it.
 on:
   schedule:
-    - cron: "40 6 * * *"
+    - cron: "40 10 * * *"
   workflow_dispatch:
 permissions:
   contents: read

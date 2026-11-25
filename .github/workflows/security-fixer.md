@@ -6,7 +6,8 @@ description: |
   secret to rotate, the server's dependencies). Started by the Security watch workflow when an
   alert is not covered yet, and weekly.
 on:
-  schedule: weekly
+  schedule:
+    - cron: "11 12 * * 4"
   workflow_dispatch:
 permissions:
   contents: read

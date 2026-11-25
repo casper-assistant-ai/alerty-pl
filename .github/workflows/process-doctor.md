@@ -15,7 +15,7 @@ on:
   # agent-health.yml dispatches it with GITHUB_TOKEN
   bots: ["github-actions[bot]"]
   schedule:
-    - cron: "20 7 * * *"
+    - cron: "20 11 * * *"
   workflow_dispatch:
     inputs:
       issue:
