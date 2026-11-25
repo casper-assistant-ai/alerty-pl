@@ -1,9 +1,8 @@
-// tests/urls.test.mjs — pins that no page follows a URL from the live service, or writes one into a link,
-// without checking that it is https (security audit #146, hardening).
-// docs/notify.js goes to the link the service names for Telegram (w.location = url): a script or a data URL
-// there would run in the site's origin. docs/common.js h() builds every link of every page: a href or a src
-// the browser would run as code is never written. Run by tests/test_urls_js.py inside the Python suite,
-// and by `node --test tests/*.test.mjs`.
+// tests/urls.test.mjs — pins that no page follows a URL from the live service without checking that it is https
+// (security audit #146, hardening). docs/notify.js goes to the link the service names for Telegram
+// (w.location = url): a script or a data URL there would run in the site's origin. That h() never writes
+// such a URL into an href or a src is tested by behaviour in tests/common.test.mjs, not by its source text.
+// Run by tests/test_urls_js.py inside the Python suite, and by `node --test tests/*.test.mjs`.
 import { readFileSync, readdirSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -15,8 +14,8 @@ const SOURCES = Object.fromEntries(readdirSync(DOCS).filter((f) => f.endsWith(".
   .map((f) => [f, read(f)]));
 
 // the navigation sinks of the pages: a URL handed to the browser to open (an assignment to location,
-// or location.replace(…)). The form's end is at the end of the match.
-const SINK = /\b(?:[\w$.]*location(?:\.href)?\s*=\s*|location\.replace\s*\()/g;
+// location.replace(…) or location.assign(…)). The form's end is at the end of the match.
+const SINK = /\b(?:[\w$.]*location(?:\.href)?\s*=\s*|location\.(?:replace|assign)\s*\()/g;
 
 // The navigation of docs/notify.js: the line that opens the service's link, and the lines above it in the
 // same function. Each sink must have, within the five lines before it, the https check of new URL(...).
@@ -33,6 +32,11 @@ test("the pin knows a guarded navigation from an unguarded one", () => {
   for (const m of ok.matchAll(SINK)) assert.ok(guarded(ok, m.index + m[0].length), m[0]);
   const bad = 'const { url } = await post("/telegram/link", {});\n  location.href = url;\n';
   for (const m of bad.matchAll(SINK)) assert.equal(guarded(bad, m.index + m[0].length), false, m[0]);
+  // location.assign(…) opens a URL the same way
+  const viaAssign = 'const { url } = await post("/telegram/link", {});\n  location.assign(url);\n';
+  const assign = [...viaAssign.matchAll(SINK)];
+  assert.equal(assign.length, 1, "the sink list lost location.assign(");
+  assert.equal(guarded(viaAssign, assign[0].index + assign[0].length), false, assign[0][0]);
 });
 
 test("every navigation of every page to a URL checks that it is https", () => {
@@ -48,11 +52,4 @@ test("every navigation of every page to a URL checks that it is https", () => {
     assert.ok(guarded(s.src, s.m.index + s.m[0].length),
       `${s.f}:${s.line}: ${s.m[0]} opens a URL without new URL(…).protocol === "https:" right before it`);
   }
-});
-
-test("h() refuses the schemes a browser runs as code, for href and for src", () => {
-  const common = SOURCES["common.js"];
-  const guard = /if \(\(k === "href" \|\| k === "src"\) && UNSAFE_URL\.test\(v\)\) continue;/.test(common);
-  assert.ok(guard, 'common.js h(): the href and src check is gone');
-  assert.match(common, /const UNSAFE_URL = \/\^\\s\*\(javascript\|data\|vbscript\):\/i;/);
 });

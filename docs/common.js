@@ -39,15 +39,18 @@ const RCB = (() => {
   }
 
   // A URL that the browser would run as code: never written into an attribute, whatever the source.
-  // (Relative links and other schemes, like the shelters' geo:, pass.)
-  const UNSAFE_URL = /^\s*(javascript|data|vbscript):/i;
+  // (Relative links and other schemes, like the shelters' geo:, pass.) The browser reads an href or a src
+  // after dropping every tab, LF and CR and trimming the leading C0 controls and spaces, so the value is read
+  // that way before its scheme is tested: "java\tscript:" and "\x01javascript:" are refused as well.
+  const UNSAFE_SCHEME = /^[\x00-\x20]*(javascript|data|vbscript):/i;
+  const unsafeURL = (v) => UNSAFE_SCHEME.test(String(v).replace(/[\t\n\r]/g, ""));
 
   function h(tag, attrs = {}, ...kids) {
     const e = document.createElement(tag);
     for (const [k, v] of Object.entries(attrs)) {
       if (k === "text") e.textContent = v;
       else if (k === "style") e.style.cssText = v;
-      else if ((k === "href" || k === "src") && UNSAFE_URL.test(v)) continue;
+      else if ((k === "href" || k === "src") && unsafeURL(v)) continue;
       else e.setAttribute(k, v);
     }
     for (const k of kids) if (k != null) e.append(k);

@@ -111,9 +111,14 @@ const attrDoc = () => ({
 
 test("h() never writes a URL the browser would run as code into href or src", () => {
   const { h } = load(attrDoc());
-  for (const bad of ["javascript:alert(1)", " JAVASCRIPT:alert(1)", "data:text/html,<script>alert(1)</script>", "vbscript:msgbox(1)"]) {
-    assert.equal(h("a", { href: bad }).attrs.href, undefined, bad);
-    assert.equal(h("script", { src: bad }).attrs.src, undefined, bad);
+  // the browser reads an href or a src after dropping every tab, LF and CR and trimming the leading C0 controls
+  // and spaces, so "java\tscript:" and "\x01javascript:" run too; the URL parser of the test reads them the same way
+  const bad = ["javascript:alert(1)", " JAVASCRIPT:alert(1)", "java\tscript:alert(1)", "\x01javascript:alert(1)",
+    "data:text/html,<script>alert(1)</script>", "vbscript:msgbox(1)"];
+  for (const url of bad) {
+    assert.ok(["javascript:", "data:", "vbscript:"].includes(new URL(url, "https://alerty.pl/").protocol), url);
+    assert.equal(h("a", { href: url }).attrs.href, undefined, url);
+    assert.equal(h("script", { src: url }).attrs.src, undefined, url);
   }
 });
 
