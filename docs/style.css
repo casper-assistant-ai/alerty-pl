@@ -250,6 +250,7 @@ main { flex: 1; width: 100%; max-width: 1480px; margin: 0 auto; padding: 24px; }
 .base-note:empty { display: none; }
 a.btn { display: inline-flex; align-items: center; text-decoration: none; }
 .compare-link { min-height: 32px; height: auto; font-size: .8125rem; }
+.compare-link[hidden] { display: none; } /* .btn is flex: without this «Porównaj daty» showed on every base layer */
 
 /* porownaj.html: two Esri Wayback maps of one place side by side, moving together */
 .cmp-page { display: block; }

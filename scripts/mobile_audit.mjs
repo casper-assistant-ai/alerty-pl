@@ -18,6 +18,7 @@ const BASE = (args.base || "https://casper-assistant-ai.github.io/alerty-pl/").r
 const PAGES = ["", "?dzien=2025-09-10", "?podklad=esri", "historia.html", "historia.html?cat=air&q=uwaga",
   "analityka.html", "analityka.html?okres=all", "powiadomienia.html", "schrony.html?lat=52.2297&lon=21.0122",
   "schrony.html", "zmiany.html", "?podklad=esri&srodek=50.5650,17.9650&zoom=15&zdjecie=2025-04-24",
+  "?od=2024-09-12&do=2024-09-20&podklad=sentinel&srodek=50.7500,17.6100&zoom=13",
   "porownaj.html?srodek=50.5650,17.9650&zoom=15&lewa=2025-03-27&prawa=2025-04-24"];
 // the English and Ukrainian texts are longer or shorter than the Polish: every page again in both (docs/i18n*.js)
 for (const code of ["en", "uk"]) for (const path of ["", "historia.html", "analityka.html", "powiadomienia.html",

@@ -60,9 +60,11 @@
       <div class="seg" role="radiogroup" aria-label="Podkład mapy" data-i18n-aria="map.aria.base">
         <label><input type="radio" name="base" value="mapa" checked><span data-i18n="map.base.map">Mapa</span></label>
         <label><input type="radio" name="base" value="esri"><span data-i18n="map.base.esri">Satelita · Esri Wayback</span></label>
+        <label><input type="radio" name="base" value="sentinel"><span data-i18n="map.base.sentinel">Satelita · Sentinel-2 (10 m)</span></label>
         <label><input type="radio" name="base" value="nasa"><span data-i18n="map.base.nasa">Satelita · NASA z dnia</span></label>
       </div>
       <label class="wb" id="wb-wrap" hidden><span class="visually-hidden" data-i18n="map.wb.label">Data zdjęcia Esri Wayback</span><select id="wayback"></select></label>
+      <label class="wb" id="s2-wrap" hidden><span class="visually-hidden" data-i18n="map.s2.label">Dzień zdjęcia Sentinel-2</span><select id="s2day"></select></label>
       <a class="btn compare-link" id="compare" href="porownaj.html" hidden title="Dwie mapy obok siebie: to samo miejsce na zdjęciach z różnych dat" data-i18n-tip="map.compareTip" data-i18n="map.compare">Porównaj daty</a>
       <label class="chk"><input type="checkbox" id="fires"><span data-i18n="map.fires">Pożary (NASA FIRMS)</span></label>
     </div>
@@ -87,6 +89,7 @@
   <div class="in">
     <p><span data-i18n="foot.unofficial">Strona nieoficjalna.</span> <span data-i18n="foot.dataFrom">Dane z</span> <a href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="foot.rcb">komunikatów Rządowego Centrum Bezpieczeństwa</a><span data-i18n="foot.checked">, sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako</span> <a href="powiadomienia.html" data-i18n="foot.notify">powiadomienia</a><span data-i18n="foot.listen">. W razie zagrożenia słuchaj komunikatów służb i stosuj się do Alertów RCB w telefonie.</span></p>
     <p><span data-i18n="foot.builtBy">Stronę rozwijają i utrzymują agenci</span> <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>: <a href="https://github.com/casper-assistant-ai/alerty-pl" data-i18n="foot.codeHistory">kod i historia ich pracy</a><span data-i18n="foot.bounds">. Granice:</span> <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a><span data-i18n="foot.map">; mapa</span> <a href="https://leafletjs.com">Leaflet</a><span data-i18n="foot.esriCanvas">, podkład Esri Light/Dark Gray Canvas (©</span> <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a><span data-i18n="foot.satellite">); zdjęcia satelitarne</span> <a href="https://livingatlas.arcgis.com/wayback/">Esri World Imagery Wayback</a> <span data-i18n="foot.and">i</span> <a href="https://www.earthdata.nasa.gov/gibs">NASA GIBS</a><span data-i18n="foot.fires">, pożary</span> <a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a> <span data-i18n="foot.fontFires">(VIIRS 375 m); krój: IBM Plex.</span>
+    <span data-i18n="map.foot.sentinel">Sentinel-2: zawiera zmodyfikowane dane</span> <a href="https://dataspace.copernicus.eu/">Copernicus Sentinel</a> <span data-i18n="map.foot.sentinelVia">(ESA), przez</span> <a href="https://planetarycomputer.microsoft.com/dataset/sentinel-2-l2a">Microsoft Planetary Computer</a>.
     <span data-i18n="map.foot.search">Wyszukiwanie miejsc:</span> <a href="https://nominatim.org">OpenStreetMap Nominatim</a>.
     <a class="mono" id="ver" href="zmiany.html"></a></p>
   </div>
@@ -96,6 +99,7 @@
 <script src="i18n-map.js" defer></script>
 <script src="common.js" defer></script>
 <script src="wayback.js" defer></script>
+<script src="sentinel.js" defer></script>
 <script src="geosearch.js" defer></script>
 <script src="app.js" defer></script>
 <script src="attacks.js" defer></script>

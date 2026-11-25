@@ -3,9 +3,10 @@
 // The period is picked with two handles over the histogram of alerts, quick buttons (24 h, 7 dni, 30 dni, rok,
 // wszystko; they end today), two dates and ◀ ▶ that shift it by its length; it lives in the URL (?od=…&do=…).
 // Under it: a street map (Esri grey canvas), Esri World Imagery Wayback (the newest image of the visible area
-// taken on or before the period's end, switched with the period) or NASA GIBS true colour of the period's last
+// taken on or before the period's end, switched with the period), Copernicus Sentinel-2 at 10 m (the clearest
+// day of the period or the clear day nearest to it, sentinel.js) or NASA GIBS true colour of the period's last
 // day, and NASA FIRMS fires (VIIRS 375 m) of that day. The view lives in the URL too (?srodek=lat,lng&zoom=z), and so
-// does a hand-picked Esri image (&zdjecie=<release date>); porownaj.html shows two images of the view side by side.
+// does a hand-picked Esri image (&zdjecie=<release date>) or Sentinel-2 day (&s2=<day>); porownaj.html shows two images of the view side by side.
 "use strict";
 const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, historyLink, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, t, tn } = RCB;
 
@@ -33,6 +34,7 @@ const FIRE_LAYERS = [
   ["VIIRS_NOAA21_Thermal_Anomalies_375m_All", "2024-01-17"],
 ];
 const WB = RCBWayback; // wayback.js
+const S2 = RCBSentinel; // sentinel.js
 const NASA_ATTR = '<a href="https://www.earthdata.nasa.gov/gibs">NASA GIBS</a>';
 
 const dark = matchMedia("(prefers-color-scheme: dark)");
@@ -52,6 +54,7 @@ const S = {
   archive: [], live: null, liveActive: [], geo: null,
   map: null, pow: null, baseLayer: null, fireLayers: [],
   wayback: null, wbRelease: null, wbLocal: null, wbSeq: 0, wbPin: null,
+  s2Day: null, s2Pin: null, s2Seq: 0, s2Note: "",
 };
 
 // ---------- alerts of a period ----------
@@ -277,6 +280,12 @@ function setPeriod(from, to, push = true) {
   if (!moved) return;
   if (S.base === "nasa") setBase("nasa");
   if (S.fires) fires();
+  // Sentinel-2 looks for the day again; a day picked by hand gives way to the new period
+  if (S.base === "sentinel") {
+    if (push && S.s2Pin) { S.s2Pin = null; viewURL(); }
+    clearTimeout(S.s2Timer);
+    S.s2Timer = setTimeout(sentinelList, 250);
+  }
   // a new period lets Wayback follow its end again, even after a hand-picked image (one from the URL stays at the start)
   if (push && S.wbPin) { S.wbPin = null; viewURL(); }
   clearTimeout(S.wbTimer);
@@ -345,6 +354,7 @@ function setBase(kind) {
   if (S.baseLayer) S.map.removeLayer(S.baseLayer);
   $("#map").classList.toggle("sat", kind !== "mapa");
   $("#wb-wrap").hidden = kind !== "esri";
+  $("#s2-wrap").hidden = kind !== "sentinel";
   $("#compare").hidden = kind !== "esri";
   const note = $("#base-note");
   if (kind === "mapa") {
@@ -356,6 +366,11 @@ function setBase(kind) {
       maxNativeZoom: 9, maxZoom: 19, attribution: NASA_ATTR + " · VIIRS NOAA-20 " + fmtISO(d),
     });
     note.textContent = t(S.to === S.today ? "map.nasa.noteToday" : "map.nasa.note", { date: fmtISO(d) });
+  } else if (kind === "sentinel") {
+    // the day's mosaic comes in when the scenes of the view are known (sentinelList)
+    S.baseLayer = L.layerGroup();
+    S.s2Day = null;
+    sentinelList();
   } else {
     S.baseLayer = WB.layer(S.wbRelease);
     waybackList();
@@ -412,6 +427,52 @@ function waybackFollow() {
   }).catch(() => {});
 }
 
+// ---------- Copernicus Sentinel-2: the clearest day of the view's centre (sentinel.js) ----------
+async function sentinelList() {
+  const seq = ++S.s2Seq, sel = $("#s2day"), note = $("#base-note");
+  if (S.base !== "sentinel") return;
+  note.textContent = t("map.s2.searching");
+  try {
+    const days = await S2.scenes(S.map.getCenter(), S.from, S.to);
+    if (seq !== S.s2Seq || S.base !== "sentinel") return;
+    const list = S2.offer(days, S.from, S.to);
+    const pinned = S.s2Pin && days.find((d) => d.day === S.s2Pin);
+    if (pinned && !list.includes(pinned)) list.push(pinned), list.sort((a, b) => b.day.localeCompare(a.day));
+    const pick = pinned || S2.pick(days, S.from, S.to);
+    sel.replaceChildren(...list.map((d) => h("option", { value: d.day, text: t("map.s2.option", { date: fmtISO(d.day), cloud: d.cloud }) })));
+    if (!pick) {
+      S.baseLayer.clearLayers(); S.s2Day = null;
+      note.textContent = t("map.s2.none", { from: fmtISO(addDays(S.from, -S2.AROUND)), to: fmtISO(addDays(S.to, S2.AROUND)) });
+      return;
+    }
+    sel.value = pick.day;
+    S.s2Note = s2Why(pick, !!pinned);
+    s2Note();
+    if (pick.day !== S.s2Day) {
+      const layer = await S2.layer(pick.day);
+      if (seq !== S.s2Seq || S.base !== "sentinel") return;
+      S.baseLayer.clearLayers();
+      S.baseLayer.addLayer(layer);
+      S.s2Day = pick.day;
+    }
+  } catch (e) {
+    if (seq === S.s2Seq) note.textContent = t("map.s2.fail", { msg: e.message });
+  }
+}
+// why this day: picked by hand, the newest clear one of the period, the clear one nearest to it, or the least cloudy
+function s2Why(d, pinned) {
+  const p = { date: fmtISO(d.day), cloud: d.cloud };
+  if (pinned) return t("map.s2.chosen", p);
+  const off = S2.away(d.day, S.from, S.to);
+  if (d.cloud > S2.CLEAR) return t("map.s2.cloudy", { ...p, around: S2.AROUND });
+  if (!off) return t("map.s2.inPeriod", p);
+  return tn(off, d.day > S.to ? "map.s2.after" : "map.s2.before", p);
+}
+function s2Note() {
+  if (S.base !== "sentinel" || !S.s2Note) return;
+  $("#base-note").textContent = S.s2Note + " " + t("map.s2.about") + (S.map.getZoom() < S2.MIN_ZOOM ? " " + t("map.s2.zoom") : "");
+}
+
 // ---------- the view in the URL ----------
 // ?srodek=lat,lng&zoom=z, &podklad, &zdjecie: a link opens this very place and picture
 function viewURL() {
@@ -420,6 +481,7 @@ function viewURL() {
   u.searchParams.set("zoom", String(+m.getZoom().toFixed(2)));
   if (S.base === "mapa") u.searchParams.delete("podklad"); else u.searchParams.set("podklad", S.base);
   if (S.base === "esri" && S.wbPin) u.searchParams.set("zdjecie", S.wbPin); else u.searchParams.delete("zdjecie");
+  if (S.base === "sentinel" && S.s2Pin) u.searchParams.set("s2", S.s2Pin); else u.searchParams.delete("s2");
   history.replaceState(null, "", u);
 }
 function readView(q) {
@@ -513,10 +575,17 @@ async function main() {
     waybackFollow();
     viewURL();
   });
+  $("#s2day").addEventListener("change", (e) => {
+    S.s2Pin = e.target.value;
+    sentinelList();
+    viewURL();
+  });
   let wbTimer;
   map.on("moveend", () => {
     if (S.base === "esri") { clearTimeout(wbTimer); wbTimer = setTimeout(waybackList, 500); compareLink(); }
+    if (S.base === "sentinel") { clearTimeout(S.s2Timer); S.s2Timer = setTimeout(sentinelList, 600); }
   });
+  map.on("zoomend", s2Note);
   $("#fires").addEventListener("change", (e) => { S.fires = e.target.checked; fires(); paint(alertsOf()); });
 
   // ◀ ▶ shift the period by its length; the quick buttons end today
@@ -533,13 +602,14 @@ async function main() {
   spark();
 
   // ?od=YYYY-MM-DD&do=YYYY-MM-DD opens a period (?dzien= one day, as the old links do);
-  // &podklad=esri|nasa and &pozary=1 open the layers; &kategoria=<cat> filters the map and the lists;
+  // &podklad=esri|sentinel|nasa and &pozary=1 open the layers (&s2=YYYY-MM-DD keeps a Sentinel-2 day); &kategoria=<cat> filters the map and the lists;
   // &zdjecie=YYYY-MM-DD keeps the Esri image of that release (the newest one of the spot on or before it)
   const { from: wantFrom, to: wantTo } = periodFromQuery(location.search, S.today);
   if (CAT[q.get("kategoria")]) S.cat = q.get("kategoria");
   if (q.get("pozary") === "1") { S.fires = true; $("#fires").checked = true; }
-  if (["esri", "nasa"].includes(q.get("podklad"))) { document.querySelector(`input[name="base"][value="${q.get("podklad")}"]`).checked = true; }
+  if (["esri", "nasa", "sentinel"].includes(q.get("podklad"))) { document.querySelector(`input[name="base"][value="${q.get("podklad")}"]`).checked = true; }
   if (q.get("podklad") === "esri" && isISO(q.get("zdjecie"))) S.wbPin = q.get("zdjecie");
+  if (q.get("podklad") === "sentinel" && isISO(q.get("s2"))) S.s2Pin = q.get("s2");
 
   async function refresh() {
     const res = await RCB.strip();
