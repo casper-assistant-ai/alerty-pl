@@ -1,11 +1,151 @@
+import contextlib
+import io
+import json
+import os
 import sys
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import retro  # noqa: E402
 
 SINCE = "2026-11-14T00:00:00Z"
+
+
+class Api(unittest.TestCase):
+    """api() against a GitHub that refuses. A rate limit (403 or 429) gets one more try after the
+    wait GitHub names; what is still refused ends in one clear line (ApiError), which main() prints.
+    Before, the queue of the issue-worker, the retro's numbers and the daily status died on a
+    traceback (`HTTPError: HTTP Error 403: rate limit exceeded`) in their first step."""
+
+    PATH = "/repos/o/r/issues?per_page=100"
+    URL = "https://api.github.com/repos/o/r/issues?per_page=100"
+    LIMITED = {"Retry-After": "60"}
+    BODY = b'{"message": "API rate limit exceeded for installation ID 1."}'
+
+    def setUp(self):
+        for p in (mock.patch.object(retro.time, "sleep"), mock.patch.object(retro.time, "time", return_value=1_700_000_000)):
+            p.start()
+            self.addCleanup(p.stop)
+        log = io.StringIO()
+        quiet = contextlib.redirect_stderr(log)  # the warning of the second try must not print in the test log
+        self.addCleanup(quiet.__exit__, None, None, None)
+        quiet.__enter__()
+        self.log = log
+
+    def refused(self, code, reason, headers=None, body=b""):
+        """An HTTPError as urlopen raises it: body None is an error with nothing to read."""
+        return urllib.error.HTTPError(self.URL, code, reason, headers or {}, None if body is None else io.BytesIO(body))
+
+    class answered:
+        def __init__(self, body=b"[]", link=None):
+            self.body = body
+            self.headers = {"Link": link} if link else {}
+
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def read(self): return self.body
+
+    def test_a_rate_limit_gets_one_more_try_after_the_wait_github_names(self):
+        answers = [self.refused(403, "rate limit exceeded", self.LIMITED, self.BODY),
+                   self.answered(b'[{"number": 1}]', '<https://api.github.com/next>; rel="next"')]
+        with mock.patch.object(retro.urllib.request, "urlopen", side_effect=answers) as opened:
+            data, nxt = retro.api(self.PATH, "t")
+        self.assertEqual(data, [{"number": 1}])
+        self.assertEqual(nxt, "https://api.github.com/next")
+        self.assertEqual(opened.call_count, 2)
+        retro.time.sleep.assert_called_once_with(60)
+        self.assertEqual(self.log.getvalue(),
+                         f"::warning::GitHub API 403 on GET {self.URL}: trying once more in 60 s\n")
+
+    def test_rate_wait_reads_retry_after_then_the_reset_time(self):
+        now = 1_700_000_000
+        wait = retro.rate_wait
+        self.assertEqual(wait({"Retry-After": "60", "X-RateLimit-Reset": "1"}, now), (60, 60))
+        self.assertEqual(wait({"X-RateLimit-Reset": str(now + 30)}, now), (30, 30))
+        self.assertEqual(wait({"X-RateLimit-Reset": str(now - 5)}, now), (0, -5))  # it ended already: now
+        # a wait over MAX_WAIT (the primary limit of an hour) is not waited out, and a wait not
+        # named at all (a 403 that is no rate limit) is the short one before a second try
+        self.assertEqual(wait({"X-RateLimit-Reset": str(now + 1500)}, now), (None, 1500))
+        self.assertEqual(wait({"Retry-After": "1500"}, now), (None, 1500))
+        for unnamed in ({}, None, {"Retry-After": "soon"}):
+            self.assertEqual(wait(unnamed, now), (retro.DEFAULT_WAIT, None))
+
+    def test_a_429_and_the_reset_time_read_the_same_way(self):
+        answers = [self.refused(429, "Too Many Requests", {"X-RateLimit-Reset": str(1_700_000_000 + 45)}),
+                   self.answered()]
+        with mock.patch.object(retro.urllib.request, "urlopen", side_effect=answers):
+            self.assertEqual(retro.api(self.PATH, "t"), ([], None))
+        retro.time.sleep.assert_called_once_with(45)
+
+    def test_still_refused_after_the_second_try_is_one_line(self):
+        # two answers, each with its own body: the first is read and closed before the second try
+        twice = mock.Mock(side_effect=[self.refused(403, "rate limit exceeded", self.LIMITED, self.BODY) for _ in (1, 2)])
+        with mock.patch.object(retro.urllib.request, "urlopen", twice):
+            with self.assertRaises(retro.ApiError) as c:
+                retro.api(self.PATH, "t")
+        self.assertEqual(twice.call_count, 2)
+        self.assertEqual(str(c.exception),
+                         "GitHub API 403 (API rate limit exceeded for installation ID 1.) "
+                         f"on GET {self.URL}; the second try, after 60 s, was refused as well; GitHub asks to wait 60 s more")
+
+    def test_a_long_message_is_cut_so_the_line_stays_readable(self):
+        once = mock.Mock(side_effect=self.refused(500, "x", {}, b'{"message": "' + b"x" * 300 + b'"}'))
+        with mock.patch.object(retro.urllib.request, "urlopen", once):
+            with self.assertRaises(retro.ApiError) as c:
+                retro.api(self.PATH, "t")
+        self.assertEqual(str(c.exception), f"GitHub API 500 ({'x' * 120}) on GET {self.URL}")
+
+    def test_a_wait_over_a_minute_is_not_waited_out(self):
+        once = mock.Mock(side_effect=self.refused(429, "Too Many Requests", {"Retry-After": "1500"}, b'{"message": "slow down"}'))
+        with mock.patch.object(retro.urllib.request, "urlopen", once):
+            with self.assertRaises(retro.ApiError) as c:
+                retro.api(self.PATH, "t")
+        self.assertEqual(str(c.exception), f"GitHub API 429 (slow down) on GET {self.URL}; GitHub asks to wait 1500 s more")
+        self.assertEqual(once.call_count, 1)
+        retro.time.sleep.assert_not_called()
+
+    def test_a_403_that_is_no_rate_limit_gets_a_second_try_as_well(self):
+        forbidden = b'{"message": "Resource not accessible by integration"}'
+        twice = mock.Mock(side_effect=[self.refused(403, "Forbidden", {}, forbidden) for _ in (1, 2)])
+        with mock.patch.object(retro.urllib.request, "urlopen", twice):
+            with self.assertRaises(retro.ApiError) as c:
+                retro.api(self.PATH, "t")
+        self.assertEqual(str(c.exception), f"GitHub API 403 (Resource not accessible by integration) on GET {self.URL}; "
+                         f"the second try, after {retro.DEFAULT_WAIT} s, was refused as well")
+        self.assertEqual(twice.call_count, 2)
+        retro.time.sleep.assert_called_once_with(retro.DEFAULT_WAIT)
+
+    def test_another_status_is_not_tried_again_and_reads_the_same(self):
+        # the message of the JSON body, else the reason phrase: a body that is not JSON, or none to read
+        for reason, body in [("Not Found", b'{"message": "Not Found"}'), ("Internal Server Error", b"<html>oops</html>"),
+                             ("Service Unavailable", None)]:
+            code = 404 if reason == "Not Found" else 503
+            once = mock.Mock(side_effect=self.refused(code, reason, {}, body))
+            with mock.patch.object(retro.urllib.request, "urlopen", once):
+                with self.assertRaises(retro.ApiError) as c:
+                    retro.api(self.PATH, "t")
+            self.assertEqual(str(c.exception), f"GitHub API {code} ({reason}) on GET {self.URL}")
+            self.assertEqual(once.call_count, 1, reason)
+        retro.time.sleep.assert_not_called()
+
+    def test_a_dispatch_refused_with_429_is_sent_once_more_body_and_all(self):
+        answers = [self.refused(429, "Too Many Requests", {"Retry-After": "1"}), self.answered(b"")]
+        path = "/repos/o/r/actions/workflows/x.lock.yml/dispatches"
+        with mock.patch.object(retro.urllib.request, "urlopen", side_effect=answers) as opened:
+            self.assertEqual(retro.api(path, "t", method="POST", body={"ref": "main"}), (None, None))
+        self.assertEqual([json.loads(c.args[0].data) for c in opened.call_args_list], [{"ref": "main"}] * 2)
+        self.assertEqual([c.args[0].get_method() for c in opened.call_args_list], ["POST", "POST"])
+
+    def test_main_exits_with_that_line_not_a_traceback(self):
+        line = f"GitHub API 403 (rate limit exceeded) on GET {self.URL}; GitHub asks to wait 1500 s more"
+        with mock.patch.dict(os.environ, {"GH_TOKEN": "t"}), \
+                mock.patch.object(retro, "fetch", side_effect=retro.ApiError(line)):
+            with self.assertRaises(SystemExit) as c:
+                retro.main(["metrics", "--days", "7"])
+        self.assertEqual(c.exception.code, "retro: " + line)
 
 
 class Kind(unittest.TestCase):
