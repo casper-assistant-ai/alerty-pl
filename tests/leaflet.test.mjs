@@ -1,8 +1,10 @@
-// tests/leaflet.test.mjs — pins that no page hands Leaflet a string of data as tooltip or popup content.
+// tests/leaflet.test.mjs — pins that no page hands Leaflet a string as tooltip or popup content.
 // Leaflet writes string content through innerHTML (DivOverlay._updateContent), so the "you are here" dot of
-// the shelter map ran markup as the name of an OpenStreetMap object (security audit #146). Content is an
-// element of h() (its text goes through textContent), a function that returns one, a helper of the same file
-// that does, or a text of the interface dictionaries — never a string built from data.
+// the shelter map ran markup as the name of an OpenStreetMap object (security audit #146), and the start of a
+// missile's route ran markup as the launch area of events/incursions.json through a dictionary text (RCB.t
+// fills {param} with the page's data without escaping it; security audit #173). Content is an element of h()
+// (its text goes through textContent), a function that returns one, or a helper of the same file that does —
+// never a string: not a name, not a value built at runtime, not a dictionary text.
 // Run by tests/test_leaflet_js.py inside the Python suite, and by `node --test tests/*.test.mjs`.
 import { readFileSync, readdirSync } from "node:fs";
 import { test } from "node:test";
@@ -33,12 +35,12 @@ function firstArg(src, open) {
   return "";
 }
 
-// the forms content may take, and what each one is
+// the forms content may take, and what each one is. A dictionary text is a string too: RCB.t, RCB.tn and tr
+// fill {param} from the page's data without escaping it, so it goes in with h("span", { text }).
 const FORMS = [
   [/^h\(/, "an element of h()"],
   [/^(?:\([^()]*\)|[\w$]+)\s*=>/, "a function"],
   [/^function\b/, "a function"],
-  [/^(?:RCB\.tn?|tr|T)\(/, "a text of the interface dictionaries"],
 ];
 // a name the file itself defines as a function: its result is what that function built
 const isFunctionOf = (src, name) => RegExp(`^(?:async\\s+)?function\\s+${name}\\s*\\(`, "m").test(src)
@@ -60,7 +62,9 @@ test("the pin refuses the forms of the audit and admits the forms the pages use"
   assert.equal(kind('h("span", { text: label })', src), "an element of h()");
   assert.equal(kind("() => tipFor(p, ev)", src), "a function");
   assert.equal(kind("tooltip", src), "a function of the file");
-  assert.equal(kind('RCB.tn(n, "shel.places", { n })', src), "a text of the interface dictionaries");
+  assert.equal(kind('RCB.tn(n, "shel.places", { n })', src), null, "a dictionary text with a value of the page in it");
+  assert.equal(kind('tr(w.launch.certain ? "map.raid.start" : "map.raid.startApprox", { area: w.launch.area_pl })', src),
+    null, "a dictionary text with the launch area of incursions.json in it (security audit #173)");
   // the argument ends at the comma outside its own strings and brackets
   const call = 'bindTooltip(h("span", { text: a || T("x, y") }), { direction: "top" })';
   assert.equal(firstArg(call, call.indexOf("(") + 1), 'h("span", { text: a || T("x, y") })');
@@ -77,6 +81,6 @@ test("every Leaflet tooltip and popup of every page is built, never a string of 
   assert.ok(sites.length >= 8, `${sites.length} content calls found: the pages changed, check the sink list`);
   for (const s of sites) {
     const what = kind(s.arg, SOURCES[s.at.split(":")[0]]);
-    assert.ok(what, `${s.at}: ${s.call}(${s.arg.slice(0, 40)}…) takes ${what || "a string of data"}: build it with h(), a function or a dictionary text`);
+    assert.ok(what, `${s.at}: ${s.call}(${s.arg.slice(0, 40)}…) takes ${what || "a string"}: build it with h(), or with a function that returns one`);
   }
 });
