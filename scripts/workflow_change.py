@@ -491,8 +491,11 @@ def sh(*cmd, check=True, env=None, tries=1):
             break
         if k + 1 < tries:
             time.sleep(15 * (k + 1))
-    if check and r.returncode != 0:
-        raise RuntimeError(f"`{' '.join(cmd[:3])}` exited {r.returncode}: {(r.stderr or r.stdout).strip()[-600:]}")
+    if r.returncode != 0:
+        why = f"`{' '.join(cmd[:3])}` exited {r.returncode}: {(r.stderr or r.stdout).strip()[-600:]}"
+        if check:
+            raise RuntimeError(why)
+        print(f"::warning::{why}")
     return r.stdout
 
 
@@ -677,6 +680,13 @@ def comment(n, text):
 
 def close(n, text):
     sh("gh", "issue", "close", str(n), "-R", repo(), "--reason", "completed", "--comment", text, tries=4)
+
+
+def close_pr(num, ref, text):
+    """Comment on a review PR, close it and delete its branch (the job's GITHUB_TOKEN may not delete branches)."""
+    sh("gh", "api", f"repos/{repo()}/issues/{num}/comments", "-f", f"body={text}", check=False, tries=4)
+    sh("gh", "api", "-X", "PATCH", f"repos/{repo()}/pulls/{num}", "-f", "state=closed", check=False, tries=4)
+    git("push", "-q", "deploy", "--delete", ref, check=False)
 
 
 def commit_url(sha):
@@ -867,7 +877,9 @@ def land(d):
                    f"Run: {run_url()}\n\n{marker(n, item['digest'], 'review')}")
         review_started = True
         print(f"#{n}: in review as #{pr}")
-    # 3. review PRs from earlier runs
+    # 3. review PRs from earlier runs (a refused one gets the label needs-casper, made here)
+    sh("gh", "label", "create", NEEDS, "-R", repo(), "--color", "b60205",
+       "--description", "Casper or the owner applies this by hand", check=False)
     for pr in gh_items(f"repos/{repo()}/pulls?state=open&per_page=100"):
         ref = pr["head"]["ref"]
         m = re.fullmatch(r"workflow-change/(\d+)", ref)
@@ -879,7 +891,7 @@ def land(d):
         cls, problems = guard(base, sha)
         if cls == "refuse":
             text = "Workflow maintainer: closed without landing, the guard refuses it: " + "; ".join(problems)
-            sh("gh", "pr", "close", str(num), "-R", repo(), "--delete-branch", "--comment", text, check=False, tries=4)
+            close_pr(num, ref, text)
             issue = gh_api(f"repos/{repo()}/issues/{n}") or {}
             sh("gh", "issue", "edit", str(n), "-R", repo(), "--add-label", NEEDS, check=False, tries=4)
             comment(n, f"{text}\n\nPR: #{num}\n\n{refuse_note()}{marker(n, digest(issue.get('body')), 'refused')}")
@@ -893,7 +905,7 @@ def land(d):
         if verdict in ("changes", "reject"):
             text = (f"Workflow maintainer: closed without landing. The PR reviewer said «{verdict}»: {reason or 'see its comment'}\n\n"
                     "The process-doctor opens a corrected workflow-change issue if the change is still needed.")
-            sh("gh", "pr", "close", str(num), "-R", repo(), "--delete-branch", "--comment", text, check=False)
+            close_pr(num, ref, text)
             issue = gh_api(f"repos/{repo()}/issues/{n}") or {}
             comment(n, f"{text}\n\nPR: #{num}\n\n{marker(n, digest(issue.get('body')), 'refused')}")
             doctor = doctor or source_of(issue) == "process-doctor"
@@ -906,8 +918,7 @@ def land(d):
             print(f"::warning::#{n}: PR #{num} approved but not landed: {e}")
             continue
         if sha2 != sha:  # rebased: the PR closes by hand, its head is no longer the landed commit
-            sh("gh", "pr", "close", str(num), "-R", repo(), "--delete-branch", "--comment",
-               f"Workflow maintainer: approved by the PR reviewer and landed on main as {commit_url(sha2)}.", check=False)
+            close_pr(num, ref, f"Workflow maintainer: approved by the PR reviewer and landed on main as {commit_url(sha2)}.")
         else:  # main now holds the PR's head: GitHub marks the PR merged; the branch goes
             git("push", "-q", "deploy", "--delete", ref, check=False)
         issue = gh_api(f"repos/{repo()}/issues/{n}") or {}
@@ -922,8 +933,6 @@ def land(d):
         sh("gh", "workflow", "run", "pr-reviewer.lock.yml", "-R", repo(), check=False)
         print("started the PR reviewer")
     # 4. what did not apply: one comment each (the marker keeps it to one per patch)
-    sh("gh", "label", "create", NEEDS, "-R", repo(), "--color", "b60205",
-       "--description", "Casper or the owner applies this by hand", check=False)
     for item in [i for i in plan if i.get("result") in ("failed", "refused", "already")]:
         report(item)
         doctor = doctor or (item["result"] == "failed" and item.get("source") == "process-doctor")
