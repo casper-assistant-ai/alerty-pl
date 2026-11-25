@@ -197,3 +197,20 @@ test("tn() picks the plural form of the language and fills {n}", () => {
   assert.equal(RCB.loc("en"), "en-GB");
   assert.equal(RCB.loc("pl"), "pl-PL");
 });
+
+test("the shared helpers speak the page's language: categories, months, regions, durations", () => {
+  const pl = load().RCB, en = load({ search: "?lang=en" }).RCB, uk = load({ store: { "alerty-lang": "uk" } }).RCB;
+  assert.equal(pl.CAT.air, "Zagrożenie z powietrza");
+  assert.equal(en.CAT.air, "Air threat");
+  assert.equal(uk.CAT.air, "Загроза з повітря");
+  assert.deepEqual([pl.MONTHS[10], en.MONTHS[10], uk.MONTHS[10]], ["listopad", "November", "листопад"]);
+  assert.equal(pl.regionText(["mazowieckie"], [], ["Lesznowola"]), "woj. mazowieckie · gm. Lesznowola");
+  assert.equal(en.regionText(["mazowieckie"], [], ["Lesznowola"]), "voiv. mazowieckie · comm. Lesznowola");
+  assert.equal(uk.regionText(["mazowieckie"], ["1418"]), "воєв. mazowieckie · 1 пов.");
+  assert.equal(uk.regionText([], []), "територію не вказано");
+  const ago = (min) => new Date(Date.now() - min * 60000).toISOString();
+  assert.equal(uk.duration(ago(5)), "5 хв");
+  assert.equal(en.duration(ago(3 * 24 * 60)), "3 days");
+  assert.equal(uk.duration(ago(5 * 24 * 60)), "5 днів");
+  assert.equal(pl.duration(ago(2 * 24 * 60)), "2 dni");
+});

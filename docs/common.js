@@ -9,11 +9,8 @@ if (typeof location !== "undefined" && location.protocol === "http:" &&
 }
 
 const RCB = (() => {
-  const CAT = {
-    air: "Zagrożenie z powietrza", drill: "Ćwiczenia i testy syren", water: "Woda niezdatna do picia",
-    weather: "Pogoda i powietrze", ordnance: "Niewybuchy i ewakuacje", fire: "Pożary",
-    chemical: "Skażenia", other: "Inne komunikaty",
-  };
+  // the categories in the page's language (cat.* in docs/i18n.js), filled once the language code below is known
+  const CAT = {};
   // map priority: when several alerts cover one powiat, the first category here wins
   const PRIORITY = ["air", "chemical", "fire", "ordnance", "weather", "water", "drill", "other"];
   const VOIV = {
@@ -23,8 +20,8 @@ const RCB = (() => {
     slaskie: "śląskie", swietokrzyskie: "świętokrzyskie", "warminsko-mazurskie": "warmińsko-mazurskie",
     wielkopolskie: "wielkopolskie", zachodniopomorskie: "zachodniopomorskie",
   };
-  const MONTHS = ["styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec", "lipiec", "sierpień",
-    "wrzesień", "październik", "listopad", "grudzień"];
+  // the month names in the page's language (month.1 … month.12), filled with CAT below
+  const MONTHS = [];
 
   // The live service (casper-infra deploy/alerty-api): polls gov.pl every 20 s and streams new alerts.
   // localStorage "alerty-api" overrides it for local testing.
@@ -59,7 +56,7 @@ const RCB = (() => {
   function leaflet() {
     if (typeof L !== "undefined") return Promise.resolve(L);
     return new Promise((ok, bad) => {
-      const miss = () => bad(new Error("biblioteka mapy (Leaflet) nie jest dostępna"));
+      const miss = () => bad(new Error(t("err.leaflet")));
       const s = document.createElement("script");
       s.src = "vendor/leaflet/leaflet.js";
       const late = setTimeout(() => { s.remove(); miss(); }, 15000);
@@ -77,7 +74,7 @@ const RCB = (() => {
   const fmtTime = (d) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
   // a full ISO stamp -> "d.mm.yyyy, hh:mm" in Warsaw time, whatever the visitor's clock;
   // "" for anything new Date cannot read, so callers can fall back to the plain date
-  const WARSAW = new Intl.DateTimeFormat("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit",
+  let WARSAW = new Intl.DateTimeFormat("pl-PL", { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit",
     year: "numeric", hour: "2-digit", minute: "2-digit" });
   const fmtStamp = (iso) => { const d = new Date(iso); return isNaN(d.getTime()) ? "" : WARSAW.format(d); };
   // an alert without an hour on gov.pl starts at 00:00: show the day only
@@ -85,9 +82,9 @@ const RCB = (() => {
 
   function duration(iso) {
     const min = Math.max(0, Math.round((Date.now() - new Date(iso)) / 60000));
-    if (min < 60) return `${min} min`;
+    if (min < 60) return t("dur.min", { m: min });
     const hrs = Math.floor(min / 60);
-    return hrs < 48 ? `${hrs} h ${min % 60} min` : `${Math.floor(hrs / 24)} dni`;
+    return hrs < 48 ? t("dur.hm", { h: hrs, m: min % 60 }) : tn(Math.floor(hrs / 24), "dur.days");
   }
 
   // powiat id -> "pow. zgorzelecki" or "Wrocław" (geo/names.json); pages await names() before rendering
@@ -96,17 +93,19 @@ const RCB = (() => {
     .catch(() => {}));
 
   // up to three items, then "i N inne"
-  const few = (xs) => xs.length > 3 ? `${xs.slice(0, 3).join(", ")} i ${xs.length - 3} inne` : xs.join(", ");
+  const few = (xs) => xs.length > 3 ? t("reg.more", { list: xs.slice(0, 3).join(", "), n: xs.length - 3 }) : xs.join(", ");
+  // "pow. zgorzelecki" of geo/names.json in the page's language (a city powiat has no prefix)
+  const powName = (n) => n.startsWith("pow. ") ? t("reg.pow", { name: n.slice(5) }) : n;
 
   // "woj. dolnośląskie · pow. zgorzelecki · gm. Pieńsk"; a powiat with no known name is counted
   function regionText(voivodeships, powiaty, gminy = []) {
-    if (!voivodeships.length) return "obszar nieustalony";
-    const parts = ["woj. " + few(voivodeships.map((v) => VOIV[v] || v))];
+    if (!voivodeships.length) return t("reg.unknown");
+    const parts = [t("reg.voiv", { list: few(voivodeships.map((v) => VOIV[v] || v)) })];
     if (powiaty.length) {
       const known = powiaty.map((p) => NAMES[p]).filter(Boolean);
-      parts.push(known.length === powiaty.length ? few(known) : `${powiaty.length} pow.`);
+      parts.push(known.length === powiaty.length ? few(known.map(powName)) : tn(powiaty.length, "reg.powiaty"));
     }
-    if (gminy && gminy.length) parts.push("gm. " + few(gminy));
+    if (gminy && gminy.length) parts.push(t("reg.gm", { list: few(gminy) }));
     return parts.join(" · ");
   }
 
@@ -185,14 +184,14 @@ const RCB = (() => {
     const a = d.alert;
     let box = $("#toasts");
     if (!box) { box = h("div", { id: "toasts", class: "toasts", "aria-live": "assertive" }); document.body.append(box); }
-    const head = d.kind === "test" ? "Test powiadomień" : d.kind === "update" ? "Aktualizacja alertu" : "Nowy alert";
+    const head = t(d.kind === "test" ? "toast.test" : d.kind === "update" ? "toast.update" : "toast.new");
     const msg = (a.updates && a.updates[0] && a.updates[0].message) || a.intro || "";
-    const close = h("button", { type: "button", class: "x", "aria-label": "Zamknij" }, "×");
-    const t = h("div", { class: "toast", role: "alert", "data-alert": a.id },
+    const close = h("button", { type: "button", class: "x", "aria-label": t("toast.close") }, "×");
+    const card = h("div", { class: "toast", role: "alert", "data-alert": a.id },
       swatch(a.category), h("div", {}, h("strong", { text: head + ": " + (CAT[a.category] || CAT.other) }),
         h("p", { text: msg.slice(0, 280) }), h("a", { href: a.url, text: a.title })), close);
-    close.addEventListener("click", () => t.remove());
-    box.prepend(t);
+    close.addEventListener("click", () => card.remove());
+    box.prepend(card);
   }
 
   // Server-Sent Events from the live service: each new or updated alert arrives within seconds.
@@ -211,7 +210,7 @@ const RCB = (() => {
     es.addEventListener("ping", (e) => {
       const d = JSON.parse(e.data);
       const c = $("#strip .checked");
-      if (c && d.checked_at) { c.textContent = "na żywo · sprawdzono " + fmtTime(new Date(d.checked_at)); $("#strip").classList.remove("stale"); }
+      if (c && d.checked_at) { c.textContent = t("strip.live") + " " + fmtTime(new Date(d.checked_at)); $("#strip").classList.remove("stale"); }
     });
   }
 
@@ -227,24 +226,25 @@ const RCB = (() => {
       let txt;
       if (air.length) {
         const vs = [...new Set(air.flatMap((a) => a.regions.voivodeships))];
-        txt = "Zagrożenie z powietrza: " + (vs.length ? "woj. " + vs.map((v) => VOIV[v] || v).join(", ") : "obszar w komunikacie");
+        txt = t("strip.air", { where: vs.length ? t("reg.voiv", { list: vs.map((v) => VOIV[v] || v).join(", ") }) : t("strip.area") });
       } else {
-        txt = "Brak zagrożenia z powietrza";
+        txt = t("strip.noAir");
       }
       if (state.textContent !== txt) state.textContent = txt; // role=status announces only a real change
       $(".others", el).textContent = air.length
-        ? (active.length > air.length ? `i ${active.length - air.length} inne alerty` : "")
-        : (active.length ? `${active.length} ${plural(active.length, "inny alert", "inne alerty", "innych alertów")} w toku` : "inne alerty: brak");
+        ? (active.length > air.length ? tn(active.length - air.length, "strip.andOthers") : "")
+        : (active.length ? tn(active.length, "strip.others") : t("strip.noOthers"));
       const checked = new Date(meta.checked_at);
       const stale = Date.now() - checked > 45 * 60000;
-      $(".checked", el).textContent = (stale ? "dane nieaktualne, ostatnio " : meta.live ? "na żywo · sprawdzono " : "sprawdzono ")
+      $(".checked", el).textContent = t(stale ? "strip.stale" : meta.live ? "strip.live" : "strip.checked") + " "
         + (meta.live && !stale ? fmtTime(checked) : fmtShort(checked));
       el.classList.toggle("alarm", air.length > 0);
       el.classList.toggle("stale", stale);
-      document.title = (air.length ? "Zagrożenie z powietrza — " : "") + document.title.replace(/^Zagrożenie z powietrza — /, "");
+      const warn = t("strip.titleAir") + " — ";
+      document.title = (air.length ? warn : "") + (document.title.startsWith(warn) ? document.title.slice(warn.length) : document.title);
       return { data, meta, active };
     } catch (e) {
-      $(".state", el).textContent = "Nie udało się pobrać danych";
+      $(".state", el).textContent = t("strip.error");
       $(".checked", el).textContent = e.message;
       el.classList.add("stale");
       return null;
@@ -255,7 +255,7 @@ const RCB = (() => {
   const ver = $("#ver");
   if (ver) getJSON("data/changelog.json").then((d) => {
     const r = d.releases.find((x) => x.version);
-    if (r) ver.textContent = "wersja " + r.version + " · historia zmian";
+    if (r) ver.textContent = t("foot.version", { v: r.version });
   }).catch(() => {});
 
   if ($("#strip")) live();
@@ -288,6 +288,10 @@ const RCB = (() => {
   }
   // the Intl locale of the language: dates and numbers as the visitor reads them
   const loc = (code = lang()) => ({ pl: "pl-PL", en: "en-GB", uk: "uk-UA" })[code] || "pl-PL";
+  for (const c of ["air", "drill", "water", "weather", "ordnance", "fire", "chemical", "other"]) CAT[c] = t("cat." + c);
+  for (let m = 1; m <= 12; m++) MONTHS.push(t("month." + m));
+  WARSAW = new Intl.DateTimeFormat(loc(), { timeZone: "Europe/Warsaw", day: "2-digit", month: "2-digit",
+    year: "numeric", hour: "2-digit", minute: "2-digit" });
   // the link of a switcher entry: every other URL parameter byte for byte, and lang set to that language
   function langUrl(search, code) {
     const parts = (search || "").replace(/^\?/, "").split("&").filter((p) => p && p.split("=")[0] !== "lang");

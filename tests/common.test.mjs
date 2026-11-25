@@ -4,11 +4,12 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import assert from "node:assert/strict";
 
-// docs/common.js is a plain script: an IIFE over `const RCB` that looks up #ver on load.
-// Evaluate it with a document stub whose querySelector answers null, then return RCB.
+// docs/common.js is a plain script: an IIFE over `const RCB` that looks up #ver on load. The pages load
+// docs/i18n.js before it (the texts of the shared helpers); no ?lang and no stored choice is Polish.
+// Evaluate both with a document stub whose querySelector answers null, then return RCB.
 const load = (doc = { querySelector: () => null }) => {
-  const source = readFileSync(new URL("../docs/common.js", import.meta.url), "utf8");
-  return new Function("document", `${source}\n;return RCB;`)(doc);
+  const read = (p) => readFileSync(new URL("../docs/" + p, import.meta.url), "utf8");
+  return new Function("document", `${read("i18n.js")}\n${read("common.js")}\n;return RCB;`)(doc);
 };
 const RCB = load();
 
