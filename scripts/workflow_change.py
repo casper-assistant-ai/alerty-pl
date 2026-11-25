@@ -878,7 +878,7 @@ def land(d):
         review_started = True
         print(f"#{n}: in review as #{pr}")
     # 3. review PRs from earlier runs (a refused one gets the label needs-casper, made here)
-    sh("gh", "label", "create", NEEDS, "-R", repo(), "--color", "b60205",
+    sh("gh", "label", "create", NEEDS, "-R", repo(), "--force", "--color", "b60205",
        "--description", "Casper or the owner applies this by hand", check=False)
     for pr in gh_items(f"repos/{repo()}/pulls?state=open&per_page=100"):
         ref = pr["head"]["ref"]
