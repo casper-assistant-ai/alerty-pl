@@ -10,6 +10,9 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### ci
 
+- **update:** push the data commit with its own deploy key, which the CodeQL ruleset lets through ([6ba4c74](https://github.com/casper-assistant-ai/alerty-pl/commit/6ba4c74))
+- **gate:** wait for every CodeQL run on the head before trusting the check ([df9eecc](https://github.com/casper-assistant-ai/alerty-pl/commit/df9eecc))
+- **codeql:** the Leaflet query is high severity, like CodeQL's own js/xss, so its alert fails the check ([f2242af](https://github.com/casper-assistant-ai/alerty-pl/commit/f2242af))
 - **codeql:** advanced setup with the repository's own queries; a PR with a new alert is not merged ([f92229e](https://github.com/casper-assistant-ai/alerty-pl/commit/f92229e))
 - **lint:** ruff for Python and ESLint for JavaScript in CI, the existing findings fixed ([c5ac0a9](https://github.com/casper-assistant-ai/alerty-pl/commit/c5ac0a9))
 - **issue-worker:** let its PR change README.md, as allowed-files says ([f3fdfdd](https://github.com/casper-assistant-ai/alerty-pl/commit/f3fdfdd))

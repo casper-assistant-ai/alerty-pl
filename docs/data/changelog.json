@@ -17,9 +17,36 @@
   {
    "version": null,
    "date": "2026-11-25",
-   "time": "2026-11-25T22:35:26+01:00",
-   "sha": "2d45139",
+   "time": "2026-11-25T22:52:37+01:00",
+   "sha": "6ba4c74",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "update",
+     "breaking": false,
+     "text": "push the data commit with its own deploy key, which the CodeQL ruleset lets through",
+     "sha": "6ba4c74",
+     "date": "2026-11-25",
+     "time": "2026-11-25T22:52:37+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "gate",
+     "breaking": false,
+     "text": "wait for every CodeQL run on the head before trusting the check",
+     "sha": "df9eecc",
+     "date": "2026-11-25",
+     "time": "2026-11-25T22:51:02+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "codeql",
+     "breaking": false,
+     "text": "the Leaflet query is high severity, like CodeQL's own js/xss, so its alert fails the check",
+     "sha": "f2242af",
+     "date": "2026-11-25",
+     "time": "2026-11-25T22:36:11+01:00"
+    },
     {
      "type": "docs",
      "scope": "agents",
