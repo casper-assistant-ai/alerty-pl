@@ -39,7 +39,10 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   for the gate (`Closes #N`) or closing it with the reason. It runs on each new issue, every two
   hours and when the CI doctor (which also watches pull request runs) dispatches it, takes an issue
   again when the gate closed its PR, and when nothing waits makes one improvement PR a day (tests, reliability,
-  simpler upkeep) from `process/improvements.md`, which the process-retro keeps filled.
+  simpler upkeep) from `process/improvements.md`, which the process-retro keeps filled. A report
+  (security audit, daily status) ends in the run that reads it: each point left becomes a dev-task
+  and the report closes with the links; `issue-worker-kick.yml` starts the next run within half an
+  hour while issues it has not seen, or a list it is moving through, wait.
 - Process doctor: `agent-health.yml` keeps one self-closing issue per failing agent and dispatches
   the `process-doctor` agent for each new one (and it runs daily). `scripts/agent_failures.py` gives
   it the failed runs of 7 days with a signature each (provider overload, timeout, turn limit, ...);
@@ -160,8 +163,9 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   send each output the moment it is ready (the issue comment before the checks, the PR after the
   first green check run, a workflow-change issue after the PR) and never hold one back to send it
   with another; a 429 [1308] «Usage limit reached for 5 hour» is the account's quota, not an
-  overloaded model, and its reset time is Beijing time (UTC+8): nothing to retry, the next run
-  takes the work; on a busy day the quota runs out about 4 h 20 m into every 5-hour window (on
+  overloaded model, and its reset time is Beijing time (UTC+8); `agent-retry.yml` re-runs a run
+  that such an error ended with nothing sent (10 minutes after a 529 or 1302, a minute after the
+  1308 reset, three attempts at most), so do not ask for retries of your own; on a busy day the quota runs out about 4 h 20 m into every 5-hour window (on
   2026-11-25 at 09:06 and 14:29 UTC), and a 429 [1302] «Rate limit reached for requests» right
   after a reset is the same [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
   minutes; process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites

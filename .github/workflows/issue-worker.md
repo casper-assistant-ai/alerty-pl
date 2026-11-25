@@ -71,11 +71,13 @@ safe-outputs:
     target: "*"
     max: 2
   # a fix that lives in .github/workflows/ (agent tokens cannot push it): the Workflow maintainer
-  # applies the patch, and the PR reviewer checks every change the issue-worker asks for
+  # applies the patch, and the PR reviewer checks every change the issue-worker asks for (label
+  # workflow-change); and the points of a report left after this run's PR, one dev-task each (#146
+  # waited 6 hours for one PR a run); issue-worker-kick.yml starts the next run on them
   create-issue:
     title-prefix: "[issue-worker] "
-    labels: [workflow-change]
-    max: 1
+    allowed-labels: [workflow-change, dev-task]
+    max: 6
     deduplicate-by-title: true
   add-comment:
     target: "*"
@@ -130,15 +132,26 @@ Kinds in the queue, in the order you take them:
 4. `dev-task`: the process-retro named a builder for it, but that builder may run only weekly.
    Take it yourself at once when no open PR names it (the retro dispatches you right after it
    opens dev-tasks); follow the issue's «how to check it», and say `Closes #<n>`.
-5. `report` (daily-status, security-audit): check each point it lists. When every point is done,
-   in a PR, a dev-task or a workflow-change issue, close it with those links; otherwise leave it
+5. `report` (daily-status, security-audit): see «Reports end in this run» below; never leave one
    for the next run.
 6. `managed` (the gh-aw "No-Op Runs" tracker; `agent-health` and `workflow-change` issues belong to the
    process-doctor, leave them): close the tracker only when no workflow source in
    `.github/workflows/*.md` still lacks `report-as-issue: false` under `noop:`, saying so.
 
+**Reports end in this run**, whatever else you do, and before your PR: for every `report` in the
+queue, check each point it lists (a numbered finding, a «Hardening» or «Recommendations» bullet,
+a failed item of a daily status). A point is covered when it is done on `main` (link the commit or
+PR), has an open or merged PR or an open `dev-task`/`workflow-change` issue (link it), or is not
+worth doing (say why in one line). Every other point becomes one dev-task now: `create-issue` with
+the label `dev-task`, titled `dev-task: <file>: <change>`, the body the point's text, the file and
+line, the fix it proposes, «How to check it» (the test to add) and `From #<report>`; group points
+only when they change the same file. Then close the report (`close-issue`) with one line per point
+and its link; the Issue worker kick starts your next run on those dev-tasks within half an hour. A
+point fixed by your PR in this run counts as covered by it.
+Label every issue you create: `dev-task` for these, `workflow-change` for workflow patches.
+
 **A fix that lives in `.github/workflows/`** (a staging line in `update.yml`, a prompt, a schedule):
-your PR cannot change it. Open one issue with `create-issue` (at most one a run), titled
+your PR cannot change it. Open one issue with `create-issue` and the label `workflow-change` (at most one a run), titled
 `workflow change: <file>: <change>`, with the reason and the patch: one fenced ```diff block per
 file, starting with `--- a/.github/workflows/<file>` and `+++ b/.github/workflows/<file>`, every
 change between unchanged context lines copied exactly from the file on `main`, hunks separated by

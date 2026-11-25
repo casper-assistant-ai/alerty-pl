@@ -271,7 +271,7 @@ def pages(path, token, key=None, stop=None, limit=10):
     return out
 
 
-def fetch(repo, token, since):
+def fetch(repo, token, since, with_runs=True):
     r = f"/repos/{repo}"
     q = urllib.parse.quote
     commits = [{"subject": c["commit"]["message"].split("\n")[0]}
@@ -291,6 +291,8 @@ def fetch(repo, token, since):
                 "created_at": i["created_at"], "labels": [x["name"] for x in i.get("labels", [])]}
                for i in pages(f"{r}/issues?state=open&per_page=100", token)
                if "pull_request" not in i and i["number"] not in seen]
+    if not with_runs:
+        return commits, prs, issues, []
     runs = [{"path": w.get("path"), "conclusion": w.get("conclusion"), "event": w.get("event")}
             for w in pages(f"{r}/actions/runs?per_page=100&created=%3E%3D{since[:10]}", token, key="workflow_runs")]
     return commits, prs, issues, runs
@@ -327,7 +329,8 @@ def issue_kind(title, labels):
     a = agent_of(title)
     if MANAGED.match(title or "") or labels & DOCTOR_LABELS:
         return "managed"
-    if "dev-task" in labels:
+    # the issue-worker's dev-tasks for a report's points, also when the model left the label off
+    if "dev-task" in labels or (title or "").startswith("[issue-worker] dev-task:"):
         return "dev-task"
     if "site-error" in labels:
         return "site-error"
@@ -381,6 +384,34 @@ def queue(issues, prs, today):
     return {"today": today, "issues": items, "actionable": [x["number"] for x in actionable],
             "give_up": give_up,
             "improvement_due": not actionable and not improved_today}
+
+
+WORKER_BUSY = {"queued", "in_progress", "waiting", "requested", "pending"}
+
+
+def should_kick(q, prs, runs):
+    """Pure: why the issue-worker should start now, or None.
+
+    Issues made by agents (GITHUB_TOKEN) start no workflow, so the worker's dev-tasks and the agents'
+    reports used to wait for its two-hourly schedule (#146: six hours for five points). Start it when
+    no worker run is waiting or running and work is left that its last run did not see or was moving
+    through: an actionable issue opened after that run started, or a PR that run opened while the
+    queue still holds issues. An issue the worker leaves open on purpose starts nothing by itself."""
+    if not q["actionable"]:
+        return None
+    if any(r.get("status") in WORKER_BUSY for r in runs):
+        return None
+    if not runs:
+        return f"no issue-worker run yet; {len(q['actionable'])} issue(s) wait"
+    last = max(r["created_at"] for r in runs)
+    new = [x["number"] for x in q["issues"] if x["number"] in q["actionable"] and (x["created_at"] or "") > last]
+    if new:
+        return "new since the last run: " + ", ".join(f"#{n}" for n in new)
+    made = [p["number"] for p in prs if agent_of(p.get("title")) == WORKER and (p.get("created_at") or "") > last]
+    if made:
+        return (f"the last run opened PR #{made[0]} and {len(q['actionable'])} issue(s) still wait: "
+                + ", ".join(f"#{n}" for n in q["actionable"][:5]))
+    return None
 
 
 def queue_md(q):
@@ -461,6 +492,9 @@ def main(argv=None):
     q.add_argument("--repo")
     q.add_argument("--out")
     q.add_argument("--md")
+    k = sub.add_parser("kick", help="start the issue-worker when new work waits (should_kick)")
+    k.add_argument("--repo")
+    k.add_argument("--dry-run", action="store_true")
     g = sub.add_parser("gave-up")
     g.add_argument("--days", type=int, default=1)
     g.add_argument("--log", help="the retro log; issues it names after «Gave up:» are skipped")
@@ -501,6 +535,21 @@ def run(a):
         if a.md:
             Path(a.md).write_text(md, encoding="utf-8")
         print(md)
+    elif a.cmd == "kick":
+        now = dt.datetime.now(dt.timezone.utc)
+        since = (now - dt.timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        repo, tok = repo_name(a.repo), token()
+        _, prs, issues, _ = fetch(repo, tok, since, with_runs=False)
+        q = queue(issues, prs, now.strftime("%Y-%m-%d"))
+        data, _ = api(f"/repos/{repo}/actions/workflows/{WORKER}.lock.yml/runs?per_page=10", tok)
+        runs = [{"status": r["status"], "created_at": r["created_at"]} for r in data["workflow_runs"]]
+        why = should_kick(q, prs, runs)
+        if not why:
+            print(f"issue-worker: not started ({len(q['actionable'])} actionable; busy, or nothing new since its last run)")
+            return
+        print(f"issue-worker: start ({why})" + (" [dry run]" if a.dry_run else ""))
+        if not a.dry_run:
+            api(f"/repos/{repo}/actions/workflows/{WORKER}.lock.yml/dispatches", tok, method="POST", body={"ref": "main"})
     elif a.cmd == "metrics":
         since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
         res = summarize(*fetch(repo_name(a.repo), token(), since), roles(), since)

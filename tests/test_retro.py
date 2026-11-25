@@ -276,6 +276,29 @@ class Queue(unittest.TestCase):
         self.assertNotIn(96, q["actionable"])
         self.assertNotIn(98, q["actionable"])
 
+    def test_kick_only_for_new_work_or_a_run_that_made_progress(self):
+        q = {"actionable": [150, 151], "issues": [
+            {"number": 150, "created_at": "2026-11-25T19:30:00Z"}, {"number": 151, "created_at": "2026-11-25T15:00:00Z"}]}
+        done = [{"status": "completed", "created_at": "2026-11-25T19:21:11Z"}]
+        # #150 was opened (by an agent: no event) after the last run started
+        self.assertIn("#150", retro.should_kick(q, [], done))
+        # nothing waits, or a run is already queued
+        self.assertIsNone(retro.should_kick({"actionable": [], "issues": []}, [], done))
+        self.assertIsNone(retro.should_kick(q, [], done + [{"status": "queued", "created_at": "2026-11-25T20:00:00Z"}]))
+        # only old issues: start again only when the last run moved (opened a PR), not for one it leaves open
+        later = [{"status": "completed", "created_at": "2026-11-25T19:40:00Z"}]
+        self.assertIsNone(retro.should_kick(q, [], later))
+        pr = {"number": 160, "title": "[issue-worker] fix(notify): refuse non-https links", "created_at": "2026-11-25T19:55:00Z"}
+        self.assertIn("PR #160", retro.should_kick(q, [pr], later))
+        other = {"number": 161, "title": "[site-designer] feat: x", "created_at": "2026-11-25T19:55:00Z"}
+        self.assertIsNone(retro.should_kick(q, [other], later))
+
+    def test_issue_worker_dev_task_of_a_report_point(self):
+        # the issue-worker splits a report's points into dev-tasks (#146); the title names it even without the label
+        t = "[issue-worker] dev-task: docs/notify.js: refuse a non-https link URL"
+        self.assertEqual(retro.issue_kind(t, ["dev-task"]), "dev-task")
+        self.assertEqual(retro.issue_kind(t, []), "dev-task")
+
     def test_improvement_due_once_a_day(self):
         q = retro.queue([], [], "2026-11-22")
         self.assertTrue(q["improvement_due"])

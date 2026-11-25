@@ -1,0 +1,48 @@
+# Issue worker kick: issues that agents open (GITHUB_TOKEN) start no workflow, so the issue-worker saw
+# its own dev-tasks and the agents' reports only on its two-hourly schedule (#146 waited six hours for
+# five points). This plain job starts it when no run waits or runs and work is left that its last run
+# did not see (an issue opened after it started) or was moving through (that run opened a PR and the
+# queue still holds issues): scripts/retro.py kick, should_kick. An issue it leaves open on purpose
+# starts nothing. After every agent run that ended by itself, and every half hour (GitHub skips the
+# schedule at times; runs it dispatches fire no workflow_run).
+name: Issue worker kick
+
+on:
+  workflow_run:
+    workflows: ["CI doctor", "Daily status", "Issue triage", "Issue worker", "PR reviewer", "Process doctor", "Process retro", "Security auditor", "Site fixer"]
+    types: [completed]
+  schedule:
+    - cron: "12,42 * * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Say whether it would start the issue-worker, without starting it"
+        type: boolean
+        default: true
+
+permissions:
+  # write: it dispatches the issue-worker
+  actions: write
+  contents: read
+  issues: read
+  pull-requests: read
+
+concurrency:
+  group: issue-worker-kick
+  cancel-in-progress: false
+
+jobs:
+  kick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            scripts/retro.py
+            .github/workflows
+      - name: Start the issue-worker when new work waits
+        run: python3 -I scripts/retro.py kick ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '--dry-run' || '' }}
