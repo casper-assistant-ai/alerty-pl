@@ -710,6 +710,50 @@
    "parser": 2
   },
   {
+   "title": "Alert RCB - woda niezdatna do spożycia, pow. ząbkowicki (19.11)",
+   "date": "2026-11-19",
+   "category": "water",
+   "updates": [
+    {
+     "time": null,
+     "message": "KOMUNIKAT: Woda z wodociągu Złoty Stok nie nadaje się do celów spożywczych w miejscowościach: Złoty Stok, Płonica i Błotnica (pow. ząbkowicki). Śledź komunikaty.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "dolnoslaskie"
+      ],
+      "powiaty": [
+       "dolnoslaskie/zabkowicki"
+      ],
+      "whole": [],
+      "gminy": [
+       "Złoty Stok"
+      ]
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu ząbkowickiego (woj. dolnośląskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "dolnoslaskie"
+    ],
+    "powiaty": [
+     "dolnoslaskie/zabkowicki"
+    ],
+    "whole": [],
+    "gminy": [
+     "Złoty Stok"
+    ]
+   },
+   "id": "alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911",
+   "intro": "„KOMUNIKAT: Woda z wodociągu Złoty Stok nie nadaje się do celów spożywczych w miejscowościach: Złoty Stok, Płonica i Błotnica (pow. ząbkowicki). Śledź komunikaty.”",
+   "status": "active",
+   "started_at": "2026-11-19T00:00:00+01:00",
+   "last_at": "2026-11-19T00:00:00+01:00",
+   "parser": 2
+  },
+  {
    "title": "Komunikat (18.11)",
    "date": "2026-11-18",
    "category": "air",

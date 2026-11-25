@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-25",
+   "time": "2026-11-25T05:27:44Z",
+   "sha": "7b12da2",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "rules for outputs sent before a 529 and the region-keeper bound, ledger of 7 days (#118)",
+     "sha": "7b12da2",
+     "date": "2026-11-25",
+     "time": "2026-11-25T05:27:44Z"
+    }
+   ]
+  },
+  {
    "version": "1.23.5",
    "date": "2026-11-24",
    "time": "2026-11-24T16:55:18Z",
