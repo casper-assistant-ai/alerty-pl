@@ -17,15 +17,22 @@ them with no human in the loop, through this script:
 
 The guard sorts a change into one of three classes:
   direct   gh-aw sources (.md): the schedule, timeout-minutes, the engine's model, fallback models,
-           max-turns and retries, safe-output limits (max), the description and the prompt text;
-           plain workflows (.yml): cron schedules and job time limits. Lands on main at once.
-  review   plain workflows: the text of `run:` scripts, the rest unchanged; and every change the
-           issue-worker asks for (it reads issues from the public). Lands after the PR reviewer
-           agent approves it.
-  refuse   everything else: permissions, network, tools, steps, imports, secrets, triggers other
-           than the schedule, other safe-output settings, engine endpoints, new, deleted or shared
-           files, `${{ }}` expressions in new prompt lines, expressions, secrets or the runner's
-           env files in new script lines.
+           max-turns and retries, safe-output limits (max) and the description; plain workflows
+           (.yml): cron schedules and job time limits. Lands on main at once.
+  review   the prompt text of a gh-aw source (agents read it as standing instructions, and the
+           process-doctor's own input quotes agent output that quotes public issues), and every
+           change the issue-worker asks for (it reads issues from the public). Lands after the PR
+           reviewer agent approves it.
+  refuse   everything else, left with the label needs-casper for Casper or the owner: `run:`
+           scripts (they run with the workflow's token and secrets, and no denylist can tell a
+           harmless line from one that sends a key away; security audit #146), permissions,
+           network, tools, steps, imports, secrets, triggers other than the schedule, other
+           safe-output settings, engine endpoints, new, deleted or shared files, the maintainer's
+           own workflow, `${{ }}` expressions or imports in new prompt lines.
+
+workflow-maintainer.yml pins this file by its SHA-256 before it hands the deploy key to it: the
+agents may change scripts/**, so a change here needs the pin changed too, which only Casper or
+the owner can push.
 """
 import argparse
 import difflib
@@ -57,13 +64,18 @@ MODEL = re.compile(r"^glm-[0-9][a-z0-9.-]*$")
 CRON = re.compile(r"^\d{1,2}(,\d{1,2})? [0-9*/,-]+ [0-9*/,-]+ [0-9A-Za-z*/,-]+ [0-9A-Za-z*/,-]+$")
 FUZZY = re.compile(r"^[a-z0-9 :,-]{3,60}$")
 BAD_PROMPT = re.compile(r"\$\{\{|^\s*(@include|@import|\{\{#import|\{\{#runtime-import)", re.I)
-BAD_SCRIPT = re.compile(r"\$\{\{|\bsecrets\b|GITHUB_ENV|GITHUB_PATH|ACTIONS_ID_TOKEN|ACTIONS_RUNTIME|ACTIONS_CACHE")
+SELF = ".github/workflows/workflow-maintainer.yml"
+NEEDS = "needs-casper"
 MISSING = object()
 TRAILER = "Workflow-Change-Issue"
 
 
 class PatchError(Exception):
     pass
+
+
+class Refused(PatchError):
+    """The guard refused the change: it is for Casper or the owner, not for a corrected patch."""
 
 
 # ---------------------------------------------------------------- reading the patch of an issue
@@ -337,7 +349,8 @@ def check_md(old, new):
     for line in added_lines(obody, nbody):
         if BAD_PROMPT.search(line):
             p.append(f"a new prompt line holds an expression or an import: {line.strip()[:80]!r}")
-    return p, False
+    # the prompt is standing instructions for an agent with write tools: the PR reviewer reads it first
+    return p, obody != nbody
 
 
 def check_jobs(a, b):
@@ -361,15 +374,11 @@ def check_jobs(a, b):
         for i, (s, t) in enumerate(zip(xs, ys), 1):
             if s == t:
                 continue
-            if not isinstance(s, dict) or not isinstance(t, dict) or _without(s, "run", "name") != _without(t, "run", "name"):
-                p.append(f"job `{j}`, step {i}: changed beyond its name and run script")
-                continue
-            if s.get("run") != t.get("run"):
-                review = True
-                for line in added_lines(s.get("run"), t.get("run")):
-                    if BAD_SCRIPT.search(line):
-                        p.append(f"job `{j}`, step {i}: a new script line reaches for an expression, a secret or the "
-                                 f"runner's env files: {line.strip()[:80]!r}")
+            if not isinstance(s, dict) or not isinstance(t, dict) or _without(s, "run") != _without(t, "run"):
+                p.append(f"job `{j}`, step {i}: changed beyond its run script")
+            elif s.get("run") != t.get("run"):
+                p.append(f"job `{j}`, step {i}: its `run:` script changed; scripts run with the workflow's token and "
+                         "secrets, so Casper or the owner applies such a change by hand")
     return p, review
 
 
@@ -453,6 +462,9 @@ def guard(base, head=None):
             continue
         if not TARGET.match(path):
             problems.append(f"`{path}`: only .github/workflows/<name>.md and .yml change here")
+            continue
+        if path == SELF:
+            problems.append(f"`{path}`: the maintainer does not change its own workflow")
             continue
         if path.endswith(".md"):
             q, r = check_md(old, new)
@@ -581,7 +593,7 @@ def attempt(issue, src):
         raise PatchError(f"gh aw compile failed: {e}")
     cls, problems = guard("HEAD")
     if cls == "refuse":
-        raise PatchError("refused by the guard: " + "; ".join(problems))
+        raise Refused("; ".join(problems))
     ok, log = run_tests()
     if not ok:
         raise PatchError("the tests fail with the patch:\n\n```text\n" + log[-2000:] + "\n```")
@@ -612,7 +624,7 @@ def prepare(out):
             cls, files, named_only = attempt(issue, src)
         except PatchError as e:
             reset_tree()
-            item.update(result="failed", reason=str(e))
+            item.update(result="refused" if isinstance(e, Refused) else "failed", reason=str(e))
             plan.append(item)
             print(f"#{n}: not applied: {str(e)[:300]}")
             continue
@@ -636,7 +648,8 @@ def prepare(out):
                 branches.append(branch)
             except PatchError as e:
                 reset_tree()
-                item.update(result="failed", reason=f"in its own branch from main: {e}")
+                item.update(result="refused" if isinstance(e, Refused) else "failed",
+                            reason=f"in its own branch from main: {e}")
             git("checkout", "-q", "wm/main")
         plan.append(item)
         print(f"#{n}: {item['result']}")
@@ -752,11 +765,20 @@ def verdict_of(pr, sha):
     return None, ""
 
 
+def refuse_note():
+    return ("This change is outside what lands with no human. Casper or the owner reads the patch and applies it by "
+            "hand (label `needs-casper`); the process-doctor does not file it again.\n\n")
+
+
 def report(item, extra=""):
     n, h, res = item["issue"], item["digest"], item["result"]
     head = {"failed": "Workflow maintainer: not applied.",
+            "refused": "Workflow maintainer: not applied, the guard refused it.",
             "already": "Workflow maintainer: the patch is already on main; nothing to apply."}[res]
     body = head + "\n\n" + (f"Reason: {item.get('reason', '')}\n\n" if item.get("reason") else "")
+    if res == "refused":
+        body += refuse_note()
+        sh("gh", "issue", "edit", str(n), "-R", repo(), "--add-label", NEEDS, check=False)
     if res == "failed":
         body += ("The issue stays open. The process-doctor closes it and opens a corrected one: each change as a "
                  "```diff block with `--- a/<path>` and `+++ b/<path>` lines and unchanged context lines copied "
@@ -795,7 +817,7 @@ def land(d):
             checks = [s for s in start_checks(item["files"], health) if s not in started]
             started.update(checks)
             body = (f"Workflow maintainer: applied in {commit_url(sha)}.\n\nFiles: {files}. The guard allowed it as a "
-                    "direct change (schedules, time limits, models, safe-output limits and prompt text only); the gh-aw "
+                    "direct change (schedules, time limits, models, retries and safe-output limits only); the gh-aw "
                     "sources were compiled again and the unit and node tests pass.\n\n")
             if checks:
                 body += "".join(f"- {c}\n" for c in checks) + "\n"
@@ -819,10 +841,10 @@ def land(d):
             print(f"::warning::#{n}: push of {branch} failed: {err[-300:]}")
             continue
         files = ", ".join(f"`{f}`" for f in item["files"])
-        body = (f"Closes #{n}\n\nThe Workflow maintainer applied the patch of #{n} to {files}. It changes the script of "
-                "a plain workflow (or comes from an agent that reads public issues), so it lands only after the PR "
-                "reviewer approves this head; the maintainer then puts it on main itself (the gate's GITHUB_TOKEN "
-                f"cannot merge workflow files).\n\nThe guard checked that permissions, triggers, steps, actions and "
+        body = (f"Closes #{n}\n\nThe Workflow maintainer applied the patch of #{n} to {files}. It changes an agent's "
+                "prompt (or comes from an agent that reads public issues), so it lands only after the PR reviewer "
+                "approves this head; the maintainer then puts it on main itself (the gate's GITHUB_TOKEN cannot merge "
+                f"workflow files).\n\nThe guard checked that permissions, triggers, steps, scripts, actions and "
                 f"secrets stay as they are; the unit and node tests pass.\n\nRun: {run_url()}")
         title = f"[workflow-maintainer] ci(workflows): {subject({'title': item['title']})}"
         r = subprocess.run(["gh", "pr", "create", "-R", repo(), "--head", branch, "--base", "main", "--title", title,
@@ -843,6 +865,17 @@ def land(d):
         if not m or (pr.get("user") or {}).get("login") != BOT or pr["head"]["repo"]["full_name"] != repo():
             continue
         n, num, sha = int(m.group(1)), pr["number"], pr["head"]["sha"]
+        git("fetch", "-q", "origin", f"+refs/heads/{ref}:refs/remotes/origin/{ref}")
+        base = git("merge-base", "origin/main", sha).strip()
+        cls, problems = guard(base, sha)
+        if cls == "refuse":
+            text = "Workflow maintainer: closed without landing, the guard refuses it: " + "; ".join(problems)
+            sh("gh", "pr", "close", str(num), "-R", repo(), "--delete-branch", "--comment", text, check=False)
+            issue = gh_api(f"repos/{repo()}/issues/{n}") or {}
+            sh("gh", "issue", "edit", str(n), "-R", repo(), "--add-label", NEEDS, check=False)
+            comment(n, f"{text}\n\nPR: #{num}\n\n{refuse_note()}{marker(n, digest(issue.get('body')), 'refused')}")
+            print(f"#{n}: PR #{num} closed, refused by the guard")
+            continue
         approve_ci(sha)
         verdict, reason = verdict_of(num, sha)
         if verdict is None:
@@ -858,7 +891,6 @@ def land(d):
             print(f"#{n}: PR #{num} closed, the reviewer said {verdict}")
             continue
         try:
-            git("fetch", "-q", "origin", f"+refs/heads/{ref}:refs/remotes/origin/{ref}")
             landed = land_on_main(f"refs/remotes/origin/{ref}", {"direct", "review"})
             sha2 = landed.get(n) or git("rev-parse", "HEAD").strip()
         except RuntimeError as e:
@@ -881,7 +913,9 @@ def land(d):
         sh("gh", "workflow", "run", "pr-reviewer.lock.yml", "-R", repo(), check=False)
         print("started the PR reviewer")
     # 4. what did not apply: one comment each (the marker keeps it to one per patch)
-    for item in [i for i in plan if i.get("result") in ("failed", "already")]:
+    sh("gh", "label", "create", NEEDS, "-R", repo(), "--color", "b60205",
+       "--description", "Casper or the owner applies this by hand", check=False)
+    for item in [i for i in plan if i.get("result") in ("failed", "refused", "already")]:
         report(item)
         doctor = doctor or (item["result"] == "failed" and item.get("source") == "process-doctor")
         print(f"#{item['issue']}: {item['result']}")

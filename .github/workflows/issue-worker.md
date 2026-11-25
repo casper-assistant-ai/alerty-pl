@@ -143,11 +143,12 @@ your PR cannot change it. Open one issue with `create-issue` (at most one a run)
 file, starting with `--- a/.github/workflows/<file>` and `+++ b/.github/workflows/<file>`, every
 change between unchanged context lines copied exactly from the file on `main`, hunks separated by
 `@@`. The Workflow maintainer applies it within 30 minutes and lands it after the PR reviewer
-approves it; prose is not applied. Only schedules, time limits, models, safe-output limits, prompt
-text and `run:` script lines can change this way: never ask for a permission, a secret, a network
-domain, a trigger or a new step. Link the new issue in your comment on the issue it serves; that
-issue closes once the change is on `main`. Do not open one when an open `workflow-change` issue
-already asks for the same change.
+approves it; prose is not applied. Schedules, time limits, models, safe-output limits and prompt
+text land this way. A `run:` script line (such as a staging line in `update.yml`) is refused and
+labelled `needs-casper`: Casper or the owner applies it by hand, so the issue it serves stays open
+until then. Never ask for a permission, a secret, a network domain, a trigger or a new step. Link
+the new issue in your comment on the issue it serves; that issue closes once the change is on
+`main`. Do not open one when an open `workflow-change` issue already asks for the same change.
 
 **Issues the gate returned** (a closed PR in `rejected PRs`): the gate closed that PR because its
 tests failed, it touched paths agents may not change, or the PR reviewer rejected it (value, size

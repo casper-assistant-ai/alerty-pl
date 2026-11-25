@@ -9,15 +9,19 @@ name: Workflow maintainer
 #            tests. This job holds no secret.
 #   land     pushes the result with the deploy key WORKFLOW_DEPLOY_KEY (write access, the only
 #            credential here that may change workflow files): a direct change (schedules, time
-#            limits, models, retries, safe-output limits, prompt text) goes straight to main; a
-#            change to a plain workflow's run script, or anything the issue-worker asks for, becomes
-#            a PR that lands only after the PR reviewer approves it. It comments the result on the
-#            issue, closes it, and starts once each failing agent whose workflow changed, so its
-#            health issue closes after the next good run.
-# The guard refuses changes to permissions, network, tools, steps, imports, secrets, triggers other
-# than the schedule, safe outputs other than their max, engine endpoints, new, deleted or shared
-# files, and expressions in new prompt or script lines. A refused or broken patch gets one comment,
-# and the process-doctor files a corrected one.
+#            limits, models, retries, safe-output limits) goes straight to main; a change to an
+#            agent's prompt, or anything the issue-worker asks for, becomes a PR that lands only
+#            after the PR reviewer approves it. It comments the result on the issue, closes it, and
+#            starts once each failing agent whose workflow changed, so its health issue closes after
+#            the next good run.
+# The guard refuses `run:` scripts (they run with the workflow's token and secrets; security audit
+# #146), permissions, network, tools, steps, imports, secrets, triggers other than the schedule,
+# safe outputs other than their max, engine endpoints, new, deleted or shared files, this workflow
+# itself, and expressions in new prompt lines: such an issue gets the label needs-casper, for Casper
+# or the owner. A patch that does not apply gets one comment, and the process-doctor files a
+# corrected one. Both jobs run scripts/workflow_change.py only at the SHA-256 pinned below: the
+# agents may change scripts/**, so a new version needs this pin changed too, which only Casper or
+# the owner can push.
 on:
   schedule:
     - cron: "7,37 * * * *"
@@ -32,6 +36,10 @@ permissions:
 concurrency:
   group: workflow-maintainer
   cancel-in-progress: false
+
+env:
+  # sha256sum scripts/workflow_change.py of the reviewed version
+  SCRIPT_SHA256: a3399a8876d9e645b5ff5ab8174ee561afb5c211c3439b50b082c103fdde1e57
 
 jobs:
   prepare:
@@ -48,6 +56,8 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+      - name: The maintainer's script is the pinned one
+        run: echo "$SCRIPT_SHA256  scripts/workflow_change.py" | sha256sum -c -
       - name: Tools (gh-aw at the version of the lock files, PyYAML for the guard)
         run: |
           gh extension install github/gh-aw --pin v1.2.2
@@ -81,6 +91,8 @@ jobs:
         with:
           name: workflow-changes
           path: ${{ runner.temp }}/wc
+      - name: The maintainer's script is the pinned one
+        run: echo "$SCRIPT_SHA256  scripts/workflow_change.py" | sha256sum -c -
       - name: Tools (PyYAML for the guard)
         run: python3 -I -c 'import yaml' 2>/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q python3-yaml; }
       - name: The deploy key (GitHub's host key pinned)

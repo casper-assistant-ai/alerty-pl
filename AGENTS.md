@@ -48,9 +48,11 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   models) in `workflow-change` issues with the patch, since agent tokens cannot change `.github/`.
 - Workflow maintainer: `workflow-maintainer.yml` (plain code, every 30 minutes) lands those
   `workflow-change` issues with no human: `scripts/workflow_change.py` applies the ```diff blocks,
-  compiles, checks that permissions, network, tools, steps, secrets and triggers stay as they are,
-  runs the tests and pushes with the deploy key `WORKFLOW_DEPLOY_KEY`; a `run:` script change, or
-  any change the issue-worker asks for, goes through a PR that the PR reviewer must approve first.
+  compiles, checks that permissions, network, tools, steps, scripts, secrets and triggers stay as
+  they are, runs the tests and pushes with the deploy key `WORKFLOW_DEPLOY_KEY`. Schedules, time
+  limits, models, retries and safe-output limits land at once; prompt text, and any change the
+  issue-worker asks for, through a PR that the PR reviewer must approve first; a `run:` script or
+  anything else gets the label `needs-casper` for Casper or the owner.
 - Give-up ladder: after two closed PRs for one issue (the queue marks it `give up`) the issue-worker adds the label
   `agent-gave-up` and closes the issue with a summary (tried, why it failed, what is needed); the daily
   `process-retro` reads those issues (`scripts/retro.py gave-up`) and splits each into smaller `[dev-task]` issues or

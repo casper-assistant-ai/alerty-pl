@@ -169,6 +169,11 @@ jobs:
                 if [ -n "$bad" ]; then
                   request_fix "It changes files outside the allowed paths: $(echo $bad). Revert them."
                   echo "::endgroup::"; continue
+                fi
+                # the Workflow maintainer's script runs with the deploy key: only Casper or the owner changes it
+                if echo "$files" | grep -qx 'scripts/workflow_change\.py'; then
+                  request_fix "It changes scripts/workflow_change.py, the Workflow maintainer's script, which runs with the deploy key and is pinned by hash in workflow-maintainer.yml; only Casper or the owner changes it. Revert it."
+                  echo "::endgroup::"; continue
                 fi;;
               dependabot)
                 bad=$(echo "$files" | grep -Ev "$DEPENDABOT_ALLOWED" || true)

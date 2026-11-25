@@ -142,11 +142,13 @@ Group by agent and signature. For each group decide, in one line with the run id
   commit on the issue and closes it. So write the patch for a machine: one fenced ```diff block per
   file, starting with `--- a/.github/workflows/<file>` and `+++ b/.github/workflows/<file>`, every
   change between unchanged context lines copied exactly from the file on `main`, hunks separated by
-  `@@` lines. A change given only in prose is not applied. The maintainer's guard lets through only
-  the schedule, `timeout-minutes`, the model, fallback models, `max-turns`, retries, safe-output `max`
-  and prompt text of an agent's `.md` (no GitHub expressions in new prompt lines), and the cron and job time
-  limits of a plain `.yml`; a change to a plain workflow's `run:` script lands after the PR reviewer
-  approves it. Skip it when an open `workflow-change` issue already asks for the same.
+  `@@` lines. A change given only in prose is not applied. The maintainer lands at once the schedule,
+  `timeout-minutes`, the model, fallback models, `max-turns`, retries and safe-output `max` of an
+  agent's `.md`, and the cron and job time limits of a plain `.yml`; prompt text (no GitHub
+  expressions in new lines) lands after the PR reviewer approves it. It refuses a `run:` script,
+  permissions, network, tools, steps and triggers, and labels such an issue `needs-casper`: Casper or
+  the owner applies it by hand, so ask for a script change only when nothing else fixes the cause.
+  Skip it when an open `workflow-change` issue already asks for the same.
   Never ask for a wider permission, a new secret, a new network domain or a looser check.
 - **Code fixes:** an item in `process/improvements.md` (see step 2); the issue-worker builds it.
 
@@ -177,9 +179,11 @@ dates of every row you saw this run. Rows unchanged for 30 days go to the `## Ar
   the same: one comment with the cause, and close it when the cause is fixed or was one-off with
   good runs after it (link them).
 - **Your `workflow-change` issues:** the Workflow maintainer closes the ones it lands; close one
-  yourself when its patch is on `main` (the workflow source shows it). When the maintainer commented
-  that a patch was not applied or was refused (its comment starts with `Workflow maintainer:`), it
-  will not try that issue again: close it, and open a corrected issue when the change is still
+  yourself when its patch is on `main` (the workflow source shows it). An issue labelled
+  `needs-casper` waits for Casper or the owner: leave it open and do not file it again. When the
+  maintainer commented that a patch was not applied (its comment starts with `Workflow maintainer:`)
+  or the PR reviewer sent it back, the maintainer will not try that issue again: close it, and open a
+  corrected issue when the change is still
   needed (fix what its comment names, such as the PR reviewer's reason; a part left in prose goes
   into its own ```diff block; end the new title with «(corrected)», since an open issue with the
   same title blocks a new one). The maintainer starts you after such a comment.
