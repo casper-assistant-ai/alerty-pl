@@ -70,6 +70,8 @@ test("a result: a short name without the postal code and the country, the boundi
   assert.deepEqual(p.bounds, [[50.3985, 16.5865], [50.4884, 16.7273]]);
   assert.equal(p.lat, 50.4435);
   assert.equal(G.place({ lat: "1", lon: "2", display_name: "Polska" }).bounds, null);
+  assert.equal(G.short("1, Grunwaldzka, Stare Miasto, Kłodzko, powiat kłodzki, województwo dolnośląskie, 57-300, Polska"), "Grunwaldzka 1, Stare Miasto, Kłodzko");
+  assert.equal(G.short("NEO Komputery, 1, Grunwaldzka, Stare Miasto, Kłodzko, Polska"), "NEO Komputery, Grunwaldzka 1, Stare Miasto");
   assert.equal(G.short("Kłodzko, Клодзько, Клодзький повіт, Нижньосілезьке воєводство, Польща"), "Kłodzko, Клодзько, Клодзький повіт");
 });
 

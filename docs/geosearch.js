@@ -71,7 +71,10 @@ const RCBGeo = (() => {
   function short(name) {
     const parts = String(name || "").split(", ");
     const country = parts.length > 1 ? parts.pop() : "";
-    const out = parts.filter((x) => !/^\d\d-\d{3}$/.test(x)).slice(0, 3).join(", ");
+    const kept = parts.filter((x) => !/^\d\d-\d{3}$/.test(x));
+    // OSM names a house "1, Grunwaldzka, …": the number goes after its street, as an address is written
+    for (let i = 0; i < kept.length - 1; i++) if (/^\d+[A-Za-z]?(\/\d+[A-Za-z]?)?$/.test(kept[i])) kept.splice(i, 2, `${kept[i + 1]} ${kept[i]}`);
+    const out = kept.slice(0, 3).join(", ");
     return out || country;
   }
   // { lat, lon, name, bounds: [[s, w], [n, e]] | null } from one Nominatim result
