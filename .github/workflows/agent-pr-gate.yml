@@ -235,6 +235,14 @@ jobs:
             # CodeQL on this head (codeql.yml, with the repository's own queries in codeql/): GitHub's check
             # "CodeQL" fails when the PR adds an alert, and the ruleset "CodeQL: no new alerts" then refuses
             # the merge. A new alert goes to the fixer; an analysis still running waits for the next round.
+            # The check says "neutral" while the Analyze jobs still run (seen on PR #174), so it counts
+            # only once every codeql.yml run on this head has completed.
+            cqbusy=$(gh run list --workflow codeql.yml --commit "$sha" --limit 20 --json status \
+                     --jq 'if length == 0 then "none" else ([.[] | select(.status != "completed")] | length | tostring) end' 2>/dev/null || echo none)
+            if [ "$cqbusy" != 0 ]; then
+              echo "CodeQL has not finished on $sha (runs not completed: $cqbusy): the next round looks again"
+              echo "::endgroup::"; continue
+            fi
             cq=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/check-runs?check_name=CodeQL&per_page=20" \
                  --jq '[.check_runs[] | select(.app.slug == "github-advanced-security") | (.conclusion // .status)][0] // "none"' 2>/dev/null || echo none)
             case "$cq" in
