@@ -13,10 +13,10 @@ reliability or simpler upkeep, never a report.
 
 ## Reliability
 - [x] `scripts/agent_failures.py`: give the process-doctor the evidence it could not get on 2026-11-24 (take this first: without it every failed run reads `unknown`). — this PR (a) `gh api …/jobs/<id>/logs` refused 39 of 41 logs («the response contains terminal escape sequences; pass --allow-escape-sequences»): pass that flag, retry without it when the gh is too old for it, and strip every escape and control sequence from the lines kept. (b) A CLI step that fails at the step limit has conclusion `failure`, not `timed_out`, and the job runs on: name it `timeout` when the step lasted at least 95% of the workflow's `timeout-minutes` (site-fixer 45248741714 stopped after 25m12s of 25). (c) A run whose agent job failed only in the ignored parser step still counts as failed through the conclusion job's `Handle agent failure`: drop that mirror when the agent job has no other failed step (parser-doctor 45288784687, 45296603145; issue-worker 45287331942, still counted on 2026-11-24 after fccf91c). Tests in `tests/test_agent_failures.py` for each; check with `python3 -I -m unittest tests.test_agent_failures`, then a live `python3 -I scripts/agent_failures.py --days 1` whose runs show signal lines and no «log not read».
-- [ ] `scripts/rcb.py`: retry a gov.pl request once on a timeout or a 5xx before failing the run, with a test.
-- [ ] `scripts/site_check.mjs`: report the page and the first failing request in one line, so the site-fixer gets a clear cause.
+- [x] `scripts/rcb.py`: retry a gov.pl request once on a timeout or a 5xx before failing the run, with a test. Already so: `fetch()` tries every request three times, a timeout and an `HTTPError` 5xx included (`FetchRetries` in tests/test_rcb_rules.py). — this PR
+- [x] `scripts/site_check.mjs`: report the page and the first failing request in one line, so the site-fixer gets a clear cause. Already so since #70 and #94: the heading of each page view names the page and the viewport, and `judge()` its first failing request with a count per host (tests/site_check.test.mjs). — this PR
 - [x] `scripts/site_check.mjs`: count the live notification service's failed requests apart from the tile servers, so an outage of `server/` reads as one line per run and no longer tips the NASA view over the limit (#70). — this PR
-- [ ] `scripts/retro.py`: handle an HTTP 403/429 from the GitHub API with one retry and a clear error.
+- [x] `scripts/retro.py`: handle an HTTP 403/429 from the GitHub API with one retry and a clear error. — this PR
 
 ## Simpler upkeep
 - [ ] `docs/*.js`: move helpers that two pages copy into `common.js`.

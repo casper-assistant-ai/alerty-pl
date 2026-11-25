@@ -35,6 +35,8 @@ import json
 import os
 import re
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -191,17 +193,71 @@ def markdown(m):
     return "\n".join(lines) + "\n"
 
 
+# A rate limit answers 403 or 429 with the wait to come: Retry-After (seconds), or X-RateLimit-Reset
+# (the epoch second it ends). Such an answer gets one more try after that wait. A step that runs on
+# schedule does not wait out a longer one: the run fails with the wait in its last line.
+RATE_LIMIT = {403, 429}
+MAX_WAIT = 60
+DEFAULT_WAIT = 2  # a 403 or 429 that names no wait (no rate limit: a missing permission) gets its second try after this
+
+
+class ApiError(Exception):
+    """GitHub refused a request: its status, its message and when to ask again, in one line."""
+
+
+def rate_wait(headers, now=None):
+    """(seconds to wait before one more try at a 403 or 429, the seconds GitHub asks for).
+    The seconds asked for are in Retry-After, else X-RateLimit-Reset minus now; None when the answer
+    names neither. The wait is that number, not under 0; over MAX_WAIT it is None: do not try again."""
+    asked = None
+    for name in ("Retry-After", "X-RateLimit-Reset"):
+        try:
+            asked = float(headers.get(name))
+        except (AttributeError, TypeError, ValueError):
+            continue
+        if name == "X-RateLimit-Reset":
+            asked -= time.time() if now is None else now
+        break
+    if asked is None:
+        return DEFAULT_WAIT, None
+    return (None if asked > MAX_WAIT else max(asked, 0)), asked
+
+
 def api(path, token, method="GET", body=None):
+    """One request: (the JSON, or None for an empty body; the URL of the next page, or None).
+    A 403 or 429 gets one more try after the wait it names (rate_wait); what is still refused, and
+    any other error status, ends in an ApiError of one line, which main() prints before it exits."""
     url = path if path.startswith("http") else "https://api.github.com" + path
-    req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body else None,
-                                 headers={"Accept": "application/vnd.github+json",
-                                          "Authorization": f"Bearer {token}",
-                                          "X-GitHub-Api-Version": "2022-11-28",
-                                          "User-Agent": "alerty-pl-retro"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        data = r.read()
-        nxt = re.search(r'<([^>]+)>;\s*rel="next"', r.headers.get("Link") or "")
-        return (json.loads(data) if data else None), (nxt.group(1) if nxt else None)
+    slept = 0
+    for tries in (1, 2):
+        req = urllib.request.Request(url, method=method, data=json.dumps(body).encode() if body else None,
+                                     headers={"Accept": "application/vnd.github+json",
+                                              "Authorization": f"Bearer {token}",
+                                              "X-GitHub-Api-Version": "2022-11-28",
+                                              "User-Agent": "alerty-pl-retro"})
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                data = r.read()
+                nxt = re.search(r'<([^>]+)>;\s*rel="next"', r.headers.get("Link") or "")
+                return (json.loads(data) if data else None), (nxt.group(1) if nxt else None)
+        except urllib.error.HTTPError as e:
+            try:  # what GitHub says: the message of the JSON body, else the reason phrase
+                said = json.loads(e.read() or b"{}").get("message") or e.reason
+            except (AttributeError, ValueError):
+                said = e.reason
+            e.close()
+            wait, asked = rate_wait(e.headers) if e.code in RATE_LIMIT else (None, None)
+            if tries == 1 and wait is not None:
+                print(f"::warning::GitHub API {e.code} on {method} {url}: trying once more in {wait:g} s", file=sys.stderr)
+                slept = wait
+                time.sleep(wait)
+                continue
+            err = f"GitHub API {e.code} ({str(said)[:120]}) on {method} {url}"
+            if tries == 2:
+                err += f"; the second try, after {slept:g} s, was refused as well"
+            if asked is not None:
+                err += f"; GitHub asks to wait {asked:g} s more"
+            raise ApiError(err) from None
 
 
 def pages(path, token, key=None, stop=None, limit=10):
@@ -412,6 +468,13 @@ def main(argv=None):
     g.add_argument("--out")
     g.add_argument("--md")
     a = ap.parse_args(argv)
+    try:
+        run(a)
+    except ApiError as e:  # one line in the step's log, not a traceback
+        sys.exit(f"retro: {e}")
+
+
+def run(a):
     if a.cmd == "gave-up":
         since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
         raw = pages(f"/repos/{repo_name(a.repo)}/issues?state=closed&labels={GAVE_UP_LABEL}&per_page=100"
