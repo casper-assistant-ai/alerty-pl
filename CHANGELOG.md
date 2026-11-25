@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **workflows:** agent-dispatch, daily-status, parser-doctor: out of the 529 hours and the first quota hole (#161) ([a70a0cb](https://github.com/casper-assistant-ai/alerty-pl/commit/a70a0cb))
+
 ## 1.28.1 (2026-11-25)
 
 ### fix

@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-25",
+   "time": "2026-11-25T20:20:19Z",
+   "sha": "a70a0cb",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "agent-dispatch, daily-status, parser-doctor: out of the 529 hours and the first quota hole (#161)",
+     "sha": "a70a0cb",
+     "date": "2026-11-25",
+     "time": "2026-11-25T20:20:19Z"
+    }
+   ]
+  },
+  {
    "version": "1.28.1",
    "date": "2026-11-25",
    "time": "2026-11-25T21:10:16+01:00",
