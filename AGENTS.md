@@ -149,11 +149,15 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   session is lost, so by 80% of the limit send what is done — the PR, the issue or `noop` — and
   stop; the issue-worker's minute 35 is this rule at 50 [timeout, site-fixer runs 45248741714 and
   45244945359 stopped at 25 min, region-keeper 45227118220 at 20].
-- every agent: a 529 from z.ai ends a run at any turn and nothing unsent survives it, so send each
-  output the moment it is ready (the issue comment before the checks, the PR after the first green
-  check run, a workflow-change issue after the PR) and never hold one back to send it with another
-  [provider-overload, issue-worker run 45528108383 lost 73 turns and 17 minutes; process-doctor run
-  45458842781 ended green with issue #113 sent and the rule it cites never pushed].
+- every agent: a 529 or a 429 from z.ai ends a run at any turn and nothing unsent survives it, so
+  send each output the moment it is ready (the issue comment before the checks, the PR after the
+  first green check run, a workflow-change issue after the PR) and never hold one back to send it
+  with another; a 429 [1308] «Usage limit reached for 5 hour» is the account's quota, not an
+  overloaded model, and its reset time is Beijing time (UTC+8): nothing to retry, the next run
+  takes the work [provider-overload, issue-worker run 45528108383 lost 73 turns and 17 minutes;
+  process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites never
+  pushed; the quota of 2026-11-25, 09:06 to 09:57 UTC: 14 runs, pr-reviewer 45581138284 at turn 16
+  and ci-doctor 45580981955 at turn 23 lost 10 minutes each].
 - region-keeper: take at most 5 items of `unmatched.json` a run (the first five; the rest wait for
   the next day), never audit `alerts.json`, and call `noop` at once when the file is empty
   [timeout, region-keeper runs 45227118220 and 45447715342: 22 minutes on the 20-minute limit,
