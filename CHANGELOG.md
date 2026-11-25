@@ -6,10 +6,12 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### docs
 
+- **agents:** keep only judgment rules; list what the checks enforce ([f714254](https://github.com/casper-assistant-ai/alerty-pl/commit/f714254))
 - **agents:** every correction becomes a test, a lint rule or a CodeQL query first ([2d45139](https://github.com/casper-assistant-ai/alerty-pl/commit/2d45139))
 
 ### ci
 
+- **rules:** check the code-checkable AGENTS.md rules in CI and the gate ([6379a68](https://github.com/casper-assistant-ai/alerty-pl/commit/6379a68))
 - **gate:** the PR's own code runs without the gate's write token ([847d34d](https://github.com/casper-assistant-ai/alerty-pl/commit/847d34d))
 - **issue-worker:** one queue for all runs, and report links without temporary IDs ([2922803](https://github.com/casper-assistant-ai/alerty-pl/commit/2922803))
 - **update:** push the data commit with its own deploy key, which the CodeQL ruleset lets through ([6ba4c74](https://github.com/casper-assistant-ai/alerty-pl/commit/6ba4c74))

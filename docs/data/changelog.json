@@ -17,9 +17,27 @@
   {
    "version": null,
    "date": "2026-11-25",
-   "time": "2026-11-25T23:42:51+01:00",
-   "sha": "847d34d",
+   "time": "2026-11-25T23:53:08+01:00",
+   "sha": "f714254",
    "changes": [
+    {
+     "type": "docs",
+     "scope": "agents",
+     "breaking": false,
+     "text": "keep only judgment rules; list what the checks enforce",
+     "sha": "f714254",
+     "date": "2026-11-25",
+     "time": "2026-11-25T23:53:08+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "rules",
+     "breaking": false,
+     "text": "check the code-checkable AGENTS.md rules in CI and the gate",
+     "sha": "6379a68",
+     "date": "2026-11-25",
+     "time": "2026-11-25T23:53:08+01:00"
+    },
     {
      "type": "ci",
      "scope": "gate",
