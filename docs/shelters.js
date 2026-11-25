@@ -112,7 +112,7 @@ function drawOverview() {
       renderer: S.renderer, radius: 2.5 + 12 * Math.sqrt(n / max), weight: 1,
       className: "cell", color: accColor("cell"), fillColor: accColor("cell"), fillOpacity: 0.28, opacity: 0.6,
     });
-    m.bindTooltip(RCB.tn(n, "shel.places", { n: n.toLocaleString(RCB.loc()) }), { className: "tip", direction: "top" });
+    m.bindTooltip("<b>" + n + "</b>", { className: "tip", direction: "top" });
     m.on("click", () => S.map.setView([lat, lon], DETAIL_ZOOM));
     m.cellKey = key;
     S.overview.addLayer(m);
