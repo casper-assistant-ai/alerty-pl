@@ -158,6 +158,11 @@ python3 -I scripts/shelters.py update          # shelter points into docs/data/s
 python3 -m http.server -d docs 8000
 ```
 
+Checks in CI: the unit and Node tests, html-validate, `ruff check .` (Python, `ruff.toml`),
+`npx eslint .` (JavaScript, `eslint.config.mjs`) and CodeQL in advanced setup (`codeql.yml`) with the
+repository's own queries and their tests in `codeql/`. A PR that adds a CodeQL alert cannot be
+merged. Every correction becomes one of these checks first (AGENTS.md, «Corrections become checks»).
+
 ## Monitor the agents
 
 ```sh

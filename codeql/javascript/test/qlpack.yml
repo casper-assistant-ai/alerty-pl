@@ -1,0 +1,6 @@
+name: alerty/javascript-queries-tests
+version: 0.0.1
+extractor: javascript
+tests: .
+dependencies:
+  alerty/javascript-queries: "*"

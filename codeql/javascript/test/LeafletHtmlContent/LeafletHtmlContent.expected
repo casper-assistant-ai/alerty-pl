@@ -1,0 +1,5 @@
+| test.js:6:40:6:45 | p.name | Leaflet bindTooltip gets a field of a data object and writes it through innerHTML. Pass an element of h() or a function that returns one. |
+| test.js:7:40:7:60 | "<b>" + ...  "</b>" | Leaflet bindTooltip gets a string concatenated from data and writes it through innerHTML. Pass an element of h() or a function that returns one. |
+| test.js:8:38:8:64 | `${p.ad ... miejsc` | Leaflet bindPopup gets a string concatenated from data and writes it through innerHTML. Pass an element of h() or a function that returns one. |
+| test.js:10:40:10:44 | label | Leaflet bindTooltip gets a string concatenated from data and writes it through innerHTML. Pass an element of h() or a function that returns one. |
+| test.js:11:44:11:64 | name +  ... n + ")" | Leaflet setTooltipContent gets a string concatenated from data and writes it through innerHTML. Pass an element of h() or a function that returns one. |

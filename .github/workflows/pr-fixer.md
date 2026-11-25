@@ -104,6 +104,9 @@ safe-outputs:
       - "docs/*.css"
       - "README.md"
       - "AGENTS.md"
+      - "codeql/**"
+      - "ruff.toml"
+      - "eslint.config.mjs"
     if-no-changes: warn
     fallback-as-pull-request: false
     exclude-lock-yml: true
@@ -141,7 +144,7 @@ branch is already checked out, and the same folder holds:
   current change.
 
 Your push may change only the agents' paths: `scripts/`, `tests/`, `docs/*.html|js|css`,
-`process/*.md|json`, `README.md` and `AGENTS.md` (the same list as the gate's `ALLOWED`). The push
+`process/*.md|json`, `README.md`, `AGENTS.md`, `codeql/`, `ruff.toml` and `eslint.config.mjs` (the same list as the gate's `ALLOWED`). The push
 refuses a commit that touches any other file, a revert included (#166). When the fix needs a file
 outside them, push nothing and answer `no fix` with that as the cause.
 

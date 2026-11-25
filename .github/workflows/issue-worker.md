@@ -55,7 +55,7 @@ safe-outputs:
     title-prefix: "[issue-worker] "
     labels: [agent]
     draft: false
-    allowed-files: ["scripts/**", "tests/**", "docs/*.html", "docs/*.js", "docs/*.css", "README.md", "process/improvements.md"]
+    allowed-files: ["scripts/**", "tests/**", "docs/*.html", "docs/*.js", "docs/*.css", "README.md", "process/improvements.md", "codeql/**", "ruff.toml", "eslint.config.mjs"]
     # gh-aw protects README.md by default even when allowed-files lists it; two runs lost their
     # PR to that on 25.11.2026 (#163, #165). Agent PR gate still checks every path.
     protected-files:

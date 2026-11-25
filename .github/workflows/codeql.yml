@@ -1,0 +1,67 @@
+name: CodeQL
+
+# Advanced setup (owner's wish, 2026-11-25; it replaced GitHub's default setup): GitHub's default
+# query suite for every language, plus this repository's own queries in codeql/<language>/queries.
+# A correction that is a code pattern becomes a query there, with a test in codeql/<language>/test
+# (AGENTS.md, "Corrections become checks"). The repository ruleset "CodeQL: no new alerts" refuses
+# to merge a PR whose analysis adds an alert; Security watch hands open alerts to the security-fixer.
+on:
+  push:
+    branches: [main]
+    # the data commits of Update data and Shelters every 10 minutes change no code
+    paths-ignore: ["docs/data/**", "CHANGELOG.md"]
+  pull_request:
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  analyze:
+    name: Analyze (${{ matrix.language }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - language: actions
+          - language: javascript-typescript
+            queries: ./codeql/javascript/queries
+            tests: codeql/javascript/test
+          - language: python
+    steps:
+      - uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        id: init
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+          # added to the default suite, not instead of it
+          queries: ${{ matrix.queries }}
+          # the queries' own test cases are made to be found
+          config: |
+            paths-ignore:
+              - codeql/*/test
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
+      - name: Tests of the repository's own queries (codeql test run)
+        if: matrix.tests
+        env:
+          CODEQL: ${{ steps.init.outputs.codeql-path }}
+        run: |
+          "$CODEQL" pack install "${{ matrix.tests }}"
+          "$CODEQL" test run "${{ matrix.tests }}"

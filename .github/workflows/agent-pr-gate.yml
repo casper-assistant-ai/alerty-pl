@@ -2,7 +2,8 @@ name: Agent PR gate
 
 # No humans in the loop: agent PRs are merged or closed by this gate, never left for a person.
 # A PR is merged only when (1) a gh-aw agent opened it, (2) it touches allowed paths only,
-# (3) unit tests, a live parse of gov.pl, node --check and html-validate pass on its head, (4) it merges into main
+# (3) unit tests, a live parse of gov.pl, node --check, html-validate, ruff and ESLint pass on its head, and CodeQL
+# found no new alert on it, (4) it merges into main
 # cleanly, and (5) the PR reviewer agent approved that same head in a PR review (never a comment;
 # scripts/gate_rules.py). When (2), (3) or (4) fails, or the
 # reviewer says "Verdict: changes", the gate asks the PR fixer agent to fix the PR in its own branch
@@ -32,6 +33,8 @@ permissions:
   pull-requests: write
   actions: write
   issues: write
+  checks: read
+  security-events: read
 
 concurrency:
   group: agent-pr-gate
@@ -42,7 +45,10 @@ jobs:
     timeout-minutes: 90
     env:
       GH_TOKEN: ${{ github.token }}
-      ALLOWED: '^(scripts/|tests/|process/[a-z0-9-]+\.(md|json)$|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$)'
+      # ruff.toml, eslint.config.mjs and codeql/ are where a correction becomes a check (AGENTS.md)
+      ALLOWED: '^(scripts/|tests/|codeql/|process/[a-z0-9-]+\.(md|json)$|docs/[a-z0-9-]+\.(html|js|css)$|README\.md$|AGENTS\.md$|ruff\.toml$|eslint\.config\.mjs$)'
+      RUFF: ruff==0.17.6
+      ESLINT: eslint@10.15.0 @eslint/js@10.0.1 globals@17.14.0
       SECURITY_ALLOWED: '^dashboard/'
       DEPENDABOT_ALLOWED: '^server/requirements[a-z0-9-]*\.txt$'
       OWNER_FORBIDDEN: '^\.github/workflows/'
@@ -214,6 +220,8 @@ jobs:
             { python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n 2>&1 || { ok=0; echo "FAILED: live parse of gov.pl"; }; } | tee -a "$log"
             for js in docs/*.js; do { node --check "$js" 2>&1 || { ok=0; echo "FAILED: node --check $js"; }; } | tee -a "$log"; done
             { npx --yes html-validate@9.7.1 --config .htmlvalidate.json docs/*.html 2>&1 || { ok=0; echo "FAILED: html-validate docs/*.html"; }; } | tee -a "$log"
+            { pipx run "$RUFF" check . 2>&1 || { ok=0; echo "FAILED: ruff check ."; }; } | tee -a "$log"
+            { { npm install --no-save --no-package-lock --no-audit --no-fund --silent $ESLINT && npx --no-install eslint .; } 2>&1 || { ok=0; echo "FAILED: eslint ."; }; } | tee -a "$log"
             if echo "$files" | grep -q '^server/'; then
               # the live service (server/) is deployed from main by casper-infra: it must install and start
               { live_check 2>&1 || { ok=0; echo "FAILED: live service start (server/)"; }; } | tee -a "$log"
@@ -224,6 +232,22 @@ jobs:
               request_fix "$(grep '^FAILED: ' "$log" | sed 's/^FAILED: //' | paste -sd, - | sed 's/,/, /g') failed on $sha (gate run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)." "$log"
               echo "::endgroup::"; continue
             fi
+            # CodeQL on this head (codeql.yml, with the repository's own queries in codeql/): GitHub's check
+            # "CodeQL" fails when the PR adds an alert, and the ruleset "CodeQL: no new alerts" then refuses
+            # the merge. A new alert goes to the fixer; an analysis still running waits for the next round.
+            cq=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/check-runs?check_name=CodeQL&per_page=20" \
+                 --jq '[.check_runs[] | select(.app.slug == "github-advanced-security") | (.conclusion // .status)][0] // "none"' 2>/dev/null || echo none)
+            case "$cq" in
+              success|neutral|skipped) echo "CodeQL: no new alert on $sha";;
+              failure|action_required)
+                alerts=$(gh api "repos/$GITHUB_REPOSITORY/code-scanning/alerts?ref=refs/pull/$n/merge&state=open&per_page=20" \
+                  --jq '.[] | "\(.rule.id) at \(.most_recent_instance.location.path):\(.most_recent_instance.location.start_line)"' 2>/dev/null | paste -sd';' - | sed 's/;/; /g')
+                request_fix "CodeQL found new alerts on $sha: ${alerts:-see the CodeQL check of the PR}. Fix the code; never dismiss an alert or exclude a path to pass."
+                echo "::endgroup::"; continue;;
+              *)
+                echo "CodeQL has not finished on $sha ($cq): the next round looks again"
+                echo "::endgroup::"; continue;;
+            esac
             mergeable() {  # GitHub computes it lazily: ask again while it says UNKNOWN
               local m
               for _ in 1 2 3 4 5 6; do

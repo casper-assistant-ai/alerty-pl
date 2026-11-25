@@ -1,0 +1,3 @@
+provide:
+  - "*/queries/qlpack.yml"
+  - "*/test/qlpack.yml"
