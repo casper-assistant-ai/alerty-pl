@@ -56,7 +56,11 @@ safe-outputs:
     labels: [agent]
     draft: false
     allowed-files: ["scripts/**", "tests/**", "docs/*.html", "docs/*.js", "docs/*.css", "README.md", "process/improvements.md"]
-    protected-files: blocked
+    # gh-aw protects README.md by default even when allowed-files lists it; two runs lost their
+    # PR to that on 25.11.2026 (#163, #165). Agent PR gate still checks every path.
+    protected-files:
+      policy: blocked
+      exclude: [README.md]
     expires: 7d
   close-issue:
     target: "*"
