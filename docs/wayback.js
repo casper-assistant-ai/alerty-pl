@@ -12,13 +12,26 @@ const RCBWayback = (() => {
   const ISO = /^\d{4}-\d\d-\d\d$/;
 
   let list = null, loading = null;
+  // One dropped request must not take the page down (the map and the comparison have no Wayback without
+  // this list): Chrome's "Failed to fetch" on a phone or a flaky link is asked again, up to three times,
+  // half a second apart; only then does config() reject.
+  const wait = (ms) => new Promise((ok) => setTimeout(ok, ms));
+  async function fetchConfig(attempts = 3) {
+    for (let i = 1; ; i++) {
+      try {
+        const r = await fetch(CONFIG);
+        if (!r.ok) throw new Error("waybackconfig: " + r.status);
+        return await r.json();
+      } catch (e) {
+        if (i >= attempts) throw e;
+        await wait(500 * i);
+      }
+    }
+  }
   // the releases, newest first: { id, date (publication, YYYY-MM-DD), meta (metadata service URL) }
   function config() {
     if (list) return Promise.resolve(list);
-    loading = loading || fetch(CONFIG).then((r) => {
-      if (!r.ok) throw new Error("waybackconfig: " + r.status);
-      return r.json();
-    }).then((cfg) => {
+    loading = loading || fetchConfig().then((cfg) => {
       list = Object.entries(cfg).map(([k, v]) => ({ id: +k, date: (v.itemTitle.match(/\d{4}-\d\d-\d\d/) || [""])[0], meta: v.metadataLayerUrl }))
         .filter((x) => x.date).sort((a, b) => b.date.localeCompare(a.date));
       return list;
