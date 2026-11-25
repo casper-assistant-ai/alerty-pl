@@ -25,8 +25,11 @@ name: Workflow maintainer
 on:
   schedule:
     - cron: "7,37 * * * *"
+  # GitHub runs this schedule about once an hour at busy times (25.11.2026: 15:07, 15:37, 16:37, 17:37
+  # and 18:07 skipped), so the maintainer also runs after Agent health, which runs after every agent and
+  # on its own schedule. Runs that GITHUB_TOKEN started (dispatched agents) fire no workflow_run.
   workflow_run:
-    workflows: ["Process doctor"]
+    workflows: ["Process doctor", "Agent health", "PR reviewer"]
     types: [completed]
   workflow_dispatch:
 
