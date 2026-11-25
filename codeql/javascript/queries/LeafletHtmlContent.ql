@@ -6,7 +6,7 @@
  *              h(), whose text goes through textContent, or a function that returns one.
  * @kind problem
  * @problem.severity error
- * @security-severity 6.1
+ * @security-severity 7.8
  * @precision high
  * @id alerty/js/leaflet-html-content
  * @tags security
