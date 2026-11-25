@@ -61,6 +61,13 @@ JavaScript, no build step, no npm, no external fonts or CDNs). Read `AGENTS.md` 
    - the map, the lists and the data flow must keep working; never change `docs/data/` or `docs/geo/`;
    - the UI language is Polish; keep every RCB link and the footer disclaimer;
    - alert colours keep their meaning (air = red); keep text contrast at WCAG AA or better.
-4. Check every changed script with `node --check docs/<file>.js`.
+   The node tests pin the front end: `tests/style.test.mjs` the `.month h2` and `.top .src` rules of
+   `docs/style.css` (fixes of the mobile audit), `tests/i18n.test.mjs` the `data-i18n` marks and the
+   switcher of every page, `tests/common.test.mjs` the helpers of `docs/common.js`. Never edit a test
+   to make a change pass: drop or reshape the change and name it in the PR body as a follow-up.
+4. Check every changed script with `node --check docs/<file>.js`, then run
+   `node --test tests/*.test.mjs` and quote its output in the PR body.
 5. Open one PR. Its body lists each change, the skill rule behind it, and how to see it.
+   The PR may change `docs/*.html`, `docs/*.js` and `docs/*.css` only: the safe output refuses the
+   whole patch for any other file, and the run's work is lost.
    Call `noop` when nothing is worth changing this week.
