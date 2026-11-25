@@ -15,11 +15,20 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.23.6",
    "date": "2026-11-25",
-   "time": "2026-11-25T05:27:44Z",
-   "sha": "7b12da2",
+   "time": "2026-11-25T06:51:22Z",
+   "sha": "3e2ce15",
    "changes": [
+    {
+     "type": "fix",
+     "scope": "retro",
+     "breaking": false,
+     "text": "retry a GitHub API 403 or 429 once and fail with one clear line (#120)",
+     "sha": "3e2ce15",
+     "date": "2026-11-25",
+     "time": "2026-11-25T06:51:22Z"
+    },
     {
      "type": "chore",
      "scope": "process",

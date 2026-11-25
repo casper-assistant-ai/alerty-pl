@@ -2,7 +2,11 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.23.6 (2026-11-25)
+
+### fix
+
+- **retro:** retry a GitHub API 403 or 429 once and fail with one clear line (#120) ([3e2ce15](https://github.com/casper-assistant-ai/alerty-pl/commit/3e2ce15))
 
 ### chore
 
