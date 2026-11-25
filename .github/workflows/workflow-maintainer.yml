@@ -1,0 +1,100 @@
+name: Workflow maintainer
+
+# The agents' GITHUB_TOKEN cannot change .github/workflows/, so the process-doctor (and the
+# issue-worker) file each change to a workflow as an issue labelled workflow-change, with the exact
+# patch in ```diff blocks. Until 2026-11-25 those issues waited for a human; this workflow lands
+# them with no human in the loop (scripts/workflow_change.py):
+#   prepare  applies each new issue's patch on top of main, compiles the gh-aw sources with the
+#            compiler of the lock files, checks the change (the guard) and runs the unit and node
+#            tests. This job holds no secret.
+#   land     pushes the result with the deploy key WORKFLOW_DEPLOY_KEY (write access, the only
+#            credential here that may change workflow files): a direct change (schedules, time
+#            limits, models, retries, safe-output limits, prompt text) goes straight to main; a
+#            change to a plain workflow's run script, or anything the issue-worker asks for, becomes
+#            a PR that lands only after the PR reviewer approves it. It comments the result on the
+#            issue, closes it, and starts once each failing agent whose workflow changed, so its
+#            health issue closes after the next good run.
+# The guard refuses changes to permissions, network, tools, steps, imports, secrets, triggers other
+# than the schedule, safe outputs other than their max, engine endpoints, new, deleted or shared
+# files, and expressions in new prompt or script lines. A refused or broken patch gets one comment,
+# and the process-doctor files a corrected one.
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_run:
+    workflows: ["Process doctor"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workflow-maintainer
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Tools (gh-aw at the version of the lock files, PyYAML for the guard)
+        run: |
+          gh extension install github/gh-aw --pin v1.2.2
+          gh aw version
+          python3 -I -c 'import yaml' 2>/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q python3-yaml; }
+      - name: Apply, compile, check and test the open workflow-change issues
+        run: python3 -I scripts/workflow_change.py prepare --out "$RUNNER_TEMP/wc"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: workflow-changes
+          path: ${{ runner.temp }}/wc
+          retention-days: 7
+
+  land:
+    needs: prepare
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: workflow-changes
+          path: ${{ runner.temp }}/wc
+      - name: Tools (PyYAML for the guard)
+        run: python3 -I -c 'import yaml' 2>/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q python3-yaml; }
+      - name: The deploy key (GitHub's host key pinned)
+        env:
+          KEY: ${{ secrets.WORKFLOW_DEPLOY_KEY }}
+        run: |
+          install -m 700 -d "$RUNNER_TEMP/ssh"
+          printf '%s\n' "$KEY" > "$RUNNER_TEMP/ssh/key"
+          chmod 600 "$RUNNER_TEMP/ssh/key"
+          echo 'github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl' > "$RUNNER_TEMP/ssh/known_hosts"
+      - name: Land the changes, comment on and close the issues
+        run: |
+          export GIT_SSH_COMMAND="ssh -i $RUNNER_TEMP/ssh/key -o IdentitiesOnly=yes -o UserKnownHostsFile=$RUNNER_TEMP/ssh/known_hosts -o StrictHostKeyChecking=yes"
+          python3 -I scripts/workflow_change.py land --dir "$RUNNER_TEMP/wc"
+      - name: Remove the key
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/ssh"

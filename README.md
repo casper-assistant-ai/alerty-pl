@@ -82,6 +82,7 @@ flowchart LR
 | `ci.yml` | plain Actions | — | push, PR | nothing |
 | `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent, owner and Dependabot PRs that pass, sends broken ones to `pr-fixer` |
 | `agent-dispatch.yml` | plain Actions | — | daily | nothing; starts the extra agent runs planned in `process/schedule.json` |
+| `workflow-maintainer.yml` | plain Actions | — | every 30 min, after the process-doctor | lands `workflow-change` issues: applies the patch, compiles, guards permissions, network, tools, steps and secrets, tests, pushes with the deploy key (a `run:` script change after the PR reviewer approves it), closes the issue |
 | `agent-health.yml` | plain Actions | — | after every agent run, twice an hour | one self-closing `[aw] <agent>: N failed runs in a row` issue per failing agent; dispatches `process-doctor` for a new one |
 | `pr-reviewer` | agent | GLM-5.4 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
 | `pr-fixer` | agent | GLM-5.4 (z.ai) | when the gate asks (3 attempts a PR) | a commit to the PR's own branch |

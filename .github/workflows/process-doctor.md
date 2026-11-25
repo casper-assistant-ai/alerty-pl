@@ -136,9 +136,17 @@ Group by agent and signature. For each group decide, in one line with the run id
 - **Workflow changes** (an issue, not the PR): a different `timeout-minutes`, `max-turns`, engine
   retries or fallback models, a safe-output limit, or prompt text in `.github/workflows/<agent>.md`.
   Your token cannot change files under `.github/`, so open one issue per change, titled
-  `[process-doctor] workflow change: <agent>: <change>`, with the reason and the evidence (run ids),
-  the exact patch as a fenced `diff` of the `.md` file, and «then `gh aw compile <agent>`». A
-  maintainer applies it. Skip it when an open `workflow-change` issue already asks for the same.
+  `[process-doctor] workflow change: <agent>: <change>`, with the reason and the evidence (run ids)
+  and the exact patch. The Workflow maintainer (`workflow-maintainer.yml`, every 30 minutes) lands it
+  with no human: it applies the patch mechanically, compiles, runs the tests, pushes, comments the
+  commit on the issue and closes it. So write the patch for a machine: one fenced ```diff block per
+  file, starting with `--- a/.github/workflows/<file>` and `+++ b/.github/workflows/<file>`, every
+  change between unchanged context lines copied exactly from the file on `main`, hunks separated by
+  `@@` lines. A change given only in prose is not applied. The maintainer's guard lets through only
+  the schedule, `timeout-minutes`, the model, fallback models, `max-turns`, retries, safe-output `max`
+  and prompt text of an agent's `.md` (no GitHub expressions in new prompt lines), and the cron and job time
+  limits of a plain `.yml`; a change to a plain workflow's `run:` script lands after the PR reviewer
+  approves it. Skip it when an open `workflow-change` issue already asks for the same.
   Never ask for a wider permission, a new secret, a new network domain or a looser check.
 - **Code fixes:** an item in `process/improvements.md` (see step 2); the issue-worker builds it.
 
@@ -168,7 +176,11 @@ dates of every row you saw this run. Rows unchanged for 30 days go to the `## Ar
 - **gh-aw notices** (label `agentic-workflows`, such as `[aw] <agent>: produced no safe outputs`):
   the same: one comment with the cause, and close it when the cause is fixed or was one-off with
   good runs after it (link them).
-- **Your `workflow-change` issues:** close one when its patch is on `main` (the workflow source shows it).
+- **Your `workflow-change` issues:** the Workflow maintainer closes the ones it lands; close one
+  yourself when its patch is on `main` (the workflow source shows it). When the maintainer commented
+  that a patch was not applied or was refused (its comment starts with `Workflow maintainer:`), it
+  will not try that issue again: close it, and open a corrected issue when the change is still
+  needed (fix what its comment names; a part left in prose goes into its own ```diff block).
 - Never close other issues.
 
 ## 7. Output

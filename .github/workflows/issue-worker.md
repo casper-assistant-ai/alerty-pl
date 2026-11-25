@@ -70,6 +70,13 @@ safe-outputs:
   close-pull-request:
     target: "*"
     max: 2
+  # a fix that lives in .github/workflows/ (agent tokens cannot push it): the Workflow maintainer
+  # applies the patch, and the PR reviewer checks every change the issue-worker asks for
+  create-issue:
+    title-prefix: "[issue-worker] "
+    labels: [workflow-change]
+    max: 1
+    deduplicate-by-title: true
   add-comment:
     target: "*"
     max: 6
@@ -124,10 +131,23 @@ Kinds in the queue, in the order you take them:
    Take it yourself at once when no open PR names it (the retro dispatches you right after it
    opens dev-tasks); follow the issue's «how to check it», and say `Closes #<n>`.
 5. `report` (daily-status, security-audit): check each point it lists. When every point is done,
-   in a PR, or a dev-task, close it with those links; otherwise leave it for the next run.
+   in a PR, a dev-task or a workflow-change issue, close it with those links; otherwise leave it
+   for the next run.
 6. `managed` (the gh-aw "No-Op Runs" tracker; `agent-health` and `workflow-change` issues belong to the
    process-doctor, leave them): close the tracker only when no workflow source in
    `.github/workflows/*.md` still lacks `report-as-issue: false` under `noop:`, saying so.
+
+**A fix that lives in `.github/workflows/`** (a staging line in `update.yml`, a prompt, a schedule):
+your PR cannot change it. Open one issue with `create-issue` (at most one a run), titled
+`workflow change: <file>: <change>`, with the reason and the patch: one fenced ```diff block per
+file, starting with `--- a/.github/workflows/<file>` and `+++ b/.github/workflows/<file>`, every
+change between unchanged context lines copied exactly from the file on `main`, hunks separated by
+`@@`. The Workflow maintainer applies it within 30 minutes and lands it after the PR reviewer
+approves it; prose is not applied. Only schedules, time limits, models, safe-output limits, prompt
+text and `run:` script lines can change this way: never ask for a permission, a secret, a network
+domain, a trigger or a new step. Link the new issue in your comment on the issue it serves; that
+issue closes once the change is on `main`. Do not open one when an open `workflow-change` issue
+already asks for the same change.
 
 **Issues the gate returned** (a closed PR in `rejected PRs`): the gate closed that PR because its
 tests failed, it touched paths agents may not change, or the PR reviewer rejected it (value, size
