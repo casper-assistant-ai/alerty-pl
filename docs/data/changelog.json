@@ -15,11 +15,47 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.27.1",
    "date": "2026-11-25",
-   "time": "2026-11-25T17:21:24+01:00",
-   "sha": "5ed2835",
+   "time": "2026-11-25T17:47:24+01:00",
+   "sha": "65e58a9",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "update.yml: stage docs/data/meta.json with a data change (#149)",
+     "sha": "65e58a9",
+     "date": "2026-11-25",
+     "time": "2026-11-25T17:47:24+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "agent-pr-gate: stop starting the reviewer and the fixer while the provider refuses them (#138)",
+     "sha": "073bbce",
+     "date": "2026-11-25",
+     "time": "2026-11-25T17:47:24+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "the maintainer makes its label idempotently",
+     "sha": "318918c",
+     "date": "2026-11-25",
+     "time": "2026-11-25T17:47:24+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "build Leaflet tooltip content with h(), never a string of data (#148)",
+     "sha": "dc7b46a",
+     "date": "2026-11-25",
+     "time": "2026-11-25T16:33:01Z"
+    },
     {
      "type": "ci",
      "scope": "workflows",

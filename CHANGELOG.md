@@ -2,10 +2,17 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.27.1 (2026-11-25)
+
+### fix
+
+- **site:** build Leaflet tooltip content with h(), never a string of data (#148) ([dc7b46a](https://github.com/casper-assistant-ai/alerty-pl/commit/dc7b46a))
 
 ### ci
 
+- **workflows:** update.yml: stage docs/data/meta.json with a data change (#149) ([65e58a9](https://github.com/casper-assistant-ai/alerty-pl/commit/65e58a9))
+- **workflows:** agent-pr-gate: stop starting the reviewer and the fixer while the provider refuses them (#138) ([073bbce](https://github.com/casper-assistant-ai/alerty-pl/commit/073bbce))
+- **workflows:** the maintainer makes its label idempotently ([318918c](https://github.com/casper-assistant-ai/alerty-pl/commit/318918c))
 - **workflows:** the maintainer closes review PRs through the API and labels before it needs to ([5ed2835](https://github.com/casper-assistant-ai/alerty-pl/commit/5ed2835))
 - **workflows:** the maintainer retries GitHub writes and takes up a review left without a result ([e3c7b86](https://github.com/casper-assistant-ai/alerty-pl/commit/e3c7b86))
 - **workflows:** the maintainer lands prompts only after review and never scripts (#146) ([8e31ed8](https://github.com/casper-assistant-ai/alerty-pl/commit/8e31ed8))
