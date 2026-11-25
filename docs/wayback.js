@@ -2,6 +2,7 @@
 // Every Wayback release is a full world mosaic; most tiles in a release are copies of an older one. The tilemap
 // of a release names the release a tile really comes from, so walking back from the newest release gives the
 // distinct images of one spot. The metadata service of a release tells when and by whom an image was taken.
+// No interface text here except detail(), which reads its unit from the page's dictionary (docs/i18n-map.js).
 "use strict";
 
 const RCBWayback = (() => {
@@ -87,5 +88,12 @@ const RCBWayback = (() => {
     return out;
   }
 
-  return { ATTR, config, layer, tileAt, local, atView, onOrBefore, byDate, captured };
+  // "source, 0,3 m" for the caption of a captured() result: the resolution as numbers are written in the page's language
+  function detail(m) {
+    const n = Number(m.res);
+    const res = m.res ? RCB.t("map.res", { n: Number.isFinite(n) ? new Intl.NumberFormat(RCB.loc(), { useGrouping: false }).format(n) : String(m.res) }) : "";
+    return [m.source, res].filter(Boolean).join(", ");
+  }
+
+  return { ATTR, config, layer, tileAt, local, atView, onOrBefore, byDate, captured, detail };
 })();

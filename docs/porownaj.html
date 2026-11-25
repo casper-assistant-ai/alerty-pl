@@ -25,31 +25,31 @@
   <a class="src mono" href="https://livingatlas.arcgis.com/wayback/" data-i18n="src" data-i18n-param-name="src.esri">źródło: Esri World Imagery Wayback</a>
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
-<div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
+<div class="strip" id="strip"><span class="state" role="status" data-i18n="map.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main class="cmp-page">
   <section class="map-wrap" aria-labelledby="h-cmp">
     <div class="cmp-bar">
-      <h1 id="h-cmp">Porównaj zdjęcia satelitarne</h1>
+      <h1 id="h-cmp" data-i18n="cmp.h1">Porównaj zdjęcia satelitarne</h1>
       <div class="cmp-act">
-        <button type="button" class="btn" id="swap" title="Zamień zdjęcia stronami">Zamień strony</button>
-        <label class="chk"><input type="checkbox" id="cursor" checked><span>Kursor na obu mapach</span></label>
-        <a class="btn" id="back" href="./?podklad=esri">Otwórz na mapie alertów</a>
+        <button type="button" class="btn" id="swap" title="Zamień zdjęcia stronami" data-i18n-tip="cmp.swapTip" data-i18n="cmp.swap">Zamień strony</button>
+        <label class="chk"><input type="checkbox" id="cursor" checked><span data-i18n="cmp.cursor">Kursor na obu mapach</span></label>
+        <a class="btn" id="back" href="./?podklad=esri" data-i18n="cmp.back">Otwórz na mapie alertów</a>
       </div>
     </div>
     <div class="cmp">
       <div class="cmp-side">
         <div class="cmp-head">
-          <label><span class="visually-hidden">Zdjęcie na lewej mapie</span><select id="sel-l"></select></label>
+          <label><span class="visually-hidden" data-i18n="cmp.selL">Zdjęcie na lewej mapie</span><select id="sel-l"></select></label>
           <span class="cmp-cap mono" id="cap-l"></span>
         </div>
-        <div id="map-l" class="lmap sat cmp-map" role="region" aria-label="Lewa mapa: zdjęcie z pierwszej daty"></div>
+        <div id="map-l" class="lmap sat cmp-map" role="region" aria-label="Lewa mapa: zdjęcie z pierwszej daty" data-i18n-aria="cmp.aria.l"></div>
       </div>
       <div class="cmp-side">
         <div class="cmp-head">
-          <label><span class="visually-hidden">Zdjęcie na prawej mapie</span><select id="sel-r"></select></label>
+          <label><span class="visually-hidden" data-i18n="cmp.selR">Zdjęcie na prawej mapie</span><select id="sel-r"></select></label>
           <span class="cmp-cap mono" id="cap-r"></span>
         </div>
-        <div id="map-r" class="lmap sat cmp-map" role="region" aria-label="Prawa mapa: zdjęcie z drugiej daty"></div>
+        <div id="map-r" class="lmap sat cmp-map" role="region" aria-label="Prawa mapa: zdjęcie z drugiej daty" data-i18n-aria="cmp.aria.r"></div>
       </div>
     </div>
     <p class="base-note mono" id="cmp-note" role="status"></p>
@@ -64,6 +64,7 @@
 </footer>
 <script src="vendor/leaflet/leaflet.js" defer></script>
 <script src="i18n.js" defer></script>
+<script src="i18n-map.js" defer></script>
 <script src="common.js" defer></script>
 <script src="wayback.js" defer></script>
 <script src="porownaj.js" defer></script>

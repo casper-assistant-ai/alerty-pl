@@ -6,23 +6,21 @@
 // Without motion (prefers-reduced-motion) the routes and places are drawn at once.
 "use strict";
 (() => {
-  const { $, h } = RCB;
+  const { $, h } = RCB, tr = RCB.t; // tr(): the page's texts (docs/i18n-map.js); the event texts of events/incursions.json stay Polish
+  const pl = RCB.lang() === "pl";
   const fmtISO = (iso) => iso.split("-").reverse().join(".");
   const still = matchMedia("(prefers-reduced-motion: reduce)");
 
-  const KIND = { missile: "rakieta", drone: "dron" };
-  const END = {
-    explosion: "wybuch", crash: "upadek", shotdown: "zestrzelenie", debris: "szczątki",
-    left_airspace: "opuścił przestrzeń RP", not_found: "nie odnaleziono",
-  };
+  // a text of the dictionary by a data key (a weapon kind, an end, a country); the key itself when there is none
+  const word = (prefix, k) => { const key = prefix + k; const v = tr(key); return v === key ? k : v; };
+  const KIND = (k) => word("map.raid.kind.", k);
+  const END = (k) => word("map.raid.end.", k);
   // from = the country that launched it, via = the country it flew over before Poland (never the other way round)
-  const FROM = { Russia: "z Rosji", "Russia-Kaliningrad": "z obwodu królewieckiego (Rosja)", Belarus: "z Białorusi" };
-  const VIA = { Ukraine: "nad Ukrainą", Belarus: "nad Białorusią" };
   function origin(w) {
-    if (w.role === "air_defense") return "podczas rosyjskiego ataku";
-    const m = w.kind === "missile", out = [];
-    if (FROM[w.from]) out.push((m ? "odpalona " : "wystrzelony ") + FROM[w.from]);
-    if (VIA[w.via]) out.push((m ? "przeleciała " : "przeleciał ") + VIA[w.via]);
+    if (w.role === "air_defense") return tr("map.raid.airDefense");
+    const k = w.kind === "missile" ? "missile" : "drone", out = [];
+    if (tr("map.raid.from." + w.from) !== "map.raid.from." + w.from) out.push(tr("map.raid.launched." + k, { from: tr("map.raid.from." + w.from) }));
+    if (tr("map.raid.via." + w.via) !== "map.raid.via." + w.via) out.push(tr("map.raid.flew." + k, { via: tr("map.raid.via." + w.via) }));
     return out.join(", ");
   }
 
@@ -56,7 +54,7 @@
       return b;
     }).filter(Boolean));
     const row = $("#raid-days");
-    row.replaceChildren(h("span", { class: "raid-days-t", text: "Zaloty rakiet i dronów nad Polską:" }), ...[...R.byDay.keys()].map((day) => {
+    row.replaceChildren(h("span", { class: "raid-days-t", text: tr("map.raid.days") }), ...[...R.byDay.keys()].map((day) => {
       const b = h("button", { type: "button", class: "raid-day mono", "data-day": day, text: fmtISO(day), title: R.byDay.get(day).map((e) => e.title_pl).join("; ") });
       b.addEventListener("click", () => api.setDay(day));
       return b;
@@ -102,7 +100,7 @@
   const endIcon = (type, burst) => L.divIcon({ className: `raid-end e-${type}${burst ? " burst" : ""}`, html: `<span>${MARK[type] || MARK.crash}</span>`, iconSize: [24, 24], iconAnchor: [12, 12] });
 
   function tipFor(p, ev) {
-    return h("div", {}, h("b", { text: (END[p.type] || p.type) + (p.place ? ": " + p.place : "") }),
+    return h("div", {}, h("b", { text: END(p.type) + (p.place ? ": " + p.place : "") }),
       p.note_pl ? h("div", { text: p.note_pl }) : null, h("div", { class: "mono muted", text: fmtISO(ev.date) }));
   }
 
@@ -126,7 +124,7 @@
         flights.push({ w, path, t, delay: slot * 450 + c * 250, dur: Math.min(8000, Math.max(3000, t.len * 5)), done: false,
           route: c ? null : L.polyline(w.path, { pane: "raid", className: "raid-route k-" + w.kind, interactive: false }).addTo(layer),
           start: c || !w.launch ? null : L.circleMarker(w.path[0], { pane: "raid", radius: 5, weight: 2, color: "#b3122e", fillColor: "#fff", fillOpacity: 1, className: "raid-start" })
-            .bindTooltip(`Start: ${w.launch.area_pl}${w.launch.certain ? "" : " (miejsce umowne)"}`, { className: "tip", direction: "top" }).addTo(layer),
+            .bindTooltip(tr(w.launch.certain ? "map.raid.start" : "map.raid.startApprox", { area: w.launch.area_pl }), { className: "tip", direction: "top" }).addTo(layer),
           trail: L.polyline([], { pane: "raid", className: "raid-trail k-" + w.kind, interactive: false }).addTo(layer),
           m: null, label: copies > 1 && c === copies - 1 && w.count > copies ? w.count : 0 });
       }
@@ -183,8 +181,8 @@
     const kinds = [...new Set((ev.weapons || []).map((w) => w.kind))];
     const weapons = (ev.weapons || []).map((w) => h("li", {},
       h("i", { class: "raid-sw k-" + w.kind, "aria-hidden": "true" }),
-      `${w.label_pl}${w.count > 1 ? " ×" + w.count : ""}${origin(w) ? ", " + origin(w) : ""}${w.end ? " → " + (END[w.end.type] || w.end.type) + (w.end.place ? " (" + w.end.place + ")" : "") : ""}`));
-    const replay = h("button", { type: "button", class: "btn", text: still.matches ? "Pokaż" : "Odtwórz ponownie" });
+      `${w.label_pl}${w.count > 1 ? " ×" + w.count : ""}${origin(w) ? ", " + origin(w) : ""}${w.end ? " → " + END(w.end.type) + (w.end.place ? " (" + w.end.place + ")" : "") : ""}`));
+    const replay = h("button", { type: "button", class: "btn", text: tr(still.matches ? "map.raid.show" : "map.raid.replay") });
     replay.addEventListener("click", () => play(ev));
     const others = list.length > 1 ? h("div", { class: "raid-pick" }, ...list.map((e) => {
       const b = h("button", { type: "button", class: "btn" + (e === ev ? " on" : ""), text: e.title_pl });
@@ -198,15 +196,16 @@
       others,
       h("p", { class: "raid-sum", text: ev.summary_pl }),
       weapons.length > 4
-        ? h("details", { class: "raid-src raid-wd" }, h("summary", { text: `Obiekty (${weapons.length})` }), h("ul", { class: "raid-w" }, ...weapons))
+        ? h("details", { class: "raid-src raid-wd" }, h("summary", { text: tr("map.raid.objects", { n: weapons.length }) }), h("ul", { class: "raid-w" }, ...weapons))
         : weapons.length ? h("ul", { class: "raid-w" }, ...weapons) : null,
-      h("ul", { class: "raid-legend mono", "aria-label": "Legenda" },
-        ...kinds.map((k) => h("li", {}, h("i", { class: "raid-sw k-" + k, "aria-hidden": "true" }), KIND[k] || k)),
+      h("ul", { class: "raid-legend mono", "aria-label": tr("map.raid.legend") },
+        ...kinds.map((k) => h("li", {}, h("i", { class: "raid-sw k-" + k, "aria-hidden": "true" }), KIND(k))),
         ...[...new Set([...(ev.points || []).map((p) => p.type), ...(ev.weapons || []).map((w) => w.end && w.end.type)].filter(Boolean))]
-          .map((t) => h("li", {}, h("i", { class: "raid-em e-" + t, "aria-hidden": "true" }), END[t] || t)),
-        h("li", {}, h("i", { class: "raid-dash", "aria-hidden": "true" }), "trasa orientacyjna")),
-      h("p", { class: "raid-note muted", text: ev.route_note_pl || "Trasy są orientacyjne: wojsko nie publikuje dokładnych torów lotu." }),
-      h("details", { class: "raid-src" }, h("summary", { text: `Źródła (${ev.sources.length})` }),
+          .map((t) => h("li", {}, h("i", { class: "raid-em e-" + t, "aria-hidden": "true" }), END(t))),
+        h("li", {}, h("i", { class: "raid-dash", "aria-hidden": "true" }), tr("map.raid.route"))),
+      h("p", { class: "raid-note muted", text: ev.route_note_pl || tr("map.raid.routeNote") }),
+      pl ? null : h("p", { class: "raid-note muted", text: tr("map.raid.orig") }),
+      h("details", { class: "raid-src" }, h("summary", { text: tr("map.raid.sources", { n: ev.sources.length }) }),
         h("ul", {}, ...ev.sources.map((s) => h("li", {}, h("a", { href: s.url, target: "_blank", rel: "noopener", text: s.title }),
           h("span", { class: "muted mono", text: ` · ${s.publisher}${s.date ? ", " + fmtISO(s.date) : ""}` })))))].filter(Boolean));
     box.hidden = false;

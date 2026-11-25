@@ -11,6 +11,9 @@ const group = (re, what) => { const m = app.match(re); assert.ok(m, `no ${what} 
 const FIRE_LAYERS = new Function(`return ${group(/const FIRE_LAYERS = (\[[\s\S]*?\]);/, "FIRE_LAYERS")};`)();
 const GIBS = group(/const GIBS = "([^"]+)";/, "GIBS");
 const fmtISO = new Function(`return ${group(/const fmtISO = ([^\n]+);/, "fmtISO")};`)();
+// the page's texts (docs/i18n-map.js): the Polish dictionary stands in for RCB.t
+const DICT = new Function(`let I18N_PL;\nconst i18nAdd = (p) => { I18N_PL = p.pl; };\n${readFileSync(new URL("../docs/i18n-map.js", import.meta.url), "utf8")}\n;return I18N_PL;`)();
+const t = (key, params = {}) => Object.entries(params).reduce((s, [k, v]) => s.split(`{${k}}`).join(v), DICT[key] ?? key);
 const start = app.indexOf("function fires() {");
 assert.notEqual(start, -1, "no fires() in docs/app.js");
 const source = app.slice(start, app.indexOf("\n}\n", start) + 3);
@@ -34,7 +37,7 @@ function load(to, fires = true) {
   L.tileLayer.wms = (url, opts) => { const l = layer(url, opts); made.push(l); return l; };
   const S = { to, fires, fireLayers: [], map: { removeLayer: (l) => removed.push(l) } };
   const $ = (sel) => { assert.equal(sel, "#fires-note"); return note; };
-  const fires_ = new Function("S", "L", "$", "GIBS", "FIRE_LAYERS", "fmtISO", `${source}\n;return fires;`)(S, L, $, GIBS, FIRE_LAYERS, fmtISO);
+  const fires_ = new Function("S", "L", "$", "GIBS", "FIRE_LAYERS", "fmtISO", "t", `${source}\n;return fires;`)(S, L, $, GIBS, FIRE_LAYERS, fmtISO, t);
   return { run: fires_, S, note, made, removed };
 }
 // the GIBS layer identifier asked of a WMS layer

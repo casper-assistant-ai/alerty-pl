@@ -6,7 +6,7 @@
 // spot on or before each date is shown), so the address bar is always a link to the same comparison.
 "use strict";
 
-const { $, h } = RCB;
+const { $, h, t, tn } = RCB;
 const WB = RCBWayback;
 RCB.strip();
 setInterval(RCB.strip, 60000);
@@ -53,18 +53,18 @@ function pick(s) {
 
 function fill(s) {
   const sel = $(`#sel-${s.key}`), list = local.length ? local : [s.rel];
-  sel.replaceChildren(...list.map((r) => h("option", { value: r.id, text: "zdjęcie z " + fmtISO(r.date) })));
+  sel.replaceChildren(...list.map((r) => h("option", { value: r.id, text: t("map.wb.photo", { date: fmtISO(r.date) }) })));
   sel.value = s.rel.id;
 }
 
 // when the picture in the middle of the view was taken (the metadata service is slow, so it comes later)
 function caption(s) {
   const cap = $(`#cap-${s.key}`), rel = s.rel, n = seq;
-  cap.textContent = `wydanie Esri z ${fmtISO(rel.date)}`;
+  cap.textContent = t("cmp.cap.release", { date: fmtISO(rel.date) });
   WB.captured(rel, s.map.getCenter(), s.map.getZoom()).then((m) => {
     if (!m || n !== seq || s.rel !== rel) return;
-    const res = m.res ? String(m.res).replace(".", ",") + " m" : "";
-    cap.textContent = `zdjęcie wykonane ${fmtISO(m.day)}` + (m.source || res ? ` · ${[m.source, res].filter(Boolean).join(", ")}` : "");
+    const detail = WB.detail(m);
+    cap.textContent = t(detail ? "cmp.cap.takenDetail" : "cmp.cap.taken", { day: fmtISO(m.day), detail });
   }).catch(() => {});
 }
 
@@ -85,17 +85,15 @@ async function refresh() {
   const n = ++seq, note = $("#cmp-note");
   url();
   try {
-    note.textContent = "Szukam zdjęć tego miejsca…";
+    note.textContent = t("map.wb.searching");
     const found = await WB.atView(side.r.map);
     if (n !== seq) return;
     local = found;
     for (const s of [side.l, side.r]) { show(s, pick(s)); fill(s); caption(s); }
     url();
-    note.textContent = local.length > 1
-      ? `${local.length} różnych zdjęć środka widoku w archiwum Esri Wayback. Daty na listach to wydania archiwum; obok listy data wykonania zdjęcia. Przesuń lub przybliż jedną mapę, a druga pójdzie za nią.`
-      : "W archiwum Esri jest tylko jedno zdjęcie środka widoku. Oddal mapę albo przesuń ją, by znaleźć miejsce z kilkoma zdjęciami.";
+    note.textContent = local.length > 1 ? tn(local.length, "cmp.found") : t("cmp.single");
   } catch (e) {
-    if (n === seq) note.textContent = "Nie udało się pobrać listy zdjęć Esri Wayback: " + e.message;
+    if (n === seq) note.textContent = t("map.wb.failList", { msg: e.message });
   }
 }
 
@@ -117,7 +115,17 @@ function sync(a, b) {
 }
 let driver = null, timer = null;
 
+// title attributes and the description in the page's language (applyI18n in common.js does the text and aria-labels)
+function localize() {
+  for (const el of document.querySelectorAll("[data-i18n-tip]")) el.title = t(el.dataset.i18nTip);
+  if (RCB.lang() !== "pl") {
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.content = t("cmp.desc");
+  }
+}
+
 async function main() {
+  localize();
   await RCB.leaflet();
   const q = new URLSearchParams(location.search);
   if (ISO.test(q.get("lewa") || "")) side.l.want = q.get("lewa");
@@ -156,6 +164,6 @@ async function main() {
 }
 
 main().catch((e) => {
-  $("#cmp-note").textContent = "Nie udało się wczytać porównania: " + e.message;
+  $("#cmp-note").textContent = t("cmp.failLoad", { msg: e.message });
   console.error(e);
 });

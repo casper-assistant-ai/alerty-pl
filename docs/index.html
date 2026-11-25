@@ -25,57 +25,58 @@
   <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="src" data-i18n-param-name="src.gov">źródło: gov.pl/web/rcb</a>
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
-<div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
+<div class="strip" id="strip"><span class="state" role="status" data-i18n="map.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main class="map-page">
-  <section class="map-wrap" aria-label="Mapa">
-    <div class="period" role="group" aria-label="Okres na mapie">
+  <section class="map-wrap" aria-label="Mapa" data-i18n-aria="map.aria.map">
+    <div class="period" role="group" aria-label="Okres na mapie" data-i18n-aria="map.aria.period">
       <div class="brush" id="brush">
           <svg id="spark" class="spark" aria-hidden="true" preserveAspectRatio="none"></svg>
           <div class="brush-sel" id="brush-sel"></div>
-          <div class="brush-h" id="h-from" role="slider" tabindex="0" aria-label="Początek okresu" aria-valuemin="0"></div>
-          <div class="brush-h" id="h-to" role="slider" tabindex="0" aria-label="Koniec okresu" aria-valuemin="0"></div>
+          <div class="brush-h" id="h-from" role="slider" tabindex="0" aria-label="Początek okresu" data-i18n-aria="map.aria.from" aria-valuemin="0"></div>
+          <div class="brush-h" id="h-to" role="slider" tabindex="0" aria-label="Koniec okresu" data-i18n-aria="map.aria.to" aria-valuemin="0"></div>
           <div class="brush-axis mono" id="brush-axis" aria-hidden="true"></div>
           <div class="raid-ticks" id="raid-ticks"></div>
       </div>
       <div class="period-ctl">
-        <div class="presets" id="presets" role="group" aria-label="Szybki wybór okresu">
-          <button type="button" data-days="1" title="Dziś">24 h</button><button type="button" data-days="7">7 dni</button><button type="button" data-days="30">30 dni</button><button type="button" data-days="365">rok</button><button type="button" data-days="all">wszystko</button>
+        <div class="presets" id="presets" role="group" aria-label="Szybki wybór okresu" data-i18n-aria="map.aria.presets">
+          <button type="button" data-days="1" title="Dziś" data-i18n-tip="map.preset.todayTip" data-i18n="map.preset.24h">24 h</button><button type="button" data-days="7" data-i18n="map.preset.7d">7 dni</button><button type="button" data-days="30" data-i18n="map.preset.30d">30 dni</button><button type="button" data-days="365" data-i18n="map.preset.year">rok</button><button type="button" data-days="all" data-i18n="map.preset.all">wszystko</button>
         </div>
         <div class="dates">
-          <button type="button" class="btn icon" id="prev" aria-label="Poprzedni okres" title="Poprzedni okres">&#9664;</button>
-          <label><span>od</span><input type="date" id="from"></label>
-          <label><span>do</span><input type="date" id="to"></label>
-          <button type="button" class="btn icon" id="next" aria-label="Następny okres" title="Następny okres">&#9654;</button>
+          <button type="button" class="btn icon" id="prev" aria-label="Poprzedni okres" data-i18n-aria="map.prev" title="Poprzedni okres" data-i18n-tip="map.prev">&#9664;</button>
+          <label><span data-i18n="map.dateFrom">od</span><input type="date" id="from"></label>
+          <label><span data-i18n="map.dateTo">do</span><input type="date" id="to"></label>
+          <button type="button" class="btn icon" id="next" aria-label="Następny okres" data-i18n-aria="map.next" title="Następny okres" data-i18n-tip="map.next">&#9654;</button>
         </div>
       </div>
       <output id="day-label" class="day-label mono" aria-live="polite"></output>
     </div>
     <div class="raid-days" id="raid-days" hidden></div>
     <section class="raid" id="raid" aria-live="polite" hidden></section>
-    <div id="map" class="lmap" role="region" aria-label="Mapa Polski z powiatami; kolorem zaznaczone powiaty z alertem w wybranym okresie"></div>
+    <div id="map" class="lmap" role="region" aria-label="Mapa Polski z powiatami; kolorem zaznaczone powiaty z alertem w wybranym okresie" data-i18n-aria="map.aria.region"></div>
     <div class="layers">
-      <div class="seg" role="radiogroup" aria-label="Podkład mapy">
-        <label><input type="radio" name="base" value="mapa" checked><span>Mapa</span></label>
-        <label><input type="radio" name="base" value="esri"><span>Satelita · Esri Wayback</span></label>
-        <label><input type="radio" name="base" value="nasa"><span>Satelita · NASA z dnia</span></label>
+      <div class="seg" role="radiogroup" aria-label="Podkład mapy" data-i18n-aria="map.aria.base">
+        <label><input type="radio" name="base" value="mapa" checked><span data-i18n="map.base.map">Mapa</span></label>
+        <label><input type="radio" name="base" value="esri"><span data-i18n="map.base.esri">Satelita · Esri Wayback</span></label>
+        <label><input type="radio" name="base" value="nasa"><span data-i18n="map.base.nasa">Satelita · NASA z dnia</span></label>
       </div>
-      <label class="wb" id="wb-wrap" hidden><span class="visually-hidden">Data zdjęcia Esri Wayback</span><select id="wayback"></select></label>
-      <a class="btn compare-link" id="compare" href="porownaj.html" hidden title="Dwie mapy obok siebie: to samo miejsce na zdjęciach z różnych dat">Porównaj daty</a>
-      <label class="chk"><input type="checkbox" id="fires"><span>Pożary (NASA FIRMS)</span></label>
+      <label class="wb" id="wb-wrap" hidden><span class="visually-hidden" data-i18n="map.wb.label">Data zdjęcia Esri Wayback</span><select id="wayback"></select></label>
+      <a class="btn compare-link" id="compare" href="porownaj.html" hidden title="Dwie mapy obok siebie: to samo miejsce na zdjęciach z różnych dat" data-i18n-tip="map.compareTip" data-i18n="map.compare">Porównaj daty</a>
+      <label class="chk"><input type="checkbox" id="fires"><span data-i18n="map.fires">Pożary (NASA FIRMS)</span></label>
     </div>
     <p class="base-note mono" id="fires-note" role="status"></p>
     <p class="base-note mono" id="base-note"></p>
-    <ul class="legend" id="legend" aria-label="Kategorie alertów — kliknij, by pokazać tylko jedną"></ul>
+    <ul class="legend" id="legend" aria-label="Kategorie alertów — kliknij, by pokazać tylko jedną" data-i18n-aria="map.aria.legend"></ul>
   </section>
   <div class="panel">
+    <p class="base-note mono" id="orig-note" hidden data-i18n="map.orig">Treść komunikatów RCB w oryginale (po polsku)</p>
     <section aria-labelledby="h-now">
-      <h2 id="h-now"><span id="now-title">Teraz</span> <span class="n" id="active-count"></span></h2>
+      <h2 id="h-now"><span id="now-title" data-i18n="map.now">Teraz</span> <span class="n" id="active-count"></span></h2>
       <ul id="active" class="rows"></ul>
     </section>
     <section aria-labelledby="h-week">
-      <h2 id="h-week"><span id="week-title">Ostatnie 7 dni</span> <span class="n" id="week-count"></span></h2>
+      <h2 id="h-week"><span id="week-title" data-i18n="map.week">Ostatnie 7 dni</span> <span class="n" id="week-count"></span></h2>
       <ul id="recent" class="rows compact"></ul>
-      <a class="more" id="more-history" href="historia.html">Pełna historia od 2021 roku</a>
+      <a class="more" id="more-history" href="historia.html" data-i18n="map.history">Pełna historia od 2021 roku</a>
     </section>
   </div>
 </main>
@@ -88,6 +89,7 @@
 </footer>
 <script src="vendor/leaflet/leaflet.js" defer></script>
 <script src="i18n.js" defer></script>
+<script src="i18n-map.js" defer></script>
 <script src="common.js" defer></script>
 <script src="wayback.js" defer></script>
 <script src="app.js" defer></script>

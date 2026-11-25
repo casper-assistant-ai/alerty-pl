@@ -7,7 +7,7 @@
 // day, and NASA FIRMS fires (VIIRS 375 m) of that day. The view lives in the URL too (?srodek=lat,lng&zoom=z), and so
 // does a hand-picked Esri image (&zdjecie=<release date>); porownaj.html shows two images of the view side by side.
 "use strict";
-const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, historyLink, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, plural } = RCB;
+const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, historyLink, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, t, tn } = RCB;
 
 // ---------- days ----------
 const DAY_MS = 86400000;
@@ -17,7 +17,8 @@ const toISO = (d) => d.toISOString().slice(0, 10);
 const addDays = (iso, n) => toISO(new Date(toDate(iso).getTime() + n * DAY_MS));
 const dayDiff = (a, b) => Math.round((toDate(b) - toDate(a)) / DAY_MS);
 const fmtISO = (iso) => iso.split("-").reverse().join(".");
-const WEEKDAY = ["niedziela", "poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota"];
+// the weekday of a day in the language of the page (Intl, not a list)
+const weekday = (iso) => new Intl.DateTimeFormat(RCB.loc(), { weekday: "long", timeZone: "UTC" }).format(toDate(iso));
 
 // ---------- layers ----------
 const GIBS = "https://gibs.earthdata.nasa.gov";
@@ -90,7 +91,7 @@ function paint(alerts) {
     b.addEventListener("click", () => setCat(S.cat === c ? null : c));
     return h("li", {}, b);
   });
-  if (S.fires) items.push(h("li", {}, h("i", { class: "sw fire-dot", "aria-hidden": "true" }), "Pożar lub anomalia termiczna (VIIRS)"));
+  if (S.fires) items.push(h("li", {}, h("i", { class: "sw fire-dot", "aria-hidden": "true" }), t("map.legend.fire")));
   leg.replaceChildren(...items);
   if (refocus) { // the legend is rebuilt on every paint: keep the keyboard where it was
     const btns = [...leg.querySelectorAll("button")];
@@ -112,31 +113,31 @@ function setCat(c, push = true) {
 function tooltip(layer) {
   const p = layer.feature.properties;
   const hits = alertsOf().filter((a) => { const r = regionsOf(a); return r.powiaty.includes(p.id) || r.whole.includes(p.v); });
-  const box = h("div", {}, h("b", { text: (p.city ? "" : "powiat ") + p.name }));
+  const box = h("div", {}, h("b", { text: p.city ? p.name : t("map.tip.powiat", { name: p.name }) }));
   const n = {};
   for (const a of hits) n[a.category] = (n[a.category] || 0) + 1;
   const one = S.from === S.to;
-  box.append(h("div", { text: hits.length ? PRIORITY.filter((c) => n[c]).map((c) => CAT[c] + (one ? "" : " × " + n[c])).join(", ") : "brak alertów" }));
+  box.append(h("div", { text: hits.length ? PRIORITY.filter((c) => n[c]).map((c) => CAT[c] + (one ? "" : " × " + n[c])).join(", ") : t("map.tip.none") }));
   return box;
 }
 
 // ---------- the panel ----------
 function activeRow(a) {
   const msg = (a.updates[0] && a.updates[0].message) || a.intro;
-  const since = a.status === "planned" ? "planowany od " + fmtShort(new Date(a.started_at)) : "trwa " + duration(a.started_at);
+  const since = a.status === "planned" ? t("map.since.planned", { date: fmtShort(new Date(a.started_at)) }) : t("map.since.ongoing", { d: duration(a.started_at) });
   return h("li", {},
     h("div", { class: "row-head" }, swatch(a.category), CAT[a.category]),
-    h("p", { class: "row-msg", text: msg.replace(/^"|"$/g, "") }),
-    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.regions.voivodeships, a.regions.powiaty, a.regions.gminy) }), h("span", { text: since }), h("a", { href: a.url, text: "komunikat" })));
+    h("p", { class: "row-msg", lang: "pl", text: msg.replace(/^"|"$/g, "") }),
+    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.regions.voivodeships, a.regions.powiaty, a.regions.gminy) }), h("span", { text: since }), h("a", { href: a.url, text: t("map.msg") })));
 }
 
 function archiveRow(a) {
   const [s, e] = span(a, S.today);
-  const when = s === e ? (hasTime(a.started_at) ? "od " + fmtShort(new Date(a.started_at)) : fmtISO(s)) : `${fmtISO(s).slice(0, 5)}–${fmtISO(e)}`;
+  const when = s === e ? (hasTime(a.started_at) ? t("map.since.from", { date: fmtShort(new Date(a.started_at)) }) : fmtISO(s)) : `${fmtISO(s).slice(0, 5)}–${fmtISO(e)}`;
   return h("li", {},
     h("div", { class: "row-head" }, swatch(a.category), CAT[a.category]),
-    h("p", { class: "row-msg", text: (a.message || a.title || "").replace(/^"|"$/g, "") }),
-    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.voivodeships, a.powiaty, a.gminy) }), h("span", { text: when }), h("a", { href: a.url, text: "komunikat" })));
+    h("p", { class: "row-msg", lang: "pl", text: (a.message || a.title || "").replace(/^"|"$/g, "") }),
+    h("div", { class: "row-meta mono" }, h("span", { text: regionText(a.voivodeships, a.powiaty, a.gminy) }), h("span", { text: when }), h("a", { href: a.url, text: t("map.msg") })));
 }
 
 function recentRow(a) {
@@ -150,25 +151,25 @@ const LIST_MAX = 30;
 function panel() {
   const today = isToday(), one = S.from === S.to;
   const all = alertsOf(), list = all.filter((a) => !S.cat || a.category === S.cat);
-  $("#now-title").textContent = today ? "Teraz" : one ? `${fmtISO(S.to)}, ${WEEKDAY[toDate(S.to).getUTCDay()]}` : `${fmtISO(S.from)} – ${fmtISO(S.to)}`;
+  $("#now-title").textContent = today ? t("map.now") : one ? `${fmtISO(S.to)}, ${weekday(S.to)}` : `${fmtISO(S.from)} – ${fmtISO(S.to)}`;
   $("#active-count").textContent = list.length;
   const rows = list.slice(0, LIST_MAX).map((a) => (a.regions ? activeRow : archiveRow)(a));
   // «pełna historia» keeps the day or period on the map; today and the whole archive open the plain page
   const hist = historyLink(S.from, S.to, S.start, S.today), more = $("#more-history");
   more.href = hist;
-  more.textContent = hist === "historia.html" ? "Pełna historia od 2021 roku" : `Pełna historia: ${S.from === S.to ? dayText(S.from) : `${dayText(S.from)} – ${dayText(S.to)}`}`;
-  if (list.length > LIST_MAX) rows.push(h("li", { class: "empty" }, `i ${list.length - LIST_MAX} starszych — `, h("a", { href: hist, text: "pełna historia" })));
+  more.textContent = hist === "historia.html" ? t("map.history") : t("map.historyRange", { range: S.from === S.to ? dayText(S.from) : `${dayText(S.from)} – ${dayText(S.to)}` });
+  if (list.length > LIST_MAX) rows.push(h("li", { class: "empty" }, t("map.older", { n: list.length - LIST_MAX }), h("a", { href: hist, text: t("map.olderLink") })));
   $("#active").replaceChildren(...(list.length ? rows
-    : [h("li", { class: "empty", text: S.cat ? "Brak alertów w tej kategorii." : today ? "Żaden alert RCB nie jest teraz aktywny." : one ? "Tego dnia nie było alertów RCB." : "W tym okresie nie było alertów RCB." })]));
+    : [h("li", { class: "empty", text: t(S.cat ? "map.empty.cat" : today ? "map.empty.now" : one ? "map.empty.day" : "map.empty.period") })]));
   if (!one) return summary(all);
   // the week before the chosen day, without the alerts already listed above; "other" only when picked
   const from = addDays(S.to, -7), ids = new Set(list.map((a) => a.id));
   const recent = S.archive.filter((a) => { const s = a.started_at.slice(0, 10); return s > from && s <= S.to && !ids.has(a.id) && (S.cat ? a.category === S.cat : a.category !== "other"); })
     .sort((a, b) => b.started_at.localeCompare(a.started_at));
-  $("#week-title").textContent = today ? "Ostatnie 7 dni" : `7 dni do ${fmtISO(S.to)}`;
+  $("#week-title").textContent = today ? t("map.week") : t("map.weekTo", { date: fmtISO(S.to) });
   $("#week-count").textContent = recent.length;
   $("#recent").replaceChildren(...(recent.length ? recent.slice(0, 12).map(recentRow)
-    : [h("li", { class: "empty", text: S.cat ? "W tym tygodniu nie było alertów w tej kategorii." : today ? "W tym tygodniu nie było alertów." : "W tym tygodniu nie było innych alertów." })]));
+    : [h("li", { class: "empty", text: t(S.cat ? "map.weekEmpty.cat" : today ? "map.weekEmpty.now" : "map.weekEmpty.other") })]));
 }
 
 // a period: the alerts by category (a click filters the map to one) and the days that had an alert
@@ -183,14 +184,14 @@ function summary(all) {
     for (let d = s; d <= e; d = addDays(d, 1)) days.add(d);
   }
   const len = dayDiff(S.from, S.to) + 1;
-  $("#week-title").textContent = "W tym okresie";
-  $("#week-count").textContent = `${days.size} ${plural(days.size, "dzień", "dni", "dni")} z alertem na ${len}`;
+  $("#week-title").textContent = t("map.period");
+  $("#week-count").textContent = tn(days.size, "map.daysWithAlert", { len });
   const cats = PRIORITY.filter((c) => n[c]);
   $("#recent").replaceChildren(...(cats.length ? cats.map((c) => {
     const b = h("button", { type: "button", class: "what", "aria-pressed": S.cat === c ? "true" : "false" }, swatch(c), h("span", { text: CAT[c] }));
     b.addEventListener("click", () => setCat(S.cat === c ? null : c));
-    return h("li", {}, h("span", { class: "when mono", text: `${n[c]} ${plural(n[c], "alert", "alerty", "alertów")}` }), b);
-  }) : [h("li", { class: "empty", text: "Brak alertów." })]));
+    return h("li", {}, h("span", { class: "when mono", text: tn(n[c], "map.alerts") }), b);
+  }) : [h("li", { class: "empty", text: t("map.noAlerts") })]));
 }
 
 // ---------- the period: a brush over the histogram ----------
@@ -235,7 +236,7 @@ function place(from, to) {
 }
 
 const PRESETS = { "1": 1, "7": 7, "30": 30, "365": 365 };
-const dayText = (iso) => (iso === S.today ? "dziś, " + fmtISO(iso) : fmtISO(iso));
+const dayText = (iso) => (iso === S.today ? t("map.todayDate", { date: fmtISO(iso) }) : fmtISO(iso));
 
 function setPeriod(from, to, push = true) {
   ({ from, to } = clampPeriod(from, to, S.start, S.today));
@@ -245,13 +246,13 @@ function setPeriod(from, to, push = true) {
   const b = $("#brush");
   b.style.setProperty("--a", dayDiff(S.start, from) / n);
   b.style.setProperty("--b", (dayDiff(S.start, to) + 1) / n);
-  for (const [id, iso, name] of [["#h-from", from, "Początek okresu"], ["#h-to", to, "Koniec okresu"]]) {
+  for (const [id, iso, name] of [["#h-from", from, t("map.aria.from")], ["#h-to", to, t("map.aria.to")]]) {
     const el = $(id);
     el.setAttribute("aria-valuenow", dayDiff(S.start, iso));
     el.setAttribute("aria-valuemax", n - 1);
     el.setAttribute("aria-valuetext", `${name}: ${fmtISO(iso)}`);
   }
-  const label = from === to ? dayText(to) : `${fmtISO(from)} – ${dayText(to)} · ${len} ${plural(len, "dzień", "dni", "dni")}`;
+  const label = from === to ? dayText(to) : `${fmtISO(from)} – ${dayText(to)} · ${tn(len, "map.days")}`;
   $("#day-label").textContent = label;
   for (const [id, v] of [["#from", from], ["#to", to]]) {
     const el = $(id);
@@ -337,7 +338,7 @@ function setBase(kind) {
   if (kind === "esri" && !S.wayback) {
     S.base = kind;
     WB.config().then((rel) => { S.wayback = rel; if (!S.wbRelease) S.wbRelease = rel[0].id; if (S.base === "esri") setBase("esri"); })
-      .catch((e) => { $("#base-note").textContent = "Nie udało się pobrać archiwum Esri Wayback: " + e.message; });
+      .catch((e) => { $("#base-note").textContent = t("map.wb.failConfig", { msg: e.message }); });
     return;
   }
   S.base = kind;
@@ -354,7 +355,7 @@ function setBase(kind) {
     S.baseLayer = L.tileLayer(`${GIBS}/wmts/epsg3857/best/VIIRS_NOAA20_CorrectedReflectance_TrueColor/default/${d}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg`, {
       maxNativeZoom: 9, maxZoom: 19, attribution: NASA_ATTR + " · VIIRS NOAA-20 " + fmtISO(d),
     });
-    note.textContent = `Zdjęcie z satelity NOAA-20 (VIIRS) z ${fmtISO(d)}${S.to === S.today ? " (dzisiejsze jeszcze się zbiera)" : ""}. Rozdzielczość ok. 250 m, w pochmurne dni widać chmury.`;
+    note.textContent = t(S.to === S.today ? "map.nasa.noteToday" : "map.nasa.note", { date: fmtISO(d) });
   } else {
     S.baseLayer = WB.layer(S.wbRelease);
     waybackList();
@@ -376,16 +377,16 @@ async function waybackList() {
   const sel = $("#wayback"), note = $("#base-note");
   try {
     S.wayback = await WB.config();
-    note.textContent = "Szukam zdjęć tego miejsca…";
+    note.textContent = t("map.wb.searching");
     const local = await WB.atView(S.map);
     if (seq !== S.wbSeq || S.base !== "esri") return;
     S.wbLocal = local;
     const list = local.length ? local : S.wayback.slice(0, 1);
-    sel.replaceChildren(...list.map((r) => h("option", { value: r.id, text: "zdjęcie z " + fmtISO(r.date) })));
-    S.wbNote = `${local.length} ${plural(local.length, "zdjęcie", "różne zdjęcia", "różnych zdjęć")} środka widoku w archiwum Esri Wayback (wydania z datą publikacji). Przybliż mapę, by zobaczyć zdjęcia konkretnego miejsca.`;
+    sel.replaceChildren(...list.map((r) => h("option", { value: r.id, text: t("map.wb.photo", { date: fmtISO(r.date) }) })));
+    S.wbNote = tn(local.length, "map.wb.count");
     waybackFollow();
   } catch (e) {
-    if (seq === S.wbSeq) note.textContent = "Nie udało się pobrać listy zdjęć Esri Wayback: " + e.message;
+    if (seq === S.wbSeq) note.textContent = t("map.wb.failList", { msg: e.message });
   }
 }
 
@@ -397,8 +398,8 @@ function waybackFollow() {
   const pick = WB.onOrBefore(list, S.wbPin || S.to);
   if (pick.id !== S.wbRelease) useRelease(pick.id);
   $("#wayback").value = S.wbRelease;
-  const why = S.wbPin ? `Wybrane wydanie Esri Wayback: ${fmtISO(pick.date)}. `
-    : pick.date <= S.to ? `Najnowsze zdjęcie z dnia ${fmtISO(S.to)} lub wcześniej: ${fmtISO(pick.date)}. ` : `Brak zdjęcia sprzed ${fmtISO(S.to)}, pokazuję najstarsze: ${fmtISO(pick.date)}. `;
+  const why = S.wbPin ? t("map.wb.chosen", { date: fmtISO(pick.date) }) + " "
+    : t(pick.date <= S.to ? "map.wb.newest" : "map.wb.oldest", { to: fmtISO(S.to), date: fmtISO(pick.date) }) + " ";
   const note = $("#base-note");
   note.textContent = why + (S.wbNote || "");
   compareLink();
@@ -406,7 +407,8 @@ function waybackFollow() {
   const seq = S.wbSeq, c = S.map.getCenter();
   WB.captured(pick, c, S.map.getZoom()).then((m) => {
     if (!m || seq !== S.wbSeq || S.wbRelease !== pick.id || S.base !== "esri") return;
-    note.textContent = why + `Zdjęcie środka widoku wykonano ${fmtISO(m.day)} (${[m.source, m.res ? String(m.res).replace(".", ",") + " m" : ""].filter(Boolean).join(", ")}). ` + (S.wbNote || "");
+    const detail = WB.detail(m);
+    note.textContent = why + t(detail ? "map.wb.taken" : "map.wb.takenPlain", { day: fmtISO(m.day), detail }) + " " + (S.wbNote || "");
   }).catch(() => {});
 }
 
@@ -453,7 +455,7 @@ function fires() {
     });
     // only the layers still on the map: a removed one may still be waiting for a tile that fails late
     l.on("tileerror", () => {
-      const msg = `Nie udało się pobrać pożarów z NASA GIBS za dzień ${fmtISO(S.to)}. Pokazane punkty mogą być niepełne.`;
+      const msg = t("map.fires.fail", { day: fmtISO(S.to) });
       if (S.fireLayers.includes(l) && note.textContent !== msg) note.textContent = msg;
     });
     S.fireLayers.push(l);
@@ -462,7 +464,18 @@ function fires() {
 }
 
 // ---------- start ----------
+// title attributes and the description in the page's language (applyI18n in common.js does the text and aria-labels)
+function localize() {
+  for (const el of document.querySelectorAll("[data-i18n-tip]")) el.title = t(el.dataset.i18nTip);
+  if (RCB.lang() !== "pl") {
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta) meta.content = t("map.desc");
+    $("#orig-note").hidden = false; // the alert texts of RCB stay in Polish
+  }
+}
+
 async function main() {
+  localize();
   await RCB.leaflet(); // a dropped request for leaflet.js gets one retry here, not "L is not defined"
   const [geo, archive] = await Promise.all([getJSON("geo/poland.geojson"), getJSON("data/archive.json"), RCB.names()]);
   S.archive = archive.alerts;
@@ -528,13 +541,13 @@ async function main() {
 
   async function refresh() {
     const res = await RCB.strip();
-    const t = todayISO();
+    const now = todayISO();
     const was = S.today;
-    if (t !== S.today) { S.today = t; spark(); dispatchEvent(new Event("rcb:range")); }
+    if (now !== S.today) { S.today = now; spark(); dispatchEvent(new Event("rcb:range")); }
     if (res) { S.live = res.data; S.liveActive = res.active; }
     // a period that ended today keeps ending today after midnight
     if (S.to === null) setPeriod(wantFrom, wantTo, false);
-    else if (S.to === was) place(addDays(S.from, dayDiff(was, t)), t);
+    else if (S.to === was) place(addDays(S.from, dayDiff(was, now)), now);
   }
   await refresh();
   // attacks.js (missiles and drones over Poland) draws on the same map and slider through this
@@ -553,6 +566,6 @@ async function main() {
 
 main().catch((e) => {
   const st = $("#strip .state");
-  if (st) st.textContent = "Nie udało się wczytać mapy: " + e.message;
+  if (st) st.textContent = t("map.failLoad", { msg: e.message });
   console.error(e);
 });
