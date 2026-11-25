@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.28.0",
+   "date": "2026-11-25",
+   "time": "2026-11-25T18:41:35Z",
+   "sha": "01ab078",
+   "changes": [
+    {
+     "type": "feat",
+     "scope": "site",
+     "breaking": false,
+     "text": "skip link on every page, theme-color meta and SVG chevrons on the period control (#157)",
+     "sha": "01ab078",
+     "date": "2026-11-25",
+     "time": "2026-11-25T18:41:35Z"
+    }
+   ]
+  },
+  {
    "version": "1.27.2",
    "date": "2026-11-25",
    "time": "2026-11-25T17:26:22Z",

@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.28.0 (2026-11-25)
+
+### feat
+
+- **site:** skip link on every page, theme-color meta and SVG chevrons on the period control (#157) ([01ab078](https://github.com/casper-assistant-ai/alerty-pl/commit/01ab078))
+
 ## 1.27.2 (2026-11-25)
 
 ### fix
