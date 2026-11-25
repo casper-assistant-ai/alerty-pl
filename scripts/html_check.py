@@ -4,7 +4,8 @@
 It catches markup that a browser repairs silently but that shows to a visitor: a quote inside an
 attribute value that ends it early (22.11.2026: a link inside <meta name="description"> printed
 'powiadomienia.">' at the top of every page), stray text in <head>, tags that close the wrong
-element or stay open, duplicate ids, and a page without lang, title, description or viewport.
+element or stay open, duplicate ids, and a page without lang, title, description, viewport or a
+Content-Security-Policy in <head>.
 
     python3 -I scripts/html_check.py [FILE ...]   (default: docs/*.html)
 
@@ -35,6 +36,7 @@ class Checker(HTMLParser):
         self.head_seen = False
         self.raw: str | None = None
         self.has = {"lang": False, "title": False, "description": False, "viewport": False}
+        self.csp: str | None = None
 
     def bad(self, msg: str) -> None:
         self.problems.append((self.getpos()[0], msg))
@@ -72,6 +74,10 @@ class Checker(HTMLParser):
             self.has["description"] = True
         if tag == "meta" and a.get("name") == "viewport":
             self.has["viewport"] = True
+        # only one in <head> counts: everything above a policy further down the page loads unchecked
+        if (tag == "meta" and self.in_head and (a.get("http-equiv") or "").lower() == "content-security-policy"
+                and (a.get("content") or "").strip()):
+            self.csp = self.csp or a["content"]
 
     def handle_endtag(self, tag: str) -> None:
         if self.raw == tag:
@@ -103,6 +109,8 @@ class Checker(HTMLParser):
                        ("description", 'no <meta name="description">'), ("viewport", 'no <meta name="viewport">')):
             if not self.has[k]:
                 self.problems.append((1, msg))
+        if self.csp is None:
+            self.problems.append((1, 'no <meta http-equiv="Content-Security-Policy"> in <head>'))
 
 
 def check(text: str) -> list[tuple[int, str]]:
@@ -110,6 +118,19 @@ def check(text: str) -> list[tuple[int, str]]:
     c.feed(text)
     c.close()
     return sorted(c.problems)
+
+
+def policy(text: str) -> dict[str, set[str]]:
+    """The sources of each directive of the page's Content-Security-Policy, split as a browser splits them."""
+    c = Checker()
+    c.feed(text)
+    c.close()
+    out: dict[str, set[str]] = {}
+    for directive in (c.csp or "").split(";"):
+        words = directive.split()
+        if words:
+            out[words[0]] = set(words[1:])
+    return out
 
 
 def main(argv: list[str]) -> int:
