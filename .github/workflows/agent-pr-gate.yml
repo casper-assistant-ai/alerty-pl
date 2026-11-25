@@ -58,6 +58,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # from `gh pr checkout` on the tree is the PR's own code: no push credential of the gate in
+          # .git/config (security audit #173); the gh calls read GH_TOKEN from the environment
+          persist-credentials: false
       - name: Merge or close agent PRs
         run: |
           set -u
@@ -215,6 +218,9 @@ jobs:
             esac
             git checkout -q --detach
             gh pr checkout "$n" --force
+            # from here to the export below the tree is the PR's code and it runs without the gate's write
+            # token (security audit #173): GH_TOKEN leaves the environment until the checks are over
+            gate_token=$GH_TOKEN; unset GH_TOKEN
             ok=1; log="/tmp/gate-log-$n.txt"; : > "$log"
             { python3 -I -m unittest discover -s tests 2>&1 || { ok=0; echo "FAILED: unit tests"; }; } | tee -a "$log"
             { python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n 2>&1 || { ok=0; echo "FAILED: live parse of gov.pl"; }; } | tee -a "$log"
@@ -227,6 +233,7 @@ jobs:
               { live_check 2>&1 || { ok=0; echo "FAILED: live service start (server/)"; }; } | tee -a "$log"
             fi
             grep -q '^FAILED: ' "$log" && ok=0
+            export GH_TOKEN=$gate_token; unset gate_token
             git checkout -q main
             if [ "$ok" != 1 ]; then
               request_fix "$(grep '^FAILED: ' "$log" | sed 's/^FAILED: //' | paste -sd, - | sed 's/,/, /g') failed on $sha (gate run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID)." "$log"
