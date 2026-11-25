@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### chore
+
+- **deps:** drop the temporary Dependabot entry for the dependabot-test branch ([5c71f12](https://github.com/casper-assistant-ai/alerty-pl/commit/5c71f12))
+
 ## 1.23.7 (2026-11-25)
 
 ### fix
