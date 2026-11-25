@@ -732,6 +732,14 @@ def busy(workflow):
     return (out.strip() or "0") != "0"
 
 
+def approve_ci(sha):
+    """CI on a PR that github-actions[bot] opened waits for an approval (as for the agents' PRs): give it."""
+    runs = (gh_api(f"repos/{repo()}/actions/runs?head_sha={sha}&status=action_required") or {}).get("workflow_runs", [])
+    for r in runs:
+        sh("gh", "api", "-X", "POST", f"repos/{repo()}/actions/runs/{r['id']}/approve", check=False)
+        print(f"approved CI run {r['id']} for {sha[:7]}")
+
+
 def verdict_of(pr, sha):
     """(verdict, reason) of the PR reviewer's comment on this exact head, or (None, '')."""
     for c in reversed(gh_items(f"repos/{repo()}/issues/{pr}/comments?per_page=100")):
@@ -833,6 +841,7 @@ def land(d):
         if not m or (pr.get("user") or {}).get("login") != BOT or pr["head"]["repo"]["full_name"] != repo():
             continue
         n, num, sha = int(m.group(1)), pr["number"], pr["head"]["sha"]
+        approve_ci(sha)
         verdict, reason = verdict_of(num, sha)
         if verdict is None:
             review_started = True
