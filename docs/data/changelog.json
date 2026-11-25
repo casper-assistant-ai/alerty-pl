@@ -17,9 +17,18 @@
   {
    "version": null,
    "date": "2026-11-25",
-   "time": "2026-11-25T16:05:23+01:00",
-   "sha": "f6ab25d",
+   "time": "2026-11-25T16:19:20+01:00",
+   "sha": "5d57a2e",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "the maintainer starts the process-doctor after a refused patch",
+     "sha": "5d57a2e",
+     "date": "2026-11-25",
+     "time": "2026-11-25T16:19:20+01:00"
+    },
     {
      "type": "ci",
      "scope": "workflows",

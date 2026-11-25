@@ -6,6 +6,7 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### ci
 
+- **workflows:** the maintainer starts the process-doctor after a refused patch ([5d57a2e](https://github.com/casper-assistant-ai/alerty-pl/commit/5d57a2e))
 - **workflows:** the maintainer approves CI on its own review PRs ([f6ab25d](https://github.com/casper-assistant-ai/alerty-pl/commit/f6ab25d))
 - **workflows:** site-designer: name the allowed files and the pinned tests, run the node suite before the  (#142) ([54e5087](https://github.com/casper-assistant-ai/alerty-pl/commit/54e5087))
 - **workflows:** process-retro: timeout-minutes 25 -> 35 (#132) ([780e973](https://github.com/casper-assistant-ai/alerty-pl/commit/780e973))
