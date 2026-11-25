@@ -51,6 +51,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add docs/data/alerts.json docs/data/archive.json docs/data/unmatched.json docs/data/changelog.json CHANGELOG.md
           if ! git diff --cached --quiet; then
+            git add docs/data/meta.json
             msg=$(python3 -I -c 'import json;m=json.load(open("docs/data/meta.json"));print("chore(data):",m["active"],"active,",m["count"],"alerts")')
             git commit -m "$msg"
             git pull --rebase --autostash -X theirs origin main
