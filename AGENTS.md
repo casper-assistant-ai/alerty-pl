@@ -182,12 +182,17 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
 <!-- reliability:start -->
 - Issues labelled `agent-health` or `workflow-change` belong to the process-doctor: do not comment
   on them, close them or open a PR for them [agent-health issues are rewritten after every run, #96].
-- issue-worker: one issue per run. Past minute 35 of the agent job, open the PR with what is done
+- issue-worker: one issue per run. A run started by a new issue that is not yours to work (labelled `workflow-change` or `agent-health`, or with an open PR) calls `noop` at once, never the queue's oldest issue [429 [1302], 2026-11-25: #163 to #166 opened at once at 20:25 UTC started four runs, and 45694883757, 45694892006 and 45694894733 fell back to #163 beside the run that took it, 45694879637: four PRs for one issue (#168, #172), five to six sessions at once on one account]. Past minute 35 of the agent job, open the PR with what is done
   and the rest as a follow-up, or stop; the step limit is 50 minutes [timeout, run 45371361840].
 - every agent: the step limit (`timeout-minutes`) ends the CLI step as a failure and the whole
   session is lost, so by 80% of the limit send what is done — the PR, the issue or `noop` — and
-  stop; the issue-worker's minute 35 is this rule at 50 [timeout, site-fixer runs 45248741714 and
-  45244945359 stopped at 25 min, region-keeper 45227118220 at 20].
+  stop; without `date` you still have `python3`: at your first turn run
+  `python3 -c 'import time; open("/tmp/gh-aw/agent/start","w").write(str(time.time()))'` and read the
+  minutes gone with `python3 -c 'import time; print(int((time.time()-float(open("/tmp/gh-aw/agent/start").read()))/60))'`;
+  the security-auditor sends its issue with the findings it has verified by minute 32 of 40
+  [timeout, site-fixer runs 45248741714 and 45244945359 stopped at 25 min, region-keeper 45227118220
+  at 20; security-auditor 44917850467 and 45695166662 at 32 of 30 and 40 of 40 minutes on 429 [1302],
+  nothing sent]; the issue-worker's minute 35 is this rule at 50.
 - every agent: a 529 or a 429 from z.ai ends a run at any turn and nothing unsent survives it, so
   send each output the moment it is ready (the issue comment before the checks, the PR after the
   first green check run, a workflow-change issue after the PR) and never hold one back to send it
