@@ -69,7 +69,7 @@ safe-outputs:
   # Detector failures stay in the run diagnostics; no ever-growing «[aw] Detection Runs» tracker.
   threat-detection:
     report-as-issue: false
-timeout-minutes: 25
+timeout-minutes: 35
 ---
 
 # Process retro
