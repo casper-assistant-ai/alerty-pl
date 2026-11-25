@@ -37,3 +37,17 @@ test("on a phone the month heading is static, so it cannot cover a row's link", 
   // same specificity as the base rule, so the phone rule must come later to win the cascade
   assert.ok(css.indexOf(rule[0]) > css.indexOf(".month h2 {"), "the phone rule must follow the base rule");
 });
+
+test("on a phone the header's source link is a tap target of at least 24 px, and stays hidden on a narrow screen", () => {
+  // .top .src is one line of 13 px text, 20 px tall. Up to 640 px wide it is hidden; on a phone held
+  // sideways (844x390) it shows, and the mobile audit listed it at 172x20 on every page (#140).
+  const phone = mediaBlock(PHONE);
+  const rule = phone.match(/\.top \.src \{[^}]*\}/);
+  assert.ok(rule, "no .top .src rule in the phone block");
+  const min = rule[0].match(/min-height:\s*([\d.]+)px/);
+  assert.ok(min, "the phone rule gives .top .src a min-height");
+  assert.ok(Number(min[1]) >= 24, `min-height ${min[1]}px is under the 24 px of a tap target`);
+  // the rule that hides the link up to 640 px has the same specificity and comes earlier: a display
+  // here would bring it back on a narrow phone, where it does not fit next to the logo
+  assert.doesNotMatch(rule[0], /display/, "the phone rule for .top .src must not set display");
+});
