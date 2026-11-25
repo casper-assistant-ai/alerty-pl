@@ -2,7 +2,11 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.30.0 (2026-11-25)
+
+### feat
+
+- **map:** Copernicus Sentinel-2 (10 m, true colour) under the map, the clearest day of the period or the nearest clear one ([9cf0718](https://github.com/casper-assistant-ai/alerty-pl/commit/9cf0718))
 
 ### ci
 
