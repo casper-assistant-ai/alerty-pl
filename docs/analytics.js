@@ -1,6 +1,6 @@
 // Alerty RCB — the analytics page: counts from data/archive.json over a chosen period.
 "use strict";
-const { CAT, VOIV, MONTHS, $, h, swatch, getJSON, fmtDay, plural } = RCB;
+const { CAT, VOIV, $, h, swatch, getJSON, fmtDay, t, tn } = RCB;
 const NS = "http://www.w3.org/2000/svg";
 const DAY = 86400000;
 
@@ -12,7 +12,12 @@ function s(tag, attrs = {}, parent, text) {
   return e;
 }
 
-const fmtN = (n) => n.toLocaleString("pl-PL");
+const fmtN = (n) => n.toLocaleString(RCB.loc());
+// the month of a date by Intl in the interface language ("long": November, "short": Nov)
+const MONTH = { long: new Intl.DateTimeFormat(RCB.loc(), { month: "long" }), short: new Intl.DateTimeFormat(RCB.loc(), { month: "short" }) };
+const monthName = (d, style) => MONTH[style].format(d);
+// a count in words with the number grouped as the language groups it
+const count = (n, key) => tn(n, key, { n: fmtN(n) });
 const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const monday = (d) => { const x = startOfDay(d); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x; };
 
@@ -30,8 +35,8 @@ function inPeriod(all, period, now) {
 function delta(n, prev, period) {
   if (prev == null) return "";
   const d = n - prev;
-  const span = period === 90 ? "poprzednie 90 dni" : "poprzednie 12 mies.";
-  return `${d > 0 ? "+" : d < 0 ? "−" : "±"}${Math.abs(d)} wobec ${prev} za ${span}`;
+  const span = t(period === 90 ? "ana.prev90" : "ana.prev365");
+  return t("ana.delta", { d: `${d > 0 ? "+" : d < 0 ? "−" : "±"}${Math.abs(d)}`, prev, span });
 }
 
 function stats(cur, period, now) {
@@ -45,10 +50,10 @@ function stats(cur, period, now) {
   const card = (label, value, sub) => h("div", { class: "stat" },
     h("div", { class: "label", text: label }), h("div", { class: "value", text: value }), h("div", { class: "delta mono", text: sub }));
   $("#stats").replaceChildren(
-    card("Wszystkie alerty", fmtN(cur.rows.length), delta(cur.rows.length, cur.prev && cur.prev.length, period) || `od ${fmtDay(cur.from)}`),
-    card("Zagrożenie z powietrza", fmtN(air.length), delta(air.length, prevAir && prevAir.length, period) || (lastAir ? `ostatnio ${fmtDay(new Date(lastAir.started_at))}` : "")),
-    card("Dni z alertem", fmtN(days), `z ${fmtN(spanDays)} ${plural(spanDays, "dnia", "dni", "dni")} w okresie`),
-    card("Najwięcej alertów", top ? VOIV[top[0]] : "—", top ? `${fmtN(top[1])} ${plural(top[1], "alert", "alerty", "alertów")} w województwie` : ""));
+    card(t("ana.stat.all"), fmtN(cur.rows.length), delta(cur.rows.length, cur.prev && cur.prev.length, period) || t("ana.since", { date: fmtDay(cur.from) })),
+    card(t("ana.air"), fmtN(air.length), delta(air.length, prevAir && prevAir.length, period) || (lastAir ? t("ana.lastAir", { date: fmtDay(new Date(lastAir.started_at)) }) : "")),
+    card(t("ana.stat.days"), fmtN(days), count(spanDays, "ana.ofDays")),
+    card(t("ana.stat.top"), top ? VOIV[top[0]] : "—", top ? count(top[1], "ana.inVoiv") : ""));
 }
 
 function countVoiv(rows) {
@@ -64,12 +69,12 @@ function timeChart(cur, period, now) {
   const unit = period === 90 ? "day" : period === 365 ? "week" : "month";
   const keyOf = (d) => unit === "day" ? startOfDay(d).getTime() : unit === "week" ? monday(d).getTime() : new Date(d.getFullYear(), d.getMonth(), 1).getTime();
   const bins = [];
-  let t = new Date(keyOf(cur.from));
-  while (t <= now) {
-    bins.push({ k: t.getTime(), d: new Date(t), air: 0, rest: 0 });
-    t = unit === "day" ? new Date(t.getFullYear(), t.getMonth(), t.getDate() + 1)
-      : unit === "week" ? new Date(t.getFullYear(), t.getMonth(), t.getDate() + 7)
-      : new Date(t.getFullYear(), t.getMonth() + 1, 1);
+  let at = new Date(keyOf(cur.from));
+  while (at <= now) {
+    bins.push({ k: at.getTime(), d: new Date(at), air: 0, rest: 0 });
+    at = unit === "day" ? new Date(at.getFullYear(), at.getMonth(), at.getDate() + 1)
+      : unit === "week" ? new Date(at.getFullYear(), at.getMonth(), at.getDate() + 7)
+      : new Date(at.getFullYear(), at.getMonth() + 1, 1);
   }
   const idx = new Map(bins.map((b, i) => [b.k, i]));
   for (const a of cur.rows) {
@@ -90,14 +95,14 @@ function timeChart(cur, period, now) {
     s("text", { x: L - 8, y: y + 4, "text-anchor": "end" }, axis, v);
   }
   const bw = iw / bins.length, gap = bins.length > 120 ? 0.5 : Math.min(4, bw * 0.25);
-  const label = (b) => unit === "day" ? fmtDay(b.d) : unit === "week" ? `tydzień od ${fmtDay(b.d)}` : `${MONTHS[b.d.getMonth()]} ${b.d.getFullYear()}`;
+  const label = (b) => unit === "day" ? fmtDay(b.d) : unit === "week" ? t("ana.week", { date: fmtDay(b.d) }) : `${monthName(b.d, "long")} ${b.d.getFullYear()}`;
   bins.forEach((b, i) => {
     const x = L + i * bw + gap / 2, w = Math.max(1, bw - gap);
     const hr = (b.rest / top) * ih, ha = (b.air / top) * ih;
     if (b.rest) s("rect", { class: "b-rest", x, width: w, y: T + ih - hr, height: hr, rx: Math.min(2, w / 2) }, bars);
     if (b.air) s("rect", { class: "b-air", x, width: w, y: T + ih - hr - ha, height: ha, rx: Math.min(2, w / 2) }, bars);
     const r = s("rect", { class: "hov", x: L + i * bw, width: bw, y: T, height: ih }, hov);
-    s("title", {}, r, `${label(b)}: ${b.air + b.rest} ${plural(b.air + b.rest, "alert", "alerty", "alertów")}${b.air ? `, z powietrza ${b.air}` : ""}`);
+    s("title", {}, r, `${label(b)}: ${count(b.air + b.rest, "ana.alerts")}${b.air ? ", " + t("ana.fromAir", { n: b.air }) : ""}`);
   });
   // x labels: months (or years for the whole archive), never more than about one per 64 px
   let lastLabel = -Infinity;
@@ -108,10 +113,9 @@ function timeChart(cur, period, now) {
     if (!first || x - lastLabel < 64) return;
     lastLabel = x;
     s("line", { x1: x, x2: x, y1: T + ih, y2: T + ih + 4, stroke: "currentColor", opacity: .3 }, axis);
-    s("text", { x: x + 2, y: H - 8 }, axis, unit === "month" ? d.getFullYear() : `${MONTHS[d.getMonth()].slice(0, 3)}${d.getMonth() === 0 ? " " + d.getFullYear() : ""}`);
+    s("text", { x: x + 2, y: H - 8 }, axis, unit === "month" ? d.getFullYear() : `${monthName(d, "short")}${d.getMonth() === 0 ? " " + d.getFullYear() : ""}`);
   });
-  const per = unit === "day" ? "dziennie" : unit === "week" ? "tygodniowo" : "miesięcznie";
-  $("#time-sub").textContent = `Liczba alertów ${per}, od ${fmtDay(cur.from)} do dziś`;
+  $("#time-sub").textContent = t("ana.timeSub." + unit, { date: fmtDay(cur.from) });
 }
 
 function heatMap(geo, byV) {
@@ -153,7 +157,7 @@ function ranked(ul, items, fmt, href) {
       href ? h("a", { href: href(i), text: fmt(i) }) : h("span", { text: fmt(i) })),
     h("span", { class: "num", text: fmtN(i.n) }),
     h("span", { class: "track", "aria-hidden": "true" }, h("i", { style: `width:${(100 * i.n / max).toFixed(1)}%${i.cat ? `;--c:var(--${i.cat})` : ""}` })))));
-  if (!items.length) ul.replaceChildren(h("li", { class: "muted", text: "Brak danych w tym okresie" }));
+  if (!items.length) ul.replaceChildren(h("li", { class: "muted", text: t("ana.none") }));
 }
 
 function hourChart(cur) {
@@ -179,14 +183,16 @@ function hourChart(cur) {
     if (b.rest) s("rect", { class: "b-rest", x, width: w, y: T + ih - hr, height: hr, rx: 2 }, svg);
     if (b.air) s("rect", { class: "b-air", x, width: w, y: T + ih - hr - ha, height: ha, rx: 2 }, svg);
     const r = s("rect", { class: "hov", x: L + i * bw, width: bw, y: T, height: ih }, svg);
-    s("title", {}, r, `${String(i).padStart(2, "0")}:00–${String(i).padStart(2, "0")}:59: ${b.air + b.rest}${b.air ? `, z powietrza ${b.air}` : ""}`);
+    s("title", {}, r, `${String(i).padStart(2, "0")}:00–${String(i).padStart(2, "0")}:59: ${b.air + b.rest}${b.air ? ", " + t("ana.fromAir", { n: b.air }) : ""}`);
     if (i % (W < 600 ? 6 : 3) === 0) s("text", { x: L + i * bw + bw / 2, y: H - 6, "text-anchor": "middle" }, axis, `${String(i).padStart(2, "0")}:00`);
   });
-  $("#hour-sub").textContent = `Godzina pierwszego komunikatu, czas polski; ${n} ${plural(n, "alert", "alerty", "alertów")} z podaną godziną`;
+  $("#hour-sub").textContent = count(n, "ana.hourSub");
 }
 
 async function main() {
   RCB.strip();
+  const desc = document.querySelector('meta[name="description"]');
+  if (desc) desc.content = t("ana.desc");
   const [data, geo] = await Promise.all([getJSON("data/archive.json"), getJSON("geo/poland.json")]);
   const all = data.alerts.filter((a) => a.date >= "2021-01-01").sort((a, b) => b.started_at.localeCompare(a.started_at));
   const btns = [...document.querySelectorAll("#period button")];
@@ -204,13 +210,13 @@ async function main() {
     const byC = {};
     for (const a of cur.rows) byC[a.category] = (byC[a.category] || 0) + 1;
     ranked($("#c-cat"), Object.entries(byC).sort((a, b) => b[1] - a[1]).map(([cat, n]) => ({ cat, n })), (i) => CAT[i.cat], (i) => "historia.html?cat=" + i.cat);
-    const names = Object.fromEntries(geo.powiaty.map((p) => [p.id, (p.city ? "" : "pow. ") + p.name]));
+    const names = Object.fromEntries(geo.powiaty.map((p) => [p.id, p.city ? p.name : t("ana.powiat", { name: p.name })]));
     const byP = {};
     for (const a of cur.rows) for (const p of a.powiaty) byP[p] = (byP[p] || 0) + 1;
     ranked($("#c-pow"), Object.entries(byP).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([p, n]) => ({ p, n })),
       (i) => `${names[i.p] || i.p} · ${VOIV[i.p.split("/")[0]]}`, (i) => "historia.html?powiat=" + encodeURIComponent(i.p));
     hourChart(cur);
-    $("#span-note").textContent = `Ile Alertów RCB wysłano, gdzie i o jakiej porze. Archiwum: ${fmtN(all.length)} alertów od ${fmtDay(new Date(all[all.length - 1].started_at))}.`;
+    $("#span-note").textContent = tn(all.length, "ana.archive", { n: fmtN(all.length), date: fmtDay(new Date(all[all.length - 1].started_at)) });
   }
   btns.forEach((b) => b.addEventListener("click", () => {
     period = b.dataset.p;
@@ -224,4 +230,4 @@ async function main() {
   draw();
 }
 
-main().catch((e) => { $("#stats").replaceChildren(h("p", { class: "stat", text: "Nie udało się wczytać archiwum: " + e.message })); });
+main().catch((e) => { $("#stats").replaceChildren(h("p", { class: "stat", text: t("ana.error", { msg: e.message }) })); });

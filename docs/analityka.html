@@ -24,55 +24,55 @@
   <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="src" data-i18n-param-name="src.gov">źródło: gov.pl/web/rcb</a>
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
-<div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
+<div class="strip" id="strip"><span class="state" role="status" data-i18n="strip.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main>
   <div class="page-head">
     <div>
-      <h1>Analityka alertów</h1>
-      <p id="span-note">Ile Alertów RCB wysłano, gdzie i o jakiej porze.</p>
+      <h1 data-i18n="ana.h1">Analityka alertów</h1>
+      <p id="span-note" data-i18n="ana.lead">Ile Alertów RCB wysłano, gdzie i o jakiej porze.</p>
     </div>
-    <div class="seg" role="group" aria-label="Okres" id="period">
-      <button type="button" data-p="90" aria-pressed="false">90 dni</button>
-      <button type="button" data-p="365" aria-pressed="true">12 miesięcy</button>
-      <button type="button" data-p="all" aria-pressed="false">od 2021</button>
+    <div class="seg" role="group" aria-label="Okres" data-i18n-aria="ana.period" id="period">
+      <button type="button" data-p="90" aria-pressed="false" data-i18n="ana.p90">90 dni</button>
+      <button type="button" data-p="365" aria-pressed="true" data-i18n="ana.p365">12 miesięcy</button>
+      <button type="button" data-p="all" aria-pressed="false" data-i18n="ana.pAll">od 2021</button>
     </div>
   </div>
   <div class="stats" id="stats"></div>
   <div class="grid-a">
     <section class="card" aria-labelledby="h-time">
-      <h2 id="h-time">Alerty w czasie</h2>
+      <h2 id="h-time" data-i18n="ana.hTime">Alerty w czasie</h2>
       <p class="sub" id="time-sub"></p>
-      <ul class="chart-legend"><li><i class="sw" style="--c:var(--accent)"></i>Zagrożenie z powietrza</li><li><i class="sw" style="--c:var(--bar)"></i>Pozostałe alerty</li></ul>
+      <ul class="chart-legend"><li><i class="sw" style="--c:var(--accent)"></i><span data-i18n="ana.air">Zagrożenie z powietrza</span></li><li><i class="sw" style="--c:var(--bar)"></i><span data-i18n="ana.rest">Pozostałe alerty</span></li></ul>
       <svg class="chart" id="c-time" role="img" aria-labelledby="h-time time-sub"></svg>
     </section>
     <div class="grid-b">
       <section class="card" aria-labelledby="h-map">
-        <h2 id="h-map">Województwa</h2>
-        <p class="sub">Liczba alertów, które objęły województwo w całości lub w części</p>
+        <h2 id="h-map" data-i18n="ana.hMap">Województwa</h2>
+        <p class="sub" data-i18n="ana.subMap">Liczba alertów, które objęły województwo w całości lub w części</p>
         <svg class="map" id="c-map" role="img" aria-labelledby="h-map"></svg>
         <div class="heat-legend"><span class="mono" id="ramp-min"></span><span class="ramp" id="ramp"></span><span class="mono" id="ramp-max"></span></div>
       </section>
       <section class="card" aria-labelledby="h-voiv">
-        <h2 id="h-voiv">Ranking województw</h2>
-        <p class="sub">Alerty w wybranym okresie; kliknięcie otwiera je w historii</p>
+        <h2 id="h-voiv" data-i18n="ana.hVoiv">Ranking województw</h2>
+        <p class="sub" data-i18n="ana.subVoiv">Alerty w wybranym okresie; kliknięcie otwiera je w historii</p>
         <ul class="ranked" id="c-voiv"></ul>
       </section>
     </div>
     <div class="grid-c">
       <section class="card" aria-labelledby="h-cat">
-        <h2 id="h-cat">Rodzaje zagrożeń</h2>
-        <p class="sub">Według treści komunikatu; kliknięcie otwiera je w historii</p>
+        <h2 id="h-cat" data-i18n="ana.hCat">Rodzaje zagrożeń</h2>
+        <p class="sub" data-i18n="ana.subCat">Według treści komunikatu; kliknięcie otwiera je w historii</p>
         <ul class="ranked" id="c-cat"></ul>
       </section>
       <section class="card" aria-labelledby="h-pow">
-        <h2 id="h-pow">Najczęściej alarmowane powiaty</h2>
-        <p class="sub">Alerty z listą powiatów; alert dla całego województwa nie liczy się tutaj; kliknięcie otwiera je w historii</p>
+        <h2 id="h-pow" data-i18n="ana.hPow">Najczęściej alarmowane powiaty</h2>
+        <p class="sub" data-i18n="ana.subPow">Alerty z listą powiatów; alert dla całego województwa nie liczy się tutaj; kliknięcie otwiera je w historii</p>
         <ul class="ranked" id="c-pow"></ul>
       </section>
     </div>
     <section class="card" aria-labelledby="h-hour">
-      <h2 id="h-hour">Pora dnia</h2>
-      <p class="sub" id="hour-sub">Godzina pierwszego komunikatu, czas polski; tylko alerty z podaną godziną</p>
+      <h2 id="h-hour" data-i18n="ana.hHour">Pora dnia</h2>
+      <p class="sub" id="hour-sub" data-i18n="ana.subHour">Godzina pierwszego komunikatu, czas polski; tylko alerty z podaną godziną</p>
       <svg class="chart" id="c-hour" role="img" aria-labelledby="h-hour hour-sub"></svg>
     </section>
   </div>
@@ -85,6 +85,7 @@
   </div>
 </footer>
 <script src="i18n.js" defer></script>
+<script src="i18n-analytics.js" defer></script>
 <script src="common.js" defer></script>
 <script src="analytics.js" defer></script>
 </body>
