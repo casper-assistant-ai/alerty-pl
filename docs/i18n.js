@@ -163,3 +163,9 @@ const I18N = {
     "foot.font": ", шрифт: IBM Plex."
   }
 };
+
+// A page's own texts live in docs/i18n-<page>.js, loaded after this file and before common.js:
+// i18nAdd({ pl: {...}, en: {...}, uk: {...} }) merges them into the three dictionaries (the same keys in each).
+function i18nAdd(part) {
+  for (const code of Object.keys(I18N)) Object.assign(I18N[code], (part && part[code]) || {});
+}

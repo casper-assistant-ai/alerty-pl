@@ -278,6 +278,16 @@ const RCB = (() => {
     for (const [k, v] of Object.entries(params || {})) s = s.split("{" + k + "}").join(v);
     return s;
   }
+  // a count in words: tn(3, "alerts") reads "alerts.one|few|many" by the plural rules of the language
+  // (English has one and many; Ukrainian and Polish one, few and many), {n} is the number
+  function tn(n, key, params, code = lang()) {
+    let form = "many";
+    try { form = new Intl.PluralRules(code).select(n); } catch (e) { /* old browser: many */ }
+    if (form !== "one" && form !== "few") form = "many";
+    return t(key + "." + form, Object.assign({ n }, params || {}), code);
+  }
+  // the Intl locale of the language: dates and numbers as the visitor reads them
+  const loc = (code = lang()) => ({ pl: "pl-PL", en: "en-GB", uk: "uk-UA" })[code] || "pl-PL";
   // the link of a switcher entry: every other URL parameter byte for byte, and lang set to that language
   function langUrl(search, code) {
     const parts = (search || "").replace(/^\?/, "").split("&").filter((p) => p && p.split("=")[0] !== "lang");
@@ -324,7 +334,7 @@ const RCB = (() => {
 
   return { isISO, periodFromQuery, clampPeriod, span, historyPeriod, inPeriod, historyLink, API, CAT, PRIORITY, VOIV, MONTHS, $, h, color, swatch, leaflet, getJSON,
     fmtISO, fmtDay, fmtShort, fmtTime, fmtStamp,
-    hasTime, duration, regionText, names, plural, strip, live, LANGS, lang, t, langUrl, applyI18n };
+    hasTime, duration, regionText, names, plural, strip, live, LANGS, lang, t, tn, loc, langUrl, applyI18n };
 })();
 
 // docs/i18n.js (loaded before this file) brings the dictionaries; without them nothing is translated.

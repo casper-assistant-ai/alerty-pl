@@ -6,7 +6,10 @@ import assert from "node:assert/strict";
 
 const read = (p) => readFileSync(new URL("../" + p, import.meta.url), "utf8");
 const PAGES = readdirSync(new URL("../docs", import.meta.url)).filter((f) => f.endsWith(".html")).sort();
-const i18n = new Function(`${read("docs/i18n.js")}\n;return I18N;`)();
+// docs/i18n.js and every page's docs/i18n-<page>.js, as the pages load them
+const DICTS = ["i18n.js", ...readdirSync(new URL("../docs", import.meta.url)).filter((f) => /^i18n-[\w-]+\.js$/.test(f)).sort()]
+  .map((f) => read("docs/" + f)).join("\n");
+const i18n = new Function(`${DICTS}\n;return I18N;`)();
 const CODES = ["pl", "en", "uk"];
 
 // common.js with the dictionaries: a document stub whose querySelectorAll answers per selector, as a page's
@@ -28,7 +31,7 @@ function load({ search = "", store = {}, doc } = {}) {
     querySelectorAll: (s) => els[s] || [] };
   const store0 = { getItem: (k) => store[k] ?? null, setItem: (k, v) => { store[k] = v; } };
   const loc = { search };
-  const RCB = new Function("document", "location", "localStorage", `${read("docs/i18n.js")}\n${read("docs/common.js")}\n;return RCB;`)(d, loc, store0);
+  const RCB = new Function("document", "location", "localStorage", `${DICTS}\n${read("docs/common.js")}\n;return RCB;`)(d, loc, store0);
   return { RCB, d, els, store, loc, nav };
 }
 const text = (html, re) => [...html.matchAll(re)];
@@ -41,8 +44,13 @@ test("the three dictionaries have the same keys and no empty text", () => {
   assert.ok(keys.length > 40, `${keys.length} keys`);
   for (const c of CODES) {
     assert.deepEqual(Object.keys(i18n[c]).sort(), keys, c);
-    for (const [k, v] of Object.entries(i18n[c])) assert.ok(typeof v === "string" && v.trim() && !/[{}]/.test(v.replace(/\{name\}/g, "")), `${c}.${k}`);
+    for (const [k, v] of Object.entries(i18n[c])) assert.ok(typeof v === "string" && v.trim() && !/[{}]/.test(v.replace(/\{\w+\}/g, "")), `${c}.${k}`);
   }
+  // a text has the same {placeholders} in every language
+  const holes = (v) => [...new Set(text(v, /\{(\w+)\}/g).map((m) => m[1]))].sort();
+  for (const k of keys) for (const c of CODES) assert.deepEqual(holes(i18n[c][k]), holes(i18n.pl[k]), `${c}.${k} placeholders`);
+  // a count has all three forms
+  for (const k of keys) if (/\.(one|few|many)$/.test(k)) for (const f of ["one", "few", "many"]) assert.ok(i18n.pl[k.replace(/\w+$/, f)] !== undefined, `${k}: no .${f}`);
   assert.deepEqual(text(i18n.pl.src, /\{(\w+)\}/g).map((m) => m[1]), ["name"]);
 });
 
@@ -83,6 +91,10 @@ test("every page loads i18n.js before common.js and has the switcher", () => {
     assert.ok(i18nAt >= 0, `${f}: i18n.js is not loaded`);
     assert.ok(commonAt >= 0, `${f}: common.js is not loaded`);
     assert.ok(i18nAt < commonAt, `${f}: i18n.js must load before common.js`);
+    for (const m of text(html, /src="(i18n-[\w-]+\.js)" defer/g)) {
+      assert.ok(m.index > i18nAt && m.index < commonAt, `${f}: ${m[1]} must load between i18n.js and common.js`);
+      assert.ok(read("docs/" + m[1]).includes("i18nAdd("), `${m[1]} adds its texts with i18nAdd()`);
+    }
     assert.match(html, /<nav class="langs" aria-label="[^"]+" data-i18n-aria="nav\.langs">/);
     assert.deepEqual(text(html, /<a href="\?lang=(\w+)" hreflang="\w+" lang="\w+" data-lang="\w+" aria-label="[^"]+" data-i18n-aria="lang\.\w+"( aria-current="true")?>[A-Z]{2}<\/a>/g).map((m) => m[1]), ["pl", "en", "uk"], f);
     assert.match(html, /<nav class="tabs" aria-label="Strony" data-i18n-aria="nav\.tabs">/);
@@ -174,4 +186,14 @@ test("without docs/i18n.js common.js still loads and t() gives the key back", ()
   assert.equal(RCB.lang("", "en"), "en");
   assert.equal(RCB.t("tab.map", null, "en"), "tab.map");
   assert.equal(RCB.applyI18n({ querySelector: () => null }), "pl");
+});
+
+test("tn() picks the plural form of the language and fills {n}", () => {
+  const { RCB } = load();
+  for (const [n, pl, en, uk] of [[1, "one", "one", "one"], [3, "few", "many", "few"], [5, "many", "many", "many"], [22, "few", "many", "few"], [21, "many", "many", "one"]]) {
+    for (const [c, f] of [["pl", pl], ["en", en], ["uk", uk]]) assert.equal(RCB.tn(n, "test.count", null, c), "test.count." + f, `${c} ${n}`);
+  }
+  assert.equal(RCB.loc("uk"), "uk-UA");
+  assert.equal(RCB.loc("en"), "en-GB");
+  assert.equal(RCB.loc("pl"), "pl-PL");
 });
