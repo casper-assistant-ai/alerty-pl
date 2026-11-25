@@ -16,6 +16,8 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
   runs it daily; it refuses a file with far fewer points than the last run. `schrony.html` + `shelters.js`
   show the points, find the nearest to the phone's location, an address (Nominatim) or a tapped place,
   and offer navigation (the Android `geo:` chooser, Apple Maps, Google Maps, Waze; `?lat=&lon=` opens a place).
+- Lint: `ruff check .` (Python, `ruff.toml`) and `npx eslint .` (JavaScript, `eslint.config.mjs`); CodeQL
+  with this repository's own queries in `codeql/` (see «Corrections become checks»).
 - Tests: `python3 -I -m unittest discover -s tests` and `node --test tests/*.test.mjs` (CI runs both; the period logic of the map page lives in `docs/common.js` so `tests/period.test.mjs` can reach it). Fixtures are saved gov.pl pages in `tests/fixtures/`.
 - Live check: `python3 -I scripts/rcb.py update --pages 1 --out /tmp/gh-aw/agent/live`.
 - Site check: `node scripts/site_check.mjs` opens every page of the live site in headless Chrome
@@ -97,6 +99,30 @@ Rules:
 - Alert categories: air, drill, water, weather, ordnance, fire, chemical, other.
   An alert is `active` until an update says it ended or its category TTL passes.
 
+## Corrections become checks
+
+When a review, a failed run or the owner corrects something, fix it and then make the correction a
+check first, so no agent can make the same mistake again (owner's rule, 2026-11-25). Pick the first
+that can catch it:
+
+1. **A test** in `tests/` when it is about behaviour (a parser case, a page rule, a gate rule).
+   Example: `scripts/html_check.py`, added after a stray quote printed `powiadomienia.">` on
+   every page on 2026-11-22; CI now fails if it comes back.
+2. **A lint rule** when it is a code pattern in one file: Python in `ruff.toml` (ruff), JavaScript in
+   `eslint.config.mjs` (ESLint), HTML in `.htmlvalidate.json` (html-validate). Turn on the existing
+   rule that catches it and fix what it finds in the same PR.
+3. **A CodeQL query** when the pattern needs data flow across lines or files: a query in
+   `codeql/<language>/queries/` with a test in `codeql/<language>/test/<Query>/` (cases marked BAD
+   and OK, and the `.expected` output). `codeql test run codeql/javascript/test` runs the tests;
+   the CodeQL workflow runs them on every PR, and an alert from a new query blocks the merge like
+   GitHub's own (example: `LeafletHtmlContent.ql`, from security audit #146).
+
+Only what needs judgment, and cannot be checked by code, goes into the rules of this file.
+Before you push: `ruff check .` and `npx eslint .` (CI installs `ruff==0.17.6` and `eslint@10.15.0`
+with `@eslint/js@10.0.1` and `globals@17.14.0`) as well as the tests. Never silence a finding with
+`noqa`, `eslint-disable` or a wider ignore list to make CI green; fix the code, or say in the PR why
+the rule is wrong there.
+
 ## Commit messages
 
 No AI tool is named as a co-author: no `Co-Authored-By: Claude …`, no «Generated with Claude Code»
@@ -141,7 +167,7 @@ The agent-coach workflow keeps this block (bounded edits, each with its evidence
   issue with that reason instead of opening a PR — the reviewer rejects behaviour-free churn
   even when the issue asks for it [PR #23, issue #21].
 - Run the checks on the exact tree you push (unittest with the node suite, the one-page live
-  parse, `node --check` on every `docs/*.js`, html-validate on `docs/*.html`) and quote their real output in the PR body; a
+  parse, `node --check` on every `docs/*.js`, html-validate on `docs/*.html`, `ruff check .`, `npx eslint .`) and quote their real output in the PR body; a
   green claim the CI contradicts costs a fixer round [PR #22, CI run 44997317672].
 - Write the PR title as a Conventional Commit on the first attempt: the gate squashes with it
   and CI lints it, and a prose title that slips through must be hand-mapped into the changelog
