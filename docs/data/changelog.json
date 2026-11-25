@@ -15,11 +15,47 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.23.7",
    "date": "2026-11-25",
-   "time": "2026-11-25T09:47:35+01:00",
-   "sha": "b7c73ac",
+   "time": "2026-11-25T11:24:03+01:00",
+   "sha": "06d6ff6",
    "changes": [
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "send plain-http visitors to https (notifications failed on CORS)",
+     "sha": "06d6ff6",
+     "date": "2026-11-25",
+     "time": "2026-11-25T11:24:03+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "parser",
+     "breaking": false,
+     "text": "keep one record per alert when gov.pl lists it twice (#123)",
+     "sha": "36ff77c",
+     "date": "2026-11-25",
+     "time": "2026-11-25T10:20:26Z"
+    },
+    {
+     "type": "docs",
+     "scope": "readme",
+     "breaking": false,
+     "text": "owner and Dependabot PRs go through the agents' pipeline (#129)",
+     "sha": "4543beb",
+     "date": "2026-11-25",
+     "time": "2026-11-25T11:18:57+01:00"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "ledger of 7 days: PR #118 on main, the 11-25 529 against the fallback models, the retro at 95% of its limit (#130)",
+     "sha": "3c46d46",
+     "date": "2026-11-25",
+     "time": "2026-11-25T10:18:32Z"
+    },
     {
      "type": "ci",
      "scope": "pipeline",

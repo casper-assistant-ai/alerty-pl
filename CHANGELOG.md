@@ -2,11 +2,24 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.23.7 (2026-11-25)
+
+### fix
+
+- **site:** send plain-http visitors to https (notifications failed on CORS) ([06d6ff6](https://github.com/casper-assistant-ai/alerty-pl/commit/06d6ff6))
+- **parser:** keep one record per alert when gov.pl lists it twice (#123) ([36ff77c](https://github.com/casper-assistant-ai/alerty-pl/commit/36ff77c))
+
+### docs
+
+- **readme:** owner and Dependabot PRs go through the agents' pipeline (#129) ([4543beb](https://github.com/casper-assistant-ai/alerty-pl/commit/4543beb))
 
 ### ci
 
 - **pipeline:** put the owner's PRs and Dependabot's PRs through the agents' pipeline ([b7c73ac](https://github.com/casper-assistant-ai/alerty-pl/commit/b7c73ac))
+
+### chore
+
+- **process:** ledger of 7 days: PR #118 on main, the 11-25 529 against the fallback models, the retro at 95% of its limit (#130) ([3c46d46](https://github.com/casper-assistant-ai/alerty-pl/commit/3c46d46))
 
 ## 1.23.6 (2026-11-25)
 
