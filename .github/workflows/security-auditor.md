@@ -4,7 +4,8 @@ description: |
   scraper, the front end (untrusted RCB text rendered in the browser) and the GitHub
   Actions workflows. Reports verified findings in one issue; fixes go through the other agents.
 on:
-  schedule: weekly
+  schedule:
+    - cron: "8 12 * * 3"
   workflow_dispatch:
 permissions:
   contents: read
