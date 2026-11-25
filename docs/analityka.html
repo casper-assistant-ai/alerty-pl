@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Analityka Alertów RCB — ile, gdzie i kiedy</title>
+<title data-i18n-title="title.analytics">Analityka Alertów RCB — ile, gdzie i kiedy</title>
 <meta name="description" content="Statystyki Alertów RCB w Polsce: liczba alertów w czasie, województwa, powiaty, rodzaje zagrożeń i pory dnia.">
 <meta name="color-scheme" content="light dark">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -13,15 +13,16 @@
 <body>
 <header class="top">
   <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
-  <nav class="tabs" aria-label="Strony">
-    <a href="./">Mapa</a>
-    <a href="schrony.html">Schrony</a>
-    <a href="historia.html">Historia</a>
-    <a href="analityka.html" aria-current="page">Analityka</a>
-    <a href="powiadomienia.html">Powiadomienia</a>
-    <a href="zmiany.html">Zmiany</a>
+  <nav class="tabs" aria-label="Strony" data-i18n-aria="nav.tabs">
+    <a href="./" data-i18n="tab.map">Mapa</a>
+    <a href="schrony.html" data-i18n="tab.shelters">Schrony</a>
+    <a href="historia.html" data-i18n="tab.history">Historia</a>
+    <a href="analityka.html" aria-current="page" data-i18n="tab.analytics">Analityka</a>
+    <a href="powiadomienia.html" data-i18n="tab.notify">Powiadomienia</a>
+    <a href="zmiany.html" data-i18n="tab.changes">Zmiany</a>
   </nav>
-  <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty">źródło: gov.pl/web/rcb</a>
+  <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="src" data-i18n-param-name="src.gov">źródło: gov.pl/web/rcb</a>
+  <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
 <div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main>
@@ -78,13 +79,12 @@
 </main>
 <footer>
   <div class="in">
-    <p>Strona nieoficjalna. Dane z <a href="https://www.gov.pl/web/rcb/komunikaty">komunikatów Rządowego Centrum Bezpieczeństwa</a>,
-    sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako <a href="powiadomienia.html">powiadomienia</a>. W razie zagrożenia słuchaj komunikatów służb i stosuj się do Alertów RCB w telefonie.</p>
-    <p>Stronę rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>:
-    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>. Mapa: <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a>, krój: IBM Plex.
+    <p><span data-i18n="foot.unofficial">Strona nieoficjalna.</span> <span data-i18n="foot.dataFrom">Dane z</span> <a href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="foot.rcb">komunikatów Rządowego Centrum Bezpieczeństwa</a><span data-i18n="foot.checked">, sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako</span> <a href="powiadomienia.html" data-i18n="foot.notify">powiadomienia</a><span data-i18n="foot.listen">. W razie zagrożenia słuchaj komunikatów służb i stosuj się do Alertów RCB w telefonie.</span></p>
+    <p><span data-i18n="foot.builtBy">Stronę rozwijają i utrzymują agenci</span> <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>: <a href="https://github.com/casper-assistant-ai/alerty-pl" data-i18n="foot.codeHistory">kod i historia ich pracy</a><span data-i18n="foot.mapColon">. Mapa:</span> <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a><span data-i18n="foot.font">, krój: IBM Plex.</span>
     <a class="mono" id="ver" href="zmiany.html"></a></p>
   </div>
 </footer>
+<script src="i18n.js" defer></script>
 <script src="common.js" defer></script>
 <script src="analytics.js" defer></script>
 </body>

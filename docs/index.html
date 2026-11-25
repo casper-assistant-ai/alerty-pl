@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Alerty RCB — mapa alertów w Polsce</title>
+<title data-i18n-title="title.map">Alerty RCB — mapa alertów w Polsce</title>
 <meta name="description" content="Mapa Alertów RCB w Polsce, dziś i w dowolnym dniu lub okresie od 2021 roku, na mapie lub zdjęciach satelitarnych z pożarami NASA: zagrożenie z powietrza, woda, pogoda, ćwiczenia. Dane z gov.pl/web/rcb/komunikaty, sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako powiadomienia.">
 <meta name="color-scheme" content="light dark">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -14,15 +14,16 @@
 <body>
 <header class="top">
   <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
-  <nav class="tabs" aria-label="Strony">
-    <a href="./" aria-current="page">Mapa</a>
-    <a href="schrony.html">Schrony</a>
-    <a href="historia.html">Historia</a>
-    <a href="analityka.html">Analityka</a>
-    <a href="powiadomienia.html">Powiadomienia</a>
-    <a href="zmiany.html">Zmiany</a>
+  <nav class="tabs" aria-label="Strony" data-i18n-aria="nav.tabs">
+    <a href="./" aria-current="page" data-i18n="tab.map">Mapa</a>
+    <a href="schrony.html" data-i18n="tab.shelters">Schrony</a>
+    <a href="historia.html" data-i18n="tab.history">Historia</a>
+    <a href="analityka.html" data-i18n="tab.analytics">Analityka</a>
+    <a href="powiadomienia.html" data-i18n="tab.notify">Powiadomienia</a>
+    <a href="zmiany.html" data-i18n="tab.changes">Zmiany</a>
   </nav>
-  <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty">źródło: gov.pl/web/rcb</a>
+  <a class="src mono" href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="src" data-i18n-param-name="src.gov">źródło: gov.pl/web/rcb</a>
+  <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
 <div class="strip" id="strip"><span class="state" role="status">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
 <main class="map-page">
@@ -80,14 +81,13 @@
 </main>
 <footer>
   <div class="in">
-    <p>Strona nieoficjalna. Dane z <a href="https://www.gov.pl/web/rcb/komunikaty">komunikatów Rządowego Centrum Bezpieczeństwa</a>,
-    sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako <a href="powiadomienia.html">powiadomienia</a>. W razie zagrożenia słuchaj komunikatów służb i stosuj się do Alertów RCB w telefonie.</p>
-    <p>Stronę rozwijają i utrzymują agenci <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>:
-    <a href="https://github.com/casper-assistant-ai/alerty-pl">kod i historia ich pracy</a>. Granice: <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a>; mapa <a href="https://leafletjs.com">Leaflet</a>, podkład Esri Light/Dark Gray Canvas (© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>); zdjęcia satelitarne <a href="https://livingatlas.arcgis.com/wayback/">Esri World Imagery Wayback</a> i <a href="https://www.earthdata.nasa.gov/gibs">NASA GIBS</a>, pożary <a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a> (VIIRS 375 m); krój: IBM Plex.
+    <p><span data-i18n="foot.unofficial">Strona nieoficjalna.</span> <span data-i18n="foot.dataFrom">Dane z</span> <a href="https://www.gov.pl/web/rcb/komunikaty" data-i18n="foot.rcb">komunikatów Rządowego Centrum Bezpieczeństwa</a><span data-i18n="foot.checked">, sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako</span> <a href="powiadomienia.html" data-i18n="foot.notify">powiadomienia</a><span data-i18n="foot.listen">. W razie zagrożenia słuchaj komunikatów służb i stosuj się do Alertów RCB w telefonie.</span></p>
+    <p><span data-i18n="foot.builtBy">Stronę rozwijają i utrzymują agenci</span> <a href="https://github.github.com/gh-aw/">GitHub Agentic Workflows</a>: <a href="https://github.com/casper-assistant-ai/alerty-pl" data-i18n="foot.codeHistory">kod i historia ich pracy</a><span data-i18n="foot.bounds">. Granice:</span> <a href="https://github.com/ppatrzyk/polska-geojson">polska-geojson</a><span data-i18n="foot.map">; mapa</span> <a href="https://leafletjs.com">Leaflet</a><span data-i18n="foot.esriCanvas">, podkład Esri Light/Dark Gray Canvas (©</span> <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a><span data-i18n="foot.satellite">); zdjęcia satelitarne</span> <a href="https://livingatlas.arcgis.com/wayback/">Esri World Imagery Wayback</a> <span data-i18n="foot.and">i</span> <a href="https://www.earthdata.nasa.gov/gibs">NASA GIBS</a><span data-i18n="foot.fires">, pożary</span> <a href="https://firms.modaps.eosdis.nasa.gov/">NASA FIRMS</a> <span data-i18n="foot.fontFires">(VIIRS 375 m); krój: IBM Plex.</span>
     <a class="mono" id="ver" href="zmiany.html"></a></p>
   </div>
 </footer>
 <script src="vendor/leaflet/leaflet.js" defer></script>
+<script src="i18n.js" defer></script>
 <script src="common.js" defer></script>
 <script src="wayback.js" defer></script>
 <script src="app.js" defer></script>

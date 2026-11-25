@@ -79,6 +79,12 @@ nav.tabs a { display: flex; align-items: center; padding: 0 12px; color: var(--t
 nav.tabs a:hover { color: var(--text); }
 nav.tabs a[aria-current="page"] { color: var(--text); border-bottom-color: var(--text); }
 .top .src { margin-left: auto; color: var(--muted); }
+/* the language switcher (PL / EN / UK): common.js keeps the other URL parameters in its links and marks the current one */
+nav.langs { display: flex; gap: 2px; }
+nav.langs a { display: flex; align-items: center; justify-content: center; min-width: 34px; min-height: 32px; padding: 0 6px; color: var(--text-2);
+  text-decoration: none; font-size: .8125rem; font-weight: 500; border-radius: 6px; }
+nav.langs a:hover { color: var(--text); background: var(--bg); }
+nav.langs a[aria-current] { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
 
 /* the status strip: the one place that turns red when there is an air threat */
 .strip { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 10px 24px;
@@ -467,6 +473,7 @@ footer p { margin: 0; max-width: 90ch; }
 @media (max-width: 640px) {
   .top { gap: 12px; padding: 0 16px; }
   .top .src { display: none; }
+  nav.langs { margin-left: auto; }
   nav.tabs a { padding: 0 8px; }
   .strip { padding: 8px 16px; }
   .strip .checked { margin-left: 0; width: 100%; }
@@ -504,9 +511,10 @@ footer p { margin: 0; max-width: 90ch; }
   .filters label { flex: 1 1 140px; }
   .filters label.q { flex-basis: 100%; }
 }
-/* on a narrow phone the four tabs do not fit next to the logo: wrap them into their own row */
-@media (max-width: 440px) {
-  .top { flex-wrap: wrap; height: auto; padding: 8px 16px 0; }
+/* narrower than a large screen the six tabs, the source link and the language switcher do not fit next to the
+   logo (about 1060 px together): wrap the tabs into their own row */
+@media (max-width: 1080px) {
+  .top { flex-wrap: wrap; height: auto; padding: 8px 16px 0; gap: 8px 16px; }
   /* overflow-x: auto makes overflow-y auto too: pin the row so it only scrolls sideways */
   nav.tabs { flex: 1 1 100%; height: 40px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; touch-action: pan-x; scrollbar-width: none; }
   nav.tabs::-webkit-scrollbar { display: none; }
