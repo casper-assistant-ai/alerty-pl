@@ -6,12 +6,15 @@
 <title data-i18n-title="title.changes">Zmiany na stronie — Alerty RCB</title>
 <meta name="description" content="Historia zmian strony Alerty RCB: wersje według semver, zbudowane z komunikatów commitów (Conventional Commits).">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111213" media="(prefers-color-scheme: dark)">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='6' fill='%23c4122f'/%3E%3Crect x='11' y='11' width='10' height='10' rx='2' fill='white'/%3E%3C/svg%3E">
 </head>
 <body>
 <header class="top">
+  <a class="skip" href="#main" data-i18n="nav.skip">Przejdź do treści</a>
   <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
   <nav class="tabs" aria-label="Strony" data-i18n-aria="nav.tabs">
     <a href="./" data-i18n="tab.map">Mapa</a>
@@ -25,7 +28,7 @@
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
 <div class="strip" id="strip"><span class="state" role="status" data-i18n="strip.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
-<main>
+<main id="main" tabindex="-1">
   <div class="page-head">
     <div>
       <h1 data-i18n="chg.h1">Historia zmian</h1>

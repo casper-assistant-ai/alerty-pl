@@ -6,6 +6,8 @@
 <title data-i18n-title="title.map">Alerty RCB — mapa alertów w Polsce</title>
 <meta name="description" content="Mapa Alertów RCB w Polsce, dziś i w dowolnym dniu lub okresie od 2021 roku, na mapie lub zdjęciach satelitarnych z pożarami NASA: zagrożenie z powietrza, woda, pogoda, ćwiczenia. Dane z gov.pl/web/rcb/komunikaty, sprawdzane co 20 sekund; nowe alerty pojawiają się od razu, także jako powiadomienia.">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f4f4f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#111213" media="(prefers-color-scheme: dark)">
 <link rel="preload" href="fonts/ibm-plex-sans-latin-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="style.css">
@@ -13,6 +15,7 @@
 </head>
 <body>
 <header class="top">
+  <a class="skip" href="#main" data-i18n="nav.skip">Przejdź do treści</a>
   <a class="logo" href="./"><span class="mark" aria-hidden="true"></span>Alerty RCB</a>
   <nav class="tabs" aria-label="Strony" data-i18n-aria="nav.tabs">
     <a href="./" aria-current="page" data-i18n="tab.map">Mapa</a>
@@ -26,7 +29,7 @@
   <nav class="langs" aria-label="Język" data-i18n-aria="nav.langs"><a href="?lang=pl" hreflang="pl" lang="pl" data-lang="pl" aria-label="Polski" data-i18n-aria="lang.pl" aria-current="true">PL</a><a href="?lang=en" hreflang="en" lang="en" data-lang="en" aria-label="English" data-i18n-aria="lang.en">EN</a><a href="?lang=uk" hreflang="uk" lang="uk" data-lang="uk" aria-label="Українська" data-i18n-aria="lang.uk">UK</a></nav>
 </header>
 <div class="strip" id="strip"><span class="state" role="status" data-i18n="map.loading">Ładowanie…</span><span class="others"></span><span class="checked mono"></span></div>
-<main class="map-page">
+<main id="main" class="map-page" tabindex="-1">
   <section class="map-wrap" aria-label="Mapa" data-i18n-aria="map.aria.map">
     <div class="period" role="group" aria-label="Okres na mapie" data-i18n-aria="map.aria.period">
       <div class="brush" id="brush">
@@ -42,10 +45,10 @@
           <button type="button" data-days="1" title="Dziś" data-i18n-tip="map.preset.todayTip" data-i18n="map.preset.24h">24 h</button><button type="button" data-days="7" data-i18n="map.preset.7d">7 dni</button><button type="button" data-days="30" data-i18n="map.preset.30d">30 dni</button><button type="button" data-days="365" data-i18n="map.preset.year">rok</button><button type="button" data-days="all" data-i18n="map.preset.all">wszystko</button>
         </div>
         <div class="dates">
-          <button type="button" class="btn icon" id="prev" aria-label="Poprzedni okres" data-i18n-aria="map.prev" title="Poprzedni okres" data-i18n-tip="map.prev">&#9664;</button>
+          <button type="button" class="btn icon" id="prev" aria-label="Poprzedni okres" data-i18n-aria="map.prev" title="Poprzedni okres" data-i18n-tip="map.prev"><svg width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3 5 8l5 5"/></svg></button>
           <label><span data-i18n="map.dateFrom">od</span><input type="date" id="from"></label>
           <label><span data-i18n="map.dateTo">do</span><input type="date" id="to"></label>
-          <button type="button" class="btn icon" id="next" aria-label="Następny okres" data-i18n-aria="map.next" title="Następny okres" data-i18n-tip="map.next">&#9654;</button>
+          <button type="button" class="btn icon" id="next" aria-label="Następny okres" data-i18n-aria="map.next" title="Następny okres" data-i18n-tip="map.next"><svg width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
         </div>
       </div>
       <output id="day-label" class="day-label mono" aria-live="polite"></output>

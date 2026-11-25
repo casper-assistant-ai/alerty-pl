@@ -8,6 +8,7 @@
 const I18N = {
   pl: {
     "nav.tabs": "Strony",
+    "nav.skip": "Przejdź do treści",
     "tab.map": "Mapa",
     "tab.shelters": "Schrony",
     "tab.history": "Historia",
@@ -116,6 +117,7 @@ const I18N = {
   },
   en: {
     "nav.tabs": "Pages",
+    "nav.skip": "Skip to content",
     "tab.map": "Map",
     "tab.shelters": "Shelters",
     "tab.history": "History",
@@ -224,6 +226,7 @@ const I18N = {
   },
   uk: {
     "nav.tabs": "Сторінки",
+    "nav.skip": "Перейти до змісту",
     "tab.map": "Мапа",
     "tab.shelters": "Сховища",
     "tab.history": "Історія",
