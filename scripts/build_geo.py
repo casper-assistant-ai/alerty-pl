@@ -60,7 +60,7 @@ def path(geom, p):
 def centroid(geom):
     r = max(rings(geom), key=len)
     a = cx = cy = 0.0
-    for (x1, y1), (x2, y2) in zip(r, r[1:] + r[:1]):
+    for (x1, y1), (x2, y2) in zip(r, r[1:] + r[:1], strict=True):
         c = x1 * y2 - x2 * y1
         a += c
         cx += (x1 + x2) * c
@@ -73,7 +73,7 @@ def inside(pt, geom):
     x, y = pt
     hit = False
     for r in rings(geom):
-        for (x1, y1), (x2, y2) in zip(r, r[1:] + r[:1]):
+        for (x1, y1), (x2, y2) in zip(r, r[1:] + r[:1], strict=True):
             if (y1 > y) != (y2 > y) and x < (x2 - x1) * (y - y1) / (y2 - y1) + x1:
                 hit = not hit
     return hit
@@ -97,7 +97,7 @@ def geojson(out, woj, pw, file):
     for v in out["voivodeships"]:
         feats.append({"type": "Feature", "properties": {"kind": "woj", "id": v["id"], "name": v["name"]},
                       "geometry": rounded(by_name[v["name"]]["geometry"])})
-    for p, f in zip(out["powiaty"], sorted(pw, key=lambda f: f["properties"]["nazwa"])):
+    for p, f in zip(out["powiaty"], sorted(pw, key=lambda f: f["properties"]["nazwa"]), strict=True):
         feats.append({"type": "Feature", "properties": {"kind": "pow", "id": p["id"], "name": p["name"],
                       "v": p["voivodeship"], "city": p["city"]}, "geometry": rounded(f["geometry"])})
     with open(file, "w", encoding="utf-8") as fh:

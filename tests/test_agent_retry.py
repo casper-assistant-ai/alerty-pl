@@ -4,9 +4,9 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-import agent_retry as ar  # noqa: E402
+import agent_retry as ar
 
-UTC = dt.timezone.utc
+UTC = dt.UTC
 # Claude Code's own records from issue-worker run 45684338261 (2026-11-25, the 5-hour quota of z.ai),
 # shortened; the API log of a job has the timestamp, `gh run view --log` adds "job<TAB>step<TAB>".
 QUOTA_LOG = (

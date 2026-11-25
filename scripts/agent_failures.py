@@ -285,11 +285,11 @@ def fetch(repo, days, now):
     pool = ThreadPoolExecutor(8)
     runs_of = pool.map(lambda w: gh(f"repos/{repo}/actions/workflows/{w['id']}/runs?status=completed&per_page=100"
                                     f"&created=%3E%3D{since}")["workflow_runs"], workflows)
-    for w, runs in zip(workflows, runs_of):
+    for w, runs in zip(workflows, runs_of, strict=True):
         w["runs"] = [r for r in runs if r.get("conclusion") not in NEUTRAL]
     every = [r for w in workflows for r in w["runs"]]
     jobs = pool.map(lambda r: gh(f"repos/{repo}/actions/runs/{r['id']}/attempts/{r.get('run_attempt') or 1}/jobs?per_page=100")["jobs"], every)
-    for r, j in zip(every, jobs):
+    for r, j in zip(every, jobs, strict=True):
         r["jobs"] = j
     to_read = []
     for w in workflows:
@@ -306,14 +306,14 @@ def fetch(repo, days, now):
             return signal_lines(gh(f"repos/{repo}/actions/jobs/{job_id}/logs", raw=True))
         except (RuntimeError, subprocess.TimeoutExpired) as e:
             return [f"(log not read: {e})"]
-    for (r, _), sig in zip(to_read, pool.map(read, to_read)):
+    for (r, _), sig in zip(to_read, pool.map(read, to_read), strict=True):
         r["signals"] = sig
 
     issues = [i for i in gh(f"repos/{repo}/issues?state=open&labels=agentic-workflows&per_page=100") if not i.get("pull_request")]
     comments = pool.map(lambda i: gh(f"repos/{repo}/issues/{i['number']}/comments?per_page=100") if i.get("comments") else [], issues)
     out = [{"number": i["number"], "title": i["title"], "updated_at": i.get("updated_at"),
             "labels": [l["name"] for l in i.get("labels") or []],
-            "doctor_commented": any(DOCTOR.search(c.get("body") or "") for c in cs)} for i, cs in zip(issues, comments)]
+            "doctor_commented": any(DOCTOR.search(c.get("body") or "") for c in cs)} for i, cs in zip(issues, comments, strict=True)]
     pool.shutdown()
     return workflows, out
 
@@ -326,7 +326,7 @@ def main(argv=None):
     p.add_argument("--out")
     p.add_argument("--md")
     a = p.parse_args(argv)
-    now = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    now = dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
     pat = Path(a.patterns)
     workflows, issues = fetch(a.repo, a.days, now)
     rep = summarize(workflows, issues, known_patterns(pat.read_text() if pat.exists() else ""), now, a.days)

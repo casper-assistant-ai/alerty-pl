@@ -213,7 +213,7 @@ async function main() {
       try { results.push(await audit(cdp, sid, path, vp)); }
       catch (e) { results.push({ url: BASE + path, viewport: vp.name, problems: [{ kind: "audit", detail: e.message.slice(0, 200) }] }); }
     }
-  } finally { proc.kill("SIGKILL"); try { rmSync(dir, { recursive: true, force: true }); } catch {} }
+  } finally { proc.kill("SIGKILL"); try { rmSync(dir, { recursive: true, force: true }); } catch { /* a leftover temp dir is harmless */ } }
   const bad = results.filter((r) => r.problems.length);
   if (args.out) writeFileSync(args.out, JSON.stringify({ ok: !bad.length, base: BASE, results }, null, 1));
   const md = [`Mobile audit of ${BASE}: ${bad.length ? bad.length + " of " + results.length + " page views with problems" : "all " + results.length + " page views fine"}.`, ""];

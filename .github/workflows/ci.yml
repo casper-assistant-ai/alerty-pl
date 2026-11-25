@@ -12,7 +12,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
         with:
@@ -38,6 +38,12 @@ jobs:
         run: python3 -I scripts/rcb.py update --pages 1 --out /tmp/smoke && python3 -I -c "import json;d=json.load(open('/tmp/smoke/alerts.json'));assert d['alerts'],'no alerts';print(len(d['alerts']),'alerts')"
       - name: JavaScript syntax
         run: for f in docs/*.js; do node --check "$f"; done
+      - name: Python lint (ruff, rules in ruff.toml)
+        run: pipx run ruff==0.17.6 check --output-format=github .
+      - name: JavaScript lint (ESLint, rules in eslint.config.mjs)
+        run: |
+          npm install --no-save --no-package-lock --no-audit --no-fund eslint@10.15.0 @eslint/js@10.0.1 globals@17.14.0
+          npx --no-install eslint .
       - name: "Node tests (every tests/*.test.mjs: common.js helpers, phone CSS rules, map period)"
         run: node --test tests/*.test.mjs
       - name: HTML pages are valid (html-validate, structural rules in .htmlvalidate.json)

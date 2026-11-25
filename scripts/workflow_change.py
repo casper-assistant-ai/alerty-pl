@@ -42,6 +42,7 @@ import os
 import re
 import subprocess
 import sys
+from datetime import UTC
 from pathlib import Path
 
 try:
@@ -371,7 +372,7 @@ def check_jobs(a, b):
         if len(xs) != len(ys):
             p.append(f"job `{j}`: steps were added or removed")
             continue
-        for i, (s, t) in enumerate(zip(xs, ys), 1):
+        for i, (s, t) in enumerate(zip(xs, ys, strict=True), 1):
             if s == t:
                 continue
             if not isinstance(s, dict) or not isinstance(t, dict) or _without(s, "run") != _without(t, "run"):
@@ -602,7 +603,7 @@ def attempt(issue, src):
     try:
         compile_sources(changed)
     except RuntimeError as e:
-        raise PatchError(f"gh aw compile failed: {e}")
+        raise PatchError(f"gh aw compile failed: {e}") from e
     cls, problems = guard("HEAD")
     if cls == "refuse":
         raise Refused("; ".join(problems))
@@ -753,8 +754,8 @@ def started_within(workflow, minutes):
              "--jq", ".[0].createdAt // \"\"", check=False).strip()
     if not out:
         return False
-    from datetime import datetime, timezone
-    age = datetime.now(timezone.utc) - datetime.fromisoformat(out.replace("Z", "+00:00"))
+    from datetime import datetime
+    age = datetime.now(UTC) - datetime.fromisoformat(out.replace("Z", "+00:00"))
     return age.total_seconds() < minutes * 60
 
 

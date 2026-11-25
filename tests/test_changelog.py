@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-import changelog  # noqa: E402
+import changelog
 
 SCRIPT = Path(__file__).resolve().parent.parent / "scripts" / "changelog.py"
 

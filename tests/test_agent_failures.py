@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-import agent_failures as af  # noqa: E402
+import agent_failures as af
 
 # Lines as they stand in real gh-aw v1.2.2 agent job logs of this repository (24.11.2026).
 TIMEOUT_LOG = """2026-11-24T10:37:43.4632609Z {"type":"system","subtype":"thinking_tokens","estimated_tokens":3171}

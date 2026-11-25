@@ -146,7 +146,7 @@ def summarize(commits, prs, issues, runs, role, since):
             reports_list.append(i["number"])
         if i.get("state") == "open" and i["number"] not in linked and "report" not in labels:
             unlinked.append(i["number"])
-    for a, g in agents.items():
+    for g in agents.values():
         g["idle"] = max(0, g["runs"] - g["failed"] - g["prs"] - g["reports"])
     out["book"] += len(reports_list)
     total = out["dev"] + out["book"]
@@ -510,7 +510,7 @@ def main(argv=None):
 
 def run(a):
     if a.cmd == "gave-up":
-        since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        since = (dt.datetime.now(dt.UTC) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
         raw = pages(f"/repos/{repo_name(a.repo)}/issues?state=closed&labels={GAVE_UP_LABEL}&per_page=100"
                     f"&since={urllib.parse.quote(since)}", token())
         issues = [{"number": i["number"], "title": i["title"], "state": i["state"], "closed_at": i.get("closed_at"),
@@ -525,7 +525,7 @@ def run(a):
             Path(a.md).write_text(md, encoding="utf-8")
         print(md)
     elif a.cmd == "queue":
-        now = dt.datetime.now(dt.timezone.utc)
+        now = dt.datetime.now(dt.UTC)
         since = (now - dt.timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%SZ")
         _, prs, issues, _ = fetch(repo_name(a.repo), token(), since)
         res = queue(issues, prs, now.strftime("%Y-%m-%d"))
@@ -536,7 +536,7 @@ def run(a):
             Path(a.md).write_text(md, encoding="utf-8")
         print(md)
     elif a.cmd == "kick":
-        now = dt.datetime.now(dt.timezone.utc)
+        now = dt.datetime.now(dt.UTC)
         since = (now - dt.timedelta(days=14)).strftime("%Y-%m-%dT%H:%M:%SZ")
         repo, tok = repo_name(a.repo), token()
         _, prs, issues, _ = fetch(repo, tok, since, with_runs=False)
@@ -551,7 +551,7 @@ def run(a):
         if not a.dry_run:
             api(f"/repos/{repo}/actions/workflows/{WORKER}.lock.yml/dispatches", tok, method="POST", body={"ref": "main"})
     elif a.cmd == "metrics":
-        since = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        since = (dt.datetime.now(dt.UTC) - dt.timedelta(days=a.days)).strftime("%Y-%m-%dT%H:%M:%SZ")
         res = summarize(*fetch(repo_name(a.repo), token(), since), roles(), since)
         if a.out:
             Path(a.out).write_text(json.dumps(res, indent=1), encoding="utf-8")
@@ -561,7 +561,7 @@ def run(a):
         print(md)
     else:
         known = {f.name.removesuffix(".lock.yml") for f in WF.glob("*.lock.yml")}
-        day = a.day or DAYS[dt.datetime.now(dt.timezone.utc).weekday()]
+        day = a.day or DAYS[dt.datetime.now(dt.UTC).weekday()]
         todo = [ag for ag, days in load_schedule(a.schedule, known).items() if day in days]
         for ag in todo:
             print(f"dispatch {ag} ({day})" + (" [dry run]" if a.dry_run else ""))

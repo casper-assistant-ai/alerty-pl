@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-import shelters  # noqa: E402
+import shelters
 
 FIXTURE = Path(__file__).resolve().parent / "fixtures" / "punkty_schronienia.csv"
 

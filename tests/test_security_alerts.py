@@ -3,7 +3,7 @@ import sys
 import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "scripts"))
-import security_alerts as sa  # noqa: E402
+import security_alerts as sa
 
 
 class SecurityAlertsTest(unittest.TestCase):

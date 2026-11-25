@@ -119,7 +119,7 @@ def level(items):
 
 
 def vstr(v):
-    return "%d.%d.%d" % v
+    return "{}.{}.{}".format(*v)
 
 
 def releases():

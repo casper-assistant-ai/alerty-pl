@@ -34,7 +34,7 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from agent_failures import ANSI, STAMP, NEUTRAL, gh, agent_failed  # noqa: E402
+from agent_failures import ANSI, STAMP, agent_failed, gh
 
 WORKFLOWS = Path(".github/workflows")
 MAX_ATTEMPTS = 3            # the first run and two retries
@@ -56,7 +56,7 @@ def _time(s):
 
 
 def _iso(t):
-    return t.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return t.astimezone(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def api_error(log_text):
@@ -238,7 +238,7 @@ def main(argv=None):
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--now", help="ISO time instead of the clock (tests, dry runs)")
     a = ap.parse_args(argv)
-    clock = (lambda: _time(a.now)) if a.now else (lambda: dt.datetime.now(dt.timezone.utc))
+    clock = (lambda: _time(a.now)) if a.now else (lambda: dt.datetime.now(dt.UTC))
     stop = clock() + dt.timedelta(minutes=a.watch)
     seen, logs, report = set(), {}, []
     while True:

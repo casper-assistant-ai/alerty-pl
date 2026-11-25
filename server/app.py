@@ -35,8 +35,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 sys.path.insert(0, os.path.join(ROOT, "scripts"))
 sys.path.insert(0, HERE)
-import rcb  # noqa: E402  the site's own parser
 import core  # noqa: E402
+import rcb  # noqa: E402  the site's own parser
 
 log = logging.getLogger("alerty")
 TZ = ZoneInfo("Europe/Warsaw")
@@ -435,7 +435,7 @@ async def body(request):
     try:
         return await request.json()
     except Exception:
-        raise web.HTTPBadRequest(text="JSON expected")
+        raise web.HTTPBadRequest(text="JSON expected") from None
 
 
 def page(title, text):
@@ -489,7 +489,7 @@ def routes(svc):
                     if ev is None:
                         break
                     await resp.write(f"event: alert\ndata: {ev}\n\n".encode())
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     await resp.write(f"event: ping\ndata: {json.dumps({'checked_at': svc.checked_at})}\n\n".encode())
         except (ConnectionResetError, asyncio.CancelledError):
             pass

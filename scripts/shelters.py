@@ -51,7 +51,7 @@ def csv_url():
             url = a.get("file_url") or a.get("link") or ""
             if (a.get("format") or "").lower() == "csv" and url.startswith("https://"):
                 return url
-    except Exception as e:  # noqa: BLE001 - the API is only a hint
+    except Exception as e:
         print("dane.gov.pl API:", e, file=sys.stderr)
     return CSV_URL
 

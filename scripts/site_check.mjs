@@ -363,7 +363,7 @@ async function main() {
     results.push(...await freshness());
   } finally {
     proc.kill("SIGKILL");
-    try { rmSync(dir, { recursive: true, force: true }); } catch {}
+    try { rmSync(dir, { recursive: true, force: true }); } catch { /* a leftover temp dir is harmless */ }
   }
   const bad = results.filter((r) => r.problems.length);
   const report = { ok: !bad.length, base: BASE, checked_at: new Date().toISOString(), pages: results.length, results };

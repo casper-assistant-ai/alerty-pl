@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
-import retro  # noqa: E402
+import retro
 
 SINCE = "2026-11-14T00:00:00Z"
 
@@ -210,7 +210,8 @@ class Roles(unittest.TestCase):
 
 class Schedule(unittest.TestCase):
     def test_caps_and_unknown(self):
-        import json, tempfile
+        import json
+        import tempfile
         with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
             json.dump({"max_extra_runs_per_week": 9, "extra_runs": {
                 "site-designer": ["mon", "tue", "wed", "thu", "mon"], "evil": ["mon"],

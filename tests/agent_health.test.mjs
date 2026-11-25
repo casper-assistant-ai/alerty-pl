@@ -184,7 +184,7 @@ test("a streak whose issue was closed after its last failure opens no second iss
 
   // a failure after the close is news: a new issue
   const later = run("failure", "2026-11-24T15:00:00Z");
-  ({ calls, args } = fakeGithub([later, bad], { [later.id]: crashed, [bad.id]: crashed }));
+  ({ args } = fakeGithub([later, bad], { [later.id]: crashed, [bad.id]: crashed }));
   args.closedIssues = closed;
   assert.equal(await H.reconcile(args), "opened #200");
 });
