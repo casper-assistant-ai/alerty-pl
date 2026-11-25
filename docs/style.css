@@ -594,3 +594,29 @@ footer p { margin: 0; max-width: 90ch; }
 nav.tabs[data-more~="r"] { mask-image: linear-gradient(to right, #000 calc(100% - 32px), transparent); }
 nav.tabs[data-more~="l"] { mask-image: linear-gradient(to left, #000 calc(100% - 32px), transparent); }
 nav.tabs[data-more~="l"][data-more~="r"] { mask-image: linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
+
+/* the place search on the map (geosearch.js): a field in the top right corner, a status line and the other matches under it */
+.lmap .geo-search { width: min(300px, calc(100vw - 120px)); background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 1px 4px rgb(0 0 0 / .18); padding: 4px; font: .8125rem var(--sans); color: var(--text); }
+.geo-search form { display: flex; gap: 4px; align-items: center; margin: 0; }
+.geo-search input { flex: 1; min-width: 0; height: 32px; font: inherit; font-size: .875rem; color: var(--text); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 6px; padding: 0 8px; }
+.geo-search input::-webkit-search-cancel-button { display: none; }
+.geo-search .btn { width: 32px; height: 32px; min-width: 32px; padding: 0; display: grid; place-items: center; font-size: 1.125rem; line-height: 1; }
+.geo-search .btn[hidden] { display: none; }
+.geo-note { margin: 4px 4px 0; color: var(--text-2); overflow-wrap: anywhere; }
+.geo-note.bad { color: var(--accent); }
+.geo-note[hidden], .geo-results[hidden] { display: none; }
+.geo-results { list-style: none; margin: 4px 0 0; padding: 4px 0 0; border-top: 1px solid var(--line); max-height: 40vh; overflow-y: auto; }
+.geo-results .link { display: block; width: 100%; text-align: left; min-height: 28px; padding: 4px; font: inherit; color: var(--text); background: none;
+  border: 0; border-radius: 4px; cursor: pointer; }
+.geo-results .link:hover, .geo-results .link[aria-current] { background: var(--surface-2); }
+.geo-results .link[aria-current] { font-weight: 500; }
+.lmap path.geo-pin { stroke: var(--surface); fill: var(--accent); fill-opacity: .9; }
+.lmap.sat path.geo-pin { stroke: #fff; }
+@media (max-width: 640px), (max-height: 500px), (pointer: coarse) {
+  .lmap .geo-search { width: calc(100vw - 112px); max-width: 340px; }
+  .geo-search input, .geo-search .btn { height: 40px; }
+  .geo-search .btn { width: 40px; min-width: 40px; }
+  .geo-results .link { min-height: 36px; }
+}

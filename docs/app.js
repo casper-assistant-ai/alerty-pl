@@ -500,6 +500,8 @@ async function main() {
   const view = readView(q);
   if (view) map.setView(view.center, view.zoom); else map.fitBounds(S.pow.getBounds(), { padding: [4, 4] });
   new ResizeObserver(() => map.invalidateSize()).observe($("#map"));
+  // the place search (geosearch.js): an address, a postal code or coordinates move the map there
+  if (typeof RCBGeo !== "undefined") RCBGeo.control(map);
 
   setBase("mapa");
   dark.addEventListener("change", () => S.base === "mapa" && setBase("mapa"));
