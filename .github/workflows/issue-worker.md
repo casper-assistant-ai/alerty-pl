@@ -109,6 +109,9 @@ PR are in work; skip them. The `rejected PRs` column lists PRs for that issue th
 closed without merging: read the gate's and the PR reviewer's comments on them and do not repeat
 what they rejected. When this run was started by a new issue
 (#${{ github.event.issue.number }}), take that issue first.
+When that issue is not yours to work (labelled `workflow-change` or `agent-health`, or with an
+open pull request), call `noop` at once: never fall back to the queue's oldest issue, which the
+run started by another issue of the same minute may have taken.
 
 Every issue you touch ends in exactly one of two ways, and you say which in one comment on it:
 
