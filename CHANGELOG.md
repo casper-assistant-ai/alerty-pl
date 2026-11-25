@@ -2,6 +2,21 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.27.2 (2026-11-25)
+
+### fix
+
+- **map:** ask again for the Wayback release list before the page fails (#156) ([e10b1b7](https://github.com/casper-assistant-ai/alerty-pl/commit/e10b1b7))
+
+### ci
+
+- **workflows:** site-designer: bound the reading, send by turn 40 (#154) ([0c5aaa1](https://github.com/casper-assistant-ai/alerty-pl/commit/0c5aaa1))
+- **workflows:** the maintainer also runs after Agent health and the PR reviewer ([c0e467c](https://github.com/casper-assistant-ai/alerty-pl/commit/c0e467c))
+
+### chore
+
+- **process:** quota twice a day, 429 [1302], site-designer bound (#153) ([a37a21c](https://github.com/casper-assistant-ai/alerty-pl/commit/a37a21c))
+
 ## 1.27.1 (2026-11-25)
 
 ### fix

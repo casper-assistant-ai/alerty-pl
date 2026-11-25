@@ -15,6 +15,50 @@
  },
  "releases": [
   {
+   "version": "1.27.2",
+   "date": "2026-11-25",
+   "time": "2026-11-25T17:26:22Z",
+   "sha": "0c5aaa1",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "site-designer: bound the reading, send by turn 40 (#154)",
+     "sha": "0c5aaa1",
+     "date": "2026-11-25",
+     "time": "2026-11-25T17:26:22Z"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "the maintainer also runs after Agent health and the PR reviewer",
+     "sha": "c0e467c",
+     "date": "2026-11-25",
+     "time": "2026-11-25T19:09:44+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "map",
+     "breaking": false,
+     "text": "ask again for the Wayback release list before the page fails (#156)",
+     "sha": "e10b1b7",
+     "date": "2026-11-25",
+     "time": "2026-11-25T17:50:40Z"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "quota twice a day, 429 [1302], site-designer bound (#153)",
+     "sha": "a37a21c",
+     "date": "2026-11-25",
+     "time": "2026-11-25T17:40:55Z"
+    }
+   ]
+  },
+  {
    "version": "1.27.1",
    "date": "2026-11-25",
    "time": "2026-11-25T17:47:24+01:00",
