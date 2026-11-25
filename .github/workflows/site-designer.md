@@ -54,9 +54,10 @@ You own the look and the front-end quality of the alerty-pl site in `docs/` (pla
 JavaScript, no build step, no npm, no external fonts or CDNs). Read `AGENTS.md` first.
 
 1. Read the `unslop` skill and the `modern-web-guidance` skill. They are your checklist.
-2. Read `docs/*.html`, `docs/*.css` and `docs/*.js`. List what still looks generic or
-   "AI-made" (by the unslop checklist) and what is out of date or weak (by modern-web-guidance:
-   accessibility, semantics, performance, responsive layout, dark/light, reduced motion).
+2. Skim `docs/*.html`, `docs/*.css` and `docs/*.js` (`wc -l`, `head` and `grep` first; read a
+   file whole only when you mean to change it) and list what still looks generic or "AI-made" (by
+   the unslop checklist) and what is out of date or weak (by modern-web-guidance: accessibility,
+   semantics, performance, responsive layout, dark/light, reduced motion).
 3. Pick at most three changes that give the most value. Keep them small and safe:
    - the map, the lists and the data flow must keep working; never change `docs/data/` or `docs/geo/`;
    - the UI language is Polish; keep every RCB link and the footer disclaimer;
@@ -68,6 +69,8 @@ JavaScript, no build step, no npm, no external fonts or CDNs). Read `AGENTS.md` 
 4. Check every changed script with `node --check docs/<file>.js`, then run
    `node --test tests/*.test.mjs` and quote its output in the PR body.
 5. Open one PR. Its body lists each change, the skill rule behind it, and how to see it.
+   The run has 25 minutes and no clock: stop reading and write by your 40th turn, and never read
+   `process/*.md` or `scripts/` (the process-doctor's files, not a design checklist).
    The PR may change `docs/*.html`, `docs/*.js` and `docs/*.css` only: the safe output refuses the
    whole patch for any other file, and the run's work is lost.
    Call `noop` when nothing is worth changing this week.
