@@ -50,6 +50,7 @@ flowchart LR
   G -->|tests fail / changes| PF[pr-fixer 🤖] -->|commit to the same PR| G
   G -->|closed PR: issue back| IW
   IW -->|fix PR| G
+  OW[owner PR · Dependabot PR] -->|label pipeline| G
   IT[issue-triage 🤖] -->|labels| RK & PD
   DS[daily-status 🤖] -->|daily report issue| IW
   SD[site-designer 🤖] -->|PR| G
@@ -72,7 +73,7 @@ flowchart LR
 | `update.yml` | plain Actions | — | every 30 min | `docs/data/` (fallback and archive), release tag, `CHANGELOG.md`, Pages |
 | `site-check.yml` | plain Actions, headless Chrome | — | hourly and after each deploy | issue `site-error`, dispatches `site-fixer` |
 | `ci.yml` | plain Actions | — | push, PR | nothing |
-| `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent PRs that pass, sends broken ones to `pr-fixer` |
+| `agent-pr-gate.yml` | plain Actions | — | twice an hour, after the reviewer and the fixer | merges agent, owner and Dependabot PRs that pass, sends broken ones to `pr-fixer` |
 | `agent-dispatch.yml` | plain Actions | — | daily | nothing; starts the extra agent runs planned in `process/schedule.json` |
 | `agent-health.yml` | plain Actions | — | after every agent run, twice an hour | one self-closing `[aw] <agent>: N failed runs in a row` issue per failing agent; dispatches `process-doctor` for a new one |
 | `pr-reviewer` | agent | GLM-5.4 (z.ai) | when the gate asks | verdict comment: approve, changes or reject |
@@ -109,6 +110,14 @@ Guard rails: agents run read-only and write only through gh-aw safe outputs; eac
 its `allowed-files`; `.github/` is protected; public issues never start an agent (triage runs on a
 schedule); the gate merges only when unit tests and a live parse of gov.pl pass and the reviewer approves; a
 broken PR is fixed in its own branch by `pr-fixer` (three attempts) before the gate gives up on it.
+
+The owner's own PRs (authors `kloba` and `casper-assistant-ai`, once marked ready) and Dependabot's
+PRs go through the same pipeline: the gate labels them `pipeline`, `pr-reviewer` gives its verdict,
+`pr-fixer` repairs them in their branch, and the gate merges them. A Dependabot PR may change only
+`server/requirements*.txt`; an owner PR may change anything except `.github/workflows/`, which the
+gate's token cannot merge. A PR that touches `server/` must also install and start the live
+service. The gate never closes an owner PR: it comments «Agent PR gate: stopped» with the reason
+and adds the label `gate-stopped`; remove the label to hand the PR back to the gate.
 
 ## Live alerts and notifications
 
