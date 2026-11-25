@@ -13,13 +13,3 @@ updates:
     commit-message:
       prefix: "build"
       include: "scope"
-  # Temporary (2026-11-25): proves the pipeline on a real Dependabot PR into the test branch
-  # dependabot-test, which pins aiohttp one patch back; removed after the test.
-  - package-ecosystem: "pip"
-    directory: "/server"
-    target-branch: "dependabot-test"
-    schedule:
-      interval: "weekly"
-    commit-message:
-      prefix: "build"
-      include: "scope"
