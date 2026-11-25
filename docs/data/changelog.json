@@ -17,9 +17,36 @@
   {
    "version": null,
    "date": "2026-11-25",
-   "time": "2026-11-25T22:14:48+01:00",
-   "sha": "f3fdfdd",
+   "time": "2026-11-25T22:35:26+01:00",
+   "sha": "2d45139",
    "changes": [
+    {
+     "type": "docs",
+     "scope": "agents",
+     "breaking": false,
+     "text": "every correction becomes a test, a lint rule or a CodeQL query first",
+     "sha": "2d45139",
+     "date": "2026-11-25",
+     "time": "2026-11-25T22:35:26+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "codeql",
+     "breaking": false,
+     "text": "advanced setup with the repository's own queries; a PR with a new alert is not merged",
+     "sha": "f92229e",
+     "date": "2026-11-25",
+     "time": "2026-11-25T22:35:26+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "lint",
+     "breaking": false,
+     "text": "ruff for Python and ESLint for JavaScript in CI, the existing findings fixed",
+     "sha": "c5ac0a9",
+     "date": "2026-11-25",
+     "time": "2026-11-25T22:35:26+01:00"
+    },
     {
      "type": "ci",
      "scope": "issue-worker",

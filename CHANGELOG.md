@@ -4,8 +4,14 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ## Unreleased
 
+### docs
+
+- **agents:** every correction becomes a test, a lint rule or a CodeQL query first ([2d45139](https://github.com/casper-assistant-ai/alerty-pl/commit/2d45139))
+
 ### ci
 
+- **codeql:** advanced setup with the repository's own queries; a PR with a new alert is not merged ([f92229e](https://github.com/casper-assistant-ai/alerty-pl/commit/f92229e))
+- **lint:** ruff for Python and ESLint for JavaScript in CI, the existing findings fixed ([c5ac0a9](https://github.com/casper-assistant-ai/alerty-pl/commit/c5ac0a9))
 - **issue-worker:** let its PR change README.md, as allowed-files says ([f3fdfdd](https://github.com/casper-assistant-ai/alerty-pl/commit/f3fdfdd))
 
 ## 1.30.0 (2026-11-25)
