@@ -2,6 +2,7 @@
 import datetime as dt
 import json
 import os
+import re
 import sys
 import unittest
 from unittest import mock
@@ -401,6 +402,75 @@ class UpdateFailingPage(unittest.TestCase):
         self.assertIn(broken, rows)          # the skipped page kept its own record, not re-parsed
         self.assertIn("woda-2024", ids)      # an entry older than the fetched pages stayed
         self.assertIn("komunikat-1811", ids)  # the pages that did load were parsed in
+
+
+class ListCarriesAlertTwice(unittest.TestCase):
+    """25.11.2026: in one run gov.pl's list carried the 19.11 water alert twice, and update()
+    wrote it twice into alerts.json: the map showed it twice and meta.json said 3 active for 2.
+    Whatever the list repeats, on one page or over two, an alert gets one record and one read
+    of its detail page. The clock is frozen on 23.11.2026, when that alert is the only active one."""
+    WATER = "alert-rcb---woda-niezdatna-do-spozycia-pow-zabkowicki-1911"
+
+    class Clock(dt.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 11, 23, 12, 0, tzinfo=tz)
+
+    def setUp(self):
+        self.saved = page("komunikaty-page1.html")
+        items = [b for b in re.findall(r"<li>.*?</li>", self.saved, re.S) if '<div class="title">' in b]
+        self.assertEqual(len(items), 10)  # one <li> per item of the saved list page
+        self.water = next(b for b in items if self.WATER in b)
+        self.following = next(b for b in items if "komunikat-1811" in b)
+        self.fetched, self.pages = [], {}
+        # one saved page stands for every other alert here, so skip the check of whose page it is
+        for p in (mock.patch.object(rcb.dt, "datetime", self.Clock),
+                  mock.patch.object(rcb, "fetch", self.fetch),
+                  mock.patch.object(rcb, "is_alert_page", return_value=True)):
+            p.start()
+            self.addCleanup(p.stop)
+
+    def fetch(self, url, tries=3):
+        self.fetched.append(url)
+        m = re.search(r"komunikaty\?page=(\d+)", url)
+        if m:
+            return self.pages[int(m.group(1))]
+        name = self.WATER if url.endswith(self.WATER) else "alert-rcb---trening-systemow-alarmowania-2111"
+        return page(name + ".html")
+
+    def update(self, pages):
+        """(ids of alerts.json, meta.json, the run's stderr) after a run over these list pages."""
+        import contextlib
+        import io
+        import tempfile
+        import warnings
+        self.pages = pages
+        err = io.StringIO()
+        with tempfile.TemporaryDirectory() as d, warnings.catch_warnings():
+            warnings.simplefilter("ignore", ResourceWarning)
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(err):
+                rcb.update(len(pages), d)
+            with open(os.path.join(d, "alerts.json"), encoding="utf-8") as fh:
+                ids = [a["id"] for a in json.load(fh)["alerts"]]
+            with open(os.path.join(d, "meta.json"), encoding="utf-8") as fh:
+                meta = json.load(fh)
+        return ids, meta, err.getvalue()
+
+    def assert_kept_once(self, ids, meta, err):
+        self.assertEqual((len(ids), len(set(ids))), (9, 9))  # the 9 alerts of the saved page
+        self.assertEqual((meta["count"], meta["active"]), (9, 1))
+        self.assertEqual(self.fetched.count(rcb.BASE + "/web/rcb/" + self.WATER), 1)
+        self.assertIn("listed twice on gov.pl, kept once: " + self.WATER, err)
+
+    def test_alert_repeated_on_the_next_page_is_kept_once(self):
+        ids, meta, err = self.update({1: self.saved, 2: self.water + self.following})
+        self.assert_kept_once(ids, meta, err)
+
+    def test_alert_repeated_on_one_page_is_kept_once(self):
+        twice = self.saved.replace(self.following, self.following + self.water, 1)
+        self.assertEqual(len(rcb.parse_list(twice)), 11)
+        ids, meta, err = self.update({1: twice})
+        self.assert_kept_once(ids, meta, err)
 
 
 class Gazetteer(unittest.TestCase):
