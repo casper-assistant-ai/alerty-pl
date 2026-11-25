@@ -5,7 +5,7 @@ description: |
   replacing yesterday's.
 on:
   schedule:
-    - cron: "50 9 * * *"
+    - cron: "5 10 * * *"
   workflow_dispatch:
 permissions:
   contents: read

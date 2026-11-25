@@ -8,7 +8,7 @@ on:
   # started by other workflows (CI, Site check, Update data, the CI doctor) with GITHUB_TOKEN
   bots: ["github-actions[bot]"]
   schedule:
-    - cron: "51 9 * * *"
+    - cron: "6 10 * * *"
   workflow_dispatch:
 permissions:
   contents: read

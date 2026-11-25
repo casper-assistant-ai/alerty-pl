@@ -5,7 +5,7 @@ name: Agent dispatch
 # agentic workflows of this repository, at most 3 extra runs per agent per week.
 on:
   schedule:
-    - cron: "5 7 * * *"
+    - cron: "5 12 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
