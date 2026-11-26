@@ -54,7 +54,7 @@ jobs:
       DEPENDABOT_ALLOWED: '^server/requirements[a-z0-9-]*\.txt$'
       OWNER_FORBIDDEN: '^\.github/workflows/'
       # scripts only Casper or the owner changes; the gate runs its own copies from main
-      PROTECTED: 'scripts/(workflow_change|gate_rules|pr_rules)\.py'
+      PROTECTED: 'scripts/(workflow_change|gate_rules|pr_rules|lock_patches)\.py'
       # GitHub logins whose PRs the pipeline takes: the owner (kloba) and Casper (casper-assistant-ai)
       OWNERS: 'kloba casper-assistant-ai'
     steps:

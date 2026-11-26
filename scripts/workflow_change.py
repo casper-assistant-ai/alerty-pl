@@ -561,6 +561,8 @@ def compile_sources(paths):
     for p in paths:
         if p.endswith(".md"):
             sh("gh", "aw", "compile", Path(p).stem)
+    # local fixes gh-aw does not offer yet (scripts/lock_patches.py)
+    sh("python3", "-I", "scripts/lock_patches.py")
 
 
 def run_tests():
