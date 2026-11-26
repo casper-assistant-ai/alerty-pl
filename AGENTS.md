@@ -203,11 +203,15 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   on them or close them (a PR that closes one fails `pr_rules.py`) [agent-health issues are
   rewritten after every run, #96].
 - issue-worker: one issue per run. Past minute 35 of the agent job, open the PR with what is done
-  and the rest as a follow-up, or stop; the step limit is 50 minutes [timeout, run 45371361840].
+  and the rest as a follow-up, or stop; the step limit is 50 minutes [timeout, run 45371361840]. A run
+  started by an issue that is not its to work (`workflow-change`, `agent-health`, an issue with an
+  open PR) calls `noop` at once, never the queue's oldest issue: on 2026-11-25 at 20:25 UTC four runs
+  fell back on #163 and #168 was closed [runs 45694879637, 45694883757, 45694892006, 45694894733].
 - every agent: the step limit (`timeout-minutes`) ends the CLI step as a failure and the whole
   session is lost, so by 80% of the limit send what is done — the PR, the issue or `noop` — and
   stop; the issue-worker's minute 35 is this rule at 50 [timeout, site-fixer runs 45248741714 and
-  45244945359 stopped at 25 min, region-keeper 45227118220 at 20].
+  45244945359 stopped at 25 min, region-keeper 45227118220 at 20]. An agent whose bash has no `date` keeps a clock: write `/tmp/gh-aw/agent/start` with the Write tool at the first turn, then `python3 -I -c "import os,time; print(int((time.time()-os.path.getmtime('/tmp/gh-aw/agent/start'))//60))"` gives the minutes since (tested in the doctor's sandbox, 2026-11-26).
+- every agent: a PR title stays under 128 characters, agent prefix included: the safe output cuts a longer one and appends «[Content truncat», the Conventional Commits check then fails and the PR fixer cannot rename it [PR #180, CI doctor run 45713805086].
 - every agent: a 529 or a 429 from z.ai ends a run at any turn and nothing unsent survives it, so
   send each output the moment it is ready (the issue comment before the checks, the PR after the
   first green check run, a workflow-change issue after the PR) and never hold one back to send it
@@ -232,7 +236,8 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   ends at the limit with nothing sent is a lost hour for the visitor and a blank page for the next
   run [timeout, site-fixer runs 45394657698 and 45400227786 on one open site-error issue, after
   the 80% rule].
-- pr-fixer: before `push_to_pull_request_branch`, run `git status --short` and `git diff --stat`.
+- security-auditor: the audit outgrows its 40 minutes when it finds much (good runs of 27 minutes, 42 at the limit with nothing sent): write before you check, with the clock above — the issue of the first confirmed finding goes out by minute 32, the rest as the run goes [timeout, runs 44917850467, 45695166662].
+- pr-fixer: before `push_to_pull_request_branch`, run `git status --short` and `git diff --stat`. When the failed check comes from main having moved (a config, a rule or a fix that is on main and not in the head, such as `ruff.toml` or `eslint.config.mjs` missing from the tree), answer `no fix` at once with «open the change anew from current main», never a merge of main: the merge brings files outside the agents' paths, the push is refused and the rounds are spent for nothing [PR #160: runs 45699496724, 45710001732, 45713893128, closed 22:55 UTC].
   The safe output refuses a patch over 4096 KB: keep generated data, fixtures and screenshots under
   /tmp/gh-aw/agent/ and push only the fix [safe-outputs, pr-fixer runs 45011310218 and
   45013053478: the same 6124 KB patch refused twice in 20 minutes].
