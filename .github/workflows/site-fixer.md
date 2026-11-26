@@ -28,6 +28,10 @@ tools:
   edit:
   github:
     toolsets: [default, actions]
+    # the site-error issues come from the Site check workflow (github-actions[bot], a CONTRIBUTOR);
+    # without this the guard hid issue #225 and the run ended report_incomplete (26.11.2026)
+    min-integrity: approved
+    trusted-users: ["github-actions[bot]"]
 safe-outputs:
   create-pull-request:
     title-prefix: "[site-fixer] "
