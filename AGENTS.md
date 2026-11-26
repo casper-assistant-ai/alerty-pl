@@ -205,8 +205,13 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
 
 <!-- reliability:start -->
 - Issues labelled `agent-health` or `workflow-change` belong to the process-doctor: do not comment
-  on them or close them (a PR that closes one fails `pr_rules.py`) [agent-health issues are
-  rewritten after every run, #96].
+  on them or close them (a PR that closes one fails `pr_rules.py`), and keep GitHub's closing
+  keywords (close, closes, closed, fix, fixes, fixed, resolve…) away from the number of such an
+  issue in a PR body, not even inside a quote: GitHub links the issue, the gate shuts the PR, and
+  the PR fixer cannot repair a body [agent-health issues are rewritten after every run, #96; PR
+  #199, the classifier fix, was shut at 05:00 UTC on 2026-11-26 for its own body, PR #228, the
+  fifth-window ledger, at 14:23 UTC after its quoted lines sent the fixer to `AGENTS.md`, a file it
+  cannot push: two doctor runs lost].
 - issue-worker: one issue per run. Past minute 35 of the agent job, open the PR with what is done
   and the rest as a follow-up, or stop; the step limit is 50 minutes [timeout, run 45371361840]. A run
   started by an issue that is not its to work (`workflow-change`, `agent-health`, an issue with an
@@ -223,7 +228,11 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   with another; a 429 [1308] «Usage limit reached for 5 hour» is the account's quota, not an
   overloaded model, and its reset time is Beijing time (UTC+8); `agent-retry.yml` re-runs a run
   that such an error ended with nothing sent (10 minutes after a 529 or 1302, a minute after the
-  1308 reset, three attempts at most), so do not ask for retries of your own; on a busy day the quota runs out 2 h 40 m to 4 h 20 m into every 5-hour window (on
+  1308 reset, three attempts at most), so do not ask for retries of your own; the quota runs out
+  47 minutes to 4 h 28 m into a 5-hour window (47 minutes into the one that began at 06:03 UTC on
+  2026-11-26: the owner ran every agent on Copilot until its reset, 886374b and 0ab933e; 3 h 20 m
+  into the next, reset 16:04:58 UTC, five runs dead from 14:23 to 15:15 UTC and agent-retry starting
+  the second attempts at 16:06 UTC; on
   2026-11-25 at 09:06 and 14:29 UTC, then at 22:41 UTC, 2 h 40 m into the window that began at
   20:01: eight runs to 23:17, pr-reviewer 45713911721 at turn 61 and issue-worker 45715355232 at
   turn 23, six at turn 1), and a 429 [1302] «Rate limit reached for requests» right
@@ -249,7 +258,13 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
 - pr-fixer: before `push_to_pull_request_branch`, run `git status --short` and `git diff --stat`. When the failed check comes from main having moved (a config, a rule or a fix that is on main and not in the head, such as `ruff.toml` or `eslint.config.mjs` missing from the tree), answer `no fix` at once with «open the change anew from current main», never a merge of main: the merge brings files outside the agents' paths, the push is refused and the rounds are spent for nothing [PR #160: runs 45699496724, 45710001732, 45713893128, closed 22:55 UTC].
   The safe output refuses a patch over 4096 KB: keep generated data, fixtures and screenshots under
   /tmp/gh-aw/agent/ and push only the fix [safe-outputs, pr-fixer runs 45011310218 and
-  45013053478: the same 6124 KB patch refused twice in 20 minutes].
+  45013053478: the same 6124 KB patch refused twice in 20 minutes]. The push also refuses
+  `AGENTS.md` and `README.md` while `pr-fixer.md` protects them although `allowed-files` names
+  them: when the change the reviewer asks for lies in one of the two, answer `no fix` in the first
+  minutes with that cause and the wording the builder needs, never a commit that stays local
+  [safe-outputs, PR #228 on 2026-11-26: runs 45830368629 (13 minutes, the push skipped),
+  45832646262 (11, a safe output failed), 45835195530 (13, `no fix`), the PR shut at 14:23 UTC;
+  workflow-change issue «pr-fixer: … protected-files exclude» of the same day].
 - site-designer: the PR may change `docs/*.html`, `docs/*.js` and `docs/*.css` only, and the node
   tests pin the front end (`tests/style.test.mjs` the phone rules of `docs/style.css`, `.month h2`
   and `.top .src`; `tests/i18n.test.mjs` the marked chrome of every page; `tests/common.test.mjs`
