@@ -2,6 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://services.arcgisonline.com https://wayback.maptiles.arcgis.com https://gibs.earthdata.nasa.gov https://planetarycomputer.microsoft.com; connect-src 'self' https://alerty-pl-cao.polandcentral.cloudapp.azure.com https://nominatim.openstreetmap.org https://s3-us-west-2.amazonaws.com https://wayback.maptiles.arcgis.com https://planetarycomputer.microsoft.com http://127.0.0.1:8090">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n-title="title.history">Historia Alertów RCB — archiwum od 2021 roku</title>
 <meta name="description" content="Archiwum wszystkich Alertów RCB z gov.pl: daty, rodzaje zagrożeń, województwa i powiaty. Filtrowanie i wyszukiwanie.">
@@ -36,7 +37,7 @@
       <p class="muted" id="orig" hidden data-i18n="hist.orig">Oryginalna treść komunikatów RCB (po polsku)</p>
     </div>
   </div>
-  <form class="filters" id="filters" role="search" onsubmit="return false">
+  <form class="filters" id="filters" role="search">
     <label class="q"><span data-i18n="hist.q">Szukaj w treści</span><input type="search" id="q" name="q" placeholder="np. Gostyń, burze, syreny"></label>
     <label><span data-i18n="hist.cat">Rodzaj</span><select id="f-cat" name="cat"><option value="" data-i18n="hist.catAll">wszystkie</option></select></label>
     <label><span data-i18n="hist.voiv">Województwo</span><select id="f-voiv" name="voiv"><option value="" data-i18n="hist.voivAll">cała Polska</option></select></label>

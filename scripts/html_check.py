@@ -4,7 +4,12 @@
 It catches markup that a browser repairs silently but that shows to a visitor: a quote inside an
 attribute value that ends it early (22.11.2026: a link inside <meta name="description"> printed
 'powiadomienia.">' at the top of every page), stray text in <head>, tags that close the wrong
-element or stay open, duplicate ids, and a page without lang, title, description or viewport.
+element or stay open, duplicate ids, and a page without lang, title, description, viewport or a
+Content-Security-Policy in <head>.
+
+It also refuses what that policy (script-src 'self') forbids and the browser passes over without an
+error of the page's own, so that a control is merely dead on the live page: an inline event handler
+attribute, a <script> without src and a javascript: URL.
 
     python3 -I scripts/html_check.py [FILE ...]   (default: docs/*.html)
 
@@ -23,6 +28,12 @@ OPTIONAL_END = {"p", "li", "dt", "dd", "option", "optgroup", "tr", "td", "th", "
                 "colgroup", "caption", "html", "head", "body"}
 RAW_TEXT = {"script", "style", "title", "textarea", "template"}
 ATTR_NAME = re.compile(r"^[a-z_:][a-z0-9_.:\-]*$")
+# an inline event handler (onclick, onsubmit, ...): script-src 'self' refuses it, and the browser says so only in
+# its own log, so the control is simply dead on the page
+INLINE_HANDLER = re.compile(r"^on[a-z]+$")
+# the attributes whose value is a URL that a click or a submit follows or the page loads
+URL_ATTR = {"href", "src", "action", "formaction", "xlink:href", "poster", "data", "background", "cite", "longdesc",
+            "ping"}
 
 
 class Checker(HTMLParser):
@@ -35,6 +46,7 @@ class Checker(HTMLParser):
         self.head_seen = False
         self.raw: str | None = None
         self.has = {"lang": False, "title": False, "description": False, "viewport": False}
+        self.csp: str | None = None
 
     def bad(self, msg: str) -> None:
         self.problems.append((self.getpos()[0], msg))
@@ -60,7 +72,15 @@ class Checker(HTMLParser):
                 self.bad(f"<{tag}> has a broken attribute {name!r}: a quote inside an attribute value ended it early")
             if value and ("<" in value or ">" in value) and name not in ("d", "points", "viewbox"):
                 self.bad(f"<{tag} {name}=…> holds markup ({value[:60]!r}…); attributes take plain text")
+            if INLINE_HANDLER.match(name):
+                self.bad(f"<{tag}> has an inline handler {name}=…: the page's Content-Security-Policy refuses it, "
+                         "use addEventListener in the page's script")
+            if name in URL_ATTR and value and re.sub(r"[\s\x00-\x20]", "", value).lower().startswith("javascript:"):
+                self.bad(f'<{tag} {name}="javascript:…">: the page\'s Content-Security-Policy refuses a javascript: URL, '
+                         "use a listener in the page's script")
             a[name] = value
+        if tag == "script" and not (a.get("src") or "").strip():
+            self.bad("<script> without src: the page's Content-Security-Policy refuses an inline script")
         if "id" in a and a["id"]:
             if a["id"] in self.ids:
                 self.bad(f"duplicate id {a['id']!r} (first on line {self.ids[a['id']]})")
@@ -72,6 +92,10 @@ class Checker(HTMLParser):
             self.has["description"] = True
         if tag == "meta" and a.get("name") == "viewport":
             self.has["viewport"] = True
+        # only one in <head> counts: everything above a policy further down the page loads unchecked
+        if (tag == "meta" and self.in_head and (a.get("http-equiv") or "").lower() == "content-security-policy"
+                and (a.get("content") or "").strip()):
+            self.csp = self.csp or a["content"]
 
     def handle_endtag(self, tag: str) -> None:
         if self.raw == tag:
@@ -103,6 +127,8 @@ class Checker(HTMLParser):
                        ("description", 'no <meta name="description">'), ("viewport", 'no <meta name="viewport">')):
             if not self.has[k]:
                 self.problems.append((1, msg))
+        if self.csp is None:
+            self.problems.append((1, 'no <meta http-equiv="Content-Security-Policy"> in <head>'))
 
 
 def check(text: str) -> list[tuple[int, str]]:
@@ -110,6 +136,19 @@ def check(text: str) -> list[tuple[int, str]]:
     c.feed(text)
     c.close()
     return sorted(c.problems)
+
+
+def policy(text: str) -> dict[str, set[str]]:
+    """The sources of each directive of the page's Content-Security-Policy, split as a browser splits them."""
+    c = Checker()
+    c.feed(text)
+    c.close()
+    out: dict[str, set[str]] = {}
+    for directive in (c.csp or "").split(";"):
+        words = directive.split()
+        if words:
+            out[words[0]] = set(words[1:])
+    return out
 
 
 def main(argv: list[str]) -> int:
