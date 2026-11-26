@@ -613,23 +613,27 @@ async function main() {
   if (q.get("podklad") === "esri" && isISO(q.get("zdjecie"))) S.wbPin = q.get("zdjecie");
   if (q.get("podklad") === "sentinel" && isISO(q.get("s2"))) S.s2Pin = q.get("s2");
 
-  async function refresh() {
-    const res = await RCB.strip();
-    const now = todayISO();
-    const was = S.today;
-    if (now !== S.today) { S.today = now; spark(); dispatchEvent(new Event("rcb:range")); }
-    if (res) { S.live = res.data; S.liveActive = res.active; }
-    // a period that ended today keeps ending today after midnight
-    if (S.to === null) setPeriod(wantFrom, wantTo, false);
-    else if (S.to === was) place(addDays(S.from, dayDiff(was, now)), now);
-  }
-  await refresh();
+  // The period of the URL, the layers it names and rcb:ready (attacks.js) come before the strip answers: a live
+  // service that hangs held the map blank, with no period and no layer, for the whole wait (#229). Only today's map
+  // reads the live list; the first refresh() repaints it with what the strip got, the service's answer or the copy on Pages.
+  setPeriod(wantFrom, wantTo, false);
   // attacks.js (missiles and drones over Poland) draws on the same map and slider through this
   window.RCBMap = { map, setDay: (d) => setPeriod(d, d), day: () => (S.from === S.to ? S.to : null), today: () => S.today,
     frac: (d) => (dayDiff(S.start, d) + 0.5) / nDays() };
   dispatchEvent(new CustomEvent("rcb:ready", { detail: window.RCBMap }));
   if (wantBase && wantBase !== "mapa") setBase(wantBase);
   if (S.fires) fires();
+
+  async function refresh() {
+    const res = await RCB.strip();
+    const now = todayISO();
+    const was = S.today;
+    if (now !== S.today) { S.today = now; spark(); dispatchEvent(new Event("rcb:range")); }
+    if (res) { S.live = res.data; S.liveActive = res.active; }
+    // a period that ends today keeps ending today after midnight, and its map takes the live list (the first one too)
+    if (S.to === was) place(addDays(S.from, dayDiff(was, now)), now);
+  }
+  await refresh();
   // from here on the URL follows the view, so the address bar is always a link to what is on the screen
   map.on("moveend", viewURL);
   if (view) viewURL();
