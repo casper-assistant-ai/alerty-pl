@@ -44,7 +44,7 @@ safe-outputs:
   # Detector failures stay in the run diagnostics; no ever-growing «[aw] Detection Runs» tracker.
   threat-detection:
     report-as-issue: false
-timeout-minutes: 40
+timeout-minutes: 60
 ---
 
 # Security auditor
