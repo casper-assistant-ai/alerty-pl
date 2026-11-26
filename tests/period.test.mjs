@@ -133,6 +133,41 @@ test("the map page draws the period of the URL, rcb:ready and its layers before 
   assert.deepEqual(failed.log, ["setPeriod 2026-11-20..2026-11-20", "event rcb:ready", "strip"]);
 });
 
+// ---------- today before the live list answers: what the copy marks as on, not all that touched today (#231) ----------
+
+test("alertsOf: today without the live list holds the copy's active and planned alerts, not one that ended today; a past day shows all", () => {
+  // Since #229 today's map is drawn before the strip answers, with S.live null. That first paint fell back to every
+  // archive alert that touched today: an air alert that ended hours ago blinked as on, under «Teraz», until the list came.
+  const app = readFileSync(new URL("../docs/app.js", import.meta.url), "utf8");
+  const from = app.indexOf("const isToday = () =>"), to = app.indexOf("const regionsOf =");
+  assert.ok(from !== -1 && to > from, "alertsOf was not found in docs/app.js");
+  const at = (d, hm) => `${d}T${hm}:00+01:00`;
+  const S = {
+    today: TODAY, from: TODAY, to: TODAY, live: null, liveActive: [],
+    archive: [ // the shape of data/archive.json: a status, started_at and last_at, no regions
+      { id: "ended-today", status: "ended", started_at: at(TODAY, "22:56"), last_at: at(TODAY, "23:54") },
+      { id: "expired-today", status: "expired", started_at: at("2026-11-22", "23:00"), last_at: at(TODAY, "01:00") },
+      { id: "on", status: "active", started_at: at("2026-11-22", "10:00"), last_at: at("2026-11-22", "12:00") },
+      { id: "planned", status: "planned", started_at: at(TODAY, "23:30"), last_at: at(TODAY, "23:30") },
+      { id: "old", status: "expired", started_at: at("2026-11-20", "08:00"), last_at: at("2026-11-20", "09:00") },
+    ],
+  };
+  const { alertsOf } = new Function("S", "span", `${app.slice(from, to)}\n;return { alertsOf };`)(S, RCB.span);
+  const ids = () => alertsOf().map((a) => a.id);
+  // without the live list: what strip() keeps from the copy too, newest first; the two that touched today and are over stay out
+  assert.deepEqual(ids(), ["planned", "on"]);
+  // with it: the live list alone
+  S.live = { alerts: [] };
+  S.liveActive = [{ id: "live", status: "active", started_at: at(TODAY, "12:00"), last_at: at(TODAY, "12:00") }];
+  assert.deepEqual(ids(), ["live"]);
+  // a past day takes nothing from the live list: every alert that touched it, as before
+  S.from = S.to = "2026-11-22";
+  assert.deepEqual(ids(), ["expired-today", "on"]);
+  S.live = null;
+  S.from = S.to = "2026-11-20";
+  assert.deepEqual(ids(), ["old"]);
+});
+
 // ---------- the history page: the same ?od=&do=, with the whole archive as the default (#52) ----------
 
 test("historyPeriod reads ?od=&do= as the map does; no date is the whole archive", () => {

@@ -61,7 +61,14 @@ const S = {
 // today alone shows what is on now (the live list); a past day or a period, every alert that touched it
 const isToday = () => S.from === S.today && S.to === S.today;
 function alertsOf(from = S.from, to = S.to) {
-  if (from === S.today && to === S.today && S.live) return S.liveActive;
+  if (from === S.today && to === S.today) {
+    if (S.live) return S.liveActive;
+    // before the live list answers (the map is drawn first, #229), and when neither the service nor the copy on Pages
+    // gave one: what the copy marks as on, the records strip() keeps from it too. Not every alert that touched today,
+    // which showed as on now the ones that ended hours ago (#231).
+    return S.archive.filter((a) => a.status === "active" || a.status === "planned")
+      .sort((a, b) => b.started_at.localeCompare(a.started_at));
+  }
   return S.archive.filter((a) => { const [s, e] = span(a, S.today); return s <= to && e >= from; })
     .sort((a, b) => b.started_at.localeCompare(a.started_at));
 }
