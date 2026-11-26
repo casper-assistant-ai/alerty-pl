@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Repository rules that code can check, so they need no line in AGENTS.md.
 
-    pr_rules.py check --base REF --head REF [--body-file F] [--workflow W] [--closes-file F]
+    pr_rules.py check --base REF (--head REF | --worktree) [--body-file F] [--workflow W] [--closes-file F]
     pr_rules.py commits RANGE
     pr_rules.py squash-body < messages
 
 `check` looks at one PR: the diff from the merge base of REF..REF, its body and the issues it
 closes. CI runs it on every pull request and the Agent PR gate on every PR it takes, with the copy
-on main (agents may not change this file). It prints one line per broken rule and exits 1:
+on main (agents may not change this file). `--worktree` checks the working tree with its untracked
+files instead of a commit, without moving HEAD or the index: an agent runs it before the push of a
+PR whose safe output takes the uncommitted change. It prints one line per broken rule and exits 1:
 
 - suppression: an added `noqa`, `eslint-disable` (or another inline ESLint comment), `nosec`,
   `type: ignore` or CodeQL `codeql[...]`/`lgtm[...]` comment in code. A finding is fixed, never
@@ -169,6 +171,22 @@ def check(files, base, head, body="", workflow="", closes=()):
     return out
 
 
+def worktree_commit():
+    """A commit of the working tree (untracked files too) on top of HEAD; HEAD and the index stay."""
+    import os
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        env = {**os.environ, "GIT_INDEX_FILE": os.path.join(d, "index"),
+               "GIT_AUTHOR_NAME": "pr_rules", "GIT_AUTHOR_EMAIL": "pr_rules@localhost",
+               "GIT_COMMITTER_NAME": "pr_rules", "GIT_COMMITTER_EMAIL": "pr_rules@localhost"}
+
+        def run(*args):
+            return subprocess.run(["git", *args], check=True, capture_output=True, text=True, env=env).stdout.strip()
+        run("read-tree", "HEAD")
+        run("add", "-A")
+        return run("commit-tree", run("write-tree"), "-p", "HEAD", "-m", "pr_rules worktree")
+
+
 def commit_problems(log):
     """Commits (records `sha\\x1fmessage\\x1e`) whose message names an AI co-author."""
     out = []
@@ -191,7 +209,9 @@ def main(argv=None):
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("check")
     c.add_argument("--base", required=True)
-    c.add_argument("--head", required=True)
+    h = c.add_mutually_exclusive_group(required=True)
+    h.add_argument("--head")
+    h.add_argument("--worktree", action="store_true", help="the working tree with untracked files, not a commit")
     c.add_argument("--body-file")
     c.add_argument("--workflow", default="")
     c.add_argument("--closes-file", help='JSON: [{"number": N, "labels": ["..."]}]')
@@ -205,6 +225,8 @@ def main(argv=None):
     if a.cmd == "commits":
         out = commit_problems(git("log", "--format=%H%x1f%B%x1e", a.range))
     else:
+        if a.worktree:
+            a.head = worktree_commit()
         files = parse_diff(git("diff", "--no-renames", "-U0", f"{a.base}...{a.head}"))
         body = open(a.body_file, encoding="utf-8").read() if a.body_file else ""
         closes = json.load(open(a.closes_file, encoding="utf-8")) if a.closes_file else []

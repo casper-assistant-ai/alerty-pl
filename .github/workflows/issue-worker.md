@@ -109,6 +109,9 @@ PR are in work; skip them. The `rejected PRs` column lists PRs for that issue th
 closed without merging: read the gate's and the PR reviewer's comments on them and do not repeat
 what they rejected. When this run was started by a new issue
 (#${{ github.event.issue.number }}), take that issue first.
+When that issue is not yours to work (labelled `workflow-change` or `agent-health`, or with an
+open pull request), call `noop` at once: never fall back to the queue's oldest issue, which the
+run started by another issue of the same minute may have taken.
 
 Every issue you touch ends in exactly one of two ways, and you say which in one comment on it:
 
@@ -116,6 +119,12 @@ Every issue you touch ends in exactly one of two ways, and you say which in one 
   paths your PR may touch (`scripts/`, `tests/`, `docs/*.html|js|css`, `README.md`,
   `process/improvements.md`), with a test when code changes, then run
   `python3 -I -m unittest discover -s tests` and `for f in docs/*.js; do node --check "$f"; done`.
+  Before the push, run `python3 -I scripts/pr_rules.py check --base origin/main --worktree
+  --body-file <body> --workflow issue-worker --closes-file <closes>` (stdlib only, so it runs where
+  ruff cannot; `--worktree` checks your uncommitted change and moves neither HEAD nor the index).
+  `<closes>` lists with their labels (`[{"number": N, "labels": [...]}]`) the issues GitHub links
+  the PR to: a closing keyword before the number. Never write such a keyword before another issue's
+  number. It names before the gate what ended PRs #202 (an added `noqa`) and #204 (a second link).
   Title: `[issue-worker] <Conventional Commit subject>`; body: the cause, the change, how it was
   checked, `Closes #<n>`, and `From #<report>` when it covers a point of a report. The Agent PR gate merges it and the issue closes.
 - **Closing with the reason** (`close-issue`, its body is the reason): a report whose points are

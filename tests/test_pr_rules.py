@@ -157,6 +157,37 @@ class FilesAndBody(unittest.TestCase):
         self.assertEqual(pr.squash_body(text), "* fix: x\n\nkeep\n")
 
 
+class Worktree(unittest.TestCase):
+    """--worktree checks the uncommitted change (an agent's safe output takes it) and moves nothing."""
+
+    def test_uncommitted_and_untracked_files_are_checked(self):
+        r = Repo({"a.py": "x = 1\n"}, {})
+        try:
+            head, index = r.run("rev-parse", "HEAD"), r.run("diff", "--cached", "--name-only")
+            r.write({"a.py": "x = 1  # noqa: E501\n", "new.py": "import os  # noqa\n"})
+            cwd = os.getcwd()
+            os.chdir(r.path)
+            try:
+                with tempfile.TemporaryFile("w+") as out:
+                    old, sys.stdout = sys.stdout, out
+                    try:
+                        code = pr.main(["check", "--base", "main", "--worktree"])
+                    finally:
+                        sys.stdout = old
+                    out.seek(0)
+                    lines = out.read().splitlines()
+            finally:
+                os.chdir(cwd)
+            self.assertEqual(code, 1)
+            self.assertEqual(sorted(l.split()[1] for l in lines if l.startswith("suppression: ")),
+                             ["a.py", "new.py"])
+            self.assertEqual(r.run("rev-parse", "HEAD"), head)
+            self.assertEqual(r.run("diff", "--cached", "--name-only"), index)
+            self.assertIn("new.py", r.run("status", "--porcelain"))
+        finally:
+            r.dir.cleanup()
+
+
 class Wiring(unittest.TestCase):
     """The checks run where AGENTS.md says they do."""
 
