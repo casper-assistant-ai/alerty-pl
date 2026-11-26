@@ -90,6 +90,32 @@ class LintCli(unittest.TestCase):
         self.assertIn("not a Conventional Commit", r.stderr)
         self.assertIn("feat", r.stderr)
 
+    def test_cut_title_fails_and_names_the_cut(self):
+        # PR #180: the create-pull-request tool stored 128 characters, a line break and a marker that is cut
+        # too; the type and the scope were right, so the hint of the format misled the CI doctor (#189)
+        title = ("chore(process): issue-worker runs of managed issues call noop, a python clock for the 80% "
+                 "rule, the ledger of t\n[Content truncat")
+        self.assertEqual(len(title), 128)
+        self.assertIsNone(changelog.parse(title))  # the rejection stays
+        self.assertEqual(changelog.lint_subjects([title]), 1)
+        r = self.run_lint(title)
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("the title was cut: 128 characters, the cut after 111", r.stderr)
+        self.assertIn("shorten the PR title", r.stderr)
+        self.assertNotIn("Use <type>", r.stderr)
+
+    def test_cut_marker_without_a_line_break_is_rejected_too(self):
+        title = "fix(map): a day slider over the whole archive of [Content truncat"
+        self.assertIsNotNone(changelog.parse(title))  # CC alone takes the marker for a description
+        self.assertEqual(changelog.lint_subjects([title]), 1)
+
+    def test_a_long_whole_title_passes(self):
+        # 128 is a rule for agents, not a limit of the lint: a commit subject has none
+        title = ("fix(changelog): the lint names a PR title that the tooling cut, with its length and "
+                 "where the cut fell, and keeps rejecting it on the line break and on the marker")
+        self.assertGreater(len(title), 128)
+        self.assertEqual(changelog.lint_subjects([title]), 0)
+
 
 class FullTimestamp(unittest.TestCase):
     """Releases and changes keep the full commit stamp: the Zmiany page shows HH:MM (#49)."""
