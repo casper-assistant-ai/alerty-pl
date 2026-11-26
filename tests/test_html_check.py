@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "scripts"))
-import html_check  # noqa: E402
+import html_check
 
 CSP = ('<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\'; '
        'style-src \'self\' \'unsafe-inline\'; img-src \'self\' data: https://example.invalid; '
