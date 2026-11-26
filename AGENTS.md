@@ -232,7 +232,8 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   47 minutes to 4 h 28 m into a 5-hour window (47 minutes into the one that began at 06:03 UTC on
   2026-11-26: the owner ran every agent on Copilot until its reset, 886374b and 0ab933e; 3 h 20 m
   into the next, reset 16:04:58 UTC, five runs dead from 14:23 to 15:15 UTC and agent-retry starting
-  the second attempts at 16:06 UTC; on
+  the second attempts at 16:06 UTC; at most 2 h 10 m into the seventh, reset 21:05:37 UTC, seven
+  runs dead at turn 1 from 18:15 to 20:54 UTC and the second attempts from 21:09; on
   2026-11-25 at 09:06 and 14:29 UTC, then at 22:41 UTC, 2 h 40 m into the window that began at
   20:01: eight runs to 23:17, pr-reviewer 45713911721 at turn 61 and issue-worker 45715355232 at
   turn 23, six at turn 1), and a 429 [1302] «Rate limit reached for requests» right
@@ -254,7 +255,13 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   ends at the limit with nothing sent is a lost hour for the visitor and a blank page for the next
   run [timeout, site-fixer runs 45394657698 and 45400227786 on one open site-error issue, after
   the 80% rule].
-- security-auditor: the audit outgrows its 40 minutes when it finds much (good runs of 27 minutes, 42 at the limit with nothing sent): write before you check, with the clock above — the issue of the first confirmed finding goes out by minute 32, the rest as the run goes [timeout, runs 44917850467, 45695166662].
+- security-auditor: write before you check. The audit outgrows its limit when it finds much (good runs
+  of 27 minutes, 32 of 30 and 42 of 40 at the limit with nothing sent), its report is one issue and
+  its bash tools give it no clock, so keep the clock above, audit the front end and the scraper
+  first, the workflows last, and open the report issue with what is verified by minute 32 or turn 50,
+  whichever comes first; the other findings go in as the run goes, and one left out goes in next
+  week's run [timeout, runs 44917850467 (32 of 30 minutes) and 45695166662 (42 of 40), both with
+  429 [1302] through the session; the limit is 60 now].
 - pr-fixer: before `push_to_pull_request_branch`, run `git status --short` and `git diff --stat`. When the failed check comes from main having moved (a config, a rule or a fix that is on main and not in the head, such as `ruff.toml` or `eslint.config.mjs` missing from the tree), answer `no fix` at once with «open the change anew from current main», never a merge of main: the merge brings files outside the agents' paths, the push is refused and the rounds are spent for nothing [PR #160: runs 45699496724, 45710001732, 45713893128, closed 22:55 UTC].
   The safe output refuses a patch over 4096 KB: keep generated data, fixtures and screenshots under
   /tmp/gh-aw/agent/ and push only the fix [safe-outputs, pr-fixer runs 45011310218 and
@@ -281,8 +288,12 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   the gate's next round. The agent has no clock (`date` is not among its bash tools), so the 80%
   rule cannot be kept [timeout, run 45739178322: 22 minutes on the 20-minute limit over one diff,
   #200; 45713911721: 61 turns, then the quota].
-- security-auditor: its report is one issue and its bash tools give it no clock, so audit the front
-  end and the scraper first, the workflows last, and open the report issue with what is verified by
-  turn 50; a finding left out goes in next week's run [timeout, runs 44917850467 (32 of 30 minutes)
-  and 45695166662 (42 of 40), both with 429 [1302] through the session; the limit is 60 now].
+- process-doctor: the PR fixer's push refuses `AGENTS.md`, so a `changes` verdict on one of your
+  rules shuts your PR with the rules and the ledger unlanded and the next run repeats the work:
+  keep the PR to `AGENTS.md` and `process/`, one line per rule and one row per signature and scope
+  (merge before you add), no closing keyword next to the number of an `agent-health` or
+  `workflow-change` issue in the ledger either, and a script change left to its item in
+  `process/improvements.md` [safe-outputs, PR #199 shut at 05:00 UTC for its body and PR #228 at
+  14:23 UTC for a reworded rule: fixer runs 45830368629, 45832646262, 45835195530; pr-reviewer
+  45739178322 timed out on the ledger diff of #199].
 <!-- reliability:end -->
