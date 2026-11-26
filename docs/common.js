@@ -32,8 +32,15 @@ const RCB = (() => {
   const $ = (s, root = document) => root.querySelector(s);
   const color = (c) => `var(--${c})`;
 
-  async function getJSON(url) {
-    const r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store" });
+  // ms: a request still waiting after that long is given up (the copy on Pages in liveData); the other
+  // data files, an archive of several MB among them, may take as long as a slow link needs
+  async function getJSON(url, ms) {
+    let r;
+    try {
+      r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store", signal: ms ? AbortSignal.timeout(ms) : undefined });
+    } catch (e) {
+      throw new Error(url + ": " + (e && e.name === "TimeoutError" ? "timeout" : e.message));
+    }
     if (!r.ok) throw new Error(url + ": " + r.status);
     return r.json();
   }
@@ -180,6 +187,10 @@ const RCB = (() => {
   // live data first, the copy on GitHub Pages (Update data workflow) when the service does not answer in 2.5 s.
   // Every page's strip waits here, and so does everything the map page draws after its strip: a service that
   // hangs held «Ładowanie…» and an empty map for the whole wait (#229). The stream (live()) brings a later answer.
+  // The copy has a wait of its own and is asked again once when it fails or stays silent: with none, one page view
+  // of 26.11.2026 whose data/alerts.json never answered kept «Ładowanie…» for as long as the tab was open (#237).
+  const COPY_WAIT = 10000;
+  const copy = () => Promise.all([getJSON("data/alerts.json", COPY_WAIT), getJSON("data/meta.json", COPY_WAIT)]);
   async function liveData() {
     try {
       const r = await fetch(API + "/alerts", { cache: "no-store", signal: AbortSignal.timeout(2500) });
@@ -188,7 +199,7 @@ const RCB = (() => {
         if (j.meta && j.meta.checked_at && Array.isArray(j.alerts)) return [j, j.meta];
       }
     } catch (e) { /* fall back to Pages */ }
-    return Promise.all([getJSON("data/alerts.json"), getJSON("data/meta.json")]);
+    try { return await copy(); } catch (e) { return copy(); } // once more: a dropped request is common, a dead copy is not
   }
 
   // a new alert slides in at the bottom right and stays until closed
