@@ -8,7 +8,8 @@ alerty-pl is two things at once:
 1. **A public site.** A live map of Poland with the alerts of the Government Centre for Security
    ([RCB](https://www.gov.pl/web/rcb/komunikaty)), in the spirit of [alerts.in.ua](https://alerts.in.ua/):
    the alerts in force now, their history since 2021, a map of shelters with the nearest ones to you,
-   and notifications by Telegram, e-mail or browser push. Unofficial; the official channel is the RCB alert SMS.
+   and notifications by Telegram, e-mail or browser push, in Polish, English and Ukrainian.
+   Unofficial; the official channel is the RCB alert SMS.
 2. **A demo of an autonomous engineering team.** After the first commit, the site is built, repaired,
    tested, reviewed, merged, deployed and documented by
    [GitHub Agentic Workflows](https://github.github.com/gh-aw/) (gh-aw), with no human in the loop.
@@ -76,7 +77,10 @@ flowchart LR
 Each agent is one Markdown file in [`.github/workflows/`](.github/workflows/): a short frontmatter
 (when it runs, what it may write) and the job in plain English. `gh aw compile` turns it into a normal
 GitHub Actions workflow. Plain-code workflows around them (site check, CI, the gate, data updates, deploys)
-do everything that needs no judgment.
+do everything that needs no judgment. Two files in that folder are not team members: `optimization.md` and
+`optimization-token-optimizer.md` (with `shared/` and `.github/cao/`) are gh-cao's Optimization campaign
+([`optimization/`](optimization/)), an hourly audit that reads the agents' runs and opens an issue with a
+recommendation to save tokens; it changes no code.
 
 ### Why you can trust it
 
@@ -125,6 +129,7 @@ Fork this repository freely: the code is under the MIT licence.
 
 ```sh
 python3 -I -m unittest discover -s tests          # tests
+node --test tests/*.test.mjs                      # the JavaScript tests
 python3 -I scripts/rcb.py update --pages 3        # fetch the latest RCB alerts into docs/data/
 python3 -m http.server -d docs 8000               # open http://localhost:8000
 ```
