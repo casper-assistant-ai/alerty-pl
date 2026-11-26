@@ -199,8 +199,12 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
 
 <!-- reliability:start -->
 - Issues labelled `agent-health` or `workflow-change` belong to the process-doctor: do not comment
-  on them or close them (a PR that closes one fails `pr_rules.py`) [agent-health issues are
-  rewritten after every run, #96].
+  on them or close them (a PR that closes one fails `pr_rules.py`), and never name one in a PR
+  body after a closing keyword (close, closes, closed, fix, fixes, fixed, resolve, resolves,
+  resolved), not even in prose: «agent-health Closes #158» in the body of PR #199 linked #158,
+  failed the check, the pr-fixer cannot edit a body, and a fix whose code the
+  reviewer called right was closed unmerged [agent-health issues are rewritten after every run,
+  #96; PR #199, verdict `changes` of 2026-11-26 03:29 UTC, run 45747361073].
 - issue-worker: one issue per run. Past minute 35 of the agent job, open the PR with what is done
   and the rest as a follow-up, or stop; the step limit is 50 minutes [timeout, run 45371361840]. A run
   started by an issue that is not its to work (`workflow-change`, `agent-health`, an issue with an
@@ -217,10 +221,13 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   with another; a 429 [1308] «Usage limit reached for 5 hour» is the account's quota, not an
   overloaded model, and its reset time is Beijing time (UTC+8); `agent-retry.yml` re-runs a run
   that such an error ended with nothing sent (10 minutes after a 529 or 1302, a minute after the
-  1308 reset, three attempts at most), so do not ask for retries of your own; on a busy day the quota runs out 2 h 40 m to 4 h 20 m into every 5-hour window (on
+  1308 reset, three attempts at most), so do not ask for retries of your own; on a busy day the quota runs out 1 h 36 m to 4 h 20 m into every 5-hour window (on
   2026-11-25 at 09:06 and 14:29 UTC, then at 22:41 UTC, 2 h 40 m into the window that began at
   20:01: eight runs to 23:17, pr-reviewer 45713911721 at turn 61 and issue-worker 45715355232 at
-  turn 23, six at turn 1), and a 429 [1302] «Rate limit reached for requests» right
+  turn 23, six at turn 1; on 2026-11-26 at most 1 h 36 m into the window that began at 06:03:36 UTC:
+  five runs at turn 1 from 07:39 to 08:00 UTC, pr-fixer 45776963621 and 45777876461, site-fixer
+  45778475715, issue-worker 45778778268, pr-reviewer 45779538622, none after the gate's `refused()`
+  held), and a 429 [1302] «Rate limit reached for requests» right
   after a reset is the same: it came back after each of the three resets of 11-25 and 11-26
   (15:11, 20:25 and 01:15 UTC) [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
   minutes; process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites
