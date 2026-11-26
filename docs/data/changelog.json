@@ -15,6 +15,41 @@
  },
  "releases": [
   {
+   "version": "1.31.2",
+   "date": "2026-11-26",
+   "time": "2026-11-26T12:40:30+01:00",
+   "sha": "56d363b",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "agents",
+     "breaking": false,
+     "text": "back to claude + glm-5.4 on z.ai after the quota reset",
+     "sha": "56d363b",
+     "date": "2026-11-26",
+     "time": "2026-11-26T12:40:30+01:00"
+    },
+    {
+     "type": "fix",
+     "scope": "site-fixer",
+     "breaking": false,
+     "text": "trust github-actions[bot] issues in the GitHub guard policy",
+     "sha": "34f9640",
+     "date": "2026-11-26",
+     "time": "2026-11-26T12:25:52+01:00"
+    },
+    {
+     "type": "docs",
+     "scope": "readme",
+     "breaking": false,
+     "text": "rewrite for visitors after the WAW Tech 2026 workshop",
+     "sha": "fd547ed",
+     "date": "2026-11-26",
+     "time": "2026-11-26T12:03:23+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.31.1",
    "date": "2026-11-26",
    "time": "2026-11-26T11:57:21+01:00",

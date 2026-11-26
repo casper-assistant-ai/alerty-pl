@@ -2,6 +2,20 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.31.2 (2026-11-26)
+
+### fix
+
+- **site-fixer:** trust github-actions[bot] issues in the GitHub guard policy ([34f9640](https://github.com/casper-assistant-ai/alerty-pl/commit/34f9640))
+
+### docs
+
+- **readme:** rewrite for visitors after the WAW Tech 2026 workshop ([fd547ed](https://github.com/casper-assistant-ai/alerty-pl/commit/fd547ed))
+
+### ci
+
+- **agents:** back to claude + glm-5.4 on z.ai after the quota reset ([56d363b](https://github.com/casper-assistant-ai/alerty-pl/commit/56d363b))
+
 ## 1.31.1 (2026-11-26)
 
 ### fix
