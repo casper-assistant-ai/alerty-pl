@@ -328,6 +328,70 @@ class Queue(unittest.TestCase):
         self.assertFalse(q["improvement_due"])
         self.assertIn("| #40 | request | none | #50, #51 (give up: close the issue with the label agent-gave-up) |", retro.queue_md(q))
 
+    def test_a_pr_that_only_mentions_an_issue_is_not_on_it(self):
+        # run 45747367985: the process-doctor's open PR #197 only cited #163 in its body, so the queue
+        # read the issue as «in work», neither actionable nor give-up, an hour after the gate had
+        # handed it back; its closed #180, on another subject, was a rejected attempt on it. Only the
+        # links GitHub makes count: a closing keyword before the number, or the number in the title.
+        issues = [{"number": 163, "title": "dev-task: docs/*.html: Content-Security-Policy on every page",
+                   "state": "open", "labels": ["dev-task"], "created_at": "2026-11-25T20:25:44Z"},
+                  {"number": 146, "title": "[security-auditor] audit of 2026-11-25", "state": "open",
+                   "labels": ["report"], "created_at": "2026-11-25T19:00:00Z"}]
+
+        def pr(n, title, body, state, **extra):
+            return {"number": n, "title": title, "body": body, "state": state,
+                    "created_at": "2026-11-26T01:24:35Z", "labels": ["agent"], **extra}
+
+        citing = "[process-doctor] chore(process): ledger of 11-26: quota, stale base, fan-out"
+        body = ("Started for #190 (PR reviewer). #163 and #164-#166 opened at once at 20:25 UTC; the worker's PR "
+                "for #163 was closed. Hardening point of security audit #146.")
+        for prs in ([pr(197, citing, body, "open")], [pr(180, citing, body, "closed", merged_at=None)],
+                    [pr(197, citing, body, "open"), pr(180, citing, body, "closed", merged_at=None)]):
+            q = retro.queue(issues, prs, "2026-11-26")
+            by = {x["number"]: x for x in q["issues"]}
+            for n in (163, 146):
+                self.assertEqual(by[n]["open_prs"], [], [p["number"] for p in prs])
+                self.assertEqual(by[n]["rejected_prs"], [], [p["number"] for p in prs])
+            self.assertEqual(q["actionable"], [163, 146])
+            self.assertEqual(q["give_up"], [])
+        self.assertIn("| #163 | dev-task | none | none |", retro.queue_md(q))
+        # the links GitHub makes still count, for an open PR and for a rejected one alike
+        csp = "[issue-worker] fix(site): Content-Security-Policy on every page"
+        on_it = [(csp, "Closes #163. From #146 (security audit, «Hardening», point 2).", {163}),  # PR #202
+                 (csp, "Closes #163 (from the security audit #146, «Hardening»: no page had a CSP).", {163}),  # #172
+                 (csp, "FIXED casper-assistant-ai/alerty-pl#163; resolves "
+                       "https://github.com/casper-assistant-ai/alerty-pl/issues/146", {163, 146}),
+                 ("[issue-worker] fix(map): take the FIRMS fires from GIBS WMS again; WMTS served no FIRMS tile (#163)",
+                  "The map page of #146.", {163})]
+        for title, text, numbers in on_it:
+            for state, key in (("open", "open_prs"), ("closed", "rejected_prs")):
+                q = retro.queue(issues, [pr(202, title, text, state, merged_at=None)], "2026-11-26")
+                by = {x["number"]: x for x in q["issues"]}
+                for n in (163, 146):
+                    self.assertEqual(by[n][key], [202] if n in numbers else [], (title, text, state, n))
+        # a PR that only cites the issue, closed, is not a second rejected attempt on it
+        q = retro.queue(issues, [pr(180, citing, body, "closed", merged_at=None),
+                                 pr(172, csp, on_it[1][1], "closed", merged_at=None)], "2026-11-26")
+        by = {x["number"]: x for x in q["issues"]}
+        self.assertEqual(by[163]["rejected_prs"], [172])
+        self.assertEqual(q["give_up"], [])
+
+    def test_only_a_closing_keyword_before_the_number_links_a_pr(self):
+        on = lambda title, body="": retro.works_on({"title": title, "body": body})
+        for text in ("Closes #12", "closed #12.", "FIXED #12", "Resolve #12", "resolves: #12",
+                     "fixed o/r#12", "closes https://github.com/o/r/issues/12",
+                     "The worker closed #12."):  # prose counts, as it links on GitHub
+            self.assertEqual(on("", text), {12}, text)
+        self.assertEqual(on("", "Fix #12, fixes #13"), {12, 13})
+        for text in ("From #12", "Refs #12", "PR #12", "Started for #12", "the audit #12", "#12 was closed",
+                     "closed by #12", "closes PR #12", "prefix #12", "Fixed in #12",
+                     "closed 22:55 UTC with no linked issue", "fixed 2 of them"):  # a number is not a reference
+            self.assertEqual(on("", text), set(), text)
+        self.assertEqual(on("[issue-worker] fix(map): fires again (#12)", "From #34"), {12})  # the title names it
+        self.assertEqual(on("[issue-worker] fix(site): CSP", "Closes #12\n#34 stays open"), {12})
+        # the keyword ends the title and the number opens the body: two fields, so no link
+        self.assertEqual(on("The gate closed", "#12"), set())
+
 
 class GaveUp(unittest.TestCase):
     """The give-up ladder: the worker labels, the retro reads the label, the daily status lists it."""
