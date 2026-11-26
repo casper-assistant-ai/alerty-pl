@@ -6,11 +6,6 @@
   "installer": "gh-aw v1.2.2",
   "files": [
     {
-      "source": ".github/workflows/optimization-token-auditor.md",
-      "destination": ".github/workflows/optimization-token-auditor.md",
-      "sha256": "71ea0a8bc6a6f62d0e02718660c238e8aba86f6a2812db59255d8363989e96fa"
-    },
-    {
       "source": ".github/workflows/optimization-token-optimizer.md",
       "destination": ".github/workflows/optimization-token-optimizer.md",
       "sha256": "c748b0dcc983aeff4c45e25ea1a700bd9d9994c7964da5517a39c1139bfc1fcc"
