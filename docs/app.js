@@ -8,7 +8,7 @@
 // day, and NASA FIRMS fires (VIIRS 375 m) of that day. The view lives in the URL too (?srodek=lat,lng&zoom=z), and so
 // does a hand-picked Esri image (&zdjecie=<release date>) or Sentinel-2 day (&s2=<day>); porownaj.html shows two images of the view side by side.
 "use strict";
-const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, span, historyLink, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, t, tn } = RCB;
+const { CAT, PRIORITY, isISO, periodFromQuery, clampPeriod, baseFromQuery, span, historyLink, $, h, swatch, getJSON, fmtShort, fmtDay, hasTime, duration, regionText, t, tn } = RCB;
 
 // ---------- days ----------
 const DAY_MS = 86400000;
@@ -602,12 +602,14 @@ async function main() {
   spark();
 
   // ?od=YYYY-MM-DD&do=YYYY-MM-DD opens a period (?dzien= one day, as the old links do);
-  // &podklad=esri|sentinel|nasa and &pozary=1 open the layers (&s2=YYYY-MM-DD keeps a Sentinel-2 day); &kategoria=<cat> filters the map and the lists;
+  // &podklad=esri|sentinel|nasa and &pozary=1 open the layers (&s2=YYYY-MM-DD keeps a Sentinel-2 day); a &podklad= that names
+  // no base opens none; &kategoria=<cat> filters the map and the lists;
   // &zdjecie=YYYY-MM-DD keeps the Esri image of that release (the newest one of the spot on or before it)
   const { from: wantFrom, to: wantTo } = periodFromQuery(location.search, S.today);
+  const wantBase = baseFromQuery(location.search); // null for a value that names no base: the default stays
   if (CAT[q.get("kategoria")]) S.cat = q.get("kategoria");
   if (q.get("pozary") === "1") { S.fires = true; $("#fires").checked = true; }
-  if (["esri", "nasa", "sentinel"].includes(q.get("podklad"))) { document.querySelector(`input[name="base"][value="${q.get("podklad")}"]`).checked = true; }
+  if (wantBase && wantBase !== "mapa") { document.querySelector(`input[name="base"][value="${wantBase}"]`).checked = true; }
   if (q.get("podklad") === "esri" && isISO(q.get("zdjecie"))) S.wbPin = q.get("zdjecie");
   if (q.get("podklad") === "sentinel" && isISO(q.get("s2"))) S.s2Pin = q.get("s2");
 
@@ -626,7 +628,7 @@ async function main() {
   window.RCBMap = { map, setDay: (d) => setPeriod(d, d), day: () => (S.from === S.to ? S.to : null), today: () => S.today,
     frac: (d) => (dayDiff(S.start, d) + 0.5) / nDays() };
   dispatchEvent(new CustomEvent("rcb:ready", { detail: window.RCBMap }));
-  if (q.get("podklad") && q.get("podklad") !== "mapa") setBase(q.get("podklad"));
+  if (wantBase && wantBase !== "mapa") setBase(wantBase);
   if (S.fires) fires();
   // from here on the URL follows the view, so the address bar is always a link to what is on the screen
   map.on("moveend", viewURL);
