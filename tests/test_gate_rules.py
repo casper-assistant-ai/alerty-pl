@@ -4,7 +4,8 @@
   by its title;
 - #165: the PR reviewer's verdict is a PR review, read the same way by the gate (gate_rules.py) and
   by the Workflow maintainer (workflow_change.py), and only pr-reviewer can submit reviews;
-- #166: the PR fixer's push may touch only the gate's ALLOWED paths.
+- #166: the PR fixer's push may touch only the gate's ALLOWED paths;
+- #177: the gate runs the PR's own code with its write token taken away (security audit #173, finding 1).
 """
 import json
 import re
@@ -262,6 +263,170 @@ class FixerAllowedFiles(unittest.TestCase):
         want = json.dumps(fixer_allowed_files(), separators=(",", ":")).replace('"', '\\"')
         self.assertIn(f'\\"allowed_files\\":{want}', lock)
         self.assertEqual(lock.count('\\"allowed_files\\":'), 2)  # the MCP config and the handler config
+
+
+def code(line):
+    """The line without its comment: cut at the first # that stands outside quotes, as bash reads it."""
+    for m in re.finditer(r"\s#", line):
+        if line[:m.start()].count('"') % 2 == 0 and line[:m.start()].count("'") % 2 == 0:
+            return line[:m.start()]
+    return line
+
+
+def functions(lines):
+    """The shell functions of a script: [(name, first, last)] by line index; a one-line function is first == last."""
+    out = []
+    for i, line in enumerate(lines):
+        m = re.match(r"( *)([a-z_][a-z0-9_]*)\(\) \{", line)
+        if not m:
+            continue
+        last = next((j for j in range(i + 1, len(lines)) if lines[j] == m[1] + "}"), i)
+        out.append((m[2], i, i if line.rstrip().endswith("}") else last))
+    return out
+
+
+PR_CODE = (  # what the gate runs of a PR's own tree: its tests, its parser, ESLint's config, the live service
+    "unittest discover -s tests", "scripts/rcb.py update", "eslint .", "-r server/requirements.txt", "server/app.py",
+)
+
+
+def token_problems(gate):
+    """#177: where a gate workflow lets the PR's own code see the gate's write token; [] when nowhere.
+
+    The shape is the one of main since #183: one job, a checkout that keeps no credential, and a block of the
+    script, from its `unset GH_TOKEN` line to the `export GH_TOKEN=` line after it, in which the token is gone
+    from the shell, so from every command started there, functions called in it included. The PR's tree is out
+    from a `gh pr checkout` line to the `git checkout -q main` after it: in between, only comments may lie
+    outside the block. Each problem names its line in the file.
+    """
+    lines = gate.splitlines()
+    text = [code(line) for line in lines]
+
+    def at(rx):
+        return [i for i, t in enumerate(text) if re.search(rx, t)]
+
+    def num(i):
+        return f"line {i + 1}"
+
+    problems = []
+    m = re.search(r"(?m)^(?P<ind>[ ]*)- uses: actions/checkout[^\n]*\n(?P<body>(?:(?P=ind)  [^\n]*\n)*)", gate)
+    if not m or "persist-credentials: false" not in m["body"]:
+        where = f"line {gate[:m.start()].count(chr(10)) + 1}" if m else "no actions/checkout step"
+        problems.append(f"{where}: actions/checkout keeps the token in .git/config: it needs persist-credentials: false")
+    drop, back = at(r"(?<![\w-])unset GH_TOKEN(?![\w-])"), at(r"(?<![\w-])export GH_TOKEN=")
+    if len(drop) != 1 or len(back) != 1 or not drop[0] < back[0]:
+        problems.append("GH_TOKEN is not taken from the shell in one block of the script: one line that unsets it, "
+                        "then one that exports it again")
+        return problems
+    lo, hi = drop[0], back[0]
+    saved = re.search(r"(\w+)=\$GH_TOKEN(?![\w-])", text[lo])
+    for i in range(lo + 1, hi):
+        if saved and re.search(rf"(?<![\w-]){saved[1]}(?![\w-])", text[i]):
+            problems.append(f"{num(i)}: reads {saved[1]}, the saved token, inside the block that runs the PR's code: "
+                            f"{lines[i].strip()!r}")
+    for co in at(r"gh pr checkout "):
+        end = next((j for j in at(r"git checkout -q main") if j > co), None)
+        if end is None:
+            problems.append(f"{num(co)}: gh pr checkout with no git checkout -q main after it")
+            continue
+        for i in range(co + 1, end):
+            if text[i].strip() and not lo <= i <= hi:
+                problems.append(f"{num(i)}: the tree is the PR's code here and GH_TOKEN is set: {lines[i].strip()!r}; "
+                                f"it belongs to the block of lines {lo + 2} to {hi}")
+    funcs = functions(text)
+
+    def safe(i, seen=()):
+        """A line of the PR's code runs without the token: it is in the block, or in a function called only from
+        such lines."""
+        if lo < i < hi:
+            return True
+        for name, first, last in funcs:
+            if first <= i <= last and name not in seen:
+                calls = [j for j, t in enumerate(text) if not first <= j <= last and re.search(rf"(?<![\w.-]){name}(?![\w-])", t)]
+                if calls and all(safe(j, (*seen, name)) for j in calls):
+                    return True
+        return False
+
+    for what in PR_CODE:
+        hits = [i for i, t in enumerate(text) if what in t]
+        if not hits:
+            problems.append(f"the gate no longer runs {what!r}: pin the command that replaced it, or drop it here")
+        problems += [f"{num(i)}: {what!r} runs the PR's code with GH_TOKEN set: {lines[i].strip()!r}; it belongs to "
+                     f"the block of lines {lo + 2} to {hi}, and a function that runs it must be called only there"
+                     for i in hits if not safe(i)]
+    return problems
+
+
+class GateToken(unittest.TestCase):
+    """#177 (security audit #173, finding 1): the gate's write token never reaches the PR's own code."""
+
+    def test_the_gate_of_main_hands_the_pr_no_token(self):
+        self.assertEqual(token_problems(GATE), [])
+
+    @staticmethod
+    def joined(lines):
+        return "".join(line + "\n" for line in lines)
+
+    @classmethod
+    def without(cls, *needles):
+        """GATE minus the lines that hold a needle."""
+        return cls.joined([line for line in GATE.splitlines() if not any(n in line for n in needles)])
+
+    @classmethod
+    def moved(cls, needle, before):
+        """GATE with the line that holds `needle` cut out and pasted just before the line that holds `before`."""
+        lines = GATE.splitlines()
+        lines.remove(next(line for line in lines if needle in line))
+        lines.insert(next(i for i, line in enumerate(lines) if before in line), next(line for line in GATE.splitlines() if needle in line))
+        return cls.joined(lines)
+
+    @staticmethod
+    def line_of(gate, needle):
+        return f"line {gate[:gate.index(needle)].count(chr(10)) + 1}"
+
+    def test_a_checkout_that_keeps_its_credential_fails(self):
+        problems = token_problems(self.without("persist-credentials: false"))
+        self.assertEqual(len(problems), 1, problems)
+        self.assertTrue(problems[0].startswith(f"{self.line_of(GATE, '- uses: actions/checkout')}: actions/checkout"), problems)
+
+    def test_a_gate_that_never_unsets_the_token_fails(self):
+        problems = token_problems(self.without("unset GH_TOKEN"))
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("one block", problems[0])
+
+    def test_a_check_outside_the_block_fails_and_names_its_line(self):
+        # the unit tests run right after gh pr checkout, before the token is gone from the shell
+        gate = self.moved("unittest discover -s tests", "gate_token=$GH_TOKEN; unset GH_TOKEN")
+        problems = token_problems(gate)
+        self.assertEqual(len(problems), 2, problems)
+        for p in problems:
+            self.assertTrue(p.startswith(f"{self.line_of(gate, 'unittest discover -s tests')}: "), p)
+        # the live parse runs after the token is back, while the tree is still the PR's
+        gate = self.moved("scripts/rcb.py update", "git checkout -q main")
+        problems = token_problems(gate)
+        self.assertEqual(len(problems), 2, problems)
+        for p in problems:
+            self.assertTrue(p.startswith(f"{self.line_of(gate, 'scripts/rcb.py update')}: "), p)
+
+    def test_the_saved_token_is_not_read_inside_the_block(self):
+        lines = GATE.splitlines()
+        at = next(i for i, line in enumerate(lines) if "unittest discover -s tests" in line)
+        lines.insert(at + 1, '              echo "$gate_token" > "/tmp/gh-token-$n"')
+        problems = token_problems(self.joined(lines))
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn(f"{self.line_of(self.joined(lines), 'gh-token-$n')}: reads gate_token", problems[0])
+
+    def test_a_function_that_runs_pr_code_is_called_only_inside_the_block(self):
+        # live_check (server/requirements.txt, server/app.py) is defined at the top of the script and called in the block
+        gate = self.moved("{ live_check 2>&1", "git checkout -q --detach")
+        problems = token_problems(gate)
+        self.assertEqual([p.split(":")[0] for p in problems],
+                         [self.line_of(GATE, "-r server/requirements.txt"), self.line_of(GATE, "server/app.py")], problems)
+
+    def test_a_check_of_the_pr_that_disappears_from_the_pin_fails(self):
+        problems = token_problems(self.without("scripts/rcb.py update"))
+        self.assertEqual(problems, ["the gate no longer runs 'scripts/rcb.py update': pin the command that replaced it, "
+                                    "or drop it here"])
 
 
 if __name__ == "__main__":
