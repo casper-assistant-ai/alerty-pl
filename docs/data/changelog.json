@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": "1.30.4",
+   "date": "2026-11-26",
+   "time": "2026-11-26T09:27:19+01:00",
+   "sha": "1c73b77",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "agents",
+     "breaking": false,
+     "text": "a crash of the step-summary renderer no longer fails the agent run",
+     "sha": "1c73b77",
+     "date": "2026-11-26",
+     "time": "2026-11-26T09:27:19+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "agents",
+     "breaking": false,
+     "text": "run the queue agents on Copilot until the z.ai quota resets",
+     "sha": "886374b",
+     "date": "2026-11-26",
+     "time": "2026-11-26T09:24:37+01:00"
+    }
+   ]
+  },
+  {
    "version": "1.30.3",
    "date": "2026-11-26",
    "time": "2026-11-26T07:39:24Z",

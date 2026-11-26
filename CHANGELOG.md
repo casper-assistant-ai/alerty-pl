@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.30.4 (2026-11-26)
+
+### fix
+
+- **agents:** a crash of the step-summary renderer no longer fails the agent run ([1c73b77](https://github.com/casper-assistant-ai/alerty-pl/commit/1c73b77))
+
+### ci
+
+- **agents:** run the queue agents on Copilot until the z.ai quota resets ([886374b](https://github.com/casper-assistant-ai/alerty-pl/commit/886374b))
+
 ## 1.30.3 (2026-11-26)
 
 ### fix
