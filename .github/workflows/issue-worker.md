@@ -29,15 +29,9 @@ concurrency:
   group: "gh-aw-${{ github.workflow }}"
   queue: max
 engine:
-  id: claude
-  model: glm-5.4
-  # z.ai answers 529 (1305 «temporarily overloaded») for one model at a time at peak hours;
-  # the api-proxy then retries the same request on the next model.
-  fallback-models: [glm-5.3, glm-5.1]
-  env:
-    ANTHROPIC_BASE_URL: https://api.z.ai/api/anthropic
-    # gh-aw sets 0 so its harness retries; the harness does not count 1305 as overloaded.
-    CLAUDE_CODE_MAX_RETRIES: "6"
+  # Temporary (26.11.2026, CAS-397): z.ai 5-hour quota ran out at 08:50 Warsaw, reset 12:03.
+  # Copilot runs the queue until then; back to claude + glm-5.4 after the reset.
+  id: copilot
 imports:
   - shared/zai.md
 network:
