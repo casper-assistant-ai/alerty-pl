@@ -32,8 +32,9 @@ const RCB = (() => {
   const $ = (s, root = document) => root.querySelector(s);
   const color = (c) => `var(--${c})`;
 
-  async function getJSON(url) {
-    const r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store" });
+  // ms, when given, is how long the request may take: a stalled one is given up after it
+  async function getJSON(url, ms) {
+    const r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store", signal: ms ? AbortSignal.timeout(ms) : undefined });
     if (!r.ok) throw new Error(url + ": " + r.status);
     return r.json();
   }
@@ -188,7 +189,15 @@ const RCB = (() => {
         if (j.meta && j.meta.checked_at && Array.isArray(j.alerts)) return [j, j.meta];
       }
     } catch (e) { /* fall back to Pages */ }
-    return Promise.all([getJSON("data/alerts.json"), getJSON("data/meta.json")]);
+    // The copy waits 10 s at most and is asked twice: a connection to the site that stalls must not hold
+    // «Ładowanie…» for as long as it hangs (#237); the second ask opens a new one.
+    for (let ask = 0; ; ask++) {
+      try {
+        return await Promise.all([getJSON("data/alerts.json", 10000), getJSON("data/meta.json", 10000)]);
+      } catch (e) {
+        if (ask) throw e;
+      }
+    }
   }
 
   // a new alert slides in at the bottom right and stays until closed

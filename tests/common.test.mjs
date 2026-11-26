@@ -127,3 +127,58 @@ test("the strip gives up on a live service that does not answer within its wait,
     assert.doesNotMatch(parts[".state"].textContent, /Ładowanie/);
   } finally { globalThis.fetch = real; }
 });
+
+// #237: the live service was down and on one page view the copy on Pages did not answer either: the Site check
+// read «Ładowanie…» with data/alerts.json still pending. The copy had no wait of its own, so a connection that
+// stalls holds every page's strip, and the map page's whole drawing, for as long as it hangs. The copy is now
+// asked twice and each ask gives up after its wait. A page with a strip whose parts record their text; the
+// caller brings fetch and shortens the waits, since the test must not sit out 2.5 s and 10 s.
+function stalledPage() {
+  const part = () => ({ textContent: "", classList: { toggle() {}, add() {}, remove() {} } });
+  const parts = { ".state": part(), ".others": part(), ".checked": part() };
+  const strip = Object.assign(part(), { querySelector: (x) => parts[x] || null });
+  const doc = { title: "Alerty", querySelectorAll: () => [], querySelector: (s) => (s === "#strip" ? strip : null) };
+  const read = (p) => readFileSync(new URL("../docs/" + p, import.meta.url), "utf8");
+  return { parts, page: new Function("document", "window", `${read("i18n.js")}\n${read("common.js")}\n;return RCB;`)(doc, {}) };
+}
+// a request that hangs: like fetch, the stub gives up when the page's AbortSignal does
+const stall = (init) => new Promise((_, bad) => init.signal.addEventListener("abort", () => bad(new DOMException("signal timed out", "TimeoutError"))));
+
+test("the strip asks the copy on Pages again when its first ask stalls, and shows the second answer", async () => {
+  const alerts = { alerts: [] }, meta = { checked_at: "2026-11-26T12:00:00Z" };
+  const real = globalThis.fetch, realTimeout = globalThis.AbortSignal.timeout;
+  globalThis.AbortSignal.timeout = (ms) => realTimeout.call(globalThis.AbortSignal, Math.min(ms, 20));
+  let asks = 0; // of data/alerts.json
+  globalThis.fetch = (url, init) => {
+    url = String(url);
+    if (url.startsWith(RCB.API)) return stall(init);
+    if (url.startsWith("data/alerts.json")) return ++asks === 1 ? stall(init) : Promise.resolve({ ok: true, json: async () => alerts });
+    return Promise.resolve({ ok: true, json: async () => meta });
+  };
+  try {
+    const { parts, page } = stalledPage();
+    const res = await page.strip();
+    assert.equal(asks, 2, "the copy was asked once more");
+    assert.equal(res.meta, meta, "the second answer filled the strip");
+    assert.equal(res.data, alerts);
+    assert.doesNotMatch(parts[".state"].textContent, /Ładowanie|Nie udało/);
+  } finally { globalThis.fetch = real; globalThis.AbortSignal.timeout = realTimeout; }
+});
+
+test("the strip gives up on a copy on Pages that stalls twice, and says so instead of «Ładowanie…»", async () => {
+  const real = globalThis.fetch, realTimeout = globalThis.AbortSignal.timeout;
+  globalThis.AbortSignal.timeout = (ms) => realTimeout.call(globalThis.AbortSignal, Math.min(ms, 20));
+  let asks = 0; // of the live service and of data/alerts.json
+  globalThis.fetch = (url, init) => {
+    url = String(url);
+    if (url.startsWith(RCB.API) || url.startsWith("data/alerts.json")) { asks++; return stall(init); }
+    return Promise.resolve({ ok: true, json: async () => ({ checked_at: "2026-11-26T12:00:00Z" }) });
+  };
+  try {
+    const { parts, page } = stalledPage();
+    const res = await page.strip();
+    assert.equal(res, null);
+    assert.equal(asks, 3, "the service once, the copy twice, and no more");
+    assert.equal(parts[".state"].textContent, "Nie udało się pobrać danych");
+  } finally { globalThis.fetch = real; globalThis.AbortSignal.timeout = realTimeout; }
+});
