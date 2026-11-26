@@ -214,14 +214,18 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   with another; a 429 [1308] «Usage limit reached for 5 hour» is the account's quota, not an
   overloaded model, and its reset time is Beijing time (UTC+8); `agent-retry.yml` re-runs a run
   that such an error ended with nothing sent (10 minutes after a 529 or 1302, a minute after the
-  1308 reset, three attempts at most), so do not ask for retries of your own; on a busy day the quota runs out about 4 h 20 m into every 5-hour window (on
-  2026-11-25 at 09:06 and 14:29 UTC), and a 429 [1302] «Rate limit reached for requests» right
-  after a reset is the same [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
+  1308 reset, three attempts at most), so do not ask for retries of your own; on a busy day the quota runs out 2 h 40 m to 4 h 20 m into every 5-hour window (on
+  2026-11-25 at 09:06 and 14:29 UTC, then at 22:41 UTC, 2 h 40 m into the window that began at
+  20:01: eight runs to 23:17, pr-reviewer 45713911721 at turn 61 and issue-worker 45715355232 at
+  turn 23, six at turn 1), and a 429 [1302] «Rate limit reached for requests» right
+  after a reset is the same: it came back after each of the three resets of 11-25 and 11-26
+  (15:11, 20:25 and 01:15 UTC) [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
   minutes; process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites
   never pushed; the quota of 2026-11-25, 09:06 to 09:57 UTC: 14 runs, pr-reviewer 45581138284 at
   turn 16 and ci-doctor 45580981955 at turn 23 lost 10 minutes each, then site-fixer 45634707189
   at 14:29; 429 [1302] from 15:11 to 15:38 UTC: site-fixer 45645531386 lost 31 turns and
-  site-designer 45640863668 61].
+  site-designer 45640863668 61; on 11-25 from 20:25 and on 11-26 at 01:15 UTC: issue-worker
+  45694879637 47 turns, pr-fixer 45698506602 38 and pr-fixer 45729583396 43, then its 30 minutes].
 - region-keeper: take at most 5 items of `unmatched.json` a run (the first five; the rest wait for
   the next day), never audit `alerts.json`, and call `noop` at once when the file is empty
   [timeout, region-keeper runs 45227118220 and 45447715342: 22 minutes on the 20-minute limit,
@@ -247,4 +251,13 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   `process/*.md` or `scripts/` (the process-doctor's), and open the PR or call `noop` by turn 40
   [timeout, site-designer run 45640863668: 61 turns over the ledger and the improvements list,
   nothing sent, #139].
+- pr-reviewer: judge each head from the diff of its code files and skim a ledger, Markdown or data
+  diff; send each verdict the moment it is judged and stop at turn 40, the heads not judged wait for
+  the gate's next round. The agent has no clock (`date` is not among its bash tools), so the 80%
+  rule cannot be kept [timeout, run 45739178322: 22 minutes on the 20-minute limit over one diff,
+  #200; 45713911721: 61 turns, then the quota].
+- security-auditor: its report is one issue and its bash tools give it no clock, so audit the front
+  end and the scraper first, the workflows last, and open the report issue with what is verified by
+  turn 50; a finding left out goes in next week's run [timeout, runs 44917850467 (32 of 30 minutes)
+  and 45695166662 (42 of 40), both with 429 [1302] through the session; the limit is 60 now].
 <!-- reliability:end -->
