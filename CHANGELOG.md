@@ -2,11 +2,25 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.31.0 (2026-11-26)
+
+### feat
+
+- **cao:** add the optimization campaign (gh-cao v0.2.5) in review mode ([586832e](https://github.com/casper-assistant-ai/alerty-pl/commit/586832e))
+
+### docs
+
+- **talks:** add WAW Tech 2026 workshop slides (PPTX and PDF) ([f1ab6b7](https://github.com/casper-assistant-ai/alerty-pl/commit/f1ab6b7))
 
 ### ci
 
 - **agents:** run every z.ai agent on Copilot until the quota resets ([0ab933e](https://github.com/casper-assistant-ai/alerty-pl/commit/0ab933e))
+
+### chore
+
+- **cao:** drop the token-auditor from the optimization package manifest ([f8c748b](https://github.com/casper-assistant-ai/alerty-pl/commit/f8c748b))
+- **cao:** drop the optimization token-auditor worker ([f33bf17](https://github.com/casper-assistant-ai/alerty-pl/commit/f33bf17))
+- **process:** ledger of 11-26: the reviewer's second timeout, the doctor near its limit (#212) ([18bde7c](https://github.com/casper-assistant-ai/alerty-pl/commit/18bde7c))
 
 ## 1.30.4 (2026-11-26)
 

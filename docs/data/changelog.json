@@ -15,11 +15,56 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.31.0",
    "date": "2026-11-26",
-   "time": "2026-11-26T09:28:13+01:00",
-   "sha": "0ab933e",
+   "time": "2026-11-26T11:22:29+01:00",
+   "sha": "f8c748b",
    "changes": [
+    {
+     "type": "chore",
+     "scope": "cao",
+     "breaking": false,
+     "text": "drop the token-auditor from the optimization package manifest",
+     "sha": "f8c748b",
+     "date": "2026-11-26",
+     "time": "2026-11-26T11:22:29+01:00"
+    },
+    {
+     "type": "chore",
+     "scope": "cao",
+     "breaking": false,
+     "text": "drop the optimization token-auditor worker",
+     "sha": "f33bf17",
+     "date": "2026-11-26",
+     "time": "2026-11-26T10:59:06+01:00"
+    },
+    {
+     "type": "feat",
+     "scope": "cao",
+     "breaking": false,
+     "text": "add the optimization campaign (gh-cao v0.2.5) in review mode",
+     "sha": "586832e",
+     "date": "2026-11-26",
+     "time": "2026-11-26T10:40:35+01:00"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "ledger of 11-26: the reviewer's second timeout, the doctor near its limit (#212)",
+     "sha": "18bde7c",
+     "date": "2026-11-26",
+     "time": "2026-11-26T09:15:18Z"
+    },
+    {
+     "type": "docs",
+     "scope": "talks",
+     "breaking": false,
+     "text": "add WAW Tech 2026 workshop slides (PPTX and PDF)",
+     "sha": "f1ab6b7",
+     "date": "2026-11-26",
+     "time": "2026-11-26T10:04:50+01:00"
+    },
     {
      "type": "ci",
      "scope": "agents",
