@@ -16,10 +16,19 @@
  "releases": [
   {
    "version": null,
-   "date": "2026-11-25",
-   "time": "2026-11-25T23:53:08+01:00",
-   "sha": "f714254",
+   "date": "2026-11-26",
+   "time": "2026-11-26T01:24:41Z",
+   "sha": "a204d63",
    "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "security-auditor: timeout-minutes 40 -> 60 (#196)",
+     "sha": "a204d63",
+     "date": "2026-11-26",
+     "time": "2026-11-26T01:24:41Z"
+    },
     {
      "type": "docs",
      "scope": "agents",

@@ -11,6 +11,7 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### ci
 
+- **workflows:** security-auditor: timeout-minutes 40 -> 60 (#196) ([a204d63](https://github.com/casper-assistant-ai/alerty-pl/commit/a204d63))
 - **rules:** check the code-checkable AGENTS.md rules in CI and the gate ([6379a68](https://github.com/casper-assistant-ai/alerty-pl/commit/6379a68))
 - **gate:** the PR's own code runs without the gate's write token ([847d34d](https://github.com/casper-assistant-ai/alerty-pl/commit/847d34d))
 - **issue-worker:** one queue for all runs, and report links without temporary IDs ([2922803](https://github.com/casper-assistant-ai/alerty-pl/commit/2922803))
