@@ -18,7 +18,8 @@ gate) and starts the extra agent runs planned for today. It only starts agentic 
 exist in this repository, at most `max_extra_runs_per_week` (capped at 3) per agent.
 
 `queue` lists the work waiting for the issue-worker agent: every open issue with its kind and the
-open PRs that already name it, the agent PRs the gate refused, and whether today's improvement PR
+open PRs that close it (the links GitHub makes: a closing keyword before the number, or the number
+in the PR's title), the PRs of that kind the gate refused, and whether today's improvement PR
 (tests, reliability, simplicity) is still due because the queue is empty. gh-aw's detection
 tracker (`[aw] Detection Runs`, a comment per run whose threat detection failed) is left out: it
 is a log that gh-aw keeps, not work.
@@ -349,24 +350,40 @@ ORDER = ["ci", "site-error", "aw-notice", "request", "dev-task", "report", "mana
 GIVE_UP = 2  # closed, unmerged PRs for one issue before the worker closes the issue instead
 GAVE_UP_LABEL = "agent-gave-up"  # the worker puts it on the issue it closes after GIVE_UP rejected PRs
 
+# A PR is on an issue when GitHub links them: a closing keyword precedes the number in its title or
+# body (Closes #12, fixed OWNER/REPO#12, resolves .../issues/12), or the number is in its title. A
+# mention alone (From #12, PR #12) is nothing: a report or a process PR that cites an issue must not
+# hide it as «in work», and a closed PR on another subject is not a rejected attempt on it.
+CLOSES = re.compile(
+    r"\b(?:clos(?:e|es|ed)|fix(?:es|ed)?|resolv(?:e|es|ed))\b:?\s*"
+    r"(?:https?://github\.com/)?(?:[\w.-]+/[\w.-]+)?(?:#|/issues/)(\d+)", re.I)
+MENTION = re.compile(r"#(\d+)")
+
+
+def works_on(pr):
+    """The numbers of the issues a PR is on: closed by a keyword in its title or body, or named in
+    its title. A number its body only mentions is not among them."""
+    title, body = pr.get("title") or "", pr.get("body") or ""
+    closed = {int(m.group(1)) for text in (title, body) for m in CLOSES.finditer(text)}
+    return closed | {int(n) for n in MENTION.findall(title)}
+
 
 def queue(issues, prs, today):
     """Pure: the issue-worker's queue from open issues and all recent PRs (plain dicts).
 
-    An open PR that names an issue means it is in work. A closed, unmerged PR that names it was
+    An open PR that is on an issue (works_on) means it is in work. A closed, unmerged PR on it was
     rejected (by the reviewer, the tests or the path check); after GIVE_UP of them the worker
     closes the issue with the reasons instead of trying again."""
     refs, rejected = {}, {}
     for p in prs:
-        nums = set(re.findall(r"#(\d+)", (p.get("title") or "") + " " + (p.get("body") or "")))
         if p.get("state") == "open":
             target = refs
         elif p.get("state") == "closed" and not p.get("merged_at"):
             target = rejected
         else:
             continue
-        for n in nums:
-            target.setdefault(int(n), []).append(p["number"])
+        for n in works_on(p):
+            target.setdefault(n, []).append(p["number"])
     items = []
     for i in issues:
         if i.get("state") != "open" or TRACKER.match(i.get("title") or ""):
