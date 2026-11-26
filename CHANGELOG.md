@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **agents:** run every z.ai agent on Copilot until the quota resets ([0ab933e](https://github.com/casper-assistant-ai/alerty-pl/commit/0ab933e))
+
 ## 1.30.4 (2026-11-26)
 
 ### fix
