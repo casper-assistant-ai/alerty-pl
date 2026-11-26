@@ -61,7 +61,14 @@ const S = {
 // today alone shows what is on now (the live list); a past day or a period, every alert that touched it
 const isToday = () => S.from === S.today && S.to === S.today;
 function alertsOf(from = S.from, to = S.to) {
-  if (from === S.today && to === S.today && S.live) return S.liveActive;
+  if (from === S.today && to === S.today) {
+    if (S.live) return S.liveActive;
+    // before the live list answers (the map is drawn first, #229), and when neither the service nor the copy on Pages
+    // gave one: what the copy marks as on, the records strip() keeps from it too. Not every alert that touched today,
+    // which showed as on now the ones that ended hours ago (#231).
+    return S.archive.filter((a) => a.status === "active" || a.status === "planned")
+      .sort((a, b) => b.started_at.localeCompare(a.started_at));
+  }
   return S.archive.filter((a) => { const [s, e] = span(a, S.today); return s <= to && e >= from; })
     .sort((a, b) => b.started_at.localeCompare(a.started_at));
 }
@@ -613,23 +620,27 @@ async function main() {
   if (q.get("podklad") === "esri" && isISO(q.get("zdjecie"))) S.wbPin = q.get("zdjecie");
   if (q.get("podklad") === "sentinel" && isISO(q.get("s2"))) S.s2Pin = q.get("s2");
 
-  async function refresh() {
-    const res = await RCB.strip();
-    const now = todayISO();
-    const was = S.today;
-    if (now !== S.today) { S.today = now; spark(); dispatchEvent(new Event("rcb:range")); }
-    if (res) { S.live = res.data; S.liveActive = res.active; }
-    // a period that ended today keeps ending today after midnight
-    if (S.to === null) setPeriod(wantFrom, wantTo, false);
-    else if (S.to === was) place(addDays(S.from, dayDiff(was, now)), now);
-  }
-  await refresh();
+  // The period of the URL, the layers it names and rcb:ready (attacks.js) come before the strip answers: a live
+  // service that hangs held the map blank, with no period and no layer, for the whole wait (#229). Only today's map
+  // reads the live list; the first refresh() repaints it with what the strip got, the service's answer or the copy on Pages.
+  setPeriod(wantFrom, wantTo, false);
   // attacks.js (missiles and drones over Poland) draws on the same map and slider through this
   window.RCBMap = { map, setDay: (d) => setPeriod(d, d), day: () => (S.from === S.to ? S.to : null), today: () => S.today,
     frac: (d) => (dayDiff(S.start, d) + 0.5) / nDays() };
   dispatchEvent(new CustomEvent("rcb:ready", { detail: window.RCBMap }));
   if (wantBase && wantBase !== "mapa") setBase(wantBase);
   if (S.fires) fires();
+
+  async function refresh() {
+    const res = await RCB.strip();
+    const now = todayISO();
+    const was = S.today;
+    if (now !== S.today) { S.today = now; spark(); dispatchEvent(new Event("rcb:range")); }
+    if (res) { S.live = res.data; S.liveActive = res.active; }
+    // a period that ends today keeps ending today after midnight, and its map takes the live list (the first one too)
+    if (S.to === was) place(addDays(S.from, dayDiff(was, now)), now);
+  }
+  await refresh();
   // from here on the URL follows the view, so the address bar is always a link to what is on the screen
   map.on("moveend", viewURL);
   if (view) viewURL();

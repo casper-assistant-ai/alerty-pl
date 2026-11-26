@@ -84,6 +84,90 @@ test("the map page gives setBase only a base that baseFromQuery named, never the
   assert.equal(has(/if \(wantBase && wantBase !== "mapa"\) setBase\(wantBase\);/), true, "setBase is not given the base baseFromQuery named");
 });
 
+// ---------- the start of the map page: what waits for the live service and what does not (#229) ----------
+
+test("the map page draws the period of the URL, rcb:ready and its layers before the strip answers; today's map takes the live list after", async () => {
+  // docs/app.js needs Leaflet and the page, so the end of main() alone runs here: from reading the URL to the end of
+  // the function, with the real day helpers and a stub for the rest. The strip is a promise the test answers.
+  // Until #229 all of it waited for the strip, and a live service that hung (6 s, then 2.5 s in #230) held the map blank.
+  const app = readFileSync(new URL("../docs/app.js", import.meta.url), "utf8");
+  const days = app.slice(app.indexOf("const DAY_MS ="), app.indexOf("const fmtISO = (iso)"));
+  assert.ok(days.length < 500, "the day helpers were not found in docs/app.js");
+  const { addDays, dayDiff } = new Function(`${days}\n;return { addDays, dayDiff };`)();
+  const from = app.indexOf("  const { from: wantFrom, to: wantTo } = periodFromQuery(location.search, S.today);");
+  const to = app.indexOf("\n}\n\nmain().catch(", from);
+  assert.ok(from !== -1 && to !== -1, "the end of main() was not found in docs/app.js");
+  const start = (search) => {
+    const log = [];
+    let answer;
+    const S = { today: TODAY, start: START, from: null, to: null, base: "mapa", fires: false };
+    const q = new URLSearchParams(search);
+    const names = {
+      periodFromQuery: RCB.periodFromQuery, location: { search }, S, baseFromQuery: RCB.baseFromQuery, CAT: { air: "Powietrze" }, q,
+      isISO: RCB.isISO, addDays, dayDiff, nDays: () => dayDiff(S.start, S.today) + 1, todayISO: () => TODAY,
+      $: () => ({ checked: false }), document: { querySelector: () => ({ checked: false }), addEventListener() {} },
+      window: {}, map: { on() {} }, view: null, viewURL() {}, setInterval() {}, spark() {},
+      setPeriod: (f, t) => { log.push(`setPeriod ${f}..${t}`); S.from = f; S.to = t; },
+      place: (f, t) => { log.push(`place ${f}..${t}`); S.from = f; S.to = t; },
+      setBase: (b) => log.push(`setBase ${b}`), fires: () => log.push("fires"),
+      dispatchEvent: (e) => log.push(`event ${e.type}`),
+      RCB: { strip: () => { log.push("strip"); return new Promise((ok) => { answer = ok; }); } },
+    };
+    const done = new Function(...Object.keys(names), `return (async () => {\n${app.slice(from, to)}\n})();`)(...Object.values(names));
+    return { log, S, answer: (res) => { answer(res); return done; } };
+  };
+  // a past day with the layers of the URL: all of it is drawn while the strip still waits, and nothing is redone after
+  const past = start("?dzien=2026-11-20&podklad=esri&pozary=1");
+  assert.deepEqual(past.log, ["setPeriod 2026-11-20..2026-11-20", "event rcb:ready", "setBase esri", "fires", "strip"]);
+  await past.answer({ data: { alerts: [] }, meta: {}, active: [{ id: 1 }] });
+  assert.equal(past.S.liveActive[0].id, 1, "the live list is kept for the tooltips and the list of today");
+  assert.deepEqual(past.log.slice(5), [], "a past day takes nothing from the live list: no repaint");
+  // today: drawn at once, then repainted with the live list when the strip answers
+  const now = start("");
+  assert.deepEqual(now.log, [`setPeriod ${TODAY}..${TODAY}`, "event rcb:ready", "strip"]);
+  await now.answer({ data: { alerts: [] }, meta: {}, active: [] });
+  assert.deepEqual(now.log.slice(3), [`place ${TODAY}..${TODAY}`]);
+  // the strip that fails (neither the service nor the copy on Pages answered): the map stays as it was drawn
+  const failed = start("?dzien=2026-11-20");
+  await failed.answer(null);
+  assert.deepEqual(failed.log, ["setPeriod 2026-11-20..2026-11-20", "event rcb:ready", "strip"]);
+});
+
+// ---------- today before the live list answers: what the copy marks as on, not all that touched today (#231) ----------
+
+test("alertsOf: today without the live list holds the copy's active and planned alerts, not one that ended today; a past day shows all", () => {
+  // Since #229 today's map is drawn before the strip answers, with S.live null. That first paint fell back to every
+  // archive alert that touched today: an air alert that ended hours ago blinked as on, under «Teraz», until the list came.
+  const app = readFileSync(new URL("../docs/app.js", import.meta.url), "utf8");
+  const from = app.indexOf("const isToday = () =>"), to = app.indexOf("const regionsOf =");
+  assert.ok(from !== -1 && to > from, "alertsOf was not found in docs/app.js");
+  const at = (d, hm) => `${d}T${hm}:00+01:00`;
+  const S = {
+    today: TODAY, from: TODAY, to: TODAY, live: null, liveActive: [],
+    archive: [ // the shape of data/archive.json: a status, started_at and last_at, no regions
+      { id: "ended-today", status: "ended", started_at: at(TODAY, "22:56"), last_at: at(TODAY, "23:54") },
+      { id: "expired-today", status: "expired", started_at: at("2026-11-22", "23:00"), last_at: at(TODAY, "01:00") },
+      { id: "on", status: "active", started_at: at("2026-11-22", "10:00"), last_at: at("2026-11-22", "12:00") },
+      { id: "planned", status: "planned", started_at: at(TODAY, "23:30"), last_at: at(TODAY, "23:30") },
+      { id: "old", status: "expired", started_at: at("2026-11-20", "08:00"), last_at: at("2026-11-20", "09:00") },
+    ],
+  };
+  const { alertsOf } = new Function("S", "span", `${app.slice(from, to)}\n;return { alertsOf };`)(S, RCB.span);
+  const ids = () => alertsOf().map((a) => a.id);
+  // without the live list: what strip() keeps from the copy too, newest first; the two that touched today and are over stay out
+  assert.deepEqual(ids(), ["planned", "on"]);
+  // with it: the live list alone
+  S.live = { alerts: [] };
+  S.liveActive = [{ id: "live", status: "active", started_at: at(TODAY, "12:00"), last_at: at(TODAY, "12:00") }];
+  assert.deepEqual(ids(), ["live"]);
+  // a past day takes nothing from the live list: every alert that touched it, as before
+  S.from = S.to = "2026-11-22";
+  assert.deepEqual(ids(), ["expired-today", "on"]);
+  S.live = null;
+  S.from = S.to = "2026-11-20";
+  assert.deepEqual(ids(), ["old"]);
+});
+
 // ---------- the history page: the same ?od=&do=, with the whole archive as the default (#52) ----------
 
 test("historyPeriod reads ?od=&do= as the map does; no date is the whole archive", () => {
