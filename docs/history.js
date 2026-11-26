@@ -47,6 +47,9 @@ function render(rows, limit) {
 }
 
 async function main() {
+  // Enter in a field must not send the form: the page's Content-Security-Policy forbids inline handlers, so
+  // the rule lives here, before the first await, and holds when the archive fails to load too
+  $("#filters").addEventListener("submit", (e) => e.preventDefault());
   RCB.strip();
   const desc = document.querySelector('meta[name="description"]');
   if (desc) desc.content = t("hist.desc");
