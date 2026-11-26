@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": "1.30.2",
+   "date": "2026-11-26",
+   "time": "2026-11-26T05:01:04Z",
+   "sha": "6ae099c",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "ledger of 11-26: quota, stale base, fan-out; rules for title, clock, auditor, fixer (#197)",
+     "sha": "6ae099c",
+     "date": "2026-11-26",
+     "time": "2026-11-26T05:01:04Z"
+    },
+    {
+     "type": "fix",
+     "scope": "map",
+     "breaking": false,
+     "text": "an unknown ?podklad= value keeps the default base (#206)",
+     "sha": "d0eb499",
+     "date": "2026-11-26",
+     "time": "2026-11-26T04:59:45Z"
+    }
+   ]
+  },
+  {
    "version": "1.30.1",
    "date": "2026-11-26",
    "time": "2026-11-26T03:32:17Z",

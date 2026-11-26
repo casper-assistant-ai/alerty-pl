@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.30.2 (2026-11-26)
+
+### fix
+
+- **map:** an unknown ?podklad= value keeps the default base (#206) ([d0eb499](https://github.com/casper-assistant-ai/alerty-pl/commit/d0eb499))
+
+### chore
+
+- **process:** ledger of 11-26: quota, stale base, fan-out; rules for title, clock, auditor, fixer (#197) ([6ae099c](https://github.com/casper-assistant-ai/alerty-pl/commit/6ae099c))
+
 ## 1.30.1 (2026-11-26)
 
 ### fix
