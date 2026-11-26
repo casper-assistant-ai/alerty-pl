@@ -39,7 +39,7 @@ const RCB = (() => {
     try {
       r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store", signal: ms ? AbortSignal.timeout(ms) : undefined });
     } catch (e) {
-      throw new Error(url + ": " + (e && e.name === "TimeoutError" ? "timeout" : e.message));
+      throw new Error(url + ": " + (e && e.name === "TimeoutError" ? "timeout" : e.message), { cause: e });
     }
     if (!r.ok) throw new Error(url + ": " + r.status);
     return r.json();
