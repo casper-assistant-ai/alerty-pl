@@ -190,11 +190,35 @@ def fmt_md(e, repo_url):
     return scope + e["text"] + link
 
 
+# A PR title that the agent tooling cut (#189, PR #180): the first 128 characters, a line break, then a
+# marker that is cut too. CC cannot match across the line break, and the type and the scope are right,
+# so the hint of the format would mislead.
+CUT_MARKER = "[Content truncat"
+
+
+def cut(subject):
+    """Where the tooling cut a subject: the characters before its line break or truncation marker,
+    else None for a whole subject."""
+    m = re.search(r"[\r\n]", subject)
+    if m:
+        return m.start()
+    i = subject.find(CUT_MARKER)
+    return i if i >= 0 else None
+
+
 def lint_subjects(subjects):
-    bad = [s for s in subjects if not SKIP.match(s) and parse(s) is None]
-    for s in bad:
-        print(f"not a Conventional Commit: {s!r}", file=sys.stderr)
-    if bad:
+    bad = [(s, cut(s)) for s in subjects if not SKIP.match(s) and (parse(s) is None or cut(s) is not None)]
+    whole = [s for s, n in bad if n is None]
+    for s, n in bad:
+        if n is None:
+            print(f"not a Conventional Commit: {s!r}", file=sys.stderr)
+        else:
+            print(f"not a Conventional Commit, the title was cut: {len(s)} characters, the cut after {n}: "
+                  f"{s!r}", file=sys.stderr)
+    if len(whole) < len(bad):
+        print("A cut title stays rejected: shorten the PR title, so that the whole title with its agent "
+              "prefix stays under 128 characters.", file=sys.stderr)
+    if whole:
         print("Use <type>(<scope>)!: <description>, type one of: " + ", ".join(TYPES), file=sys.stderr)
     return 1 if bad else 0
 
