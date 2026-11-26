@@ -99,3 +99,31 @@ test("leaflet() fails with a Polish message when the retry is refused too", asyn
   scripts[0].onerror();
   await assert.rejects(p, /biblioteka mapy/);
 });
+
+// #229: the live service did not answer for one Site check run. Every page's strip waits on it through liveData(),
+// and the map page draws its period, incursions and layers only after its strip: with a wait of 6 s the run
+// reported «Ładowanie…» on all 26 page views and a map with nothing drawn. The check reads a page 3.5 s after
+// its load event, so the wait ends well before that and the copy on Pages takes over.
+test("the strip gives up on a live service that does not answer within its wait, and shows the copy on Pages", async () => {
+  const part = () => ({ textContent: "", classList: { toggle() {}, add() {}, remove() {} } });
+  const parts = { ".state": part(), ".others": part(), ".checked": part() };
+  const strip = Object.assign(part(), { querySelector: (x) => parts[x] || null });
+  const doc = { title: "Alerty", querySelectorAll: () => [], querySelector: (s) => (s === "#strip" ? strip : null) };
+  const alerts = { alerts: [] }, meta = { checked_at: "2026-11-26T12:00:00Z" };
+  const real = globalThis.fetch;
+  // the service that never answers: like fetch, the stub gives up when the page's AbortSignal does
+  globalThis.fetch = (url, init) => (String(url).startsWith(RCB.API)
+    ? new Promise((_, bad) => init.signal.addEventListener("abort", () => bad(new DOMException("The operation was aborted.", "TimeoutError"))))
+    : Promise.resolve({ ok: true, json: async () => (String(url).startsWith("data/meta.json") ? meta : alerts) }));
+  try {
+    const read = (p) => readFileSync(new URL("../docs/" + p, import.meta.url), "utf8");
+    const page = new Function("document", "window", `${read("i18n.js")}\n${read("common.js")}\n;return RCB;`)(doc, {});
+    const t0 = Date.now();
+    const res = await page.strip();
+    const waited = Date.now() - t0;
+    assert.ok(waited < 3000, `${waited} ms: the Site check reads the strip 3.5 s after the load event`);
+    assert.equal(res.meta, meta, "the copy on Pages filled the strip");
+    assert.equal(res.data, alerts);
+    assert.doesNotMatch(parts[".state"].textContent, /Ładowanie/);
+  } finally { globalThis.fetch = real; }
+});

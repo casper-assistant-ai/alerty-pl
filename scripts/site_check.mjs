@@ -243,9 +243,21 @@ export function liveLine(results) {
     `${top} on ${down.length} of ${views.length} page views; the pages fall back to the Pages copy of the data until it answers (server/, outside this repository)` }] };
 }
 
+// The site's own origins for one page view: where BASE lives, and every origin that a redirect from one of them
+// leads to. GitHub Pages answers the github.io address of a site with a custom domain with a 301 to that domain,
+// and the pages then load their data there. Judged by BASE alone (#229), a 503 of the site's own data file was
+// filed as a third party's tile and dropped, and the report said «Ładowanie…» 26 times without one address.
+export function ownOrigins(base) {
+  const origins = new Set([new URL(base).origin]);
+  const originOf = (url) => { try { return new URL(url).origin; } catch { return ""; } };
+  // Network.requestWillBeSent carries redirectResponse when the request was redirected from another address
+  const redirected = (url, from) => { if (/^https?:/.test(url) && origins.has(originOf(from))) origins.add(originOf(url)); };
+  return { isOwn: (url) => origins.has(originOf(url)), redirected };
+}
+
 async function visit(cdp, sid, page, vp) {
   const problems = [];
-  const origin = new URL(BASE).origin;
+  const site = ownOrigins(BASE);
   const pending = new Map();
   let loaded = false;
   const handler = (m) => {
@@ -259,19 +271,28 @@ async function visit(cdp, sid, page, vp) {
         if (p.type === "error" || p.type === "assert")
           problems.push({ kind: "console", detail: p.args.map((a) => a.value ?? a.description ?? "").join(" ").slice(0, 300) });
         break;
-      case "Network.requestWillBeSent": pending.set(p.requestId, p.request.url); break;
+      case "Network.requestWillBeSent": // a redirect comes again under the same id, with the address it went to
+        pending.set(p.requestId, { url: p.request.url, type: p.type });
+        if (p.redirectResponse) site.redirected(p.request.url, p.redirectResponse.url);
+        break;
       case "Network.responseReceived":
         if (p.response.status >= 400) {
-          const own = p.response.url.startsWith(origin);
+          const own = site.isOwn(p.response.url);
           const url = p.response.url.slice(0, 200);
           // mimeType stays on the problem: a 404 whose body is an image is GIBS's empty tile, which judge() leaves out
           problems.push({ kind: own ? "http" : "http-3rd", detail: `${p.response.status} ${url}`, url, mimeType: p.response.mimeType });
         }
         break;
+      case "Network.loadingFinished": pending.delete(p.requestId); break;
       case "Network.loadingFailed": {
-        const url = pending.get(p.requestId) || "?";
-        if (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(p.errorText) && !p.canceled)
-          problems.push({ kind: url.startsWith(origin) ? "network" : "network-3rd", detail: `${p.errorText} ${url.slice(0, 200)}`, url: url.slice(0, 200) });
+        const url = pending.get(p.requestId)?.url || "?";
+        pending.delete(p.requestId);
+        // A page that goes away aborts what it was loading, and so does the stream's own reconnect: neither is a
+        // failure. The one abort that is: /alerts of the live service, which docs/common.js gives up on after its
+        // wait (#229): the service is up and not answering in time.
+        const gaveUp = url.startsWith(LIVE) && !/\/events$/.test(url) && /ERR_ABORTED/.test(p.errorText);
+        if (gaveUp || (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(p.errorText) && !p.canceled))
+          problems.push({ kind: site.isOwn(url) ? "network" : "network-3rd", detail: `${gaveUp ? "no answer before the page gave up on the service: " : ""}${p.errorText} ${url.slice(0, 200)}`, url: url.slice(0, 200) });
         break;
       }
       case "Page.loadEventFired": loaded = true; break;
@@ -289,6 +310,14 @@ async function visit(cdp, sid, page, vp) {
     const r = await cdp.send("Runtime.evaluate", { expression: expr, returnByValue: true }, sid);
     if (r.exceptionDetails) problems.push({ kind: "check", detail: "check failed: " + r.exceptionDetails.text });
     else for (const d of r.result.value || []) problems.push({ kind, detail: d });
+  }
+  // What the page was still waiting for when its checks ran: a data file that has not answered is why a list is
+  // empty or a strip still says «Ładowanie…», and without its address the report names nothing (#229). The
+  // stream of the live service stays open by design; tiles and fonts are what the page checks look at.
+  for (const { url, type } of pending.values()) {
+    if (/^(Image|Font)$/.test(type) || /\/events$/.test(url)) continue;
+    const service = url.startsWith(LIVE);
+    if (service || site.isOwn(url)) problems.push({ kind: service ? "network-3rd" : "network", detail: `no answer while the page was checked ${url.slice(0, 200)}`, url: url.slice(0, 200) });
   }
   let shot;
   if (args.shots) {
