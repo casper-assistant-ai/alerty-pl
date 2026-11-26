@@ -15,6 +15,41 @@
  },
  "releases": [
   {
+   "version": "1.30.3",
+   "date": "2026-11-26",
+   "time": "2026-11-26T07:39:24Z",
+   "sha": "8b38ad5",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "retro",
+     "breaking": false,
+     "text": "the queue counts only a PR that closes an issue or names it in its title (#208)",
+     "sha": "8b38ad5",
+     "date": "2026-11-26",
+     "time": "2026-11-26T07:39:24Z"
+    },
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "process-doctor: timeout-minutes 25 -> 35 (#211)",
+     "sha": "91b144a",
+     "date": "2026-11-26",
+     "time": "2026-11-26T07:21:54Z"
+    },
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "Content-Security-Policy on every page (#202)",
+     "sha": "fd505ae",
+     "date": "2026-11-26",
+     "time": "2026-11-26T06:39:31Z"
+    }
+   ]
+  },
+  {
    "version": "1.30.2",
    "date": "2026-11-26",
    "time": "2026-11-26T05:01:04Z",

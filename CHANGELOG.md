@@ -2,6 +2,17 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.30.3 (2026-11-26)
+
+### fix
+
+- **retro:** the queue counts only a PR that closes an issue or names it in its title (#208) ([8b38ad5](https://github.com/casper-assistant-ai/alerty-pl/commit/8b38ad5))
+- **site:** Content-Security-Policy on every page (#202) ([fd505ae](https://github.com/casper-assistant-ai/alerty-pl/commit/fd505ae))
+
+### ci
+
+- **workflows:** process-doctor: timeout-minutes 25 -> 35 (#211) ([91b144a](https://github.com/casper-assistant-ai/alerty-pl/commit/91b144a))
+
 ## 1.30.2 (2026-11-26)
 
 ### fix
