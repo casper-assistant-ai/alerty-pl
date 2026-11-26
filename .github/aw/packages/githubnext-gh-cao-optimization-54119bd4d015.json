@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "package": "githubnext/gh-cao/optimization",
+  "source": "githubnext/gh-cao/optimization@v0.2.5",
+  "resolvedCommit": "0206402a798c97c4af4b42dc566830c978186412",
+  "installer": "gh-aw v1.2.2",
+  "files": [
+    {
+      "source": ".github/workflows/optimization-token-auditor.md",
+      "destination": ".github/workflows/optimization-token-auditor.md",
+      "sha256": "71ea0a8bc6a6f62d0e02718660c238e8aba86f6a2812db59255d8363989e96fa"
+    },
+    {
+      "source": ".github/workflows/optimization-token-optimizer.md",
+      "destination": ".github/workflows/optimization-token-optimizer.md",
+      "sha256": "c748b0dcc983aeff4c45e25ea1a700bd9d9994c7964da5517a39c1139bfc1fcc"
+    },
+    {
+      "source": ".github/workflows/optimization.md",
+      "destination": ".github/workflows/optimization.md",
+      "sha256": "f09867a2466ca978a2f59a0836082878f9df612f1cc33c5c78601819203bc9c7"
+    }
+  ]
+}

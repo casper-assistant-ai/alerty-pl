@@ -7,7 +7,18 @@
         "casper-assistant-ai/alerty-pl"
       ]
     },
-    "campaigns": {},
+    "campaigns": {
+      "optimization": {
+        "workers": {
+          "token-auditor": {
+            "workflow": "optimization-token-auditor"
+          },
+          "token-optimizer": {
+            "workflow": "optimization-token-optimizer"
+          }
+        }
+      }
+    },
     "marketplace": {
       "registries": [
         {

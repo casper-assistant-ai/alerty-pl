@@ -6,8 +6,9 @@ import js from "@eslint/js";
 import globals from "globals";
 
 export default [
-  // codeql/*/test holds the cases a query must find, bad on purpose
-  { ignores: ["dashboard/**", "docs/vendor/**", ".github/**", "node_modules/**", "codeql/**"] },
+  // codeql/*/test holds the cases a query must find, bad on purpose;
+  // optimization/ is the gh-cao campaign package that `gh cao add` installs and owns (not our code)
+  { ignores: ["dashboard/**", "docs/vendor/**", ".github/**", "node_modules/**", "codeql/**", "optimization/**"] },
   // eslint-disable and other inline comments do not count: a finding is fixed, never silenced
   { linterOptions: { noInlineConfig: true, reportUnusedInlineConfigs: "error" } },
   js.configs.recommended,
