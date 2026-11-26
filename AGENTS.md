@@ -159,9 +159,8 @@ within 7 days, each tied to a number in `process/retro-log.md`). Every agent fol
 <!-- process:start -->
 - Target: at least half of the agent output is product work (feat, fix, perf, refactor, test):
   merged PRs that change the map, history, analytics, parser, tests or site check. Data commits,
-  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-25: 66% (21 product
-  PRs, 1 docs PR + 10 reports; every live day 11-21..11-25 merged, but 11-24 was one repair pair,
-  #94 and #106, and 11-25 a script fix, #120). Hold that: ≥ 50%, at least 4 product PRs a week,
+  reports and docs touch-ups are bookkeeping and do not count. Week to 2026-11-26: 56% (32 product
+  PRs, 25 docs/chore PRs and reports; every live day 11-21..11-26 merged). Hold that: ≥ 50%, at least 4 product PRs a week,
   no live day without a merge.
 - Builders (site-designer, site-fixer, parser-doctor, region-keeper, test-improver, docs-keeper):
   before your own plan, look for open issues labelled `dev-task` that name you or fit your paths.
