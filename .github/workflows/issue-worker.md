@@ -122,6 +122,12 @@ Every issue you touch ends in exactly one of two ways, and you say which in one 
   paths your PR may touch (`scripts/`, `tests/`, `docs/*.html|js|css`, `README.md`,
   `process/improvements.md`), with a test when code changes, then run
   `python3 -I -m unittest discover -s tests` and `for f in docs/*.js; do node --check "$f"; done`.
+  Before the push, run `python3 -I scripts/pr_rules.py check --base main --head HEAD --body-file
+  <body> --workflow issue-worker --closes-file <closes>`, where `<closes>` lists with their labels
+  (`[{"number": N, "labels": [...]}]`) the issues GitHub links the PR to: a closing keyword before
+  the number, or the number in the title, and never such a keyword before another issue's number.
+  It is stdlib-only, so it runs where ruff cannot: it names before the gate does what ended PRs
+  #202 (an added `noqa`) and #204 (a second closing link in its own body).
   Title: `[issue-worker] <Conventional Commit subject>`; body: the cause, the change, how it was
   checked, `Closes #<n>`, and `From #<report>` when it covers a point of a report. The Agent PR gate merges it and the issue closes.
 - **Closing with the reason** (`close-issue`, its body is the reason): a report whose points are
