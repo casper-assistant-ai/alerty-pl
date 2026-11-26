@@ -87,6 +87,29 @@ test("a run whose only failed step is the parser closes the issue too", async ()
   assert.equal(calls.at(-1)[1].state, "closed");
 });
 
+test("a good run closes the issue only when it was created after the newest failure it names", async () => {
+  // 25.11.2026, #158: both failures were on attempt 2 (in progress), so the completed runs held a good run of 17:35 UTC only
+  const issue = { number: 158, title: "x", body: `${H.marker(WF.path)}\n\n| Run | Started | Event | Agent job | Failed steps |\n| --- | --- | --- | --- | --- |\n` +
+    "| [45690181810](https://example.test/runs/1) | 2026-11-25 19:59 UTC | workflow_dispatch | 2 min | agent / Execute Claude Code CLI |\n" +
+    "| [45684338261](https://example.test/runs/2) | 2026-11-25 19:21 UTC | schedule | 7 min | agent / Execute Claude Code CLI |" };
+  // older than both failures: nothing is written
+  let t = fakeGithub([run("success", "2026-11-25T17:35:00Z")], {}, [issue]);
+  assert.equal(await H.reconcile(t.args), "kept #158");
+  assert.equal(t.calls.length, 0);
+  // the minute of the newest failure (a re-run that succeeded has the created_at of its failure): the next good run closes
+  t = fakeGithub([run("success", "2026-11-25T19:59:40Z")], {}, [issue]);
+  assert.equal(await H.reconcile(t.args), "kept #158");
+  assert.equal(t.calls.length, 0);
+  // a later minute: closed
+  t = fakeGithub([run("success", "2026-11-25T20:00:00Z")], {}, [issue]);
+  assert.equal(await H.reconcile(t.args), "closed #158");
+  assert.equal(t.calls.at(-1)[1].state, "closed");
+  // an issue that names no run closes as before
+  assert.equal(H.lastNamed({ body: H.marker(WF.path) }), null);
+  t = fakeGithub([run("success", "2026-11-25T17:35:00Z")], {}, [{ number: 158, title: "x", body: H.marker(WF.path) }]);
+  assert.equal(await H.reconcile(t.args), "closed #158");
+});
+
 test("issues of other workflows are not touched", async () => {
   const ok = run("success");
   const { calls, args } = fakeGithub([ok], {}, [{ number: 90, title: "x", body: H.marker(".github/workflows/pr-fixer.lock.yml") }]);

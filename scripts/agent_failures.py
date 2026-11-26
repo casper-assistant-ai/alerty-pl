@@ -5,7 +5,8 @@
                       [--out FILE.json] [--md FILE.md]
 
 Reads, through the `gh` CLI (GH_TOKEN): every gh-aw agent workflow (a .lock.yml with its .md
-source), its completed runs of the last N days, the failed steps of each failed run (gh-aw's
+source), its completed runs of the last N days and the ones in progress (a failed run that is being
+re-run counts by its first attempt), the failed steps of each failed run (gh-aw's
 step-summary parser crash after the agent's work is left out, as in scripts/agent_health.cjs, and
 so is the conclusion job's mirror of it; a CLI step that ran to the step limit is a timeout), and
 the error lines of the failed job's log, without its escape sequences. Each failed run gets one
@@ -105,6 +106,19 @@ def _time(s):
     return dt.datetime.fromisoformat(s.replace("Z", "+00:00"))
 
 
+def by_first_attempt(run):
+    """Whether a run counts by its first attempt: it is on attempt 2 or later and the new attempt has no verdict of
+    its own (in progress, or cancelled). The first attempt failed, and nothing has taken its place: issue-worker
+    45684338261 and 45690181810 were in progress on attempt 2 when the report of 25.11.2026 20:08 UTC listed
+    completed runs only and saw neither; attempt 2 of the first was then cancelled, which it left out too."""
+    return (run.get("run_attempt") or 1) > 1 and (run.get("status") != "completed" or run.get("conclusion") in NEUTRAL)
+
+
+def attempt_of(run):
+    """The attempt whose jobs say how a run went."""
+    return 1 if by_first_attempt(run) else (run.get("run_attempt") or 1)
+
+
 def counting(steps):
     """The failed steps that are not the ignored parser crash."""
     return [s for s in steps or [] if s.get("conclusion") in BAD and s["name"] not in IGNORED_STEPS]
@@ -182,15 +196,17 @@ def summarize(workflows, issues, patterns, now, days):
         ok = bad = 0
         mins = []
         for r in wf["runs"]:
-            if r.get("status") != "completed" or r.get("conclusion") in NEUTRAL:
+            first = by_first_attempt(r)
+            if not first and (r.get("status") != "completed" or r.get("conclusion") in NEUTRAL):
                 continue
             agent = next((j for j in r.get("jobs") or [] if j.get("name") == "agent"), None)
             m = minutes(agent.get("started_at"), agent.get("completed_at")) if agent else None
             if m is not None:
                 mins.append(m)
-            steps = failed_steps(r.get("jobs"), wf["timeout"]) if r.get("conclusion") != "success" else []
+            steps = [] if not first and r.get("conclusion") == "success" else failed_steps(r.get("jobs"), wf["timeout"])
             if not steps:
-                ok += 1
+                if not first:
+                    ok += 1
                 continue
             bad += 1
             signals = r.get("signals")
@@ -200,6 +216,8 @@ def summarize(workflows, issues, patterns, now, days):
             day = (r.get("created_at") or "")[:10]
             failures.append({"workflow": wf["name"], "file": wf["file"], "run": r["id"], "url": r.get("html_url"),
                              "created_at": r.get("created_at"), "event": r.get("event"), "agent_minutes": m,
+                             "status": r.get("status"), "conclusion": r.get("conclusion"),
+                             "attempt": attempt_of(r), "run_attempt": r.get("run_attempt") or 1,
                              "steps": steps, "signature": sig, "errors": signals or []})
             s = sigs.setdefault(sig, {"signature": sig, "runs": 0, "days": set(), "workflows": set()})
             s["runs"] += 1
@@ -248,8 +266,13 @@ def markdown(rep):
           f"process-doctor commented: {'yes' if i['doctor_commented'] else 'no'})" for i in rep["open_issues"]] or ["None."]
     L += ["", "## Failed runs, newest first", ""]
     for f in rep["failures"][:40]:
+        # A run counted by its first attempt says what its new attempt does: in progress, or cancelled.
+        again = ""
+        if f["run_attempt"] > f["attempt"]:
+            verdict = (f["status"] if f["status"] != "completed" else f["conclusion"]).replace("_", " ")
+            again = f" (re-run: attempt {f['run_attempt']} {verdict}, counted by attempt {f['attempt']})"
         L.append(f"### {f['workflow']}: run {f['run']}, {(f['created_at'] or '')[:16].replace('T', ' ')} UTC, "
-                 f"{f['event']}, agent {f['agent_minutes'] if f['agent_minutes'] is not None else '?'} min, `{f['signature']}`")
+                 f"{f['event']}, agent {f['agent_minutes'] if f['agent_minutes'] is not None else '?'} min, `{f['signature']}`{again}")
         L.append(f"{f['url']}  ")
         L.append("Failed steps: " + "; ".join(f["steps"]))
         if f["errors"]:
@@ -283,12 +306,20 @@ def fetch(repo, days, now):
         if w["path"].endswith(".lock.yml") and src.exists():
             workflows.append({"id": w["id"], "name": w["name"], "file": src.name, "timeout": timeout_of(src.read_text())})
     pool = ThreadPoolExecutor(8)
-    runs_of = pool.map(lambda w: gh(f"repos/{repo}/actions/workflows/{w['id']}/runs?status=completed&per_page=100"
-                                    f"&created=%3E%3D{since}")["workflow_runs"], workflows)
+
+    def list_runs(w):
+        # The completed runs, and the ones in progress: a failed run that is being re-run is among the latter.
+        return [r for status in ("completed", "in_progress")
+                for r in gh(f"repos/{repo}/actions/workflows/{w['id']}/runs?status={status}&per_page=100"
+                            f"&created=%3E%3D{since}")["workflow_runs"]]
+
+    runs_of = pool.map(list_runs, workflows)
     for w, runs in zip(workflows, runs_of, strict=True):
-        w["runs"] = [r for r in runs if r.get("conclusion") not in NEUTRAL]
+        w["runs"] = sorted((r for r in runs if by_first_attempt(r)
+                            or (r.get("status") == "completed" and r.get("conclusion") not in NEUTRAL)),
+                           key=lambda r: r.get("created_at") or "", reverse=True)
     every = [r for w in workflows for r in w["runs"]]
-    jobs = pool.map(lambda r: gh(f"repos/{repo}/actions/runs/{r['id']}/attempts/{r.get('run_attempt') or 1}/jobs?per_page=100")["jobs"], every)
+    jobs = pool.map(lambda r: gh(f"repos/{repo}/actions/runs/{r['id']}/attempts/{attempt_of(r)}/jobs?per_page=100")["jobs"], every)
     for r, j in zip(every, jobs, strict=True):
         r["jobs"] = j
     to_read = []

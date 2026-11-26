@@ -2,6 +2,7 @@ import datetime as dt
 import sys
 import unittest
 from pathlib import Path
+from unittest import mock
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import agent_failures as af
@@ -48,6 +49,19 @@ HANDLER_ONLY = [job("agent", "success", [("Execute Claude Code CLI", "success", 
                     start="2026-11-23T23:27:07Z", end="2026-11-23T23:35:34Z"),
                 job("conclusion", "failure", [("Handle agent failure", "failure", "2026-11-23T23:38:11Z", "2026-11-23T23:38:15Z")],
                     start="2026-11-23T23:38:00Z", end="2026-11-23T23:38:27Z")]
+
+
+def rerun(i, attempt, status, conclusion=None, jobs=CRASH, at="2026-11-25T19:21:11Z", signals=None):
+    """A run on a later attempt, as GitHub's runs API gives it (issue-worker 45684338261, 25.11.2026: created 19:21 UTC,
+    its CLI step failed on attempt 1, attempt 2 ran from 20:07 and was cancelled at 20:12). A run in progress has no
+    conclusion."""
+    r = {"id": i, "status": status, "run_attempt": attempt, "created_at": at, "event": "schedule",
+         "html_url": f"https://example.test/runs/{i}", "jobs": jobs}
+    if status == "completed":
+        r["conclusion"] = conclusion
+    if signals is not None:
+        r["signals"] = signals
+    return r
 
 
 class Signals(unittest.TestCase):
@@ -164,6 +178,75 @@ class Summary(unittest.TestCase):
         rep = self.rep(runs)
         self.assertEqual((rep["agents"][0]["ok"], rep["agents"][0]["failed"]), (3, 0))
         self.assertEqual((rep["failures"], rep["signatures"]), ([], []))
+
+    def test_a_rerun_in_progress_counts_by_its_first_attempt(self):
+        # issue-worker 45684338261: attempt 1 failed in the CLI step, attempt 2 ran from 20:07 UTC. The completed runs
+        # held only a good run of 17:35 UTC, so the report of 20:08 UTC and agent-health (#158) saw no failure.
+        again = rerun(45684338261, 2, "in_progress", signals=["Agent execution exited with code 1"])
+        older_ok = run(2, "success", [job("agent", "success")], at="2026-11-25T17:35:00Z")
+        rep = self.rep([again, older_ok])
+        self.assertEqual((rep["agents"][0]["ok"], rep["agents"][0]["failed"]), (1, 1))
+        f = rep["failures"][0]
+        self.assertEqual((f["run"], f["signature"], f["attempt"], f["run_attempt"]), (45684338261, "engine-crash", 1, 2))
+        self.assertIn("(re-run: attempt 2 in progress, counted by attempt 1)", af.markdown(rep))
+
+    def test_a_cancelled_rerun_counts_by_its_first_attempt_too(self):
+        # attempt 2 of the same run was cancelled at 20:12 UTC: a completed run with a neutral conclusion, left out before;
+        # a cancelled run on its first attempt still is
+        again = rerun(45684338261, 2, "completed", "cancelled")
+        rep = self.rep([again, rerun(3, 1, "completed", "cancelled")])
+        self.assertEqual((rep["agents"][0]["ok"], rep["agents"][0]["failed"]), (0, 1))
+        self.assertEqual([f["run"] for f in rep["failures"]], [45684338261])
+        self.assertIn("(re-run: attempt 2 cancelled, counted by attempt 1)", af.markdown(rep))
+
+    def test_a_completed_rerun_counts_by_its_last_attempt(self):
+        self.assertEqual(af.attempt_of({"status": "completed", "conclusion": "failure", "run_attempt": 2}), 2)
+        self.assertEqual(af.attempt_of({"status": "in_progress", "run_attempt": 1}), 1)
+        self.assertEqual(af.attempt_of({"status": "completed", "conclusion": "success"}), 1)
+        fixed = rerun(4, 2, "completed", "success", jobs=[job("agent", "success")])
+        failed = rerun(5, 2, "completed", "failure")
+        rep = self.rep([fixed, failed])
+        self.assertEqual((rep["agents"][0]["ok"], rep["agents"][0]["failed"]), (1, 1))
+        self.assertEqual(rep["failures"][0]["run"], 5)
+        self.assertNotIn("re-run", af.markdown(rep))
+
+    def test_a_run_in_progress_on_its_first_attempt_counts_nothing(self):
+        first = rerun(6, 1, "in_progress", jobs=[])
+        rep = self.rep([first, run(7, "success", [job("agent", "success")])])
+        self.assertEqual((rep["agents"][0]["ok"], rep["agents"][0]["failed"]), (1, 0))
+        self.assertEqual(rep["failures"], [])
+
+
+class Fetch(unittest.TestCase):
+    def test_in_progress_runs_are_listed_and_a_rerun_is_read_by_its_first_attempt(self):
+        paths = []
+        crash = [dict(j, id=99) for j in CRASH]
+        pages = {
+            "actions/workflows?per_page=100": {"workflows": [{"id": 7, "name": "Issue worker", "path": ".github/workflows/issue-worker.lock.yml"}]},
+            "runs?status=completed": {"workflow_runs": [rerun(10, 2, "completed", "failure", at="2026-11-25T18:00:00Z")]},
+            "runs?status=in_progress": {"workflow_runs": [rerun(12, 1, "in_progress", at="2026-11-25T20:30:00Z"),
+                                                          rerun(11, 2, "in_progress")]},
+            "runs/10/attempts/2/jobs": {"jobs": crash},
+            "runs/11/attempts/1/jobs": {"jobs": crash},
+            "jobs/99/logs": OVERLOAD_LOG,
+            "issues?state=open": [],
+        }
+
+        def fake_gh(path, raw=False):
+            paths.append(path)
+            return next(page for key, page in pages.items() if key in path)
+
+        with mock.patch.object(af, "gh", fake_gh):
+            workflows, issues = af.fetch("o/r", 1, "2026-11-26T12:00:00Z")
+        runs = workflows[0]["runs"]
+        # the run in progress on its first attempt is left out; the re-run is kept and read by attempt 1
+        self.assertEqual([r["id"] for r in runs], [11, 10])
+        self.assertEqual(runs[0]["signals"], af.signal_lines(OVERLOAD_LOG))
+        self.assertTrue(any("runs?status=in_progress" in p for p in paths))
+        self.assertIn("repos/o/r/actions/runs/11/attempts/1/jobs?per_page=100", paths)
+        self.assertIn("repos/o/r/actions/runs/10/attempts/2/jobs?per_page=100", paths)
+        self.assertFalse(any("/runs/11/attempts/2/" in p or "/runs/12/" in p for p in paths))
+        self.assertEqual(issues, [])
 
 
 class Gh(unittest.TestCase):

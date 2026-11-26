@@ -77,6 +77,16 @@ function body(name, path, streak) {
   ].join("\n");
 }
 
+/** The start of the newest failed run an issue's table names (its "Started" column), or null. */
+function lastNamed(issue) {
+  let newest = null;
+  for (const m of (issue.body || "").matchAll(/^\| \[\d+\]\([^)]*\) \| (\d{4}-\d\d-\d\d \d\d:\d\d) UTC \|/gm)) {
+    const t = Date.parse(`${m[1].replace(" ", "T")}:00Z`);
+    if (!Number.isNaN(t) && (newest === null || t > newest)) newest = t;
+  }
+  return newest;
+}
+
 /** Reconcile one workflow ({id, name, path}) with its issue. Returns what was done. */
 async function reconcile({ github, owner, repo, workflow, openIssues, closedIssues = [], core }) {
   const { data } = await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: workflow.id, status: "completed", per_page: 40 });
@@ -85,6 +95,16 @@ async function reconcile({ github, owner, repo, workflow, openIssues, closedIssu
   const issue = openIssues.find((i) => (i.body || "").includes(marker(workflow.path)));
   if (!streak.length) {
     if (!issue) return "ok";
+    // A good run recovers the issue only when it was created after the newest failure the issue names, to the minute
+    // (the table's resolution: a re-run that succeeded has the created_at of its failure and waits for the next good
+    // run). A failed run that is being re-run (attempt 2 in progress, or cancelled) is in no completed failure, so the
+    // newest good run can be older than the failures (#158, 25.11.2026: closed on a good run of 17:35 UTC while both
+    // its failures were on attempt 2 since 20:07 UTC).
+    const named = lastNamed(issue);
+    if (recovered && named !== null && Date.parse(`${recovered.created_at.slice(0, 16)}:00Z`) <= named) {
+      core.info(`${workflow.name}: kept #${issue.number}: run ${recovered.id} is older than the failure it names`);
+      return `kept #${issue.number}`;
+    }
     const how = recovered ? `[run ${recovered.id}](${recovered.html_url}) succeeded at ${recovered.updated_at.replace("T", " ").slice(0, 16)} UTC` : "no failed run is left";
     await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: `Recovered: ${how}. Closing.` });
     await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: "closed", state_reason: "completed" });
@@ -217,4 +237,4 @@ async function main({ github, context, core }) {
   await core.summary.addList(done.length ? done : ["nothing to do"]).write();
 }
 
-module.exports = { main, pick, reconcile, retireLegacy, dispatchDoctor, isLegacy, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };
+module.exports = { main, pick, reconcile, retireLegacy, dispatchDoctor, isLegacy, streakOf, failedSteps, title, body, marker, lastNamed, IGNORED_STEPS };
