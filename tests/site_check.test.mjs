@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LIVE, judge, liveLine } from "../scripts/site_check.mjs";
+import { LIVE, judge, liveLine, ownOrigins } from "../scripts/site_check.mjs";
 
 const src = readFileSync(new URL("../scripts/site_check.mjs", import.meta.url), "utf8");
 
@@ -161,4 +161,54 @@ test("one line for the run when the live service did not answer", () => {
   assert.equal(line.viewport, "-");
   assert.deepEqual(line.problems, [{ kind: "live", detail: `${fail("network-3rd", EVENTS).detail} on 3 of 4 page views; the pages fall back to the Pages copy of the data until it answers (server/, outside this repository)` }]);
   assert.equal(liveLine([view(), view()]), null);
+});
+
+// #229: GitHub Pages answers the github.io address with a 301 to the site's domain, the pages load their data
+// there, and the check took that host for a third party's: a 503 of data/shelters/index.json was dropped as one
+// tile, and the report said «Ładowanie…» on 26 page views without one address of the site's own.
+const GH = "https://casper-assistant-ai.github.io/alerty-pl/";
+const SITE = "https://alerty.klioba.com/";
+
+test("the site's own files are recognised on the domain GitHub Pages redirects to", () => {
+  const site = ownOrigins(GH);
+  assert.equal(site.isOwn(GH + "data/meta.json"), true);
+  assert.equal(site.isOwn(SITE + "data/shelters/index.json"), false, "not before the redirect is seen");
+  site.redirected(SITE + "schrony.html", GH + "schrony.html"); // Network.requestWillBeSent with redirectResponse
+  assert.equal(site.isOwn(SITE + "data/shelters/index.json"), true);
+  assert.equal(site.isOwn("https://alerty.klioba.com.evil.example/data/shelters/index.json"), false, "another host with the same prefix");
+  assert.equal(site.isOwn("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/1/2/3"), false);
+  site.redirected("https://gibs.earthdata.nasa.gov/wms.cgi?x=1", "https://gibs.earthdata.nasa.gov/wms.cgi");
+  site.redirected("data:text/html,1", GH + "index.html");
+  assert.equal(site.isOwn("https://gibs.earthdata.nasa.gov/wms.cgi?x=1"), false, "a redirect of another site makes nothing the site's own");
+  assert.equal(site.isOwn("data:text/html,1"), false);
+  // visit() files by it: a failed request of the site's own is an http or network problem on every count
+  const v = src.slice(src.indexOf("async function visit("), src.indexOf("// The HTML of each page"));
+  assert.match(v, /const site = ownOrigins\(BASE\)/);
+  assert.match(v, /const own = site\.isOwn\(p\.response\.url\)/);
+  assert.match(v, /kind: site\.isOwn\(url\) \? "network" : "network-3rd"/);
+  assert.match(v, /if \(p\.redirectResponse\) site\.redirected\(p\.request\.url, p\.redirectResponse\.url\)/);
+  assert.equal(judge([{ kind: "http", detail: "503 " + SITE + "data/shelters/index.json", url: SITE + "data/shelters/index.json" }]).problems.length, 1);
+});
+
+test("a request the page still waits for when its checks ran is named, and so is the live service the page gave up on", () => {
+  // the map page waits on RCB.strip(), which waits on the live service: everything after it is «not drawn»
+  const v = src.slice(src.indexOf("async function visit("), src.indexOf("// The HTML of each page"));
+  const wired = (code) => assert.ok(v.includes(code), "visit() no longer has: " + code);
+  wired('case "Network.loadingFinished": pending.delete(p.requestId);'); // a request that answered is not waited for
+  wired('if (/^(Image|Font)$/.test(type) || /\\/events$/.test(url)) continue;'); // tiles, fonts and the stream: the page checks' business
+  wired('kind: service ? "network-3rd" : "network", detail: `no answer while the page was checked ');
+  // a hung /alerts fetch is aborted by docs/common.js after its wait: an abort the check used to drop with the rest
+  wired('const gaveUp = url.startsWith(LIVE) && !/\\/events$/.test(url) && /ERR_ABORTED/.test(p.errorText);');
+  wired('if (gaveUp || (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(p.errorText) && !p.canceled))');
+  wired('no answer before the page gave up on the service: ');
+  // judged like the service's other failures: one line for the run, the site's own file on its page view
+  const alerts = LIVE + "alerts";
+  const waiting = { kind: "network-3rd", detail: "no answer while the page was checked " + alerts, url: alerts };
+  const view = (live, problems = []) => ({ page: "Mapa", viewport: "desktop", problems, ...(live ? { live } : {}) });
+  const line = liveLine([view([waiting]), view([waiting], [{ kind: "network", detail: "no answer while the page was checked " + SITE + "data/alerts.json" }]), view()]);
+  assert.equal(line.problems[0].detail, `${waiting.detail} on 2 of 3 page views; the pages fall back to the Pages copy of the data until it answers (server/, outside this repository)`);
+  const own = judge([view([waiting], [{ kind: "network", detail: "no answer while the page was checked " + SITE + "data/alerts.json" }]).problems[0]]);
+  assert.equal(own.problems.length, 1);
+  assert.deepEqual(own.live, []);
+  assert.deepEqual(judge([waiting]).problems, [], "the service's own wait is not a failed tile of another site");
 });

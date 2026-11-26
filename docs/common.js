@@ -177,10 +177,12 @@ const RCB = (() => {
     return t >= 2 && t <= 4 && !(tt >= 12 && tt <= 14) ? few : many;
   }
 
-  // live data first, the copy on GitHub Pages (Update data workflow) when the service does not answer
+  // live data first, the copy on GitHub Pages (Update data workflow) when the service does not answer in 2.5 s.
+  // Every page's strip waits here, and so does everything the map page draws after its strip: a service that
+  // hangs held «Ładowanie…» and an empty map for the whole wait (#229). The stream (live()) brings a later answer.
   async function liveData() {
     try {
-      const r = await fetch(API + "/alerts", { cache: "no-store", signal: AbortSignal.timeout(6000) });
+      const r = await fetch(API + "/alerts", { cache: "no-store", signal: AbortSignal.timeout(2500) });
       if (r.ok) {
         const j = await r.json();
         if (j.meta && j.meta.checked_at && Array.isArray(j.alerts)) return [j, j.meta];
