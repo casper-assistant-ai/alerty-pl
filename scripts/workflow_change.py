@@ -681,8 +681,8 @@ def comment(n, text):
     sh("gh", "issue", "comment", str(n), "-R", repo(), "--body", text, tries=4)
 
 
-def close(n, text):
-    sh("gh", "issue", "close", str(n), "-R", repo(), "--reason", "completed", "--comment", text, tries=4)
+def close(n, text, reason="completed"):
+    sh("gh", "issue", "close", str(n), "-R", repo(), "--reason", reason, "--comment", text, tries=4)
 
 
 def close_pr(num, ref, text):
@@ -706,6 +706,10 @@ def push(ref, branch, force=False):
     return r.returncode == 0, (r.stderr or r.stdout).strip()
 
 
+class Stale(RuntimeError):
+    """The review PR no longer rebases onto main (often the lock file's header, after a recompile on main)."""
+
+
 def land_on_main(ref, expect):
     """Rebase ref's commits onto the newest main, check each again, push: {issue: sha}."""
     last = ""
@@ -714,7 +718,7 @@ def land_on_main(ref, expect):
         git("checkout", "-q", "-B", "land", ref)
         if subprocess.run(["git", "rebase", "-q", "origin/main"], capture_output=True).returncode:
             git("rebase", "--abort", check=False)
-            raise RuntimeError("main changed the same lines meanwhile; the next run applies the patch again")
+            raise Stale("main changed the same lines meanwhile")
         landed = {}
         for c in git("rev-list", "--reverse", "origin/main..HEAD").split():
             cls, problems = guard(f"{c}^", c)
@@ -925,13 +929,24 @@ def land(d):
                     "The process-doctor opens a corrected workflow-change issue if the change is still needed.")
             close_pr(num, ref, text)
             issue = gh_api(f"repos/{repo()}/issues/{n}") or {}
-            comment(n, f"{text}\n\nPR: #{num}\n\n{marker(n, digest(issue.get('body')), 'refused')}")
+            # the issue ends here too: left open it waited for nobody (#209, 2026-11-26)
+            close(n, f"{text}\n\nPR: #{num}\n\n{marker(n, digest(issue.get('body')), 'refused')}", "not planned")
             doctor = doctor or source_of(issue) == "process-doctor"
             print(f"#{n}: PR #{num} closed, the reviewer said {verdict}")
             continue
         try:
             landed = land_on_main(f"refs/remotes/origin/{ref}", {"direct", "review"})
             sha2 = landed.get(n) or git("rev-parse", "HEAD").strip()
+        except Stale as e:
+            # the open PR kept prepare() from trying the patch again, so the approved #187 waited for a
+            # rebase that never came (2026-11-26): close it, and the next run applies the issue's patch on
+            # the new main and opens a fresh PR for the reviewer
+            close_pr(num, ref, f"Workflow maintainer: approved, but {e} and the PR no longer rebases. The next run "
+                               f"applies the patch of #{n} on the new main and opens a new PR for review.")
+            comment(n, f"Workflow maintainer: PR #{num} closed: {e}; the next run applies the patch again.\n\n"
+                       f"Run: {run_url()}")
+            print(f"::warning::#{n}: PR #{num} approved but stale: {e}")
+            continue
         except RuntimeError as e:
             print(f"::warning::#{n}: PR #{num} approved but not landed: {e}")
             continue
