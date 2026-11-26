@@ -2,7 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.31.3 (2026-11-26)
+
+### fix
+
+- **map:** the map draws before the live service answers (#231) ([00b99ba](https://github.com/casper-assistant-ai/alerty-pl/commit/00b99ba))
+- **site:** the strip waits 2.5 s for the live service, the site check names its own files (#230) ([6d23d95](https://github.com/casper-assistant-ai/alerty-pl/commit/6d23d95))
 
 ### docs
 
@@ -10,6 +15,7 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 
 ### chore
 
+- **process:** ledger of 11-26: PR #228 shut by the protected AGENTS.md, quota windows five and six (#236) ([0fa4c46](https://github.com/casper-assistant-ai/alerty-pl/commit/0fa4c46))
 - **process:** retro 2026-11-26, dev share 54% (#226) ([31fc8e0](https://github.com/casper-assistant-ai/alerty-pl/commit/31fc8e0))
 
 ## 1.31.2 (2026-11-26)

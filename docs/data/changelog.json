@@ -15,11 +15,38 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.31.3",
    "date": "2026-11-26",
-   "time": "2026-11-26T13:33:50Z",
-   "sha": "31fc8e0",
+   "time": "2026-11-26T16:55:52Z",
+   "sha": "00b99ba",
    "changes": [
+    {
+     "type": "fix",
+     "scope": "map",
+     "breaking": false,
+     "text": "the map draws before the live service answers (#231)",
+     "sha": "00b99ba",
+     "date": "2026-11-26",
+     "time": "2026-11-26T16:55:52Z"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "ledger of 11-26: PR #228 shut by the protected AGENTS.md, quota windows five and six (#236)",
+     "sha": "0fa4c46",
+     "date": "2026-11-26",
+     "time": "2026-11-26T16:55:16Z"
+    },
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "the strip waits 2.5 s for the live service, the site check names its own files (#230)",
+     "sha": "6d23d95",
+     "date": "2026-11-26",
+     "time": "2026-11-26T16:19:33Z"
+    },
     {
      "type": "chore",
      "scope": "process",
