@@ -235,11 +235,21 @@ jobs:
               echo "::endgroup::"; continue
             fi
             git checkout -q --detach
+            # the checks run on the tree the merge with main would give (below): a PR opened before a check
+            # landed on main cannot receive it (the PR fixer pushes allowed paths only), so #160 failed for a
+            # cause that was not its own (2026-11-25, #195). merge-tree only reads objects, so a conflict
+            # is known here, before the tree becomes the PR's code.
+            if ! git merge-tree --write-tree origin/main "$sha" >/dev/null; then
+              request_fix "It conflicts with main: merge origin/main into the branch and resolve the conflict."
+              echo "::endgroup::"; continue
+            fi
             gh pr checkout "$n" --force
             # from here to the export below the tree is the PR's code and it runs without the gate's write
             # token (security audit #173): GH_TOKEN leaves the environment until the checks are over
             gate_token=$GH_TOKEN; unset GH_TOKEN
             ok=1; log="/tmp/gate-log-$n.txt"; : > "$log"
+            # local only, never pushed; it cannot conflict (merge-tree said so above)
+            git merge -q --no-edit origin/main >/dev/null 2>&1 || { ok=0; echo "FAILED: merge of origin/main" | tee -a "$log"; git merge --abort 2>/dev/null; }
             { python3 -I -m unittest discover -s tests 2>&1 || { ok=0; echo "FAILED: unit tests"; }; } | tee -a "$log"
             { python3 -I scripts/rcb.py update --pages 1 --out /tmp/gate-$n 2>&1 || { ok=0; echo "FAILED: live parse of gov.pl"; }; } | tee -a "$log"
             for js in docs/*.js; do { node --check "$js" 2>&1 || { ok=0; echo "FAILED: node --check $js"; }; } | tee -a "$log"; done
