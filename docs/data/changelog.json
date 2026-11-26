@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-26",
+   "time": "2026-11-26T13:33:50Z",
+   "sha": "31fc8e0",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "retro 2026-11-26, dev share 54% (#226)",
+     "sha": "31fc8e0",
+     "date": "2026-11-26",
+     "time": "2026-11-26T13:33:50Z"
+    },
+    {
+     "type": "docs",
+     "scope": null,
+     "breaking": false,
+     "text": "bring README.md and AGENTS.md up to date (#227)",
+     "sha": "6b33fd0",
+     "date": "2026-11-26",
+     "time": "2026-11-26T13:33:23Z"
+    }
+   ]
+  },
+  {
    "version": "1.31.2",
    "date": "2026-11-26",
    "time": "2026-11-26T12:40:30+01:00",

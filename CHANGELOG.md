@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### docs
+
+- bring README.md and AGENTS.md up to date (#227) ([6b33fd0](https://github.com/casper-assistant-ai/alerty-pl/commit/6b33fd0))
+
+### chore
+
+- **process:** retro 2026-11-26, dev share 54% (#226) ([31fc8e0](https://github.com/casper-assistant-ai/alerty-pl/commit/31fc8e0))
+
 ## 1.31.2 (2026-11-26)
 
 ### fix
