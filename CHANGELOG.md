@@ -2,6 +2,21 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.31.1 (2026-11-26)
+
+### fix
+
+- **workflow-maintainer:** close a review PR that no longer rebases, and the issue the reviewer refused ([621810c](https://github.com/casper-assistant-ai/alerty-pl/commit/621810c))
+
+### ci
+
+- **gate:** run the checks on the merge of the PR head and main ([92ad641](https://github.com/casper-assistant-ai/alerty-pl/commit/92ad641))
+- **issue-worker:** noop on an issue not its to work; run pr_rules check --worktree before the push ([b9aad6e](https://github.com/casper-assistant-ai/alerty-pl/commit/b9aad6e))
+
+### chore
+
+- **process:** retro 2026-11-26, dev share 56% (#221) ([2117c56](https://github.com/casper-assistant-ai/alerty-pl/commit/2117c56))
+
 ## 1.31.0 (2026-11-26)
 
 ### feat

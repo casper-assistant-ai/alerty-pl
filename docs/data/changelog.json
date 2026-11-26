@@ -15,6 +15,50 @@
  },
  "releases": [
   {
+   "version": "1.31.1",
+   "date": "2026-11-26",
+   "time": "2026-11-26T11:57:21+01:00",
+   "sha": "621810c",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "workflow-maintainer",
+     "breaking": false,
+     "text": "close a review PR that no longer rebases, and the issue the reviewer refused",
+     "sha": "621810c",
+     "date": "2026-11-26",
+     "time": "2026-11-26T11:57:21+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "gate",
+     "breaking": false,
+     "text": "run the checks on the merge of the PR head and main",
+     "sha": "92ad641",
+     "date": "2026-11-26",
+     "time": "2026-11-26T11:57:21+01:00"
+    },
+    {
+     "type": "ci",
+     "scope": "issue-worker",
+     "breaking": false,
+     "text": "noop on an issue not its to work; run pr_rules check --worktree before the push",
+     "sha": "b9aad6e",
+     "date": "2026-11-26",
+     "time": "2026-11-26T11:57:21+01:00"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "retro 2026-11-26, dev share 56% (#221)",
+     "sha": "2117c56",
+     "date": "2026-11-26",
+     "time": "2026-11-26T10:42:47Z"
+    }
+   ]
+  },
+  {
    "version": "1.31.0",
    "date": "2026-11-26",
    "time": "2026-11-26T11:22:29+01:00",
