@@ -15,11 +15,38 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.30.1",
    "date": "2026-11-26",
-   "time": "2026-11-26T01:24:41Z",
-   "sha": "a204d63",
+   "time": "2026-11-26T03:32:17Z",
+   "sha": "820ab3b",
    "changes": [
+    {
+     "type": "test",
+     "scope": "gate",
+     "breaking": false,
+     "text": "pin that the PR's own code runs without the gate's token (#194)",
+     "sha": "820ab3b",
+     "date": "2026-11-26",
+     "time": "2026-11-26T03:32:17Z"
+    },
+    {
+     "type": "fix",
+     "scope": "changelog",
+     "breaking": false,
+     "text": "the lint names a PR title that the tooling cut, with its length and where the cut fell (#198)",
+     "sha": "c15377f",
+     "date": "2026-11-26",
+     "time": "2026-11-26T03:31:22Z"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "rules for the reviewer and the auditor, the third quota window in the ledger (#201)",
+     "sha": "611e58c",
+     "date": "2026-11-26",
+     "time": "2026-11-26T03:30:51Z"
+    },
     {
      "type": "ci",
      "scope": "workflows",

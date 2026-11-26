@@ -2,12 +2,20 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.30.1 (2026-11-26)
+
+### fix
+
+- **changelog:** the lint names a PR title that the tooling cut, with its length and where the cut fell (#198) ([c15377f](https://github.com/casper-assistant-ai/alerty-pl/commit/c15377f))
 
 ### docs
 
 - **agents:** keep only judgment rules; list what the checks enforce ([f714254](https://github.com/casper-assistant-ai/alerty-pl/commit/f714254))
 - **agents:** every correction becomes a test, a lint rule or a CodeQL query first ([2d45139](https://github.com/casper-assistant-ai/alerty-pl/commit/2d45139))
+
+### test
+
+- **gate:** pin that the PR's own code runs without the gate's token (#194) ([820ab3b](https://github.com/casper-assistant-ai/alerty-pl/commit/820ab3b))
 
 ### ci
 
@@ -21,6 +29,10 @@ Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventi
 - **codeql:** advanced setup with the repository's own queries; a PR with a new alert is not merged ([f92229e](https://github.com/casper-assistant-ai/alerty-pl/commit/f92229e))
 - **lint:** ruff for Python and ESLint for JavaScript in CI, the existing findings fixed ([c5ac0a9](https://github.com/casper-assistant-ai/alerty-pl/commit/c5ac0a9))
 - **issue-worker:** let its PR change README.md, as allowed-files says ([f3fdfdd](https://github.com/casper-assistant-ai/alerty-pl/commit/f3fdfdd))
+
+### chore
+
+- **process:** rules for the reviewer and the auditor, the third quota window in the ledger (#201) ([611e58c](https://github.com/casper-assistant-ai/alerty-pl/commit/611e58c))
 
 ## 1.30.0 (2026-11-25)
 
