@@ -10,7 +10,6 @@ Optimization gives maintainers evidence-bounded audits and recommendations for r
 | Workflow | Responsibility |
 | --- | --- |
 | [`optimization`](../.github/workflows/optimization.md) | Hourly and manually dispatchable orchestrator that selects a repository and dispatches campaign workers. |
-| [`optimization-token-auditor`](../.github/workflows/optimization-token-auditor.md) | Audits one repository's measured agentic-workflow AI Credit, token use, and reliability. |
 | [`optimization-token-optimizer`](../.github/workflows/optimization-token-optimizer.md) | Finds one evidence-complete agentic workflow and recommends a conservative, measurable efficiency change. |
 
 Workers are independently dispatchable and handle exactly one authorized target repository. Review mode routes findings and recommendations to the control repository; live mode may open the equivalent issue on the target repository.
@@ -38,7 +37,6 @@ Declare the campaign in `.github/workflows/cao.json`:
 				"mode": "review",
 				"max-repositories": 1,
 				"workers": {
-					"token-auditor": { "workflow": "optimization-token-auditor", "max-mode": "review" },
 					"token-optimizer": { "workflow": "optimization-token-optimizer", "max-mode": "review" }
 				}
 			}

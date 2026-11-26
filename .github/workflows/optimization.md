@@ -95,7 +95,7 @@ network:
 
 safe-outputs:
   dispatch-workflow:
-    workflows: [optimization-token-auditor, optimization-token-optimizer]
+    workflows: [optimization-token-optimizer]
     max: 12
   threat-detection: false
 source: githubnext/gh-cao/optimization@v0.2.5
@@ -126,7 +126,6 @@ Select no more than the effective `max_repos`. Use exact precomputed repository 
 
 ## Workers
 
-- `optimization-token-auditor` produces one bounded repository-level audit of AI Credit, token, reliability, and workflow activity for the last 7 full days.
 - `optimization-token-optimizer` selects at most one workflow in the repository whose complete evidence supports a conservative optimization recommendation.
 
 For each selected repository, dispatch each enabled worker at most once using the full standard control-plane envelope. Deduplicate `(worker, target_repo, safe_output_mode)` tuples before dispatch. Do not retry a failed or rate-limited dispatch in the same run.
