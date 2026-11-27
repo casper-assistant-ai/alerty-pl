@@ -166,6 +166,79 @@ class Summary(unittest.TestCase):
         self.assertEqual((rep["failures"], rep["signatures"]), ([], []))
 
 
+def listed(i, status, conclusion, attempt, at):
+    """A run as GitHub lists it: no jobs, and no conclusion while it is not completed."""
+    return {"id": i, "status": status, "conclusion": conclusion, "run_attempt": attempt, "created_at": at,
+            "event": "schedule", "html_url": f"https://example.test/runs/{i}"}
+
+
+def fake_get(answers):
+    """A stand-in for gh(): answers by path and records every path asked."""
+    paths = []
+    def get(path, raw=False):
+        paths.append(path)
+        return answers[path]
+    get.paths = paths
+    return get
+
+
+# 2026-11-25: the issue worker's run 45684338261 failed in its first attempt (CLI step 19:23 to 19:30 UTC)
+# and was in progress on attempt 2 since 20:07 UTC, so `status=completed` did not list it and the newest
+# completed run was the good one of 17:35, 45663764218.
+AGAIN = listed(45684338261, "in_progress", None, 2, "2026-11-25T19:23:00Z")
+GOOD = listed(45663764218, "completed", "success", 1, "2026-11-25T17:35:00Z")
+FIRST_JOBS = [dict(job("agent", "failure", [("Execute Claude Code CLI", "failure", "2026-11-25T19:23:10Z", "2026-11-25T19:30:20Z")],
+                         start="2026-11-25T19:22:50Z", end="2026-11-25T19:30:40Z"), id=502), job("conclusion", "success")]
+WF = "repos/o/r/actions/workflows/7/runs?status="
+PAGE = "&per_page=100&created=%3E%3D2026-11-24"
+
+
+class Fetch(unittest.TestCase):
+    """fetch() through a stand-in for gh: the runs the report counts."""
+
+    def report(self, going):
+        get = fake_get({
+            "repos/o/r/actions/workflows?per_page=100":
+                {"workflows": [{"id": 7, "name": "Issue worker", "path": ".github/workflows/issue-worker.lock.yml"}]},
+            WF + "completed" + PAGE: {"workflow_runs": [GOOD]},
+            WF + "in_progress" + PAGE: {"workflow_runs": going},
+            WF + "queued" + PAGE: {"workflow_runs": []},
+            "repos/o/r/actions/runs/45663764218/attempts/1/jobs?per_page=100": {"jobs": [dict(job("agent", "success"), id=501)]},
+            "repos/o/r/actions/runs/45684338261/attempts/1/jobs?per_page=100": {"jobs": FIRST_JOBS},
+            "repos/o/r/actions/jobs/502/logs": "2026-11-25T19:30:20Z ##[error]Agent execution exited with code 1\n",
+            "repos/o/r/issues?state=open&labels=agentic-workflows&per_page=100": [],
+        })
+        workflows, issues = af.fetch("o/r", 1, "2026-11-25T20:08:00Z", get=get)
+        return get, af.summarize(workflows, issues, set(), "2026-11-25T20:08:00Z", 1)
+
+    def test_a_run_being_re_run_counts_by_its_first_attempt(self):
+        get, rep = self.report([AGAIN])
+        self.assertEqual([(f["run"], f["rerun"]) for f in rep["failures"]], [(45684338261, True)])
+        f = rep["failures"][0]
+        self.assertEqual((f["signature"], f["steps"], f["agent_minutes"]), ("engine-crash", ["agent / Execute Claude Code CLI"], 8))
+        self.assertEqual(rep["signatures"][0]["signature"], "engine-crash")
+        self.assertEqual((rep["agents"][0]["ok"], rep["agents"][0]["failed"]), (1, 1))    # the good run of 17:35 stays a success
+        md = af.markdown(rep)
+        self.assertIn("run 45684338261, 2026-11-25 19:23 UTC", md)
+        self.assertIn("the first attempt of a re-run that was under way", md)
+        self.assertIn("Agent execution exited with code 1", md)
+        self.assertIn("repos/o/r/actions/runs/45684338261/attempts/1/jobs?per_page=100", get.paths)
+        self.assertIn("repos/o/r/actions/jobs/502/logs", get.paths)                       # that attempt's log is read
+        self.assertFalse(any("attempts/2/" in p for p in get.paths))
+
+    def test_a_first_attempt_still_waiting_for_its_runner_is_nothing(self):
+        first = listed(45690000000, "queued", None, 1, "2026-11-25T20:05:00Z")
+        get, rep = self.report([AGAIN, first])
+        self.assertEqual([f["run"] for f in rep["failures"]], [45684338261])
+        self.assertFalse(any("45690000000" in p for p in get.paths))
+
+    def test_first_attempt_record(self):
+        r = af.first_attempt(AGAIN, FIRST_JOBS)
+        self.assertEqual((r["status"], r["conclusion"], r["run_attempt"], r["rerun"], r["id"]),
+                         ("completed", "failure", 1, True, 45684338261))
+        self.assertEqual(af.first_attempt(AGAIN, [job("agent", "success")])["conclusion"], "success")
+
+
 class Gh(unittest.TestCase):
     class Done:
         def __init__(self, code, out="", err=""):

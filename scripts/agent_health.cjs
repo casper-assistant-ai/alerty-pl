@@ -13,20 +13,64 @@ const LABELS = ["agentic-workflows", LABEL];
 const IGNORED_STEPS = new Set(["Parse agent logs for step summary"]);
 // Conclusions that are neither a success nor a failure of the agent.
 const NEUTRAL = new Set(["cancelled", "skipped", "action_required", "neutral", "stale"]);
+// A job or step that did not do its work.
+const BAD = new Set(["failure", "timed_out", "cancelled"]);
+// The conclusion job's copy of the agent job's result: it fails whenever the agent job does, and alone when the
+// agent job passed (pr-fixer 45835195530 on 2026-11-26 sent its `no fix`; only this step failed).
+const HANDLER_STEP = "Handle agent failure";
 const SHOWN = 10;
+// Runs are listed by status: the completed ones, and those still going, of which a re-run counts (countedRuns).
+const LISTED = ["completed", "in_progress", "queued"];
 
 const marker = (path) => `<!-- agent-health: ${path} -->`;
 
+/** Whether the agent job failed by itself: false when it is there and none of its failed steps counts. */
+function agentFailed(jobs) {
+  const agent = (jobs || []).find((j) => j.name === "agent");
+  if (!agent) return true;
+  const bad = (agent.steps || []).filter((s) => BAD.has(s.conclusion));
+  return BAD.has(agent.conclusion) && !(bad.length && !bad.some((s) => !IGNORED_STEPS.has(s.name)));
+}
+
 /** The failed steps of a run's jobs that count, as "job / step" strings. */
 function failedSteps(jobs) {
+  const real = agentFailed(jobs);
   const out = [];
   for (const job of jobs || []) {
-    if (job.conclusion !== "failure" && job.conclusion !== "timed_out" && job.conclusion !== "cancelled") continue;
-    const bad = (job.steps || []).filter((s) => s.conclusion === "failure" || s.conclusion === "timed_out" || s.conclusion === "cancelled");
+    if (!BAD.has(job.conclusion)) continue;
+    const bad = (job.steps || []).filter((s) => BAD.has(s.conclusion));
     if (!bad.length) out.push(`${job.name} (${job.conclusion})`);
-    for (const s of bad) if (!IGNORED_STEPS.has(s.name)) out.push(`${job.name} / ${s.name}${s.conclusion === "failure" ? "" : ` (${s.conclusion})`}`);
+    for (const s of bad) {
+      if (IGNORED_STEPS.has(s.name) || (s.name === HANDLER_STEP && !real)) continue;
+      out.push(`${job.name} / ${s.name}${s.conclusion === "failure" ? "" : ` (${s.conclusion})`}`);
+    }
   }
   return out;
+}
+
+/** A run that is being re-run, as its first attempt: GitHub lists the run in progress with no conclusion while
+ * its second attempt runs (agent-retry.yml), and the first attempt's jobs say whether it failed. */
+function firstAttempt(run, jobs) {
+  return { ...run, status: "completed", conclusion: (jobs || []).some((j) => BAD.has(j.conclusion)) ? "failure" : "success", run_attempt: 1, first_attempt: true };
+}
+
+/**
+ * The runs of a workflow that count, newest first: its completed runs and, for a run being re-run, that run's
+ * first attempt. On 2026-11-25 the issue worker's 45684338261 and 45690181810 were in progress on attempt 2,
+ * `status=completed` showed the good run 45663764218 of 17:35 first, and issue 158 was closed as recovered.
+ */
+async function countedRuns(github, owner, repo, workflowId) {
+  const list = async (status, per_page) => (await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: workflowId, status, per_page })).data.workflow_runs;
+  const [done, ...going] = await Promise.all(LISTED.map((s) => list(s, s === "completed" ? 40 : 100)));
+  const firsts = await Promise.all(going.flat().filter((r) => (r.run_attempt || 1) > 1).map(async (run) =>
+    firstAttempt(run, (await github.rest.actions.listJobsForWorkflowRunAttempt({ owner, repo, run_id: run.id, attempt_number: 1, per_page: 100 })).data.jobs)));
+  return [...done, ...firsts].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+}
+
+/** The failures an issue's table names, newest first: [{id, at}] from its rows `| [id](url) | 2026-11-25 19:23 UTC |`. */
+function namedFailures(issue) {
+  return [...(issue.body || "").matchAll(/^\| \[(\d+)\]\([^)]*\) \| (\d{4}-\d\d-\d\d \d\d:\d\d) UTC\b/gm)]
+    .map((m) => ({ id: Number(m[1]), at: Date.parse(`${m[2].replace(" ", "T")}:00Z`) }));
 }
 
 /** Minutes a step or job ran, or null. */
@@ -36,7 +80,7 @@ function minutes(a, b) {
 }
 
 /**
- * The failure streak of one workflow: runs newest first (completed only), jobsOf(run) gives its jobs.
+ * The failure streak of one workflow: runs newest first (those of countedRuns), jobsOf(run) gives its jobs.
  * Returns {streak: [{run, steps, mins}], recovered: run|null}; recovered is the newest good run.
  */
 async function streakOf(runs, jobsOf) {
@@ -61,7 +105,7 @@ function title(name, streak) {
 
 function body(name, path, streak) {
   const rows = streak.slice(0, SHOWN).map(({ run, steps, mins }) =>
-    `| [${run.id}](${run.html_url}) | ${run.created_at.replace("T", " ").slice(0, 16)} UTC | ${run.event} | ${mins ?? "?"} min | ${steps.join("<br>")} |`);
+    `| [${run.id}](${run.html_url}) | ${run.created_at.replace("T", " ").slice(0, 16)} UTC${run.first_attempt ? " (first attempt; re-run under way)" : ""} | ${run.event} | ${mins ?? "?"} min | ${steps.join("<br>")} |`);
   const first = streak[streak.length - 1].run;
   return [
     marker(path),
@@ -79,12 +123,19 @@ function body(name, path, streak) {
 
 /** Reconcile one workflow ({id, name, path}) with its issue. Returns what was done. */
 async function reconcile({ github, owner, repo, workflow, openIssues, closedIssues = [], core }) {
-  const { data } = await github.rest.actions.listWorkflowRuns({ owner, repo, workflow_id: workflow.id, status: "completed", per_page: 40 });
+  const runs = await countedRuns(github, owner, repo, workflow.id);
   const jobsOf = async (run) => (await github.rest.actions.listJobsForWorkflowRunAttempt({ owner, repo, run_id: run.id, attempt_number: run.run_attempt || 1, per_page: 100 })).data.jobs;
-  const { streak, recovered } = await streakOf(data.workflow_runs, jobsOf);
+  const { streak, recovered } = await streakOf(runs, jobsOf);
   const issue = openIssues.find((i) => (i.body || "").includes(marker(workflow.path)));
   if (!streak.length) {
     if (!issue) return "ok";
+    // Only a good run newer than every failure the issue names recovers it: one that the runs listed no longer
+    // show (it fell off the page of 40) is not answered by a good run that is older than it.
+    const named = namedFailures(issue).filter((f) => !recovered || f.id !== recovered.id);
+    if (recovered && named.some((f) => !(Date.parse(recovered.created_at) > f.at))) {
+      core.info(`${workflow.name}: kept #${issue.number}: run ${recovered.id} is older than the failures it names`);
+      return `kept #${issue.number}`;
+    }
     const how = recovered ? `[run ${recovered.id}](${recovered.html_url}) succeeded at ${recovered.updated_at.replace("T", " ").slice(0, 16)} UTC` : "no failed run is left";
     await github.rest.issues.createComment({ owner, repo, issue_number: issue.number, body: `Recovered: ${how}. Closing.` });
     await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: "closed", state_reason: "completed" });
@@ -217,4 +268,4 @@ async function main({ github, context, core }) {
   await core.summary.addList(done.length ? done : ["nothing to do"]).write();
 }
 
-module.exports = { main, pick, reconcile, retireLegacy, dispatchDoctor, isLegacy, streakOf, failedSteps, title, body, marker, IGNORED_STEPS };
+module.exports = { main, pick, reconcile, retireLegacy, dispatchDoctor, isLegacy, streakOf, countedRuns, failedSteps, agentFailed, firstAttempt, namedFailures, title, body, marker, IGNORED_STEPS };
