@@ -33,13 +33,20 @@ const RCB = (() => {
   const color = (c) => `var(--${c})`;
 
   // ms: a request still waiting after that long is given up (the copy on Pages in liveData); the other
-  // data files, an archive of several MB among them, may take as long as a slow link needs
+  // data files, an archive of several MB among them, may take as long as a slow link needs.
+  // A request that fetch itself drops (a TypeError, "Failed to fetch": the connection, not an answer) is asked
+  // once more before the page gives up, like the Leaflet script below: one dropped request on a phone must not
+  // end the map page in the strip's error (#258). The page's own timeout and an HTTP status are answers: no retry.
   async function getJSON(url, ms) {
     let r;
-    try {
-      r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store", signal: ms ? AbortSignal.timeout(ms) : undefined });
-    } catch (e) {
-      throw new Error(url + ": " + (e && e.name === "TimeoutError" ? "timeout" : e.message), { cause: e });
+    for (let attempt = 0; ; attempt++) {
+      try {
+        r = await fetch(url + "?t=" + Math.floor(Date.now() / 60000), { cache: "no-store", signal: ms ? AbortSignal.timeout(ms) : undefined });
+      } catch (e) {
+        if (attempt === 0 && e instanceof TypeError) continue;
+        throw new Error(url + ": " + (e && e.name === "TimeoutError" ? "timeout" : e.message), { cause: e });
+      }
+      break;
     }
     if (!r.ok) throw new Error(url + ": " + r.status);
     return r.json();
