@@ -29,6 +29,12 @@ QUOTA_LOG = (
     'Your limit will reset at 2026-11-26 04:01:55][202611260329256bddf080d53c40cc]"}\n'
     '2026-11-25T19:30:35.27Z ##[error]Agent execution exited with code 1\n'
 )
+# A result record whose text carries an astral character (a surrogate pair in JSON) and one that echoed a
+# terminal escape (a control character, as an escape): the record is parsed undecoded.
+EMOJI_LOG = ('2026-11-24T05:06:51.1Z {"type":"result","subtype":"success","is_error":true,"num_turns":1,'
+             '"result":"Fixed \\ud83d\\ude00 in the table"}\n')
+ESC_LOG = ('2026-11-24T05:06:51.1Z {"type":"result","subtype":"success","is_error":true,"num_turns":1,'
+           '"result":"done, then \\u001b[2Kbefore the end"}\n')
 
 
 def job(name, conclusion, steps=(), start="2026-11-24T10:00:00Z", end="2026-11-24T10:10:00Z"):
@@ -97,6 +103,20 @@ class Signals(unittest.TestCase):
         # a 400 that ends the CLI is no overload
         bad = "API Error: 400 invalid_request_error: messages.0: field required"
         self.assertEqual(af.classify(["agent / Execute Claude Code CLI"], [bad, lines[2]]), "engine-crash")
+
+    def test_result_record_with_an_emoji_still_parses(self):
+        # decoded half by half, the pair is two lone surrogates and the report could not be written as UTF-8
+        lines = af.signal_lines(EMOJI_LOG)
+        want = "result: subtype=success is_error=True turns=1 terminal_reason=None Fixed 😀 in the table"
+        self.assertEqual("\n".join(lines).encode("utf-8"), want.encode("utf-8"))    # json.loads folds the pair
+        self.assertEqual(lines, [want])
+
+    def test_result_record_with_an_escaped_escape_stays(self):
+        # strict json.loads refuses a decoded control character: the record must still give its result line
+        lines = af.signal_lines(ESC_LOG)
+        self.assertEqual(len(lines), 1, lines)
+        self.assertTrue(lines[0].startswith("result: subtype=success is_error=True turns=1 terminal_reason=None done, then "))
+        self.assertTrue(lines[0].endswith("before the end"))
 
     def test_step_names_classify_without_a_log(self):
         self.assertEqual(af.classify(["safe_outputs / Process Safe Outputs"]), "safe-outputs")

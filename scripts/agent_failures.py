@@ -69,6 +69,16 @@ REQUEST_ID = re.compile(r"\[\d{14}[0-9a-f]{8,}\]")
 PARSER_CRASH = re.compile(r"Maximum call stack size exceeded")
 
 
+def _char(match):
+    """The character of a JSON line's \\uXXXX escape, for the API Error search only. A control character and
+    the half of a surrogate pair (an emoji is written as two) stay escapes: the API_ERROR match stops before
+    them as before any backslash, and nothing that UTF-8 cannot hold reaches the report."""
+    code = int(match.group(1), 16)
+    if code < 0x20 or 0x7F <= code <= 0x9F or 0xD800 <= code <= 0xDFFF:
+        return match.group(0)
+    return chr(code)
+
+
 def classify(steps, signals=()):
     """One signature for a failed run from its failed steps and its signal lines."""
     text = "\n".join(list(steps) + list(signals))
@@ -88,14 +98,16 @@ def signal_lines(log_text, limit=LOG_LINES):
         if line and line not in out:
             out.append(line)
     for raw in (log_text or "").splitlines():
-        # the \uXXXX escapes are decoded first: the quota line's «·» would end the API_ERROR match
-        # before the code and the reset time (Beijing time, UTC+8)
-        line = JSON_ESCAPE.sub(lambda m: chr(int(m.group(1), 16)), ANSI.sub("", STAMP.sub("", raw)))
+        line = ANSI.sub("", STAMP.sub("", raw))
         if "##[error]" in line:
             if not PARSER_CRASH.search(line):
                 add(line.split("##[error]", 1)[1])
             continue
-        for m in API_ERROR.findall(line):
+        # The escapes are decoded for the API Error search only: the quota line's «·» would end the match
+        # before the code and the reset time (Beijing time, UTC+8). The result record is parsed undecoded:
+        # strict JSON refuses a decoded control character, and a decoded surrogate pair (an emoji) is two
+        # lone surrogates, which the report cannot be written with.
+        for m in API_ERROR.findall(JSON_ESCAPE.sub(_char, line)):
             add(REQUEST_ID.sub("[…]", m))
         if line.lstrip().startswith("{") and '"type":"result"' in line:
             try:
