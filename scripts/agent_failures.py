@@ -5,7 +5,8 @@
                       [--out FILE.json] [--md FILE.md]
 
 Reads, through the `gh` CLI (GH_TOKEN): every gh-aw agent workflow (a .lock.yml with its .md
-source), its completed runs of the last N days, the failed steps of each failed run (gh-aw's
+source), its completed runs of the last N days and the runs being re-run (counted by their failed first
+attempt), the failed steps of each failed run (gh-aw's
 step-summary parser crash after the agent's work is left out, as in scripts/agent_health.cjs, and
 so is the conclusion job's mirror of it; a CLI step that ran to the step limit is a timeout), and
 the error lines of the failed job's log, without its escape sequences. Each failed run gets one
@@ -172,6 +173,17 @@ def failed_steps(jobs, timeout=None):
     return out
 
 
+def first_attempt(run, jobs):
+    """A run that is being re-run (agent-retry.yml starts its second attempt), as its first attempt: GitHub
+    lists the run as in progress with no conclusion, and the first attempt's jobs are
+    `.../runs/<id>/attempts/1/jobs`. It counts as completed, failed when one of that attempt's jobs failed
+    (issue-worker 45684338261 and 45690181810 on 2026-11-25: in progress on attempt 2 since 20:07 UTC, so the
+    report of 20:08 saw neither, and agent-health closed issue 158 as recovered by a good run of 17:35)."""
+    failed = any(j.get("conclusion") in BAD for j in jobs or [])
+    return dict(run, status="completed", conclusion="failure" if failed else "success", run_attempt=1, jobs=jobs,
+                rerun=True)
+
+
 def minutes(a, b):
     if not a or not b:
         return None
@@ -219,7 +231,8 @@ def summarize(workflows, issues, patterns, now, days):
             day = (r.get("created_at") or "")[:10]
             failures.append({"workflow": wf["name"], "file": wf["file"], "run": r["id"], "url": r.get("html_url"),
                              "created_at": r.get("created_at"), "event": r.get("event"), "agent_minutes": m,
-                             "steps": steps, "signature": sig, "errors": signals or []})
+                             "steps": steps, "signature": sig, "errors": signals or [],
+                             "rerun": bool(r.get("rerun"))})
             s = sigs.setdefault(sig, {"signature": sig, "runs": 0, "days": set(), "workflows": set()})
             s["runs"] += 1
             s["days"].add(day)
@@ -268,7 +281,8 @@ def markdown(rep):
     L += ["", "## Failed runs, newest first", ""]
     for f in rep["failures"][:40]:
         L.append(f"### {f['workflow']}: run {f['run']}, {(f['created_at'] or '')[:16].replace('T', ' ')} UTC, "
-                 f"{f['event']}, agent {f['agent_minutes'] if f['agent_minutes'] is not None else '?'} min, `{f['signature']}`")
+                 f"{f['event']}, agent {f['agent_minutes'] if f['agent_minutes'] is not None else '?'} min, `{f['signature']}`"
+                 f"{', the first attempt of a re-run that was under way' if f.get('rerun') else ''}")
         L.append(f"{f['url']}  ")
         L.append("Failed steps: " + "; ".join(f["steps"]))
         if f["errors"]:
@@ -294,22 +308,35 @@ def gh(path, raw=False, run=subprocess.run):
     return out.stdout if raw else json.loads(out.stdout)
 
 
-def fetch(repo, days, now):
+def fetch(repo, days, now, get=None):
+    """Every gh-aw workflow with its runs of the last N days and their jobs, and the open agent-tooling
+    issues. `get` is `gh`, or a stand-in in the tests."""
+    get = get or gh
     since = (dt.datetime.fromisoformat(now.replace("Z", "+00:00")) - dt.timedelta(days=days)).strftime("%Y-%m-%d")
     workflows = []
-    for w in gh(f"repos/{repo}/actions/workflows?per_page=100")["workflows"]:
+    for w in get(f"repos/{repo}/actions/workflows?per_page=100")["workflows"]:
         src = Path(w["path"].replace(".lock.yml", ".md"))
         if w["path"].endswith(".lock.yml") and src.exists():
             workflows.append({"id": w["id"], "name": w["name"], "file": src.name, "timeout": timeout_of(src.read_text())})
     pool = ThreadPoolExecutor(8)
-    runs_of = pool.map(lambda w: gh(f"repos/{repo}/actions/workflows/{w['id']}/runs?status=completed&per_page=100"
-                                    f"&created=%3E%3D{since}")["workflow_runs"], workflows)
-    for w, runs in zip(workflows, runs_of, strict=True):
-        w["runs"] = [r for r in runs if r.get("conclusion") not in NEUTRAL]
+    # Completed runs, and the ones still going: a run that is being re-run is in progress (or queued) on its
+    # second attempt, and its failed first attempt is in neither list; it counts by that attempt.
+    statuses = ("completed", "in_progress", "queued")
+    pages = list(pool.map(lambda t: get(f"repos/{repo}/actions/workflows/{t[0]['id']}/runs?status={t[1]}"
+                                        f"&per_page=100&created=%3E%3D{since}")["workflow_runs"],
+                          [(w, s) for w in workflows for s in statuses]))
+    again = []
+    for w, (done, *going) in zip(workflows, [pages[i:i + len(statuses)] for i in range(0, len(pages), len(statuses))],
+                                 strict=True):
+        w["runs"] = [r for r in done if r.get("conclusion") not in NEUTRAL]
+        again += [(w, r) for runs in going for r in runs if (r.get("run_attempt") or 1) > 1]
     every = [r for w in workflows for r in w["runs"]]
-    jobs = pool.map(lambda r: gh(f"repos/{repo}/actions/runs/{r['id']}/attempts/{r.get('run_attempt') or 1}/jobs?per_page=100")["jobs"], every)
+    jobs = pool.map(lambda r: get(f"repos/{repo}/actions/runs/{r['id']}/attempts/{r.get('run_attempt') or 1}/jobs?per_page=100")["jobs"], every)
+    first = pool.map(lambda ar: get(f"repos/{repo}/actions/runs/{ar[1]['id']}/attempts/1/jobs?per_page=100")["jobs"], again)
     for r, j in zip(every, jobs, strict=True):
         r["jobs"] = j
+    for (w, r), j in zip(again, first, strict=True):
+        w["runs"].append(first_attempt(r, j))
     to_read = []
     for w in workflows:
         failed = [r for r in w["runs"] if r.get("conclusion") != "success" and failed_steps(r["jobs"], w["timeout"])]
@@ -322,14 +349,14 @@ def fetch(repo, days, now):
     def read(item):
         r, job_id = item
         try:
-            return signal_lines(gh(f"repos/{repo}/actions/jobs/{job_id}/logs", raw=True))
+            return signal_lines(get(f"repos/{repo}/actions/jobs/{job_id}/logs", raw=True))
         except (RuntimeError, subprocess.TimeoutExpired) as e:
             return [f"(log not read: {e})"]
     for (r, _), sig in zip(to_read, pool.map(read, to_read), strict=True):
         r["signals"] = sig
 
-    issues = [i for i in gh(f"repos/{repo}/issues?state=open&labels=agentic-workflows&per_page=100") if not i.get("pull_request")]
-    comments = pool.map(lambda i: gh(f"repos/{repo}/issues/{i['number']}/comments?per_page=100") if i.get("comments") else [], issues)
+    issues = [i for i in get(f"repos/{repo}/issues?state=open&labels=agentic-workflows&per_page=100") if not i.get("pull_request")]
+    comments = pool.map(lambda i: get(f"repos/{repo}/issues/{i['number']}/comments?per_page=100") if i.get("comments") else [], issues)
     out = [{"number": i["number"], "title": i["title"], "updated_at": i.get("updated_at"),
             "labels": [l["name"] for l in i.get("labels") or []],
             "doctor_commented": any(DOCTOR.search(c.get("body") or "") for c in cs)} for i, cs in zip(issues, comments, strict=True)]

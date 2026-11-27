@@ -19,14 +19,19 @@ const job = (name, conclusion, steps = []) => ({
 });
 const crashed = [job("agent", "failure", [["Execute Claude Code CLI", "failure"]]), job("conclusion", "success")];
 const parserOnly = [job("agent", "failure", [["Execute Claude Code CLI", "success"], ["Parse agent logs for step summary", "failure"]])];
+// pr-fixer 45835195530: the agent job passed (its `no fix` went out) and only the handler step failed.
+const handlerOnly = [job("agent", "success", [["Execute Claude Code CLI", "success"]]), job("conclusion", "failure", [["Handle agent failure", "failure"]])];
+// A run as GitHub lists it: no jobs, and no conclusion while it is not completed.
+const listed = (id, status, conclusion, run_attempt, at) => ({ id, status, conclusion, run_attempt, event: "schedule", created_at: at, updated_at: at, html_url: `https://example.test/runs/${id}` });
 
-function fakeGithub(runs, jobsById, issues = []) {
+// runs: the completed runs; going: the in-progress ones. jobsById: by run id, or by "run id/attempt".
+function fakeGithub(runs, jobsById, issues = [], going = []) {
   const calls = [];
   const github = {
     rest: {
       actions: {
-        listWorkflowRuns: async () => ({ data: { workflow_runs: runs } }),
-        listJobsForWorkflowRunAttempt: async ({ run_id }) => ({ data: { jobs: jobsById[run_id] || [] } }),
+        listWorkflowRuns: async ({ status }) => ({ data: { workflow_runs: status === "completed" ? runs : status === "in_progress" ? going : [] } }),
+        listJobsForWorkflowRunAttempt: async ({ run_id, attempt_number }) => ({ data: { jobs: jobsById[`${run_id}/${attempt_number}`] ?? jobsById[run_id] ?? [] } }),
       },
       issues: {
         create: async (a) => { calls.push(["create", a]); return { data: { number: 200 } }; },
@@ -41,6 +46,55 @@ function fakeGithub(runs, jobsById, issues = []) {
 test("a step-summary parser crash after the agent's work is not a failure", () => {
   assert.deepEqual(H.failedSteps(parserOnly), []);
   assert.deepEqual(H.failedSteps(crashed), ["agent / Execute Claude Code CLI"]);
+});
+
+test("a failed handler step alone is no failure of the agent", async () => {
+  const mirror = job("conclusion", "failure", [["Handle agent failure", "failure"]]);
+  assert.deepEqual(H.failedSteps(handlerOnly), []);
+  assert.deepEqual(H.failedSteps([...crashed, mirror]), ["agent / Execute Claude Code CLI", "conclusion / Handle agent failure"]);
+  assert.deepEqual(H.failedSteps([mirror]), ["conclusion / Handle agent failure"]); // no agent job in the list
+  const r = run("failure");
+  const { calls, args } = fakeGithub([r], { [r.id]: handlerOnly }, [{ number: 232, title: "x", body: H.marker(WF.path) }]);
+  assert.equal(await H.reconcile(args), "closed #232");
+  assert.equal(calls.at(-1)[1].state, "closed");
+});
+
+test("a run being re-run counts by its first attempt, so an older good run recovers nothing", async () => {
+  // 2026-11-25: issue 158 was closed as recovered by run 45663764218 of 17:35 UTC while 45684338261 (19:23)
+  // was in progress on attempt 2 and its first attempt had failed.
+  const good = run("success", "2026-11-25T17:35:00Z");
+  const again = listed(45684338261, "in_progress", null, 2, "2026-11-25T19:23:00Z");
+  let { calls, args } = fakeGithub([good], { [good.id]: [job("agent", "success")], "45684338261/1": crashed }, [], [again]);
+  assert.equal(await H.reconcile(args), "opened #200");
+  assert.match(calls[0][1].title, /1 failed run in a row/);
+  assert.match(calls[0][1].body, /\[45684338261\]\([^)]*\) \| 2026-11-25 19:23 UTC \(first attempt; re-run under way\)/);
+  assert.doesNotMatch(calls[0][1].body, /45663764218/);
+  assert.deepEqual(H.namedFailures({ body: calls[0][1].body }), [{ id: 45684338261, at: Date.parse("2026-11-25T19:23:00Z") }]);
+  // a first run still waiting for its runner is nothing
+  const waiting = listed(45690000000, "in_progress", null, 1, "2026-11-25T20:05:00Z");
+  const ok = run("success", "2026-11-25T20:30:00Z");
+  ({ calls, args } = fakeGithub([ok], { [ok.id]: [job("agent", "success")] }, [], [waiting]));
+  assert.equal(await H.reconcile(args), "ok");
+  assert.equal(calls.length, 0);
+});
+
+test("a good run older than a failure the issue names closes nothing", async () => {
+  const issue = { number: 158, title: "x", body: `${H.marker(WF.path)}\n| Run | Started | Event | Agent job | Failed steps |\n| --- | --- | --- | --- | --- |\n` +
+    `| [45684338261](https://example.test/runs/45684338261) | 2026-11-25 19:23 UTC | schedule | 7 min | agent / Execute Claude Code CLI |` };
+  // the failure is no longer listed and the newest good run, 17:35, is older than it
+  const good = run("success", "2026-11-25T17:35:00Z");
+  let { calls, args } = fakeGithub([good], { [good.id]: [job("agent", "success")] }, [issue]);
+  assert.equal(await H.reconcile(args), "kept #158");
+  assert.equal(calls.length, 0);
+  // the same run, re-run to a success, is that failure recovered
+  const redone = listed(45684338261, "completed", "success", 2, "2026-11-25T19:23:00Z");
+  ({ calls, args } = fakeGithub([redone], { [redone.id]: [job("agent", "success")] }, [issue]));
+  assert.equal(await H.reconcile(args), "closed #158");
+  assert.match(calls[0][1].body, /Recovered: \[run 45684338261\]/);
+  // a good run after the failure closes it as before
+  const later = run("success", "2026-11-25T20:30:00Z");
+  ({ args } = fakeGithub([later], { [later.id]: [job("agent", "success")] }, [issue]));
+  assert.equal(await H.reconcile(args), "closed #158");
 });
 
 test("a failed run opens one issue with the marker and both labels", async () => {
