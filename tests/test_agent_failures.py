@@ -17,6 +17,18 @@ OVERLOAD_LOG = """2026-11-24T05:06:51.1Z {"type":"result","subtype":"success","i
 2026-11-24T05:07:00.5374996Z ##[error]Agent execution exited with code 1
 2026-11-24T05:07:00.5385095Z ##[error]Process completed with exit code 1.
 """
+# The quota (429 [1308]) as z.ai answered pr-fixer 45589262864 on 25.11.2026: the code is away from the colon,
+# and the JSON line keeps the «·» before it as an escape.
+QUOTA_LOG = (
+    '2026-11-25T19:27:44.96Z {"type":"assistant","message":{"model":"<synthetic>","content":[{"type":"text",'
+    '"text":"API Error: Request rejected (429) \\u00b7 [1308][Usage limit reached for 5 hour. Your limit will '
+    'reset at 2026-11-26 04:01:55][20261126032744a932d41421574474]"}]},"error":"rate_limit",'
+    '"is_api_error_message":true,"api_error_status":429}\n'
+    '2026-11-25T19:29:26.40Z {"type":"result","subtype":"success","is_error":true,"terminal_reason":"api_error",'
+    '"api_error_status":429,"result":"API Error: Request rejected (429) \\u00b7 [1308][Usage limit reached for 5 hour. '
+    'Your limit will reset at 2026-11-26 04:01:55][202611260329256bddf080d53c40cc]"}\n'
+    '2026-11-25T19:30:35.27Z ##[error]Agent execution exited with code 1\n'
+)
 
 
 def job(name, conclusion, steps=(), start="2026-11-24T10:00:00Z", end="2026-11-24T10:10:00Z"):
@@ -72,6 +84,19 @@ class Signals(unittest.TestCase):
         self.assertEqual(len(api), 1, lines)
         self.assertTrue(any(l.startswith("result: ") for l in lines))
         self.assertEqual(af.classify(["agent / Execute Claude Code CLI"], lines), "provider-overload")
+
+    def test_quota_1308_is_provider_overload(self):
+        # 20 runs of the seven days to 27.11.2026 read `engine-crash`: the code does not follow the colon
+        lines = af.signal_lines(QUOTA_LOG)
+        self.assertEqual(lines[0], "API Error: Request rejected (429) · [1308][Usage limit reached for 5 hour. "
+                                   "Your limit will reset at 2026-11-26 04:01:55][…]")    # the reset time stays
+        self.assertEqual(lines[2], "Agent execution exited with code 1")
+        self.assertEqual(af.classify(["agent / Execute Claude Code CLI"], lines), "provider-overload")
+        rate = "API Error: Request rejected (429) · [1302][Rate limit reached for requests][…]"
+        self.assertEqual(af.classify(["agent / Execute Claude Code CLI"], [rate, lines[2]]), "provider-overload")
+        # a 400 that ends the CLI is no overload
+        bad = "API Error: 400 invalid_request_error: messages.0: field required"
+        self.assertEqual(af.classify(["agent / Execute Claude Code CLI"], [bad, lines[2]]), "engine-crash")
 
     def test_step_names_classify_without_a_log(self):
         self.assertEqual(af.classify(["safe_outputs / Process Safe Outputs"]), "safe-outputs")
