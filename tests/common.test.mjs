@@ -127,3 +127,53 @@ test("the strip gives up on a live service that does not answer within its wait,
     assert.doesNotMatch(parts[".state"].textContent, /Ładowanie/);
   } finally { globalThis.fetch = real; }
 });
+
+// #237: the live service was down and one page view of 26.11.2026 (Site check, 21:18 UTC) got no answer to its
+// data/alerts.json on Pages either. The copy had no wait, so the strip stayed at «Ładowanie…» for as long as the
+// tab was open. The copy is asked with a wait of its own and again once when that ends; a second silence is the
+// strip's error. The page's waits are cut to 20 ms here; like fetch, the stub gives up when the page's signal does.
+async function stripWith(fetchStub) {
+  const part = () => ({ textContent: "", classList: { toggle() {}, add() {}, remove() {} } });
+  const parts = { ".state": part(), ".others": part(), ".checked": part() };
+  const strip = Object.assign(part(), { querySelector: (x) => parts[x] || null });
+  const doc = { title: "Alerty", querySelectorAll: () => [], querySelector: (s) => (s === "#strip" ? strip : null) };
+  const real = { fetch: globalThis.fetch, timeout: globalThis.AbortSignal.timeout };
+  globalThis.fetch = fetchStub;
+  globalThis.AbortSignal.timeout = (ms) => real.timeout(Math.min(ms, 20));
+  try {
+    const read = (p) => readFileSync(new URL("../docs/" + p, import.meta.url), "utf8");
+    const page = new Function("document", "window", `${read("i18n.js")}\n${read("common.js")}\n;return RCB;`)(doc, {});
+    return { res: await page.strip(), parts };
+  } finally { globalThis.fetch = real.fetch; globalThis.AbortSignal.timeout = real.timeout; }
+}
+// a request that stays silent until the page gives up on it
+const silent = (init) => new Promise((_, bad) => {
+  if (!init || !init.signal) return bad(new Error("the page gave this request no wait"));
+  init.signal.addEventListener("abort", () => bad(new DOMException("The operation was aborted.", "TimeoutError")));
+});
+const answer = (data) => () => Promise.resolve({ ok: true, json: async () => data });
+
+test("the copy on Pages that stays silent is asked again, each time with a wait", async () => {
+  const alerts = { alerts: [] }, meta = { checked_at: "2026-11-26T21:00:00Z" };
+  const signals = [];
+  let asked = 0;
+  const { res, parts } = await stripWith((url, init) => {
+    const u = String(url);
+    if (u.startsWith(RCB.API)) return silent(init);
+    if (u.startsWith("data/alerts.json")) { asked++; signals.push(init.signal); return asked === 1 ? silent(init) : answer(alerts)(); }
+    return answer(meta)();
+  });
+  assert.equal(asked, 2); // once more after the silence
+  assert.ok(signals.length === 2 && signals.every((s) => s instanceof globalThis.AbortSignal), "each request for the copy carries a wait");
+  assert.equal(signals[0].aborted, true, "the page's wait, not the stub's, ended the first silence");
+  assert.equal(res.meta, meta, "the second request filled the strip");
+  assert.equal(res.data, alerts);
+  assert.doesNotMatch(parts[".state"].textContent, /Ładowanie/);
+});
+
+test("a copy that stays silent twice ends in the strip's error, not in «Ładowanie…»", async () => {
+  const { res, parts } = await stripWith((url, init) => (String(url).startsWith("data/meta.json") ? answer({ checked_at: "2026-11-26T21:00:00Z" })() : silent(init)));
+  assert.equal(res, null);
+  assert.equal(parts[".state"].textContent, "Nie udało się pobrać danych");
+  assert.match(parts[".checked"].textContent, /data\/alerts\.json: timeout/);
+});
