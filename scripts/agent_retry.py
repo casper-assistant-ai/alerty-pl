@@ -19,6 +19,9 @@ that event (#146 waited from 19:21 to 21:25 UTC on 2026-11-25). This script re-r
   time (z.ai gives it in Beijing time, UTC+8), never later than 30 minutes after the failure for
   the other codes.
 
+At most one run is re-run per pass; the next due one waits STAGGER (5 minutes), so a quota reset
+does not start every waiting session at once.
+
 With `--watch N` it keeps looking for N minutes while a retry is due later, sleeping until the next
 one (at most 10 minutes at a time), so a quota that resets 40 minutes later is still met by one job.
 The pure functions are tested in tests/test_agent_retry.py; only fetch-like helpers talk to GitHub.
@@ -41,6 +44,9 @@ MAX_ATTEMPTS = 3            # the first run and two retries
 DELAY = dt.timedelta(minutes=10)
 AFTER_RESET = dt.timedelta(minutes=1)
 UNKNOWN_RESET = dt.timedelta(minutes=30)
+# one re-run at a time: after a quota reset every waiting run fell due in the same minute, and the
+# burst of sessions met 429 [1302] «Rate limit reached for requests» (11-27 07:21 and 07:35 UTC)
+STAGGER = dt.timedelta(minutes=5)
 BEIJING = dt.timezone(dt.timedelta(hours=8))
 BUSY = {"queued", "in_progress", "waiting", "requested", "pending"}
 # Safe outputs a second attempt may repeat without harm; any other one means the work went out.
@@ -197,7 +203,7 @@ def scan(repo, now, hours, dry_run, seen, logs=None):
     """One pass over every agent; returns (lines, next due time or None). `logs` keeps the agent logs of
     runs that wait, so a watch does not download them again."""
     logs = {} if logs is None else logs
-    lines, nxt = [], None
+    lines, nxt, started = [], None, False
     for w in agents(repo):
         runs = gh(f"repos/{repo}/actions/workflows/{w['id']}/runs?per_page=30")["workflow_runs"]
         for r in candidates(runs, now, hours):
@@ -217,6 +223,12 @@ def scan(repo, now, hours, dry_run, seen, logs=None):
                 lines.append(f"{label}: {reason}")
                 nxt = due if nxt is None or due < nxt else nxt
                 continue
+            if started:  # STAGGER: the next one waits for the next pass
+                due = now + STAGGER
+                lines.append(f"{label}: {reason}, waits {int(STAGGER.total_seconds() // 60)} minutes after the last re-run")
+                nxt = due if nxt is None or due < nxt else nxt
+                continue
+            started = True
             seen.add(key)
             logs.pop(key, None)
             if dry_run:

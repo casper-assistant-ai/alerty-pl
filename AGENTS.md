@@ -228,7 +228,12 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   with another; a 429 [1308] «Usage limit reached for 5 hour» is the account's quota, not an
   overloaded model, and its reset time is Beijing time (UTC+8); `agent-retry.yml` re-runs a run
   that such an error ended with nothing sent (10 minutes after a 529 or 1302, a minute after the
-  1308 reset, three attempts at most), so do not ask for retries of your own; the quota runs out
+  1308 reset, three attempts at most, one re-run per 5 minutes so a reset does not end in a burst
+  of 1302), so do not ask for retries of your own; every z.ai agent starts behind the quota gate
+  of `scripts/zai_gate.py` (a pre-activation step asks z.ai's free quota endpoint and skips the run,
+  green, when the 5-hour quota is used to 90% for the pipeline agents or to 60% for the others;
+  edit the gate there, never by hand, then `gh aw compile` and `scripts/lock_patches.py`; 2026-11-27,
+  after 25 runs died on 1308 or 1302 in one night); the quota runs out
   47 minutes to 4 h 28 m into a 5-hour window (47 minutes into the one that began at 06:03 UTC on
   2026-11-26: the owner ran every agent on Copilot until its reset, 886374b and 0ab933e; 3 h 20 m
   into the next, reset 16:04:58 UTC, five runs dead from 14:23 to 15:15 UTC and agent-retry starting

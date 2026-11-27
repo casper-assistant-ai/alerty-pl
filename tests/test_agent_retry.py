@@ -132,5 +132,32 @@ class Candidates(unittest.TestCase):
         self.assertEqual([r["id"] for r in ar.candidates(runs, now, 12)], [1, 6])
 
 
+class Stagger(unittest.TestCase):
+    """After a quota reset only one waiting run is re-run per pass (11-27: a burst met 429 [1302])."""
+
+    def test_one_rerun_per_pass(self):
+        now = dt.datetime(2026, 11, 25, 20, 10, tzinfo=UTC)
+        wfs = [{"id": 1, "name": "Issue worker"}, {"id": 2, "name": "PR fixer"}]
+        runs = {1: [run(11, "2026-11-25T19:21:11Z", ended="2026-11-25T19:33:30Z")],
+                2: [run(21, "2026-11-25T19:22:11Z", ended="2026-11-25T19:34:30Z", title="PR fixer")]}
+        started = []
+        saved = (ar.agents, ar.gh, ar.agent_log, ar.rerun)
+        try:
+            ar.agents = lambda repo: wfs
+            ar.gh = lambda path, raw=False: ({"jobs": AGENT_FAILED} if "/jobs" in path
+                                             else {"workflow_runs": runs[int(path.split("/workflows/")[1].split("/")[0])]})
+            ar.agent_log = lambda repo, jobs: QUOTA_LOG
+            ar.rerun = lambda repo, rid, post=None: started.append(rid)
+            seen, logs = set(), {}
+            lines, nxt = ar.scan("o/r", now, 12, False, seen, logs)
+            self.assertEqual(started, [11])
+            self.assertEqual(nxt, now + ar.STAGGER)
+            self.assertIn("waits 5 minutes", lines[1])
+            ar.scan("o/r", nxt, 12, False, seen, logs)
+            self.assertEqual(started, [11, 21])
+        finally:
+            ar.agents, ar.gh, ar.agent_log, ar.rerun = saved
+
+
 if __name__ == "__main__":
     unittest.main()
