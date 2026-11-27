@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LIVE, judge, liveLine, ownOrigins } from "../scripts/site_check.mjs";
+import { LIVE, SETTLE, STRIP_WAIT, judge, liveLine, ownOrigins, settle } from "../scripts/site_check.mjs";
 
 const src = readFileSync(new URL("../scripts/site_check.mjs", import.meta.url), "utf8");
 
@@ -211,4 +211,57 @@ test("a request the page still waits for when its checks ran is named, and so is
   assert.equal(own.problems.length, 1);
   assert.deepEqual(own.live, []);
   assert.deepEqual(judge([waiting]).problems, [], "the service's own wait is not a failed tile of another site");
+});
+
+test("the checks wait for a strip that is still loading, and no longer than STRIP_WAIT", async () => {
+  // #271: while the live service is down every strip lives on the copy on Pages, which the page asks for only
+  // once the service's 2.5 s are over. On one view of 54 it had not answered when the checks ran, 3.5 s after
+  // the load event, and the report filed the fallback at work as «status strip: Ładowanie…».
+  // The page is asked for its strip through the real expression, answered from a stub document at each poll.
+  const doc = (strip, checked) => ({ querySelector: (s) => (s === "#strip" ? strip : s === "#strip .checked" ? checked : null) });
+  const loading = doc({}, { textContent: "  " }), done = doc({}, { textContent: "sprawdzono 17:31" });
+  const failed = doc({}, { textContent: "data/alerts.json: 503" }), noStrip = doc(null, null);
+  const page = (states) => {
+    let polls = 0;
+    return { get polls() { return polls; }, send: async (_m, p) => {
+      assert.equal(p.returnByValue, true);
+      const value = new Function("document", "return " + p.expression)(states[Math.min(polls++, states.length - 1)]);
+      return { result: { value } };
+    } };
+  };
+  const slow = page([loading, loading, loading, done]); // the copy answers on the third poll
+  await settle(slow, 1, { wait: 1000, every: 5 });
+  assert.equal(slow.polls, 4, "asked again until the strip is filled in");
+  for (const [name, state] of [["filled in", done], ["failed", failed], ["absent", noStrip]]) {
+    const once = page([state]);
+    await settle(once, 1, { wait: 1000, every: 5 });
+    assert.equal(once.polls, 1, `a strip that is ${name} is not waited for`);
+  }
+  const gone = { polls: 0, send: async () => { gone.polls++; return { exceptionDetails: { text: "Cannot find context with specified id" } }; } };
+  await settle(gone, 1, { wait: 1000 });
+  assert.equal(gone.polls, 1, "a page that went away is not asked again");
+  const dead = page([loading]);
+  const t0 = Date.now();
+  const wait = 60, every = 5;
+  await settle(dead, 1, { wait, every });
+  assert.ok(Date.now() - t0 >= 55, `a strip that never fills: the whole wait, then the checks (${Date.now() - t0} ms)`);
+  // half the polls the cadence allows, not its ideal count: a 5 ms timer a few ms late on a loaded runner
+  // (CI runs the test files in parallel) is no defect of settle(), and one or two polls still fail this
+  assert.ok(dead.polls >= Math.floor(wait / every / 2) && dead.polls <= 20, `asked every ${every} ms for ${wait} ms: ${dead.polls} polls`);
+});
+
+test("SETTLE and STRIP_WAIT follow the waits of docs/common.js and stay bounded", () => {
+  const common = readFileSync(new URL("../docs/common.js", import.meta.url), "utf8");
+  const liveWait = Number(common.match(/fetch\(API \+ "\/alerts"[^\n]*AbortSignal\.timeout\((\d+)\)/)[1]);
+  const copyWait = Number(common.match(/const COPY_WAIT = (\d+)/)[1]);
+  // the copy on Pages, asked once the service's wait is over, gets a few seconds to answer before it is judged...
+  assert.ok(SETTLE + STRIP_WAIT >= liveWait + 5000, `${SETTLE} + ${STRIP_WAIT} ms is not the service's ${liveWait} ms and five seconds more`);
+  // ...but not its whole wait: a copy that uses that up is a problem to report
+  assert.ok(STRIP_WAIT < copyWait, `${STRIP_WAIT} ms waits out the copy's whole wait of ${copyWait} ms`);
+  // 54 views of a strip that never fills add under eight minutes to the run, inside the workflow's limit of 25
+  assert.ok(54 * STRIP_WAIT < 8 * 60000, `${STRIP_WAIT} ms on 54 views is more than eight minutes`);
+  // wired after the load event's settle and before the checks
+  const v = src.slice(src.indexOf("async function visit("), src.indexOf("// The HTML of each page"));
+  const settleAt = v.indexOf("await settle(cdp, sid);");
+  assert.ok(v.indexOf("await sleep(SETTLE);") < settleAt && settleAt < v.indexOf("for (const [kind, expr] of"), "visit() no longer settles the strip between SETTLE and the checks");
 });
