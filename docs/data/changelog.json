@@ -15,11 +15,20 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.31.5",
    "date": "2026-11-27",
-   "time": "2026-11-27T02:29:00Z",
-   "sha": "acfc7fb",
+   "time": "2026-11-27T07:42:34Z",
+   "sha": "04a7e34",
    "changes": [
+    {
+     "type": "fix",
+     "scope": "process",
+     "breaking": false,
+     "text": "agent_failures names the 429 [1308] quota line provider-overload (#257)",
+     "sha": "04a7e34",
+     "date": "2026-11-27",
+     "time": "2026-11-27T07:42:34Z"
+    },
     {
      "type": "ci",
      "scope": "workflows",

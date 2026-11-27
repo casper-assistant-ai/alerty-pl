@@ -2,7 +2,11 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.31.5 (2026-11-27)
+
+### fix
+
+- **process:** agent_failures names the 429 [1308] quota line provider-overload (#257) ([04a7e34](https://github.com/casper-assistant-ai/alerty-pl/commit/04a7e34))
 
 ### ci
 

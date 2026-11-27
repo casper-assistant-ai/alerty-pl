@@ -3,6 +3,46 @@
  "parser": 2,
  "alerts": [
   {
+   "title": "Alert RCB - trening syren w powiecie nidzickim (27.11)",
+   "date": "2026-11-27",
+   "category": "drill",
+   "updates": [
+    {
+     "time": null,
+     "message": "ĆWICZENIA: Dziś (27.11) w godz. 11:30-12:30 na terenie powiatu nidzickiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.",
+     "ended": false,
+     "regions": {
+      "voivodeships": [
+       "warminsko-mazurskie"
+      ],
+      "powiaty": [
+       "warminsko-mazurskie/nidzicki"
+      ],
+      "whole": [],
+      "gminy": []
+     },
+     "region_text": "został wysłany do odbiorców na terenie powiatu nidzickiego (woj. warmińsko-mazurskie)."
+    }
+   ],
+   "regions": {
+    "voivodeships": [
+     "warminsko-mazurskie"
+    ],
+    "powiaty": [
+     "warminsko-mazurskie/nidzicki"
+    ],
+    "whole": [],
+    "gminy": []
+   },
+   "id": "alert-rcb---trening-syren-w-powiecie-nidzickim-2711",
+   "url": "https://www.gov.pl/web/rcb/alert-rcb---trening-syren-w-powiecie-nidzickim-2711",
+   "intro": "\"ĆWICZENIA: Dziś (27.11) w godz. 11:30-12:30 na terenie powiatu nidzickiego odbędzie się trening systemu alarmowania z wykorzystaniem syren. Zachowaj spokój.\"",
+   "status": "planned",
+   "started_at": "2026-11-27T11:30:00+01:00",
+   "last_at": "2026-11-27T00:00:00+01:00",
+   "parser": 2
+  },
+  {
    "title": "Alert RCB - Trening systemu alarmowania (powiat piski) - 25.11",
    "date": "2026-11-25",
    "category": "drill",
