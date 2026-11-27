@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **agents:** z.ai quota gate before every agent run, staggered retries ([d71a240](https://github.com/casper-assistant-ai/alerty-pl/commit/d71a240))
+
 ## 1.31.5 (2026-11-27)
 
 ### fix
