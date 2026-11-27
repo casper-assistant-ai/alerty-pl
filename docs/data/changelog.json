@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-27",
+   "time": "2026-11-27T02:29:00Z",
+   "sha": "acfc7fb",
+   "changes": [
+    {
+     "type": "ci",
+     "scope": "workflows",
+     "breaking": false,
+     "text": "issue-worker.md: the site-fixer's open PR makes a site-error issue in work; one more look  (#253)",
+     "sha": "acfc7fb",
+     "date": "2026-11-27",
+     "time": "2026-11-27T02:29:00Z"
+    }
+   ]
+  },
+  {
    "version": "1.31.4",
    "date": "2026-11-27",
    "time": "2026-11-27T02:22:42Z",

@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### ci
+
+- **workflows:** issue-worker.md: the site-fixer's open PR makes a site-error issue in work; one more look  (#253) ([acfc7fb](https://github.com/casper-assistant-ai/alerty-pl/commit/acfc7fb))
+
 ## 1.31.4 (2026-11-27)
 
 ### fix
