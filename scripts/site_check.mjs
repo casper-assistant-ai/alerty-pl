@@ -255,6 +255,28 @@ export function ownOrigins(base) {
   return { isOwn: (url) => origins.has(originOf(url)), redirected };
 }
 
+// Data files and charts load after the load event: SETTLE. The status strip has a budget of its own in
+// docs/common.js: 2.5 s for the live service, then the copy on Pages with a wait of 10 s, asked twice. While the
+// service is down (#271: a day and a half, 54 of 54 page views) every strip lives on that copy, which the page
+// asks for only once the service's wait is over. On one view of 54 the copy had not answered when the checks ran,
+// and the report filed the fallback at work as «status strip: Ładowanie…» and a pending data/alerts.json. So the
+// checks wait for a strip that is still loading, up to STRIP_WAIT: its «checked» line is empty until success and
+// failure alike fill it (strip() in docs/common.js), in every language. A strip that is done costs nothing. The
+// wait is bounded per page view on purpose: 54 views of a strip that never fills may not outlast the
+// workflow's 25 minutes, and that site is reported as before, a few seconds later. tests/site_check.test.mjs
+// keeps SETTLE and STRIP_WAIT in step with the waits of docs/common.js.
+export const SETTLE = 3500;
+export const STRIP_WAIT = 8000;
+const STRIP_PENDING = 'document.querySelector("#strip") && !document.querySelector("#strip .checked")?.textContent.trim()';
+export async function settle(cdp, sid, { wait = STRIP_WAIT, every = 250 } = {}) {
+  const end = Date.now() + wait;
+  for (;;) {
+    const r = await cdp.send("Runtime.evaluate", { expression: STRIP_PENDING, returnByValue: true }, sid);
+    if (r.exceptionDetails || !r.result.value || Date.now() >= end) return;
+    await sleep(every);
+  }
+}
+
 async function visit(cdp, sid, page, vp) {
   const problems = [];
   const site = ownOrigins(BASE);
@@ -305,7 +327,8 @@ async function visit(cdp, sid, page, vp) {
   await cdp.send("Page.navigate", { url }, sid);
   while (!loaded && Date.now() - t0 < 30000) await sleep(100);
   if (!loaded) problems.push({ kind: "timeout", detail: "page did not load in 30 s" });
-  await sleep(3500); // data files and charts load after the load event
+  await sleep(SETTLE); // data files and charts load after the load event
+  await settle(cdp, sid); // then the strip's own wait, when it is still loading
   for (const [kind, expr] of [["content", COMMON], ["markup", MARKUP], ["content", page.check]]) {
     const r = await cdp.send("Runtime.evaluate", { expression: expr, returnByValue: true }, sid);
     if (r.exceptionDetails) problems.push({ kind: "check", detail: "check failed: " + r.exceptionDetails.text });
