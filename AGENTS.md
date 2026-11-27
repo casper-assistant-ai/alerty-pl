@@ -233,23 +233,15 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   of `scripts/zai_gate.py` (a pre-activation step asks z.ai's free quota endpoint and skips the run,
   green, when the 5-hour quota is used to 90% for the pipeline agents or to 60% for the others;
   edit the gate there, never by hand, then `gh aw compile` and `scripts/lock_patches.py`; 2026-11-27,
-  after 25 runs died on 1308 or 1302 in one night); the quota runs out
-  47 minutes to 4 h 28 m into a 5-hour window (47 minutes into the one that began at 06:03 UTC on
-  2026-11-26: the owner ran every agent on Copilot until its reset, 886374b and 0ab933e; 3 h 20 m
-  into the next, reset 16:04:58 UTC, five runs dead from 14:23 to 15:15 UTC and agent-retry starting
-  the second attempts at 16:06 UTC; at most 2 h 10 m into the seventh, reset 21:05:37 UTC, seven
-  runs dead at turn 1 from 18:15 to 20:54 UTC and the second attempts from 21:09; on
-  2026-11-25 at 09:06 and 14:29 UTC, then at 22:41 UTC, 2 h 40 m into the window that began at
-  20:01: eight runs to 23:17, pr-reviewer 45713911721 at turn 61 and issue-worker 45715355232 at
-  turn 23, six at turn 1), and a 429 [1302] «Rate limit reached for requests» right
-  after a reset is the same: it came back after each of the three resets of 11-25 and 11-26
-  (15:11, 20:25 and 01:15 UTC) [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
+  after 25 runs died on 1308 or 1302 in one night); the quota runs out 47 minutes to 4 h 31 m into
+  a 5-hour window (ten windows of 11-25 to 11-27: their resets, runs and losses are the two
+  provider-overload rows of `process/failure-patterns.md`), and a 429 [1302] «Rate limit reached for
+  requests» right after a reset was agent-retry starting every waiting session in the same minute,
+  which STAGGER now spreads [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
   minutes; process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites
-  never pushed; the quota of 2026-11-25, 09:06 to 09:57 UTC: 14 runs, pr-reviewer 45581138284 at
-  turn 16 and ci-doctor 45580981955 at turn 23 lost 10 minutes each, then site-fixer 45634707189
-  at 14:29; 429 [1302] from 15:11 to 15:38 UTC: site-fixer 45645531386 lost 31 turns and
-  site-designer 45640863668 61; on 11-25 from 20:25 and on 11-26 at 01:15 UTC: issue-worker
-  45694879637 47 turns, pr-fixer 45698506602 38 and pr-fixer 45729583396 43, then its 30 minutes].
+  never pushed; 429 [1302] from 15:11 to 15:38 UTC on 11-25: site-fixer 45645531386 lost 31 turns
+  and site-designer 45640863668 61, and at 07:21 to 07:36 UTC on 11-27: pr-fixer 45957259299 18
+  turns, issue-worker 45946260556 four sessions].
 - region-keeper: take at most 5 items of `unmatched.json` a run (the first five; the rest wait for
   the next day), never audit `alerts.json`, and call `noop` at once when the file is empty
   [timeout, region-keeper runs 45227118220 and 45447715342: 22 minutes on the 20-minute limit,
@@ -298,7 +290,11 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   keep the PR to `AGENTS.md` and `process/`, one line per rule and one row per signature and scope
   (merge before you add), no closing keyword next to the number of an `agent-health` or
   `workflow-change` issue in the ledger either, and a script change left to its item in
-  `process/improvements.md` [safe-outputs, PR #199 shut at 05:00 UTC for its body and PR #228 at
-  14:23 UTC for a reworded rule: fixer runs 45830368629, 45832646262, 45835195530; pr-reviewer
-  45739178322 timed out on the ledger diff of #199].
+  `process/improvements.md`. A quota hole (429 [1308], or a run the gate skipped) is one ledger row
+  and its health comment, not a diagnosis: read the two tables of `failures.md` and that row, never
+  the ledger whole, and send the PR by minute 15, because a merge to the same three files while it
+  is open leaves a conflict the fixer cannot rebase [safe-outputs, PR #199 shut at 05:00 UTC for its
+  body and PR #228 at 14:23 UTC for a reworded rule: fixer runs 45830368629, 45832646262,
+  45835195530; pr-reviewer 45739178322 timed out on the ledger diff of #199; stale base, the
+  doctor runs 45921158980 and 45942255646 of 2026-11-27: issue #256, PR #267 left dirty].
 <!-- reliability:end -->
