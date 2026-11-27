@@ -133,6 +133,10 @@ Every issue you touch ends in exactly one of two ways, and you say which in one 
   number. It names before the gate what ended PRs #202 (an added `noqa`) and #204 (a second link).
   Title: `[issue-worker] <Conventional Commit subject>`; body: the cause, the change, how it was
   checked, `Closes #<n>`, and `From #<report>` when it covers a point of a report. The Agent PR gate merges it and the issue closes.
+  One more look before you open it: through the open pull requests, for the issue's number in any wording
+  and for one that changes the files you changed, since another run may have opened one while you
+  worked (#245 and #246, both for #237 on 26.11.2026). One that is there is in work: no second PR.
+  Leave the issue open, say which PR covers it in one comment, and stop.
 - **Closing with the reason** (`close-issue`, its body is the reason): a report whose points are
   done or already turned into dev-tasks or PRs (link them); a duplicate (name the original); a
   one-off failure when a later run of the same workflow succeeded (link that run); a request that
@@ -142,6 +146,9 @@ Kinds in the queue, in the order you take them:
 
 1. `ci` (CI doctor issues) and `site-error`: read the failed run or the site check, fix the cause.
    A one-off network error with a later green run: close it with that run's link.
+   A `site-error` issue is the site-fixer's as well: its PR says `Refs #<n>`, which the queue's `open PRs`
+   column does not count. Before you work one, look through the open pull requests for its number in
+   any wording; one that is there is in work: skip it as above.
 2. `aw-notice` (other gh-aw notices, such as «produced no safe outputs»): read the run it names; a
    one-off with good runs after it: close it with their links. Issues labelled `agent-health` or
    `workflow-change` are not in your queue (kind `managed`): the process-doctor owns them.
