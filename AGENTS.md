@@ -229,22 +229,10 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   overloaded model, and its reset time is Beijing time (UTC+8); `agent-retry.yml` re-runs a run
   that such an error ended with nothing sent (10 minutes after a 529 or 1302, a minute after the
   1308 reset, three attempts at most), so do not ask for retries of your own; the quota runs out
-  47 minutes to 4 h 28 m into a 5-hour window (47 minutes into the one that began at 06:03 UTC on
-  2026-11-26: the owner ran every agent on Copilot until its reset, 886374b and 0ab933e; 3 h 20 m
-  into the next, reset 16:04:58 UTC, five runs dead from 14:23 to 15:15 UTC and agent-retry starting
-  the second attempts at 16:06 UTC; at most 2 h 10 m into the seventh, reset 21:05:37 UTC, seven
-  runs dead at turn 1 from 18:15 to 20:54 UTC and the second attempts from 21:09; on
-  2026-11-25 at 09:06 and 14:29 UTC, then at 22:41 UTC, 2 h 40 m into the window that began at
-  20:01: eight runs to 23:17, pr-reviewer 45713911721 at turn 61 and issue-worker 45715355232 at
-  turn 23, six at turn 1), and a 429 [1302] «Rate limit reached for requests» right
-  after a reset is the same: it came back after each of the three resets of 11-25 and 11-26
-  (15:11, 20:25 and 01:15 UTC) [provider-overload, issue-worker run 45528108383 lost 73 turns and 17
-  minutes; process-doctor run 45458842781 ended green with issue #113 sent and the rule it cites
-  never pushed; the quota of 2026-11-25, 09:06 to 09:57 UTC: 14 runs, pr-reviewer 45581138284 at
-  turn 16 and ci-doctor 45580981955 at turn 23 lost 10 minutes each, then site-fixer 45634707189
-  at 14:29; 429 [1302] from 15:11 to 15:38 UTC: site-fixer 45645531386 lost 31 turns and
-  site-designer 45640863668 61; on 11-25 from 20:25 and on 11-26 at 01:15 UTC: issue-worker
-  45694879637 47 turns, pr-fixer 45698506602 38 and pr-fixer 45729583396 43, then its 30 minutes].
+  47 minutes to 4 h 31 m into a 5-hour window (nine windows from 11-25 to 11-27), and a 429 [1302]
+  «Rate limit reached for requests» right after a reset is the same: nothing to retry; the
+  windows, their runs and what was tried are in the ledger (`process/failure-patterns.md`, the
+  429 [1308] and 1302 rows) [provider-overload, 2026-11-25 to 2026-11-27].
 - region-keeper: take at most 5 items of `unmatched.json` a run (the first five; the rest wait for
   the next day), never audit `alerts.json`, and call `noop` at once when the file is empty
   [timeout, region-keeper runs 45227118220 and 45447715342: 22 minutes on the 20-minute limit,
@@ -292,8 +280,11 @@ with its evidence (runs, issues). Its ledger is `process/failure-patterns.md`. E
   rules shuts your PR with the rules and the ledger unlanded and the next run repeats the work:
   keep the PR to `AGENTS.md` and `process/`, one line per rule and one row per signature and scope
   (merge before you add), no closing keyword next to the number of an `agent-health` or
-  `workflow-change` issue in the ledger either, and a script change left to its item in
-  `process/improvements.md` [safe-outputs, PR #199 shut at 05:00 UTC for its body and PR #228 at
+  `workflow-change` issue in the ledger either, a script change left to its item in
+  `process/improvements.md`, and a quota hole (429 [1308]) one ledger row, not a diagnosis: read the
+  tables of `failures.md`, comment the health issues and write the row, with no full read of the
+  ledger for it [doctor runs 45876495660 and 45908619356 dead at turn 1 in a hole; the second
+  attempt 45921158980 lost its PR, #256; safe-outputs, PR #199 shut at 05:00 UTC for its body and PR #228 at
   14:23 UTC for a reworded rule: fixer runs 45830368629, 45832646262, 45835195530; pr-reviewer
   45739178322 timed out on the ledger diff of #199].
 <!-- reliability:end -->
