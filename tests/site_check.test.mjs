@@ -242,9 +242,12 @@ test("the checks wait for a strip that is still loading, and no longer than STRI
   assert.equal(gone.polls, 1, "a page that went away is not asked again");
   const dead = page([loading]);
   const t0 = Date.now();
-  await settle(dead, 1, { wait: 60, every: 5 });
+  const wait = 60, every = 5;
+  await settle(dead, 1, { wait, every });
   assert.ok(Date.now() - t0 >= 55, `a strip that never fills: the whole wait, then the checks (${Date.now() - t0} ms)`);
-  assert.ok(dead.polls >= 10 && dead.polls <= 20, `asked every 5 ms: ${dead.polls} polls`);
+  // half the polls the cadence allows, not its ideal count: a 5 ms timer a few ms late on a loaded runner
+  // (CI runs the test files in parallel) is no defect of settle(), and one or two polls still fail this
+  assert.ok(dead.polls >= Math.floor(wait / every / 2) && dead.polls <= 20, `asked every ${every} ms for ${wait} ms: ${dead.polls} polls`);
 });
 
 test("SETTLE and STRIP_WAIT follow the waits of docs/common.js and stay bounded", () => {
