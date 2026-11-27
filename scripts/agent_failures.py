@@ -47,7 +47,11 @@ DOCTOR = re.compile(r"process[ -]doctor", re.I)
 # a whole gh-aw job log names every error type in its own config ("rate_limit_error" and so on).
 SIGNATURES = [
     ("timeout", r"timed out after|has exceeded the maximum execution time|\(timed_out\)|\(timeout\)|\(cancelled\)"),
-    ("provider-overload", r"API Error: (529|429|5\d\d)|overloaded|\[1305\]|rate limit reached|too many requests"),
+    # The quota does not put its code after the colon: «API Error: Request rejected (429) · [1308][Usage limit
+    # reached for 5 hour. Your limit will reset at …]» (and [1302] «Rate limit reached for requests») read
+    # `engine-crash` in 20 runs of the seven days to 2026-11-27. A 429, a 529 or a 5xx among the first 40
+    # characters of the API line ([^[]{0,40}: anything but the bracket of a code or a request id) names it.
+    ("provider-overload", r"API Error: [^[]{0,40}\b(429|529|5\d\d)\b|overloaded|\[1305\]|(usage|rate) limit reached|too many requests"),
     ("turn-limit", r"error_max_turns|max(imum)?[ _-]turns"),
     ("network", r"firewall|blocked (by|domain)|ENOTFOUND|ECONNREFUSED|ECONNRESET|ETIMEDOUT|EAI_AGAIN|socket hang up"),
     ("auth", r"API Error: 401|invalid[ _]api[ _]key|authentication_error|bad credentials"),
@@ -60,8 +64,19 @@ STAMP = re.compile(r"^\d{4}-\d\d-\d\dT[\d:.]+Z ")
 # characters that remain in a line after splitlines() (NUL, backspace, bell, DEL...); tabs stay.
 ANSI = re.compile(r"\x1b(?:\[[0-?]*[ -/]*[@-~]|\][^\x07\x1b]*(?:\x07|\x1b\\)?|[ -/]*[0-~])|[\x00-\x08\x0b-\x1f\x7f]")
 API_ERROR = re.compile(r"API Error: [^\"\\]{0,160}")
+JSON_ESCAPE = re.compile(r"\\u([0-9a-fA-F]{4})")   # a JSON line keeps the quota line's middle dot as an escape
 REQUEST_ID = re.compile(r"\[\d{14}[0-9a-f]{8,}\]")
 PARSER_CRASH = re.compile(r"Maximum call stack size exceeded")
+
+
+def _char(match):
+    """The character of a JSON line's \\uXXXX escape, for the API Error search only. A control character and
+    the half of a surrogate pair (an emoji is written as two) stay escapes: the API_ERROR match stops before
+    them as before any backslash, and nothing that UTF-8 cannot hold reaches the report."""
+    code = int(match.group(1), 16)
+    if code < 0x20 or 0x7F <= code <= 0x9F or 0xD800 <= code <= 0xDFFF:
+        return match.group(0)
+    return chr(code)
 
 
 def classify(steps, signals=()):
@@ -88,7 +103,11 @@ def signal_lines(log_text, limit=LOG_LINES):
             if not PARSER_CRASH.search(line):
                 add(line.split("##[error]", 1)[1])
             continue
-        for m in API_ERROR.findall(line):
+        # The escapes are decoded for the API Error search only: the quota line's «·» would end the match
+        # before the code and the reset time (Beijing time, UTC+8). The result record is parsed undecoded:
+        # strict JSON refuses a decoded control character, and a decoded surrogate pair (an emoji) is two
+        # lone surrogates, which the report cannot be written with.
+        for m in API_ERROR.findall(JSON_ESCAPE.sub(_char, line)):
             add(REQUEST_ID.sub("[…]", m))
         if line.lstrip().startswith("{") and '"type":"result"' in line:
             try:
