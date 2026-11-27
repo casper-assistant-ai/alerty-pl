@@ -15,11 +15,38 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.31.6",
    "date": "2026-11-27",
-   "time": "2026-11-27T08:56:06+01:00",
-   "sha": "d71a240",
+   "time": "2026-11-27T12:57:40Z",
+   "sha": "c52e0d1",
    "changes": [
+    {
+     "type": "fix",
+     "scope": "process",
+     "breaking": false,
+     "text": "count a failed run that is being re-run by its first attempt (#259)",
+     "sha": "c52e0d1",
+     "date": "2026-11-27",
+     "time": "2026-11-27T12:57:40Z"
+    },
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "getJSON asks a dropped data request once more before the page gives up (#269)",
+     "sha": "ef41050",
+     "date": "2026-11-27",
+     "time": "2026-11-27T12:56:58Z"
+    },
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "quota windows eight to ten, the gate-skip row and its item, a shorter rule 5 (#270)",
+     "sha": "f1be1c9",
+     "date": "2026-11-27",
+     "time": "2026-11-27T12:56:29Z"
+    },
     {
      "type": "ci",
      "scope": "agents",

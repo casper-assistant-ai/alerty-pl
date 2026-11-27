@@ -2,11 +2,20 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.31.6 (2026-11-27)
+
+### fix
+
+- **process:** count a failed run that is being re-run by its first attempt (#259) ([c52e0d1](https://github.com/casper-assistant-ai/alerty-pl/commit/c52e0d1))
+- **site:** getJSON asks a dropped data request once more before the page gives up (#269) ([ef41050](https://github.com/casper-assistant-ai/alerty-pl/commit/ef41050))
 
 ### ci
 
 - **agents:** z.ai quota gate before every agent run, staggered retries ([d71a240](https://github.com/casper-assistant-ai/alerty-pl/commit/d71a240))
+
+### chore
+
+- **process:** quota windows eight to ten, the gate-skip row and its item, a shorter rule 5 (#270) ([f1be1c9](https://github.com/casper-assistant-ai/alerty-pl/commit/f1be1c9))
 
 ## 1.31.5 (2026-11-27)
 
