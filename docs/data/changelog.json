@@ -15,6 +15,32 @@
  },
  "releases": [
   {
+   "version": "1.31.4",
+   "date": "2026-11-27",
+   "time": "2026-11-27T02:22:42Z",
+   "sha": "7abd614",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "one quota row in the ledger, a rule for the doctor's own PR (#244)",
+     "sha": "7abd614",
+     "date": "2026-11-27",
+     "time": "2026-11-27T02:22:42Z"
+    },
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "the copy on Pages gets a wait of its own and a second request when it stays silent (#246)",
+     "sha": "518f77b",
+     "date": "2026-11-27",
+     "time": "2026-11-27T02:22:06Z"
+    }
+   ]
+  },
+  {
    "version": "1.31.3",
    "date": "2026-11-26",
    "time": "2026-11-26T16:55:52Z",

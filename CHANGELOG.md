@@ -2,6 +2,16 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.31.4 (2026-11-27)
+
+### fix
+
+- **site:** the copy on Pages gets a wait of its own and a second request when it stays silent (#246) ([518f77b](https://github.com/casper-assistant-ai/alerty-pl/commit/518f77b))
+
+### chore
+
+- **process:** one quota row in the ledger, a rule for the doctor's own PR (#244) ([7abd614](https://github.com/casper-assistant-ai/alerty-pl/commit/7abd614))
+
 ## 1.31.3 (2026-11-26)
 
 ### fix
