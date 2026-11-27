@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": "1.31.7",
+   "date": "2026-11-27",
+   "time": "2026-11-27T19:45:51Z",
+   "sha": "d5934a3",
+   "changes": [
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "the site check waits for a strip that is still loading (#272)",
+     "sha": "d5934a3",
+     "date": "2026-11-27",
+     "time": "2026-11-27T19:45:51Z"
+    }
+   ]
+  },
+  {
    "version": "1.31.6",
    "date": "2026-11-27",
    "time": "2026-11-27T12:57:40Z",

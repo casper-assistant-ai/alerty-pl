@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.31.7 (2026-11-27)
+
+### fix
+
+- **site:** the site check waits for a strip that is still loading (#272) ([d5934a3](https://github.com/casper-assistant-ai/alerty-pl/commit/d5934a3))
+
 ## 1.31.6 (2026-11-27)
 
 ### fix
