@@ -93,7 +93,7 @@ test("a good run older than a failure the issue names closes nothing", async () 
   assert.match(calls[0][1].body, /Recovered: \[run 45684338261\]/);
   // a good run after the failure closes it as before
   const later = run("success", "2026-11-25T20:30:00Z");
-  ({ calls, args } = fakeGithub([later], { [later.id]: [job("agent", "success")] }, [issue]));
+  ({ args } = fakeGithub([later], { [later.id]: [job("agent", "success")] }, [issue]));
   assert.equal(await H.reconcile(args), "closed #158");
 });
 
