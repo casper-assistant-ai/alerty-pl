@@ -100,6 +100,46 @@ test("leaflet() fails with a Polish message when the retry is refused too", asyn
   await assert.rejects(p, /biblioteka mapy/);
 });
 
+// #258: the mobile audit of 27.11.2026 (12:18 UTC) saw one phone view of the map page end in the strip's error with
+// no map: fetch() itself failed for geo/poland.geojson ("Failed to fetch", a dropped connection) and getJSON asked
+// once. Like the Leaflet script, a data file gets one more request when the first was dropped; the page's own
+// timeout and an HTTP status are answers, and get none.
+test("getJSON asks a data file once more when the network dropped the first request", async () => {
+  const real = globalThis.fetch;
+  const urls = [];
+  globalThis.fetch = (url) => { urls.push(String(url)); return urls.length === 1 ? Promise.reject(new TypeError("Failed to fetch")) : Promise.resolve({ ok: true, json: async () => ({ fine: true }) }); };
+  try {
+    assert.deepEqual(await RCB.getJSON("geo/poland.geojson"), { fine: true });
+    assert.equal(urls.length, 2, "one retry, no more");
+    assert.ok(urls.every((u) => u.startsWith("geo/poland.geojson?t=")), "the retry asks the same file");
+  } finally { globalThis.fetch = real; }
+});
+
+test("getJSON fails with the file's name when the retry is dropped too", async () => {
+  const real = globalThis.fetch;
+  let asks = 0;
+  globalThis.fetch = () => { asks++; return Promise.reject(new TypeError("Failed to fetch")); };
+  try {
+    await assert.rejects(RCB.getJSON("geo/poland.geojson"), /geo\/poland\.geojson: Failed to fetch$/);
+    assert.equal(asks, 2, "one retry only");
+  } finally { globalThis.fetch = real; }
+});
+
+test("getJSON gives no retry to an HTTP status or to the page's own timeout", async () => {
+  const real = globalThis.fetch;
+  let asks = 0;
+  globalThis.fetch = () => { asks++; return Promise.resolve({ ok: false, status: 404 }); };
+  try {
+    await assert.rejects(RCB.getJSON("data/x.json"), /data\/x\.json: 404$/);
+    assert.equal(asks, 1, "a status is an answer");
+    asks = 0;
+    // the copy that never answers: like fetch, the stub gives up when the page's AbortSignal does
+    globalThis.fetch = (url, init) => { asks++; return new Promise((_, bad) => init.signal.addEventListener("abort", () => bad(new DOMException("The operation was aborted.", "TimeoutError")))); };
+    await assert.rejects(RCB.getJSON("data/x.json", 20), /data\/x\.json: timeout$/);
+    assert.equal(asks, 1, "the page's own give-up is an answer too: the strip's waits stay as they are");
+  } finally { globalThis.fetch = real; }
+});
+
 // #229: the live service did not answer for one Site check run. Every page's strip waits on it through liveData(),
 // and the map page draws its period, incursions and layers only after its strip: with a wait of 6 s the run
 // reported «Ładowanie…» on all 26 page views and a map with nothing drawn. The check reads a page 3.5 s after
