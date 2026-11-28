@@ -7,7 +7,7 @@
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { LIVE, SETTLE, STRIP_WAIT, judge, liveLine, ownOrigins, settle } from "../scripts/site_check.mjs";
+import { BROWSER_TRANSIENT, LIVE, SETTLE, STRIP_WAIT, isBrowserTransient, judge, liveLine, ownOrigins, settle } from "../scripts/site_check.mjs";
 
 const src = readFileSync(new URL("../scripts/site_check.mjs", import.meta.url), "utf8");
 
@@ -264,4 +264,45 @@ test("SETTLE and STRIP_WAIT follow the waits of docs/common.js and stay bounded"
   const v = src.slice(src.indexOf("async function visit("), src.indexOf("// The HTML of each page"));
   const settleAt = v.indexOf("await settle(cdp, sid);");
   assert.ok(v.indexOf("await sleep(SETTLE);") < settleAt && settleAt < v.indexOf("for (const [kind, expr] of"), "visit() no longer settles the strip between SETTLE and the checks");
+});
+
+// #271, 28.11 13:26 UTC: the first view of the run got a network line, net::ERR_CERT_VERIFIER_CHANGED on the address of
+// its own main document, and nothing else: the view loaded, its strip filled in and its check passed. The browser aborts a
+// certificate verification when it replaces its verifier underneath it, and recovers from it itself: a start-up race of
+// the checking browser, not the site's certificate, and the 53 other views of the same address were fine.
+const CHANGED = "net::ERR_CERT_VERIFIER_CHANGED";
+
+test("only the browser's own certificate-verifier error, and only on the main document, is held apart from the view's failures", () => {
+  assert.match(CHANGED, BROWSER_TRANSIENT);
+  // the site's or the network's, reported as before: a certificate the browser does not trust, a wrong address, a
+  // reset connection, a timeout, the abort of a page that goes away, and no error text at all
+  for (const text of ["net::ERR_CERT_DATE_INVALID", "net::ERR_CERT_AUTHORITY_INVALID", "net::ERR_CERT_COMMON_NAME_INVALID", "net::ERR_NAME_NOT_RESOLVED",
+    "net::ERR_CONNECTION_RESET", "net::ERR_TIMED_OUT", "net::ERR_ABORTED", ""]) {
+    assert.doesNotMatch(text, BROWSER_TRANSIENT, text);
+  }
+  const doc = "1:1", redirect = "1:1", data = "1:2"; // Network.requestWillBeSent: a redirect comes again under the same id
+  assert.equal(isBrowserTransient(doc, doc, CHANGED), true);
+  assert.equal(isBrowserTransient(redirect, doc, CHANGED), true);
+  assert.equal(isBrowserTransient(data, doc, CHANGED), false, "a data file's request with the same error is a failed request");
+  assert.equal(isBrowserTransient(doc, doc, "net::ERR_CERT_DATE_INVALID"), false);
+  assert.equal(isBrowserTransient(doc, null, CHANGED), false, "before any Document of the view was seen");
+});
+
+test("visit() holds that failure apart and reports it when the view does not load or its checks find something", () => {
+  const v = src.slice(src.indexOf("async function visit("), src.indexOf("// The HTML of each page"));
+  const wired = (code) => assert.ok(v.includes(code), "visit() no longer has: " + code);
+  wired('if (p.type === "Document" && !docId) docId = p.requestId;'); // the main document: the first Document of the view
+  wired("if (isBrowserTransient(p.requestId, docId, p.errorText)) {"); // before the rule of every other failure
+  wired("browserTransient.push({ kind: \"network\""); // held apart, not among the view's problems
+  // The held failures reach the report in one place, read after the checks ran: when the view did not load, or when its
+  // checks found something. Page.loadEventFired fires for the browser's error page too, so `loaded` alone would drop the
+  // line from a view that really failed on this error; only a view that loaded and passed its checks keeps it out.
+  const checks = v.indexOf("for (const [kind, expr] of [[\"content\", COMMON], [\"markup\", MARKUP], [\"content\", page.check]]) {");
+  const held = v.indexOf("if (!loaded || problems.length > before) problems.push(...browserTransient);");
+  assert.ok(checks >= 0, "visit() no longer has its checks loop");
+  assert.ok(held > checks && held < v.indexOf("for (const { url, type } of pending.values())"), "visit() no longer adds the browser's own failure after its checks ran, by what they found");
+  assert.equal(v.split("problems.push(...browserTransient").length - 1, 1, "visit() adds the browser's own failure in more than one place, or in none");
+  // `before` counts the view's problems after its load wait and just before its checks: the timeout line is in it, what the checks find is not
+  const counted = v.indexOf("const before = problems.length;");
+  assert.ok(counted > v.indexOf("if (!loaded) problems.push({ kind: \"timeout\"") && counted < checks, "visit() no longer counts the view's problems between its load wait and its checks");
 });
