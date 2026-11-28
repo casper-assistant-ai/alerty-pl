@@ -277,10 +277,24 @@ export async function settle(cdp, sid, { wait = STRIP_WAIT, every = 250 } = {}) 
   }
 }
 
+// The checking browser's own failure, never the site's: Chromium aborts a certificate verification when it replaces its
+// verifier underneath it (CERT_VERIFIER_CHANGED in its net error list: «the certificate verifier changed, so the
+// certificate verification was aborted»), a start-up race of the browser that says nothing about the site's certificate,
+// and one it recovers from itself. On the first view of the run of 28.11 13:26 UTC (#271) that took the main document's
+// first request: the view loaded and filled in after it, and the report filed a network line for it all the same, the
+// only line of that view. visit() keeps such a failure apart and reports it only when the view does not load after it;
+// every other failure of the main document is reported as before. tests/site_check.test.mjs keeps the list.
+export const BROWSER_TRANSIENT = /ERR_CERT_VERIFIER_CHANGED/;
+// ...is that error on the main document's request (its redirect keeps the id): the browser's own, held apart by visit().
+// On any other request the same error is a failed request like any other.
+export const isBrowserTransient = (requestId, docId, errorText) => requestId === docId && BROWSER_TRANSIENT.test(errorText);
+
 async function visit(cdp, sid, page, vp) {
   const problems = [];
   const site = ownOrigins(BASE);
   const pending = new Map();
+  const browserTransient = []; // the browser's own failures of the main document (BROWSER_TRANSIENT), reported only if the view does not load
+  let docId = null; // the main document's request: the first Document of the view, its redirect under the same id
   let loaded = false;
   const handler = (m) => {
     if (m.sessionId !== sid) return;
@@ -294,6 +308,7 @@ async function visit(cdp, sid, page, vp) {
           problems.push({ kind: "console", detail: p.args.map((a) => a.value ?? a.description ?? "").join(" ").slice(0, 300) });
         break;
       case "Network.requestWillBeSent": // a redirect comes again under the same id, with the address it went to
+        if (p.type === "Document" && !docId) docId = p.requestId;
         pending.set(p.requestId, { url: p.request.url, type: p.type });
         if (p.redirectResponse) site.redirected(p.request.url, p.redirectResponse.url);
         break;
@@ -312,6 +327,12 @@ async function visit(cdp, sid, page, vp) {
         // A page that goes away aborts what it was loading, and so does the stream's own reconnect: neither is a
         // failure. The one abort that is: /alerts of the live service, which docs/common.js gives up on after its
         // wait (#229): the service is up and not answering in time.
+        // The browser's own transient error on the main document (BROWSER_TRANSIENT), which it recovers from itself:
+        // held apart, and reported only if the view does not load
+        if (isBrowserTransient(p.requestId, docId, p.errorText)) {
+          browserTransient.push({ kind: "network", detail: `${p.errorText} ${url.slice(0, 200)}`, url: url.slice(0, 200) });
+          break;
+        }
         const gaveUp = url.startsWith(LIVE) && !/\/events$/.test(url) && /ERR_ABORTED/.test(p.errorText);
         if (gaveUp || (!/ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/.test(p.errorText) && !p.canceled))
           problems.push({ kind: site.isOwn(url) ? "network" : "network-3rd", detail: `${gaveUp ? "no answer before the page gave up on the service: " : ""}${p.errorText} ${url.slice(0, 200)}`, url: url.slice(0, 200) });
@@ -326,7 +347,7 @@ async function visit(cdp, sid, page, vp) {
   const t0 = Date.now();
   await cdp.send("Page.navigate", { url }, sid);
   while (!loaded && Date.now() - t0 < 30000) await sleep(100);
-  if (!loaded) problems.push({ kind: "timeout", detail: "page did not load in 30 s" });
+  if (!loaded) problems.push(...browserTransient, { kind: "timeout", detail: "page did not load in 30 s" }); // a view that loaded after the browser's own error is fine; the report then names that error too
   await sleep(SETTLE); // data files and charts load after the load event
   await settle(cdp, sid); // then the strip's own wait, when it is still loading
   for (const [kind, expr] of [["content", COMMON], ["markup", MARKUP], ["content", page.check]]) {
