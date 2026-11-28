@@ -78,9 +78,10 @@ Each agent is one Markdown file in [`.github/workflows/`](.github/workflows/): a
 (when it runs, what it may write) and the job in plain English. `gh aw compile` turns it into a normal
 GitHub Actions workflow. Plain-code workflows around them (site check, CI, the gate, data updates, deploys)
 do everything that needs no judgment. Two files in that folder are not team members: `optimization.md` and
-`optimization-token-optimizer.md` (with `shared/` and `.github/cao/`) are gh-cao's Optimization campaign
-([`optimization/`](optimization/)), an hourly audit that reads the agents' runs and opens an issue with a
-recommendation to save tokens; it changes no code.
+`optimization-token-optimizer.md` (with the control files in `shared/` and `.github/cao/`) are gh-cao's
+Optimization campaign ([`optimization/`](optimization/)), an hourly audit that reads the agents' runs and opens
+an issue with a recommendation to save tokens; it changes no code. One file in `shared/` is the repository's own:
+`zai.md`, the settings every agent imports (the z.ai network allow-list and the token-economizer plugin).
 
 ### Why you can trust it
 

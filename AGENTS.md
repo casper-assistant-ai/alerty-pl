@@ -9,7 +9,7 @@ alerty-pl is a static site: a map of Poland that shows active RCB alerts, like a
 - `scripts/build_gminy.py` builds `docs/geo/gminy.json` (every gmina with its TERYT code and powiat
   id, read by the parser's gazetteer) and `docs/geo/names.json` (the powiat labels the pages show)
   from the GUGiK PRG WFS service. You do not need to run it.
-- `server/` (`app.py`, aiohttp) is the live notification service, deployed by Casper (casper-infra
+- `server/` (`app.py`, aiohttp; `core.py` is its pure logic, stdlib only, tested by `tests/test_live.py`) is the live notification service, deployed by Casper (casper-infra
   `deploy/alerty-api`): it imports `scripts/rcb.py`, polls gov.pl every 20 s, streams each new alert to
   the open pages (Server-Sent Events) and sends Telegram, e-mail and Web Push. `docs/data/` stays the
   fallback and the archive.
