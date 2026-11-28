@@ -15,6 +15,23 @@
  },
  "releases": [
   {
+   "version": null,
+   "date": "2026-11-28",
+   "time": "2026-11-28T14:23:38Z",
+   "sha": "85284b8",
+   "changes": [
+    {
+     "type": "chore",
+     "scope": "process",
+     "breaking": false,
+     "text": "ledger of 11-28: no failed run in 26 h, holes 11 to 15 as gate-skips, re-run rows fixed (#273)",
+     "sha": "85284b8",
+     "date": "2026-11-28",
+     "time": "2026-11-28T14:23:38Z"
+    }
+   ]
+  },
+  {
    "version": "1.31.7",
    "date": "2026-11-27",
    "time": "2026-11-27T19:45:51Z",

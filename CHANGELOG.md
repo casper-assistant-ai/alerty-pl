@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## Unreleased
+
+### chore
+
+- **process:** ledger of 11-28: no failed run in 26 h, holes 11 to 15 as gate-skips, re-run rows fixed (#273) ([85284b8](https://github.com/casper-assistant-ai/alerty-pl/commit/85284b8))
+
 ## 1.31.7 (2026-11-27)
 
 ### fix
