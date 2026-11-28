@@ -91,6 +91,10 @@ const SCAN = `(() => {
     return !el.closest("[hidden], .visually-hidden, .leaflet-pane, .leaflet-tile-container"); };
   const clippedX = (el) => { for (let e = el.parentElement; e && e !== document.body; e = e.parentElement) {
       const o = getComputedStyle(e).overflowX; if (o !== "visible") return true; } return false; };
+  // the scan runs after the load event: a stylesheet whose sheet is null then never came (run() names its
+  // request), and the view is unstyled: every size below would be the browser's default, not the site's
+  const bare = [...document.querySelectorAll('link[rel="stylesheet"]')].filter((l) => !l.sheet).map((l) => l.getAttribute("href"));
+  if (bare.length) return ["stylesheet not applied: " + bare.join(", ") + " (its request failed or did not finish; nothing else can be measured in this view)"];
   if (document.documentElement.scrollWidth > W + 1) p.push("page scrolls sideways: " + document.documentElement.scrollWidth + " px on " + W);
   const all = [...document.body.querySelectorAll("*")].filter((e) => !/^(SCRIPT|STYLE|svg|path|g|rect|line|text|circle|polyline|tspan)$/i.test(e.tagName));
   const out = new Set();
@@ -145,12 +149,25 @@ const CLICKABLES = `[...document.querySelectorAll("button, summary, [role=tab], 
   .filter((el) => { const r = el.getBoundingClientRect(); return r.width && r.height && !el.disabled && !el.closest("[hidden]"); })
   .slice(0, 30).map((el, i) => { el.dataset.auditI = i; return i; })`;
 
+// A stylesheet or a script that did not come leaves the view unstyled or inert, and every size the scan
+// measures is then the browser's default (#271, 28.11 14:22 UTC: one view without style.css, reported as
+// 44 tap-target lines with no address), so such a request is named. An abort is the page giving up on
+// purpose (the live service), as in the site check; tiles, fonts and data stay the site check's.
+const PAGE_FILE = /^(Stylesheet|Script)$/;
+const GIVEN_UP = /ERR_ABORTED|ERR_BLOCKED_BY_CLIENT/;
+
 async function run(cdp, sid, url, vp, problems) {
   let loaded = false;
+  const files = new Map();
   const h = (m) => { if (m.sessionId !== sid) return;
     if (m.method === "Page.loadEventFired") loaded = true;
     if (m.method === "Runtime.exceptionThrown") problems.push({ kind: "exception", detail: (m.params.exceptionDetails.exception?.description || m.params.exceptionDetails.text).split("\n")[0] });
-    if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error") problems.push({ kind: "console", detail: m.params.args.map((a) => a.value ?? a.description ?? "").join(" ").slice(0, 200) }); };
+    if (m.method === "Runtime.consoleAPICalled" && m.params.type === "error") problems.push({ kind: "console", detail: m.params.args.map((a) => a.value ?? a.description ?? "").join(" ").slice(0, 200) });
+    if (m.method === "Network.requestWillBeSent" && PAGE_FILE.test(m.params.type)) files.set(m.params.requestId, m.params.request.url);
+    if (m.method === "Network.responseReceived" && PAGE_FILE.test(m.params.type) && m.params.response.status >= 400)
+      problems.push({ kind: "http", detail: `${m.params.response.status} ${m.params.response.url.slice(0, 200)}` });
+    if (m.method === "Network.loadingFailed" && files.has(m.params.requestId) && !GIVEN_UP.test(m.params.errorText) && !m.params.canceled)
+      problems.push({ kind: "network", detail: `${m.params.errorText} ${files.get(m.params.requestId).slice(0, 200)}` }); };
   cdp.on(h);
   await cdp.send("Page.navigate", { url }, sid);
   const t0 = Date.now(); while (!loaded && Date.now() - t0 < 30000) await sleep(100);
