@@ -288,13 +288,21 @@ test("only the browser's own certificate-verifier error, and only on the main do
   assert.equal(isBrowserTransient(doc, null, CHANGED), false, "before any Document of the view was seen");
 });
 
-test("visit() holds that failure apart and reports it only when the view does not load after it", () => {
+test("visit() holds that failure apart and reports it when the view does not load or its checks find something", () => {
   const v = src.slice(src.indexOf("async function visit("), src.indexOf("// The HTML of each page"));
   const wired = (code) => assert.ok(v.includes(code), "visit() no longer has: " + code);
   wired('if (p.type === "Document" && !docId) docId = p.requestId;'); // the main document: the first Document of the view
   wired("if (isBrowserTransient(p.requestId, docId, p.errorText)) {"); // before the rule of every other failure
   wired("browserTransient.push({ kind: \"network\""); // held apart, not among the view's problems
-  // the held failures reach the report only with the timeout line of a view that did not load
-  const held = v.indexOf("if (!loaded) problems.push(...browserTransient, { kind: \"timeout\"");
-  assert.ok(held > v.indexOf("await cdp.send(\"Page.navigate\"") && held < v.indexOf("await sleep(SETTLE);"), "visit() no longer adds the browser's own failure to a view that did not load, before its checks");
+  // The held failures reach the report in one place, read after the checks ran: when the view did not load, or when its
+  // checks found something. Page.loadEventFired fires for the browser's error page too, so `loaded` alone would drop the
+  // line from a view that really failed on this error; only a view that loaded and passed its checks keeps it out.
+  const checks = v.indexOf("for (const [kind, expr] of [[\"content\", COMMON], [\"markup\", MARKUP], [\"content\", page.check]]) {");
+  const held = v.indexOf("if (!loaded || problems.length > before) problems.push(...browserTransient);");
+  assert.ok(checks >= 0, "visit() no longer has its checks loop");
+  assert.ok(held > checks && held < v.indexOf("for (const { url, type } of pending.values())"), "visit() no longer adds the browser's own failure after its checks ran, by what they found");
+  assert.equal(v.split("problems.push(...browserTransient").length - 1, 1, "visit() adds the browser's own failure in more than one place, or in none");
+  // `before` counts the view's problems after its load wait and just before its checks: the timeout line is in it, what the checks find is not
+  const counted = v.indexOf("const before = problems.length;");
+  assert.ok(counted > v.indexOf("if (!loaded) problems.push({ kind: \"timeout\"") && counted < checks, "visit() no longer counts the view's problems between its load wait and its checks");
 });

@@ -282,8 +282,9 @@ export async function settle(cdp, sid, { wait = STRIP_WAIT, every = 250 } = {}) 
 // certificate verification was aborted»), a start-up race of the browser that says nothing about the site's certificate,
 // and one it recovers from itself. On the first view of the run of 28.11 13:26 UTC (#271) that took the main document's
 // first request: the view loaded and filled in after it, and the report filed a network line for it all the same, the
-// only line of that view. visit() keeps such a failure apart and reports it only when the view does not load after it;
-// every other failure of the main document is reported as before. tests/site_check.test.mjs keeps the list.
+// only line of that view. visit() keeps such a failure apart and reports it when the view does not load after it or its
+// checks find something (the browser's error page fires the load event too); every other failure of the main document is
+// reported as before. tests/site_check.test.mjs keeps the list.
 export const BROWSER_TRANSIENT = /ERR_CERT_VERIFIER_CHANGED/;
 // ...is that error on the main document's request (its redirect keeps the id): the browser's own, held apart by visit().
 // On any other request the same error is a failed request like any other.
@@ -293,7 +294,7 @@ async function visit(cdp, sid, page, vp) {
   const problems = [];
   const site = ownOrigins(BASE);
   const pending = new Map();
-  const browserTransient = []; // the browser's own failures of the main document (BROWSER_TRANSIENT), reported only if the view does not load
+  const browserTransient = []; // the browser's own failures of the main document (BROWSER_TRANSIENT), reported when the view does not load or its checks find something
   let docId = null; // the main document's request: the first Document of the view, its redirect under the same id
   let loaded = false;
   const handler = (m) => {
@@ -328,7 +329,7 @@ async function visit(cdp, sid, page, vp) {
         // failure. The one abort that is: /alerts of the live service, which docs/common.js gives up on after its
         // wait (#229): the service is up and not answering in time.
         // The browser's own transient error on the main document (BROWSER_TRANSIENT), which it recovers from itself:
-        // held apart, and reported only if the view does not load
+        // held apart, and reported when the view does not load or its checks find something
         if (isBrowserTransient(p.requestId, docId, p.errorText)) {
           browserTransient.push({ kind: "network", detail: `${p.errorText} ${url.slice(0, 200)}`, url: url.slice(0, 200) });
           break;
@@ -347,14 +348,20 @@ async function visit(cdp, sid, page, vp) {
   const t0 = Date.now();
   await cdp.send("Page.navigate", { url }, sid);
   while (!loaded && Date.now() - t0 < 30000) await sleep(100);
-  if (!loaded) problems.push(...browserTransient, { kind: "timeout", detail: "page did not load in 30 s" }); // a view that loaded after the browser's own error is fine; the report then names that error too
+  if (!loaded) problems.push({ kind: "timeout", detail: "page did not load in 30 s" });
   await sleep(SETTLE); // data files and charts load after the load event
   await settle(cdp, sid); // then the strip's own wait, when it is still loading
+  const before = problems.length; // the view's problems before its checks ran
   for (const [kind, expr] of [["content", COMMON], ["markup", MARKUP], ["content", page.check]]) {
     const r = await cdp.send("Runtime.evaluate", { expression: expr, returnByValue: true }, sid);
     if (r.exceptionDetails) problems.push({ kind: "check", detail: "check failed: " + r.exceptionDetails.text });
     else for (const d of r.result.value || []) problems.push({ kind, detail: d });
   }
+  // The browser's own failure of the main document, held apart above, reaches the report when the view did not load or
+  // when its checks found something: Page.loadEventFired fires for the browser's error page too, so `loaded` alone does
+  // not say the view is fine, and a view that really failed on this error must keep the line that names its cause. Only
+  // a view that loaded and passed its checks drops the line.
+  if (!loaded || problems.length > before) problems.push(...browserTransient);
   // What the page was still waiting for when its checks ran: a data file that has not answered is why a list is
   // empty or a strip still says «Ładowanie…», and without its address the report names nothing (#229). The
   // stream of the live service stays open by design; tiles and fonts are what the page checks look at.
