@@ -15,11 +15,29 @@
  },
  "releases": [
   {
-   "version": null,
+   "version": "1.31.8",
    "date": "2026-11-28",
-   "time": "2026-11-28T14:23:38Z",
-   "sha": "85284b8",
+   "time": "2026-11-28T15:08:56Z",
+   "sha": "a3eca74",
    "changes": [
+    {
+     "type": "fix",
+     "scope": "site",
+     "breaking": false,
+     "text": "hold the browser's own ERR_CERT_VERIFIER_CHANGED apart in the site check (#274)",
+     "sha": "a3eca74",
+     "date": "2026-11-28",
+     "time": "2026-11-28T15:08:56Z"
+    },
+    {
+     "type": "docs",
+     "scope": "site",
+     "breaking": false,
+     "text": "name server/core.py and shared/zai.md in the notes (#275)",
+     "sha": "4748c4f",
+     "date": "2026-11-28",
+     "time": "2026-11-28T15:08:27Z"
+    },
     {
      "type": "chore",
      "scope": "process",

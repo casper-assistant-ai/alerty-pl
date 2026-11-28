@@ -2,7 +2,15 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
-## Unreleased
+## 1.31.8 (2026-11-28)
+
+### fix
+
+- **site:** hold the browser's own ERR_CERT_VERIFIER_CHANGED apart in the site check (#274) ([a3eca74](https://github.com/casper-assistant-ai/alerty-pl/commit/a3eca74))
+
+### docs
+
+- **site:** name server/core.py and shared/zai.md in the notes (#275) ([4748c4f](https://github.com/casper-assistant-ai/alerty-pl/commit/4748c4f))
 
 ### chore
 
