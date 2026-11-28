@@ -2,6 +2,12 @@
 
 Built by `scripts/changelog.py` from [Conventional Commits](https://www.conventionalcommits.org) and the version tags; versions follow [semver](https://semver.org). Do not edit by hand.
 
+## 1.31.9 (2026-11-28)
+
+### fix
+
+- **site:** name a missing stylesheet in the mobile audit instead of its tap-target lines (#276) ([87d63af](https://github.com/casper-assistant-ai/alerty-pl/commit/87d63af))
+
 ## 1.31.8 (2026-11-28)
 
 ### fix
